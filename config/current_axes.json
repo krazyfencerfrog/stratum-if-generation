@@ -1,323 +1,354 @@
 {
     "axis_categories":
     [
-	{
-	    "name": "diegetic",
-	    "description": "what the world of the story is",
-	    "axes":
-	    [
-		{
-		    "name": "spatial setting",
-		    "description": "",
-		    "examples": "frontier,urban,rural,institutional(work,school,...)"
-		},
-		{
-		    "name": "temporal setting",
-		    "description": "",
-		    "examples": "deep past,historical/specific,period/recent,contemporary,near future"
-		},
-		{
-		    "name": "ontology/physics",
-		    "description": "",
-		    "examples": "mundane realism,hard science fiction,supernatural intrusion,high fantasy"
-		},
-		{
-		    "name": "cosmology/meta-physics",
-		    "description": "",
-		    "examples": "no higher order,prvidential,fated,karmic"
-		},
-		{
-		    "name": "scale of stakes",
-		    "description": "",
-		    "examples": "internal/psycological,interpersonal,familial,communal,national"
-		},
-		{
-		    "name": "milieu/social world",
-		    "description": "",
-		    "examples": "criminal underworld,high society,sports,legal"
-		},
-		{
-		    "name": "technological texture",
-		    "description": "",
-		    "examples": "pre-industrial,industrial,information-age,post-scarcity"
-		},
-		{
-		    "name": "threat source",
-		    "description": "",
-		    "examples": "human antagonistic,institution/system,nature/environment,creature,disease,time"
-		},
-		{
-		    "name": "spacial confinement",
-		    "description": "",
-		    "examples": "open roaming,journey linear,bounded arena,single location,trapped"
-		}
-	    ]
-	},
-	{
-	    "name": "thematic",
-	    "description": "how the story is about (abstracted)",
-	    "axes":
-	    [
-		{
-		    "name": "core thematic axis",
-		    "description": "",
-		    "examples": "order vs chaos, civilization vs wilderness, appearance vs reality"
-		},
-		{
-		    "name": "ideological stance",
-		    "description": "",
-		    "examples": "conservative/restorative,liberal/reformist,radical,reactionary"
-		},
-		{
-		    "name": "views of institutions",
-		    "description": "",
-		    "examples": "trustworthy,corrupt but flexible,irreemable,absent"
-		},
-		{
-		    "name": "views of violence",
-		    "description": "",
-		    "examples": "heroic/cathartic,regrettable/neccessary,corrosive,absurd"
-		},
-		{
-		    "name": "view of history/fate",
-		    "description": "",
-		    "examples": "progress,cyclical,decline,providential"
-		}
-	    ]
-	},
-	{
-	    "name": "structural",
-	    "description": "how the story is shaped",
-	    "axes":
-	    [
-		{
-		    "name": "plot architecture",
-		    "description": "",
-		    "examples": "quest,investigation,caper,escape,rise/fall"
-		},
-		{
-		    "name": "conflict type",
-		    "description": "",
-		    "examples": "vs person, nature, society, fate"
-		},
-		{
-		    "name": "epistemic distribution",
-		    "description": "",
-		    "examples": "audience > characters, audience = characters (mystery), audience < characters (untrustworthy narrator)"
-		},
-		{
-		    "name": "goal clarity",
-		    "description": "",
-		    "examples": ""
-		},
-		{
-		    "name": "causality",
-		    "description": "",
-		    "examples": "tight cause vs effect,episodic,coincidental,cyclical"
-		},
-		{
-		    "name": "closure",
-		    "description": "",
-		    "examples": "restorative,tragic,pyrrhic,anti-climatic,ambiguous"
-		},
-		{
-		    "name": "temporal structure",
-		    "description": "",
-		    "examples": "linear,framed,braided,real-time,elliptical,looped"
-		},
-		{
-		    "name": "protaganist configuration",
-		    "description": "",
-		    "examples": "lone,duo-buddy,duo-adversarial,ensemble convergent,antagonist pov,community as protaganist"
-		},
-		{
-		    "name": "agency",
-		    "description": "",
-		    "examples": "hyper confident,competancy tested,everyman,powerless,self-destructive"
-		},
-		{
-		    "name": "rules foregrounding",
-		    "description": "",
-		    "examples": "mastering an explicit ruleset vs rules are background"
-		}
-	    ]
-	},
-	{
-	    "name": "affective",
-	    "description": "how the story makes you feel",
-	    "axes":
-	    [
-		{
-		    "name": "primary affect",
-		    "description": "",
-		    "examples": "fear,dread,laughter,awe,arousal,grief,tension"
-		},
-		{
-		    "name": "affect trajectory",
-		    "description": "",
-		    "examples": "sustained,escalating,oscillating,bait-and-switch,relentless"
-		},
-		{
-		    "name": "tone/register",
-		    "description": "",
-		    "examples": "earnest vs ironc,sincere vs camp,grim vs light"
-		},
-		{
-		    "name": "moral valence",
-		    "description": "",
-		    "examples": "clear good vs evil,grey all around,amoral,nihilistic,didectic"
-		},
-		{
-		    "name": "identification target",
-		    "description": "",
-		    "examples": "hero,victim,perpetrator,bystander"
-		},
-		{
-		    "name": "somatic address",
-		    "description": "",
-		    "examples": "cerebral,emotional,visceral,sensual"
-		},
-		{
-		    "name": "distance",
-		    "description": "",
-		    "examples": "immersive,observational,alienated"
-		},
-		{
-		    "name": "transgression level",
-		    "description": "",
-		    "examples": "comfort affirming,mildly challenging,deliberately offensive"
-		}		
-	    ]
-	},
-	{
-	    "name": "formal",
-	    "description": "how the story is made and looks/sounds",
-	    "axes":
-	    [
-		{
-		    "name": "medium/mode",
-		    "description": "",
-		    "examples": "live action,animation,musical,interactive"
-		},
-		{
-		    "name": "verisimilitude of style",
-		    "description": "",
-		    "examples": "photorealistic,theatrical,abstract,cartoon"
-		},
-		{
-		    "name": "iconography",
-		    "description": "",
-		    "examples": "six shooters and horses,neon and rain"
-		},
-		{
-		    "name": "visual palette",
-		    "description": "",
-		    "examples": "high key,low key,desaturated,monochrome"
-		},
-		{
-		    "name": "camera/staging grammar",
-		    "description": "",
-		    "examples": "long takes,montage,subjective pov"
-		},
-		{
-		    "name": "sound design/score idiom",
-		    "description": "",
-		    "examples": "orchestral"
-		},
-		{
-		    "name": "language register",
-		    "description": "",
-		    "examples": "vernaculer,stylized,archaic,minimalist"
-		},
-		{
-		    "name": "narration",
-		    "description": "",
-		    "examples": "dramatic/shown,epistolary,omniscient,direct told"
-		},
-		{
-		    "name": "pacing/density",
-		    "description": "",
-		    "examples": "contemplative,procedural,propulsive,frenetic,rythmic"
-		},
-		{
-		    "name": "length/unit",
-		    "description": "",
-		    "examples": "short,feature,serial-episodic,serial-arc,open-ended"
-		},
-		{
-		    "name": "violence explicitness",
-		    "description": "",
-		    "examples": "none,implied,stylized,graphic"
-		},
-		{
-		    "name": "sexual explicitness",
-		    "description": "",
-		    "examples": "none,implied,stylized,graphic"
-		},
-		{
-		    "name": "reflexivity",
-		    "description": "",
-		    "examples": "transparent,self aware,parody,meta-fiction"
-		}		
-	    ]
-	},
-	{
-	    "name": "extra-textual",
-	    "description": "how the story sits in the (real) world",
-	    "axes":
-	    [
-		{
-		    "name": "target audience",
-		    "description": "",
-		    "examples": "family,teen,scholarly"
-		},
-		{
-		    "name": "function/use context",
-		    "description": "",
-		    "examples": "entertainment,award,educational,provocative"
-		},
-		{
-		    "name": "production tier",
-		    "description": "",
-		    "examples": "no budget,b-movie,mid budget"
-		},
-		{
-		    "name": "distribution/venue",
-		    "description": "",
-		    "examples": "theatrical event,broadcast,web,book"
-		},
-		{
-		    "name": "corpus lineage/intertext",
-		    "description": "",
-		    "examples": "founding text imitation,revisionist,parody"
-		},
-		{
-		    "name": "national/regional tradition",
-		    "description": "",
-		    "examples": "k-drama,telenovella,hollywood"
-		},
-		{
-		    "name": "star/auteur persona",
-		    "description": "",
-		    "examples": "vehicle for X,house style of Y"
-		},
-		{
-		    "name": "cultural moment",
-		    "description": "",
-		    "examples": "pre-code,post-war"
-		},
-		{
-		    "name": "relation to reality",
-		    "description": "",
-		    "examples": "pure fiction,based on true story,docudrama"
-		},
-		{
-		    "name": "franchise position",
-		    "description": "",
-		    "examples": "standalone,origin,sequel,prequel,reboot"
-		}		
-	    ]
-	}
+        {
+            "name": "diegetic",
+            "description": "The objective properties of the story's world — setting, physics, and stakes, independent of how the story about it is told.",
+            "axes":
+            [
+                {
+                    "name": "spatial setting",
+                    "description": "The geographic and social type of place the story unfolds in.",
+                    "examples": ["frontier", "urban", "suburban", "rural", "wilderness", "institutional (school, hospital, workplace)", "domestic", "maritime/at sea", "otherworldly/alien"]
+                },
+                {
+                    "name": "temporal setting",
+                    "description": "Where the story sits on the timeline from historical to speculative.",
+                    "examples": ["deep past/prehistoric", "historical/specific era", "period/recent past", "contemporary", "near future", "far future", "post-apocalyptic", "alternate history"]
+                },
+                {
+                    "name": "ontology/physics",
+                    "description": "How far the world's physical rules depart from consensus reality.",
+                    "examples": ["mundane realism", "hard science fiction", "soft science fiction", "supernatural intrusion (one crack in an otherwise normal world)", "high fantasy (fully alternate physics)", "surreal/dreamlike logic"]
+                },
+                {
+                    "name": "cosmology/meta-physics",
+                    "description": "Whether the story implies a moral order behind events — a universe that rewards and punishes, or an indifferent one.",
+                    "examples": ["no higher order/indifferent universe", "providential (benevolent design)", "fated/predestined", "karmic (actions return in kind)", "malevolent/hostile cosmos"]
+                },
+                {
+                    "name": "scale of stakes",
+                    "description": "The largest scope of consequence the plot threatens or promises, from a character's inner life up to civilization-wide.",
+                    "examples": ["internal/psychological", "interpersonal", "familial", "communal/local", "national", "civilizational", "cosmic/existential"]
+                },
+                {
+                    "name": "milieu/social world",
+                    "description": "The specific subculture or institutional world the story is embedded in, which supplies its texture, jargon, and norms.",
+                    "examples": ["criminal underworld", "high society", "sports", "legal/courtroom", "military", "academia", "medicine", "show business", "religious community"]
+                },
+                {
+                    "name": "technological texture",
+                    "description": "The prevailing level and character of technology available to characters in the world.",
+                    "examples": ["pre-industrial", "industrial", "information-age", "near-future speculative", "post-scarcity", "anachronistic/mixed (e.g. steampunk)"]
+                },
+                {
+                    "name": "threat source",
+                    "description": "Where the story's central danger originates in the world itself — the diegetic 'who or what.' Compare to the structural axis 'conflict type,' which frames that same threat in narrative terms (person vs. X).",
+                    "examples": ["human antagonist", "institution/system", "nature/environment", "creature/monster", "disease/contagion", "the self (internal)", "time/decay", "the supernatural/unknown"]
+                },
+                {
+                    "name": "spatial confinement",
+                    "description": "How much the world's geography constrains where the story can physically go.",
+                    "examples": ["open roaming", "linear journey", "bounded arena", "single location", "trapped/locked-room", "branching map"]
+                }
+            ]
+        },
+        {
+            "name": "thematic",
+            "description": "What the story is about, in the abstract — the ideas and values it dramatizes.",
+            "axes":
+            [
+                {
+                    "name": "core thematic axis",
+                    "description": "The central binary tension the story dramatizes and ultimately takes (or refuses to take) a position on.",
+                    "examples": ["order vs chaos", "civilization vs wilderness", "appearance vs reality", "individual vs community", "freedom vs security", "tradition vs progress", "fate vs free will"]
+                },
+                {
+                    "name": "ideological stance",
+                    "description": "The political/social posture the story's resolution implies toward the existing order.",
+                    "examples": ["conservative/restorative", "liberal/reformist", "radical/revolutionary", "reactionary", "apolitical/neutral"]
+                },
+                {
+                    "name": "views of institutions",
+                    "description": "How the story portrays organized authority — governments, corporations, churches, police.",
+                    "examples": ["trustworthy", "corrupt but reformable", "irredeemable", "absent/irrelevant", "well-intentioned but incompetent"]
+                },
+                {
+                    "name": "views of violence",
+                    "description": "The moral framing the story assigns to violent acts within it.",
+                    "examples": ["heroic/cathartic", "regrettable but necessary", "corrosive/traumatic", "absurd/darkly comic", "glorified/spectacle"]
+                },
+                {
+                    "name": "view of history/fate",
+                    "description": "The story's implicit theory of how time and events unfold.",
+                    "examples": ["progress (things improve)", "cyclical (patterns repeat)", "decline (things worsen)", "providential (guided by higher purpose)", "contingent/random"]
+                }
+            ]
+        },
+        {
+            "name": "structural",
+            "description": "How the story is built — the mechanics of plot, cast, and time that shape it.",
+            "axes":
+            [
+                {
+                    "name": "plot architecture",
+                    "description": "The overall template or shape the plot follows.",
+                    "examples": ["quest", "investigation/mystery", "caper/heist", "escape", "rise and fall", "revenge", "coming-of-age", "survival", "romance"]
+                },
+                {
+                    "name": "conflict type",
+                    "description": "The classic literary category of opposing force the protagonist struggles against. Compare to the diegetic axis 'threat source,' which names the specific in-world origin of that force.",
+                    "examples": ["person vs person", "person vs nature", "person vs society", "person vs self", "person vs fate/god", "person vs technology"]
+                },
+                {
+                    "name": "epistemic distribution",
+                    "description": "Who knows what — the relative information held by the audience versus the characters.",
+                    "examples": ["audience > characters (dramatic irony)", "audience = characters (discovery together, e.g. mystery)", "audience < characters (unreliable or withholding narrator)"]
+                },
+                {
+                    "name": "goal clarity",
+                    "description": "How explicit and fixed the protagonist's objective is over the course of the story.",
+                    "examples": ["single explicit goal", "evolving/shifting goal", "multiple competing goals", "goal discovered late", "no clear goal (drift/aimless)"]
+                },
+                {
+                    "name": "causality",
+                    "description": "How tightly plot events are bound together by cause and effect.",
+                    "examples": ["tight cause-and-effect chain", "episodic (loosely connected incidents)", "coincidental", "cyclical (events repeat)", "overdetermined (multiple converging causes)"]
+                },
+                {
+                    "name": "closure",
+                    "description": "The emotional and moral shape of the ending.",
+                    "examples": ["restorative (order regained)", "tragic", "pyrrhic (victory at great cost)", "anti-climactic", "ambiguous/open", "bittersweet"]
+                },
+                {
+                    "name": "temporal structure",
+                    "description": "How the story orders and presents time to the audience, as distinct from the diegetic 'temporal setting' (when the story takes place).",
+                    "examples": ["linear", "framed (story within a story)", "braided (parallel timelines)", "real-time", "elliptical (gaps/jumps)", "looped (repeating time)", "reverse chronology"]
+                },
+                {
+                    "name": "protagonist configuration",
+                    "description": "The number and relational structure of the story's central character(s).",
+                    "examples": ["lone protagonist", "duo/buddy", "duo/adversarial", "ensemble/convergent", "antagonist POV", "community-as-protagonist"]
+                },
+                {
+                    "name": "agency",
+                    "description": "How much control and competence the protagonist exercises over events.",
+                    "examples": ["hyper-confident/exceptional", "competency tested/growing", "everyman/ordinary", "powerless/acted-upon", "self-destructive/own worst enemy"]
+                },
+                {
+                    "name": "rules foregrounding",
+                    "description": "How visible and explicit the story's internal rule system (magic system, game, law, procedure) is made to the audience.",
+                    "examples": ["explicit ruleset the audience masters (hard magic, game rules)", "rules present but backgrounded (soft magic, atmosphere over mechanics)", "no formal rule system"]
+                }
+            ]
+        },
+        {
+            "name": "affective",
+            "description": "How the story makes the audience feel, moment to moment and overall.",
+            "axes":
+            [
+                {
+                    "name": "primary affect",
+                    "description": "The dominant emotional experience the story is designed to produce.",
+                    "examples": ["fear", "dread", "laughter", "awe/wonder", "arousal", "grief", "tension/suspense", "comfort/warmth", "anger"]
+                },
+                {
+                    "name": "affect trajectory",
+                    "description": "How the intended emotion changes in intensity over the course of the story.",
+                    "examples": ["sustained (steady level)", "escalating", "oscillating", "bait-and-switch", "relentless (no relief)", "cathartic release at the end"]
+                },
+                {
+                    "name": "tone/register",
+                    "description": "The story's attitude toward its own material — sincere or knowing, light or heavy. Distinct from the formal axis 'language register,' which covers word choice and diction rather than attitude.",
+                    "examples": ["earnest vs ironic", "sincere vs camp", "grim vs light", "wholesome vs edgy"]
+                },
+                {
+                    "name": "moral valence",
+                    "description": "How clearly the story sorts characters and actions into good and bad.",
+                    "examples": ["clear good vs evil", "grey/morally ambiguous throughout", "amoral (no moral frame offered)", "nihilistic", "didactic (explicit moral lesson)"]
+                },
+                {
+                    "name": "identification target",
+                    "description": "Whose perspective the audience is invited to emotionally align with.",
+                    "examples": ["hero", "victim", "perpetrator", "bystander", "multiple/shifting"]
+                },
+                {
+                    "name": "somatic address",
+                    "description": "What register of bodily or mental response the story primarily targets.",
+                    "examples": ["cerebral (puzzle, ideas)", "emotional (heart)", "visceral (gut, adrenaline)", "sensual (physical/sensory pleasure)"]
+                },
+                {
+                    "name": "distance",
+                    "description": "How close the story invites the audience to feel to the events, versus preserving a sense of separation. Distinct from 'epistemic distribution,' which is about information rather than feeling.",
+                    "examples": ["immersive/close", "observational/detached", "alienated/estranged"]
+                },
+                {
+                    "name": "transgression level",
+                    "description": "How much the story pushes against audience comfort or social norms.",
+                    "examples": ["comfort-affirming", "mildly challenging", "provocative", "deliberately taboo-breaking"]
+                }
+            ]
+        },
+        {
+            "name": "formal",
+            "description": "How the story is made and encountered — its craft choices and surface texture. For a text/IF engine, treat film-derived terms (camera, sound design) as their prose equivalents, noted below.",
+            "axes":
+            [
+                {
+                    "name": "medium/mode",
+                    "description": "The delivery format the text takes. Kept broad in case the engine ever generates hybrid or non-prose forms.",
+                    "examples": ["prose fiction", "interactive/branching text", "epistolary (letters, logs, texts)", "screenplay-style", "dialogue-only/script"]
+                },
+                {
+                    "name": "verisimilitude of style",
+                    "description": "How closely the prose's rendering of reality mimics real-world texture versus stylizing or abstracting it.",
+                    "examples": ["photorealistic/naturalistic detail", "theatrical/heightened", "abstract/impressionistic", "cartoonish/exaggerated"]
+                },
+                {
+                    "name": "iconography",
+                    "description": "The recurring concrete objects and images that signal genre and setting at a glance.",
+                    "examples": ["six-shooters and horses (western)", "neon and rain (cyberpunk noir)", "candlelight and stone (gothic)", "chrome and glass (near-future corporate)"]
+                },
+                {
+                    "name": "sensory palette",
+                    "description": "The dominant sensory quality of the prose's descriptive imagery — its 'color' in the reader's mind's eye. (Renamed from 'visual palette' since a text medium engages more than sight.)",
+                    "examples": ["high-key/bright", "low-key/shadowed", "desaturated/muted", "monochrome", "richly saturated"]
+                },
+                {
+                    "name": "scene staging/focalization",
+                    "description": "The prose equivalent of camera grammar: how scenes are staged and framed — close, intimate description versus wide, panoramic scene-setting, and how often the 'lens' cuts versus lingers. (Renamed from 'camera/staging grammar.')",
+                    "examples": ["long, lingering scenes", "quick-cut/montage pacing between scenes", "close subjective focalization (inside one head)", "wide/panoramic scene-setting"]
+                },
+                {
+                    "name": "soundscape idiom",
+                    "description": "The auditory texture evoked through prose description — ambient sound, described music. Largely optional for a pure-text engine; more relevant if audio or voice output is ever added. (Renamed from 'sound design/score idiom.')",
+                    "examples": ["orchestral/cinematic", "diegetic ambient noise only", "silence/sparse", "music as a recurring motif", "not applicable (silent medium)"]
+                },
+                {
+                    "name": "language diction",
+                    "description": "The diction and formality of the prose itself — the vocabulary and sentence texture the reader encounters. Distinct from the affective axis 'tone/register,' which is about attitude rather than word choice.",
+                    "examples": ["vernacular/colloquial", "stylized/literary", "archaic", "minimalist/spare", "purple/ornate", "technical/jargon-heavy"]
+                },
+                {
+                    "name": "narration",
+                    "description": "The point of view and mode of address used to tell the story.",
+                    "examples": ["first person", "close third/limited", "omniscient", "epistolary (letters, diary, logs)", "second person ('you')", "unreliable narrator"]
+                },
+                {
+                    "name": "pacing/density",
+                    "description": "The rhythm and information-density of the prose as experienced moment to moment.",
+                    "examples": ["contemplative/slow", "procedural/methodical", "propulsive/page-turner", "frenetic", "rhythmic/lyrical"]
+                },
+                {
+                    "name": "length/unit",
+                    "description": "The intended overall size and release format of the piece.",
+                    "examples": ["short story/vignette", "novella", "feature-length/novel", "serial-episodic (standalone episodes)", "serial-arc (continuing story)", "open-ended/persistent"]
+                },
+                {
+                    "name": "violence explicitness",
+                    "description": "How graphically violence is depicted on the page.",
+                    "examples": ["none", "implied/off-page", "stylized", "graphic/detailed"]
+                },
+                {
+                    "name": "sexual explicitness",
+                    "description": "How graphically sexual content is depicted on the page.",
+                    "examples": ["none", "implied/off-page", "stylized/suggestive", "graphic/detailed"]
+                },
+                {
+                    "name": "reflexivity",
+                    "description": "How aware the text is of its own status as a constructed story.",
+                    "examples": ["transparent (no acknowledgment)", "self-aware (light winks to the reader)", "parody", "full meta-fiction (breaks the fourth wall)"]
+                }
+            ]
+        },
+        {
+            "name": "extra-textual",
+            "description": "How the story situates itself relative to the real world — its audience, tradition, and context of production.",
+            "axes":
+            [
+                {
+                    "name": "target audience",
+                    "description": "The intended readership by age and sophistication.",
+                    "examples": ["children", "family/all-ages", "teen/YA", "adult", "scholarly/niche"]
+                },
+                {
+                    "name": "function/use context",
+                    "description": "The primary purpose the piece is meant to serve beyond the story itself.",
+                    "examples": ["pure entertainment", "awards/prestige-oriented", "educational", "provocative/discourse-generating", "therapeutic/reflective", "commercial/tie-in"]
+                },
+                {
+                    "name": "production tier",
+                    "description": "The implied scale of resources and craft behind the piece — mainly a flavor and tone signal for a text generator rather than a literal budget.",
+                    "examples": ["no-budget/amateur", "b-movie/pulp", "mid-budget/competent genre work", "prestige/lavish"]
+                },
+                {
+                    "name": "distribution/venue",
+                    "description": "Where and how the piece is imagined to reach its audience.",
+                    "examples": ["theatrical/event release", "broadcast/serialized", "web/self-published", "book/print", "interactive game release"]
+                },
+                {
+                    "name": "corpus lineage/intertext",
+                    "description": "The piece's relationship to a prior tradition or specific influential works it is responding to.",
+                    "examples": ["founding-text imitation (homage)", "revisionist (subverts the tradition)", "parody", "genre-blind (unaware of its own tradition)"]
+                },
+                {
+                    "name": "national/regional tradition",
+                    "description": "The storytelling tradition and convention set the piece draws its structure and sensibility from.",
+                    "examples": ["k-drama", "telenovela", "hollywood blockbuster", "british realism", "japanese light novel", "russian literary tradition"]
+                },
+                {
+                    "name": "star/auteur persona",
+                    "description": "Whether the piece is built as a vehicle for a signature voice or persona. For a generative engine, express this as an archetype rather than naming a real person.",
+                    "examples": ["vehicle for a charismatic archetype (e.g. wisecracking action lead)", "house style of a genre-auteur archetype (e.g. moody neo-noir stylist)", "no persona-driven framing"]
+                },
+                {
+                    "name": "cultural moment",
+                    "description": "The real-world cultural or historical backdrop the piece is implicitly conversing with.",
+                    "examples": ["pre-code/transgressive era", "post-war anxiety", "cold war paranoia", "post-9/11", "post-pandemic", "current/contemporary zeitgeist"]
+                },
+                {
+                    "name": "relation to reality",
+                    "description": "How the piece frames its own truth-claim relative to real events.",
+                    "examples": ["pure fiction", "based on a true story", "docudrama", "alternate history", "roman à clef"]
+                },
+                {
+                    "name": "franchise position",
+                    "description": "Where the piece sits relative to other installments in a series.",
+                    "examples": ["standalone", "origin story", "sequel", "prequel", "reboot", "spin-off", "shared-universe entry"]
+                }
+            ]
+        },
+        {
+            "name": "interactivity",
+            "description": "How the audience acts on and within the story.",
+            "axes":
+            [
+                {
+                    "name": "branching structure",
+                    "description": "The shape of the choice graph the player moves through.",
+                    "examples": ["linear with cosmetic choices", "branch-and-bottleneck (diverges then rejoins)", "fully branching tree", "open/hub-and-spoke", "simulation/state-based (no fixed graph)"]
+                },
+                {
+                    "name": "choice granularity",
+                    "description": "How frequently, and at what scale, the player is asked to make decisions.",
+                    "examples": ["scene-level choices only", "frequent small choices", "dialogue-tree driven", "stat/resource management choices", "free-text parser input"]
+                },
+                {
+                    "name": "player-protagonist relationship",
+                    "description": "How the player relates to the character(s) they control.",
+                    "examples": ["silent self-insert avatar", "defined character with their own voice", "party/multiple controllable characters", "god-game/observer role"]
+                },
+                {
+                    "name": "failure & consequence model",
+                    "description": "How the story handles player mistakes or 'bad' choices.",
+                    "examples": ["no fail state (all paths are valid)", "soft fail (setbacks, story continues)", "hard fail/death with retry", "permadeath, no retry", "consequences accumulate silently (delayed payoff)"]
+                },
+                {
+                    "name": "ending multiplicity",
+                    "description": "How many distinct endings the branching structure produces and how they relate to each other.",
+                    "examples": ["single ending, choices affect texture only", "a few (2-4) meaningfully distinct endings", "many endings on a spectrum (best to worst)", "combinatorial/many small variations", "open-ended/no true ending"]
+                }
+            ]
+        }
     ]
 }
-    
