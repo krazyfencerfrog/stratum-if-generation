@@ -1,0 +1,323 @@
+{
+    "axis_categories":
+    [
+	{
+	    "name": "diegetic",
+	    "description": "what the world of the story is",
+	    "axes":
+	    [
+		{
+		    "name": "spatial setting",
+		    "description": "",
+		    "examples": "frontier,urban,rural,institutional(work,school,...)"
+		},
+		{
+		    "name": "temporal setting",
+		    "description": "",
+		    "examples": "deep past,historical/specific,period/recent,contemporary,near future"
+		},
+		{
+		    "name": "ontology/physics",
+		    "description": "",
+		    "examples": "mundane realism,hard science fiction,supernatural intrusion,high fantasy"
+		},
+		{
+		    "name": "cosmology/meta-physics",
+		    "description": "",
+		    "examples": "no higher order,prvidential,fated,karmic"
+		},
+		{
+		    "name": "scale of stakes",
+		    "description": "",
+		    "examples": "internal/psycological,interpersonal,familial,communal,national"
+		},
+		{
+		    "name": "milieu/social world",
+		    "description": "",
+		    "examples": "criminal underworld,high society,sports,legal"
+		},
+		{
+		    "name": "technological texture",
+		    "description": "",
+		    "examples": "pre-industrial,industrial,information-age,post-scarcity"
+		},
+		{
+		    "name": "threat source",
+		    "description": "",
+		    "examples": "human antagonistic,institution/system,nature/environment,creature,disease,time"
+		},
+		{
+		    "name": "spacial confinement",
+		    "description": "",
+		    "examples": "open roaming,journey linear,bounded arena,single location,trapped"
+		}
+	    ]
+	},
+	{
+	    "name": "thematic",
+	    "description": "how the story is about (abstracted)",
+	    "axes":
+	    [
+		{
+		    "name": "core thematic axis",
+		    "description": "",
+		    "examples": "order vs chaos, civilization vs wilderness, appearance vs reality"
+		},
+		{
+		    "name": "ideological stance",
+		    "description": "",
+		    "examples": "conservative/restorative,liberal/reformist,radical,reactionary"
+		},
+		{
+		    "name": "views of institutions",
+		    "description": "",
+		    "examples": "trustworthy,corrupt but flexible,irreemable,absent"
+		},
+		{
+		    "name": "views of violence",
+		    "description": "",
+		    "examples": "heroic/cathartic,regrettable/neccessary,corrosive,absurd"
+		},
+		{
+		    "name": "view of history/fate",
+		    "description": "",
+		    "examples": "progress,cyclical,decline,providential"
+		}
+	    ]
+	},
+	{
+	    "name": "structural",
+	    "description": "how the story is shaped",
+	    "axes":
+	    [
+		{
+		    "name": "plot architecture",
+		    "description": "",
+		    "examples": "quest,investigation,caper,escape,rise/fall"
+		},
+		{
+		    "name": "conflict type",
+		    "description": "",
+		    "examples": "vs person, nature, society, fate"
+		},
+		{
+		    "name": "epistemic distribution",
+		    "description": "",
+		    "examples": "audience > characters, audience = characters (mystery), audience < characters (untrustworthy narrator)"
+		},
+		{
+		    "name": "goal clarity",
+		    "description": "",
+		    "examples": ""
+		},
+		{
+		    "name": "causality",
+		    "description": "",
+		    "examples": "tight cause vs effect,episodic,coincidental,cyclical"
+		},
+		{
+		    "name": "closure",
+		    "description": "",
+		    "examples": "restorative,tragic,pyrrhic,anti-climatic,ambiguous"
+		},
+		{
+		    "name": "temporal structure",
+		    "description": "",
+		    "examples": "linear,framed,braided,real-time,elliptical,looped"
+		},
+		{
+		    "name": "protaganist configuration",
+		    "description": "",
+		    "examples": "lone,duo-buddy,duo-adversarial,ensemble convergent,antagonist pov,community as protaganist"
+		},
+		{
+		    "name": "agency",
+		    "description": "",
+		    "examples": "hyper confident,competancy tested,everyman,powerless,self-destructive"
+		},
+		{
+		    "name": "rules foregrounding",
+		    "description": "",
+		    "examples": "mastering an explicit ruleset vs rules are background"
+		}
+	    ]
+	},
+	{
+	    "name": "affective",
+	    "description": "how the story makes you feel",
+	    "axes":
+	    [
+		{
+		    "name": "primary affect",
+		    "description": "",
+		    "examples": "fear,dread,laughter,awe,arousal,grief,tension"
+		},
+		{
+		    "name": "affect trajectory",
+		    "description": "",
+		    "examples": "sustained,escalating,oscillating,bait-and-switch,relentless"
+		},
+		{
+		    "name": "tone/register",
+		    "description": "",
+		    "examples": "earnest vs ironc,sincere vs camp,grim vs light"
+		},
+		{
+		    "name": "moral valence",
+		    "description": "",
+		    "examples": "clear good vs evil,grey all around,amoral,nihilistic,didectic"
+		},
+		{
+		    "name": "identification target",
+		    "description": "",
+		    "examples": "hero,victim,perpetrator,bystander"
+		},
+		{
+		    "name": "somatic address",
+		    "description": "",
+		    "examples": "cerebral,emotional,visceral,sensual"
+		},
+		{
+		    "name": "distance",
+		    "description": "",
+		    "examples": "immersive,observational,alienated"
+		},
+		{
+		    "name": "transgression level",
+		    "description": "",
+		    "examples": "comfort affirming,mildly challenging,deliberately offensive"
+		}		
+	    ]
+	},
+	{
+	    "name": "formal",
+	    "description": "how the story is made and looks/sounds",
+	    "axes":
+	    [
+		{
+		    "name": "medium/mode",
+		    "description": "",
+		    "examples": "live action,animation,musical,interactive"
+		},
+		{
+		    "name": "verisimilitude of style",
+		    "description": "",
+		    "examples": "photorealistic,theatrical,abstract,cartoon"
+		},
+		{
+		    "name": "iconography",
+		    "description": "",
+		    "examples": "six shooters and horses,neon and rain"
+		},
+		{
+		    "name": "visual palette",
+		    "description": "",
+		    "examples": "high key,low key,desaturated,monochrome"
+		},
+		{
+		    "name": "camera/staging grammar",
+		    "description": "",
+		    "examples": "long takes,montage,subjective pov"
+		},
+		{
+		    "name": "sound design/score idiom",
+		    "description": "",
+		    "examples": "orchestral"
+		},
+		{
+		    "name": "language register",
+		    "description": "",
+		    "examples": "vernaculer,stylized,archaic,minimalist"
+		},
+		{
+		    "name": "narration",
+		    "description": "",
+		    "examples": "dramatic/shown,epistolary,omniscient,direct told"
+		},
+		{
+		    "name": "pacing/density",
+		    "description": "",
+		    "examples": "contemplative,procedural,propulsive,frenetic,rythmic"
+		},
+		{
+		    "name": "length/unit",
+		    "description": "",
+		    "examples": "short,feature,serial-episodic,serial-arc,open-ended"
+		},
+		{
+		    "name": "violence explicitness",
+		    "description": "",
+		    "examples": "none,implied,stylized,graphic"
+		},
+		{
+		    "name": "sexual explicitness",
+		    "description": "",
+		    "examples": "none,implied,stylized,graphic"
+		},
+		{
+		    "name": "reflexivity",
+		    "description": "",
+		    "examples": "transparent,self aware,parody,meta-fiction"
+		}		
+	    ]
+	},
+	{
+	    "name": "extra-textual",
+	    "description": "how the story sits in the (real) world",
+	    "axes":
+	    [
+		{
+		    "name": "target audience",
+		    "description": "",
+		    "examples": "family,teen,scholarly"
+		},
+		{
+		    "name": "function/use context",
+		    "description": "",
+		    "examples": "entertainment,award,educational,provocative"
+		},
+		{
+		    "name": "production tier",
+		    "description": "",
+		    "examples": "no budget,b-movie,mid budget"
+		},
+		{
+		    "name": "distribution/venue",
+		    "description": "",
+		    "examples": "theatrical event,broadcast,web,book"
+		},
+		{
+		    "name": "corpus lineage/intertext",
+		    "description": "",
+		    "examples": "founding text imitation,revisionist,parody"
+		},
+		{
+		    "name": "national/regional tradition",
+		    "description": "",
+		    "examples": "k-drama,telenovella,hollywood"
+		},
+		{
+		    "name": "star/auteur persona",
+		    "description": "",
+		    "examples": "vehicle for X,house style of Y"
+		},
+		{
+		    "name": "cultural moment",
+		    "description": "",
+		    "examples": "pre-code,post-war"
+		},
+		{
+		    "name": "relation to reality",
+		    "description": "",
+		    "examples": "pure fiction,based on true story,docudrama"
+		},
+		{
+		    "name": "franchise position",
+		    "description": "",
+		    "examples": "standalone,origin,sequel,prequel,reboot"
+		}		
+	    ]
+	}
+    ]
+}
+    
