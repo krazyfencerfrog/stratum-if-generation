@@ -1,354 +1,938 @@
 {
-    "axis_categories":
-    [
+    "axis_categories": [
         {
             "name": "diegetic",
             "description": "The objective properties of the story's world — setting, physics, and stakes, independent of how the story about it is told.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "spatial setting",
                     "description": "The geographic and social type of place the story unfolds in.",
-                    "examples": ["frontier", "urban", "suburban", "rural", "wilderness", "institutional (school, hospital, workplace)", "domestic", "maritime/at sea", "otherworldly/alien"]
+                    "examples": [
+                        "frontier",
+                        "urban",
+                        "suburban",
+                        "rural",
+                        "wilderness",
+                        "institutional (school, hospital, workplace)",
+                        "domestic",
+                        "maritime/at sea",
+                        "otherworldly/alien"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "temporal setting",
                     "description": "Where the story sits on the timeline from historical to speculative.",
-                    "examples": ["deep past/prehistoric", "historical/specific era", "period/recent past", "contemporary", "near future", "far future", "post-apocalyptic", "alternate history"]
+                    "examples": [
+                        "deep past/prehistoric",
+                        "historical/specific era",
+                        "period/recent past",
+                        "contemporary",
+                        "near future",
+                        "far future",
+                        "post-apocalyptic (after civilization's collapse, however far forward that falls)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 6,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"deep past/prehistoric\", integer 6 = \"post-apocalyptic (after civilization's collapse, however far forward that falls)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'alternate history' is a branch off the timeline, not a position on it -- score an alternate-history concept by the era it diverges from, and flag the counterfactual quality separately (tags/description) rather than forcing it onto this scale."
                 },
                 {
                     "name": "ontology/physics",
                     "description": "How far the world's physical rules depart from consensus reality.",
-                    "examples": ["mundane realism", "hard science fiction", "soft science fiction", "supernatural intrusion (one crack in an otherwise normal world)", "high fantasy (fully alternate physics)", "surreal/dreamlike logic"]
+                    "examples": [
+                        "mundane realism (no departure from consensus physics at all)",
+                        "hard science fiction",
+                        "soft science fiction",
+                        "supernatural intrusion (one crack in an otherwise normal world)",
+                        "high fantasy (fully alternate physics, but internally coherent)",
+                        "surreal/dreamlike logic (physical law itself is unstable or inconsistent, not merely different)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 5,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"mundane realism (no departure from consensus physics at all)\", integer 5 = \"surreal/dreamlike logic (physical law itself is unstable or inconsistent, not merely different)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "cosmology/meta-physics",
                     "description": "Whether the story implies a moral order behind events — a universe that rewards and punishes, or an indifferent one.",
-                    "examples": ["no higher order/indifferent universe", "providential (benevolent design)", "fated/predestined", "karmic (actions return in kind)", "malevolent/hostile cosmos"]
+                    "examples": [
+                        "no higher order/indifferent universe",
+                        "providential (benevolent design)",
+                        "fated/predestined",
+                        "karmic (actions return in kind)",
+                        "malevolent/hostile cosmos"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "scale of stakes",
                     "description": "The largest scope of consequence the plot threatens or promises, from a character's inner life up to civilization-wide.",
-                    "examples": ["internal/psychological", "interpersonal", "familial", "communal/local", "national", "civilizational", "cosmic/existential"]
+                    "examples": [
+                        "internal/psychological (confined to one character's mind)",
+                        "interpersonal",
+                        "familial",
+                        "communal/local",
+                        "national",
+                        "civilizational",
+                        "cosmic/existential (the fate of reality or existence itself)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 6,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"internal/psychological (confined to one character's mind)\", integer 6 = \"cosmic/existential (the fate of reality or existence itself)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "milieu/social world",
                     "description": "The specific subculture or institutional world the story is embedded in, which supplies its texture, jargon, and norms.",
-                    "examples": ["criminal underworld", "high society", "sports", "legal/courtroom", "military", "academia", "medicine", "show business", "religious community"]
+                    "examples": [
+                        "criminal underworld",
+                        "high society",
+                        "sports",
+                        "legal/courtroom",
+                        "military",
+                        "academia",
+                        "medicine",
+                        "show business",
+                        "religious community"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "technological texture",
                     "description": "The prevailing level and character of technology available to characters in the world.",
-                    "examples": ["pre-industrial", "industrial", "information-age", "near-future speculative", "post-scarcity", "anachronistic/mixed (e.g. steampunk)"]
+                    "examples": [
+                        "pre-industrial (no mechanized production at all)",
+                        "industrial",
+                        "information-age",
+                        "near-future speculative",
+                        "post-scarcity (resource constraints no longer meaningfully shape life)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 4,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"pre-industrial (no mechanized production at all)\", integer 4 = \"post-scarcity (resource constraints no longer meaningfully shape life)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'anachronistic/mixed' (e.g. steampunk) blends eras rather than extending the scale -- treat as a categorical flag, not a position past post-scarcity."
                 },
                 {
                     "name": "threat source",
                     "description": "Where the story's central danger originates in the world itself — the diegetic 'who or what.' Compare to the structural axis 'conflict type,' which frames that same threat in narrative terms (person vs. X).",
-                    "examples": ["human antagonist", "institution/system", "nature/environment", "creature/monster", "disease/contagion", "the self (internal)", "time/decay", "the supernatural/unknown"]
+                    "examples": [
+                        "human antagonist",
+                        "institution/system",
+                        "nature/environment",
+                        "creature/monster",
+                        "disease/contagion",
+                        "the self (internal)",
+                        "time/decay",
+                        "the supernatural/unknown"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "spatial confinement",
                     "description": "How much the world's geography constrains where the story can physically go.",
-                    "examples": ["open roaming", "linear journey", "bounded arena", "single location", "trapped/locked-room", "branching map"]
+                    "examples": [
+                        "open roaming (no meaningful geographic restriction)",
+                        "linear journey",
+                        "bounded arena",
+                        "single location",
+                        "trapped/locked-room (a single, inescapable space)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 4,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"open roaming (no meaningful geographic restriction)\", integer 4 = \"trapped/locked-room (a single, inescapable space)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'branching map' (multiple paths/choices about where to go) describes topology, not raw openness, and overlaps with the interactivity axis 'branching structure' -- omitted here to avoid double-counting; use that axis for choice-of-route instead."
                 }
             ]
         },
         {
             "name": "thematic",
             "description": "What the story is about, in the abstract — the ideas and values it dramatizes.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "core thematic axis",
                     "description": "The central binary tension the story dramatizes and ultimately takes (or refuses to take) a position on.",
-                    "examples": ["order vs chaos", "civilization vs wilderness", "appearance vs reality", "individual vs community", "freedom vs security", "tradition vs progress", "fate vs free will"]
+                    "examples": [
+                        "order vs chaos",
+                        "civilization vs wilderness",
+                        "appearance vs reality",
+                        "individual vs community",
+                        "freedom vs security",
+                        "tradition vs progress",
+                        "fate vs free will"
+                    ],
+                    "encoding": "nominal",
+                    "encoding_note": "This axis currently captures WHICH binary tension governs the story (a categorical pick). It does not capture WHERE on that tension the story lands (e.g. leaning toward 'chaos' vs 'order') -- that would be a second, ordinal judgment this schema doesn't yet model."
                 },
                 {
                     "name": "ideological stance",
                     "description": "The political/social posture the story's resolution implies toward the existing order.",
-                    "examples": ["conservative/restorative", "liberal/reformist", "radical/revolutionary", "reactionary", "apolitical/neutral"]
+                    "examples": [
+                        "conservative/restorative",
+                        "liberal/reformist",
+                        "radical/revolutionary",
+                        "reactionary",
+                        "apolitical/neutral"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "views of institutions",
                     "description": "How the story portrays organized authority — governments, corporations, churches, police.",
-                    "examples": ["trustworthy", "corrupt but reformable", "irredeemable", "absent/irrelevant", "well-intentioned but incompetent"]
+                    "examples": [
+                        "trustworthy",
+                        "corrupt but reformable",
+                        "irredeemable",
+                        "absent/irrelevant",
+                        "well-intentioned but incompetent"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "views of violence",
                     "description": "The moral framing the story assigns to violent acts within it.",
-                    "examples": ["heroic/cathartic", "regrettable but necessary", "corrosive/traumatic", "absurd/darkly comic", "glorified/spectacle"]
+                    "examples": [
+                        "heroic/cathartic",
+                        "regrettable but necessary",
+                        "corrosive/traumatic",
+                        "absurd/darkly comic",
+                        "glorified/spectacle"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "view of history/fate",
                     "description": "The story's implicit theory of how time and events unfold.",
-                    "examples": ["progress (things improve)", "cyclical (patterns repeat)", "decline (things worsen)", "providential (guided by higher purpose)", "contingent/random"]
+                    "examples": [
+                        "progress (things improve)",
+                        "cyclical (patterns repeat)",
+                        "decline (things worsen)",
+                        "providential (guided by higher purpose)",
+                        "contingent/random"
+                    ],
+                    "encoding": "nominal"
                 }
             ]
         },
         {
             "name": "structural",
             "description": "How the story is built — the mechanics of plot, cast, and time that shape it.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "plot architecture",
                     "description": "The overall template or shape the plot follows.",
-                    "examples": ["quest", "investigation/mystery", "caper/heist", "escape", "rise and fall", "revenge", "coming-of-age", "survival", "romance"]
+                    "examples": [
+                        "quest",
+                        "investigation/mystery",
+                        "caper/heist",
+                        "escape",
+                        "rise and fall",
+                        "revenge",
+                        "coming-of-age",
+                        "survival",
+                        "romance"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "conflict type",
                     "description": "The classic literary category of opposing force the protagonist struggles against. Compare to the diegetic axis 'threat source,' which names the specific in-world origin of that force.",
-                    "examples": ["person vs person", "person vs nature", "person vs society", "person vs self", "person vs fate/god", "person vs technology"]
+                    "examples": [
+                        "person vs person",
+                        "person vs nature",
+                        "person vs society",
+                        "person vs self",
+                        "person vs fate/god",
+                        "person vs technology"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "epistemic distribution",
                     "description": "Who knows what — the relative information held by the audience versus the characters.",
-                    "examples": ["audience > characters (dramatic irony)", "audience = characters (discovery together, e.g. mystery)", "audience < characters (unreliable or withholding narrator)"]
+                    "examples": [
+                        "audience > characters (dramatic irony)",
+                        "audience = characters (discovery together, e.g. mystery)",
+                        "audience < characters (unreliable or withholding narrator)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 2,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"audience > characters (dramatic irony)\", integer 2 = \"audience < characters (unreliable or withholding narrator)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "goal clarity",
                     "description": "How explicit and fixed the protagonist's objective is over the course of the story.",
-                    "examples": ["single explicit goal", "evolving/shifting goal", "multiple competing goals", "goal discovered late", "no clear goal (drift/aimless)"]
+                    "examples": [
+                        "single explicit goal (protagonist and audience both know exactly what's wanted)",
+                        "evolving/shifting goal",
+                        "multiple competing goals",
+                        "goal discovered late",
+                        "no clear goal (drift/aimless, no defined want at all)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 4,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"single explicit goal (protagonist and audience both know exactly what's wanted)\", integer 4 = \"no clear goal (drift/aimless, no defined want at all)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "causality",
                     "description": "How tightly plot events are bound together by cause and effect.",
-                    "examples": ["tight cause-and-effect chain", "episodic (loosely connected incidents)", "coincidental", "cyclical (events repeat)", "overdetermined (multiple converging causes)"]
+                    "examples": [
+                        "tight cause-and-effect chain",
+                        "episodic (loosely connected incidents)",
+                        "coincidental",
+                        "cyclical (events repeat)",
+                        "overdetermined (multiple converging causes)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "closure",
                     "description": "The emotional and moral shape of the ending.",
-                    "examples": ["restorative (order regained)", "tragic", "pyrrhic (victory at great cost)", "anti-climactic", "ambiguous/open", "bittersweet"]
+                    "examples": [
+                        "restorative (order regained)",
+                        "tragic",
+                        "pyrrhic (victory at great cost)",
+                        "anti-climactic",
+                        "ambiguous/open",
+                        "bittersweet"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "temporal structure",
                     "description": "How the story orders and presents time to the audience, as distinct from the diegetic 'temporal setting' (when the story takes place).",
-                    "examples": ["linear", "framed (story within a story)", "braided (parallel timelines)", "real-time", "elliptical (gaps/jumps)", "looped (repeating time)", "reverse chronology"]
+                    "examples": [
+                        "linear",
+                        "framed (story within a story)",
+                        "braided (parallel timelines)",
+                        "real-time",
+                        "elliptical (gaps/jumps)",
+                        "looped (repeating time)",
+                        "reverse chronology"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "protagonist configuration",
                     "description": "The number and relational structure of the story's central character(s).",
-                    "examples": ["lone protagonist", "duo/buddy", "duo/adversarial", "ensemble/convergent", "antagonist POV", "community-as-protagonist"]
+                    "examples": [
+                        "lone protagonist",
+                        "duo/buddy",
+                        "duo/adversarial",
+                        "ensemble/convergent",
+                        "antagonist POV",
+                        "community-as-protagonist"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "agency",
                     "description": "How much control and competence the protagonist exercises over events.",
-                    "examples": ["hyper-confident/exceptional", "competency tested/growing", "everyman/ordinary", "powerless/acted-upon", "self-destructive/own worst enemy"]
+                    "examples": [
+                        "hyper-confident/exceptional (near-total control over outcomes)",
+                        "competency tested/growing",
+                        "everyman/ordinary",
+                        "powerless/acted-upon (no meaningful influence over outcomes at all)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"hyper-confident/exceptional (near-total control over outcomes)\", integer 3 = \"powerless/acted-upon (no meaningful influence over outcomes at all)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'self-destructive/own worst enemy' is a distinct failure mode (capability turned against the self), not a lower point than powerless -- treat as a categorical flag if it applies, with lower confidence rather than a forced scale value."
                 },
                 {
                     "name": "rules foregrounding",
                     "description": "How visible and explicit the story's internal rule system (magic system, game, law, procedure) is made to the audience.",
-                    "examples": ["explicit ruleset the audience masters (hard magic, game rules)", "rules present but backgrounded (soft magic, atmosphere over mechanics)", "no formal rule system"]
+                    "examples": [
+                        "explicit ruleset the audience is meant to master (hard magic, game rules) -- the mechanics are the point",
+                        "rules present but backgrounded (soft magic, atmosphere over mechanics)",
+                        "no formal rule system (nothing resembling rules is ever exposed)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 2,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"explicit ruleset the audience is meant to master (hard magic, game rules) -- the mechanics are the point\", integer 2 = \"no formal rule system (nothing resembling rules is ever exposed)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 }
             ]
         },
         {
             "name": "affective",
             "description": "How the story makes the audience feel, moment to moment and overall.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "primary affect",
                     "description": "The dominant emotional experience the story is designed to produce.",
-                    "examples": ["fear", "dread", "laughter", "awe/wonder", "arousal", "grief", "tension/suspense", "comfort/warmth", "anger"]
+                    "examples": [
+                        "fear",
+                        "dread",
+                        "laughter",
+                        "awe/wonder",
+                        "arousal",
+                        "grief",
+                        "tension/suspense",
+                        "comfort/warmth",
+                        "anger"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "affect trajectory",
                     "description": "How the intended emotion changes in intensity over the course of the story.",
-                    "examples": ["sustained (steady level)", "escalating", "oscillating", "bait-and-switch", "relentless (no relief)", "cathartic release at the end"]
+                    "examples": [
+                        "sustained (steady level)",
+                        "escalating",
+                        "oscillating",
+                        "bait-and-switch",
+                        "relentless (no relief)",
+                        "cathartic release at the end"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "tone/register",
                     "description": "The story's attitude toward its own material — sincere or knowing, light or heavy. Distinct from the formal axis 'language register,' which covers word choice and diction rather than attitude.",
-                    "examples": ["earnest vs ironic", "sincere vs camp", "grim vs light", "wholesome vs edgy"]
+                    "examples": [
+                        "deeply earnest/sincere (no ironic distance at all)",
+                        "warm/heartfelt",
+                        "wry/knowing",
+                        "ironic/arch",
+                        "full camp/self-parody (maximal ironic distance from its own material)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 4,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"deeply earnest/sincere (no ironic distance at all)\", integer 4 = \"full camp/self-parody (maximal ironic distance from its own material)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "rewritten as single points along one sincerity spectrum (earnest -> camp); the original examples were binary pairs and couldn't anchor a scale. 'grim vs light' (heaviness) is a related but separate dimension this axis does not capture. Distinct from the formal axis 'reflexivity,' whose 'genre-aware parody' anchor is about formal self-awareness technique, not attitude."
                 },
                 {
                     "name": "moral valence",
                     "description": "How clearly the story sorts characters and actions into good and bad.",
-                    "examples": ["clear good vs evil", "grey/morally ambiguous throughout", "amoral (no moral frame offered)", "nihilistic", "didactic (explicit moral lesson)"]
+                    "examples": [
+                        "clear good vs evil",
+                        "grey/morally ambiguous throughout",
+                        "amoral (no moral frame offered)",
+                        "nihilistic",
+                        "didactic (explicit moral lesson)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "identification target",
                     "description": "Whose perspective the audience is invited to emotionally align with.",
-                    "examples": ["hero", "victim", "perpetrator", "bystander", "multiple/shifting"]
+                    "examples": [
+                        "hero",
+                        "victim",
+                        "perpetrator",
+                        "bystander",
+                        "multiple/shifting"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "somatic address",
                     "description": "What register of bodily or mental response the story primarily targets.",
-                    "examples": ["cerebral (puzzle, ideas)", "emotional (heart)", "visceral (gut, adrenaline)", "sensual (physical/sensory pleasure)"]
+                    "examples": [
+                        "cerebral (puzzle, ideas)",
+                        "emotional (heart)",
+                        "visceral (gut, adrenaline)",
+                        "sensual (physical/sensory pleasure)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "distance",
                     "description": "How close the story invites the audience to feel to the events, versus preserving a sense of separation. Distinct from 'epistemic distribution,' which is about information rather than feeling.",
-                    "examples": ["immersive/close", "observational/detached", "alienated/estranged"]
+                    "examples": [
+                        "immersive/close (the audience is meant to feel inside the events)",
+                        "observational/detached",
+                        "alienated/estranged (the story deliberately holds the audience at arm's length)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 2,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"immersive/close (the audience is meant to feel inside the events)\", integer 2 = \"alienated/estranged (the story deliberately holds the audience at arm's length)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "transgression level",
                     "description": "How much the story pushes against audience comfort or social norms.",
-                    "examples": ["comfort-affirming", "mildly challenging", "provocative", "deliberately taboo-breaking"]
+                    "examples": [
+                        "comfort-affirming (nothing here will unsettle a mainstream audience)",
+                        "mildly challenging",
+                        "provocative",
+                        "deliberately taboo-breaking (intentionally violates a core social or moral norm)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"comfort-affirming (nothing here will unsettle a mainstream audience)\", integer 3 = \"deliberately taboo-breaking (intentionally violates a core social or moral norm)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 }
             ]
         },
         {
             "name": "formal",
             "description": "How the story is made and encountered — its craft choices and surface texture. For a text/IF engine, treat film-derived terms (camera, sound design) as their prose equivalents, noted below.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "medium/mode",
                     "description": "The delivery format the text takes. Kept broad in case the engine ever generates hybrid or non-prose forms.",
-                    "examples": ["prose fiction", "interactive/branching text", "epistolary (letters, logs, texts)", "screenplay-style", "dialogue-only/script"]
+                    "examples": [
+                        "prose fiction",
+                        "interactive/branching text",
+                        "epistolary (letters, logs, texts)",
+                        "screenplay-style",
+                        "dialogue-only/script"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "verisimilitude of style",
                     "description": "How closely the prose's rendering of reality mimics real-world texture versus stylizing or abstracting it.",
-                    "examples": ["photorealistic/naturalistic detail", "theatrical/heightened", "abstract/impressionistic", "cartoonish/exaggerated"]
+                    "examples": [
+                        "photorealistic/naturalistic detail (renders the world as lived experience would)",
+                        "theatrical/heightened (emphasis and emotion pitched above naturalism, still representational)",
+                        "abstract/impressionistic (mood and impression over literal detail)",
+                        "cartoonish/exaggerated (deliberately unrealistic distortion for effect)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"photorealistic/naturalistic detail (renders the world as lived experience would)\", integer 3 = \"cartoonish/exaggerated (deliberately unrealistic distortion for effect)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'abstract/impressionistic' and 'cartoonish/exaggerated' are different flavors of stylization (mood-abstraction vs. exaggeration-for-effect) rather than strictly sequential -- both are a bigger departure from naturalism than 'theatrical/heightened', but ordering between the two is a judgment call."
                 },
                 {
                     "name": "iconography",
                     "description": "The recurring concrete objects and images that signal genre and setting at a glance.",
-                    "examples": ["six-shooters and horses (western)", "neon and rain (cyberpunk noir)", "candlelight and stone (gothic)", "chrome and glass (near-future corporate)"]
+                    "examples": [
+                        "six-shooters and horses (western)",
+                        "neon and rain (cyberpunk noir)",
+                        "candlelight and stone (gothic)",
+                        "chrome and glass (near-future corporate)",
+                        "swords and banners (medieval/historical)",
+                        "picket fences and porch lights (small-town Americana)",
+                        "skyscrapers and boardrooms (contemporary corporate)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "sensory palette",
-                    "description": "The dominant sensory quality of the prose's descriptive imagery — its 'color' in the reader's mind's eye. (Renamed from 'visual palette' since a text medium engages more than sight.)",
-                    "examples": ["high-key/bright", "low-key/shadowed", "desaturated/muted", "monochrome", "richly saturated"]
+                    "description": "The dominant sensory quality of the prose's descriptive imagery -- its 'color' in the reader's mind's eye. Spans two related qualities, brightness and saturation; the examples below cover the corners of that space rather than a single line. (Renamed from 'visual palette' since a text medium engages more than sight.)",
+                    "examples": [
+                        "high-key & saturated (bright, vivid color)",
+                        "high-key & desaturated (bright, washed-out/sun-bleached)",
+                        "low-key & saturated (dark, jewel-toned)",
+                        "low-key & desaturated (dark, muted/gloomy)",
+                        "monochrome (single color or grayscale)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "scene staging/focalization",
-                    "description": "The prose equivalent of camera grammar: how scenes are staged and framed — close, intimate description versus wide, panoramic scene-setting, and how often the 'lens' cuts versus lingers. (Renamed from 'camera/staging grammar.')",
-                    "examples": ["long, lingering scenes", "quick-cut/montage pacing between scenes", "close subjective focalization (inside one head)", "wide/panoramic scene-setting"]
+                    "description": "The prose equivalent of camera grammar: how scenes are staged and framed. Spans two related qualities -- cutting rhythm (lingering vs. quick-cut) and framing distance (close/intimate vs. wide/panoramic); the examples below cover the corners of that space rather than a single line. (Renamed from 'camera/staging grammar.')",
+                    "examples": [
+                        "long, lingering + close/intimate (extended dwelling inside one perspective)",
+                        "long, lingering + wide/panoramic (extended, unhurried scene-setting)",
+                        "quick-cut/montage + close/intimate (rapid shifts between subjective moments)",
+                        "quick-cut/montage + wide/panoramic (rapid montage of establishing shots)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "soundscape idiom",
                     "description": "The auditory texture evoked through prose description — ambient sound, described music. Largely optional for a pure-text engine; more relevant if audio or voice output is ever added. (Renamed from 'sound design/score idiom.')",
-                    "examples": ["orchestral/cinematic", "diegetic ambient noise only", "silence/sparse", "music as a recurring motif", "not applicable (silent medium)"]
+                    "examples": [
+                        "orchestral/cinematic",
+                        "diegetic ambient noise only",
+                        "silence/sparse",
+                        "music as a recurring motif",
+                        "not applicable (silent medium)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
-                    "name": "language diction",
+                    "name": "language register",
                     "description": "The diction and formality of the prose itself — the vocabulary and sentence texture the reader encounters. Distinct from the affective axis 'tone/register,' which is about attitude rather than word choice.",
-                    "examples": ["vernacular/colloquial", "stylized/literary", "archaic", "minimalist/spare", "purple/ornate", "technical/jargon-heavy"]
+                    "examples": [
+                        "vernacular/colloquial",
+                        "stylized/literary",
+                        "archaic",
+                        "minimalist/spare",
+                        "purple/ornate",
+                        "technical/jargon-heavy"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "narration",
                     "description": "The point of view and mode of address used to tell the story.",
-                    "examples": ["first person", "close third/limited", "omniscient", "epistolary (letters, diary, logs)", "second person ('you')", "unreliable narrator"]
+                    "examples": [
+                        "first person",
+                        "close third/limited",
+                        "omniscient",
+                        "epistolary (letters, diary, logs)",
+                        "second person ('you')",
+                        "unreliable narrator"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "pacing/density",
                     "description": "The rhythm and information-density of the prose as experienced moment to moment.",
-                    "examples": ["contemplative/slow", "procedural/methodical", "propulsive/page-turner", "frenetic", "rhythmic/lyrical"]
+                    "examples": [
+                        "contemplative/slow (lingers, minimal forward momentum)",
+                        "procedural/methodical",
+                        "propulsive/page-turner",
+                        "frenetic (constant, breathless forward momentum)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"contemplative/slow (lingers, minimal forward momentum)\", integer 3 = \"frenetic (constant, breathless forward momentum)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'rhythmic/lyrical' describes prose quality (verse-like cadence), not speed, and can occur at any point on this scale -- treat as a categorical flag if it applies, not a position past frenetic."
                 },
                 {
                     "name": "length/unit",
                     "description": "The intended overall size and release format of the piece.",
-                    "examples": ["short story/vignette", "novella", "feature-length/novel", "serial-episodic (standalone episodes)", "serial-arc (continuing story)", "open-ended/persistent"]
+                    "examples": [
+                        "short story/vignette (a single sitting)",
+                        "novella",
+                        "feature-length/novel",
+                        "serial-episodic (standalone episodes)",
+                        "serial-arc (continuing story across installments)",
+                        "open-ended/persistent (no defined endpoint at all)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 5,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"short story/vignette (a single sitting)\", integer 5 = \"open-ended/persistent (no defined endpoint at all)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "the serial modes represent scope-over-time rather than single-work size, so they're placed by convention rather than strict length measurement. 'open-ended/persistent' is a different kind of extreme than the others: length becomes unbounded, not merely large."
                 },
                 {
                     "name": "violence explicitness",
                     "description": "How graphically violence is depicted on the page.",
-                    "examples": ["none", "implied/off-page", "stylized", "graphic/detailed"]
+                    "examples": [
+                        "none",
+                        "implied/off-page (occurs but is not shown)",
+                        "stylized (shown, through non-graphic convention)",
+                        "graphic/detailed (rendered in full physical detail)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"none\", integer 3 = \"graphic/detailed (rendered in full physical detail)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "sexual explicitness",
                     "description": "How graphically sexual content is depicted on the page.",
-                    "examples": ["none", "implied/off-page", "stylized/suggestive", "graphic/detailed"]
+                    "examples": [
+                        "none",
+                        "implied/off-page (occurs but is not shown)",
+                        "stylized/suggestive (shown through conventionalized, non-explicit framing)",
+                        "graphic/detailed (rendered in full explicit detail)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"none\", integer 3 = \"graphic/detailed (rendered in full explicit detail)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "reflexivity",
                     "description": "How aware the text is of its own status as a constructed story.",
-                    "examples": ["transparent (no acknowledgment)", "self-aware (light winks to the reader)", "parody", "full meta-fiction (breaks the fourth wall)"]
+                    "examples": [
+                        "transparent (no acknowledgment) -- never signals it's a constructed story",
+                        "self-aware (light winks to the reader)",
+                        "genre-aware parody (knowingly mimics and exaggerates the conventions it's told in)",
+                        "full meta-fiction (breaks the fourth wall) -- characters or narration directly address the audience or the text's own construction"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"transparent (no acknowledgment) -- never signals it's a constructed story\", integer 3 = \"full meta-fiction (breaks the fourth wall) -- characters or narration directly address the audience or the text's own construction\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "distinct from the affective axis 'tone/register,' whose 'camp/self-parody' anchor is about attitude, not this axis's formal acknowledgment-of-construction."
                 }
             ]
         },
         {
             "name": "extra-textual",
             "description": "How the story situates itself relative to the real world — its audience, tradition, and context of production.",
-            "axes":
-            [
+            "axes": [
                 {
                     "name": "target audience",
                     "description": "The intended readership by age and sophistication.",
-                    "examples": ["children", "family/all-ages", "teen/YA", "adult", "scholarly/niche"]
+                    "examples": [
+                        "children (no content requiring adult context or discretion)",
+                        "family/all-ages",
+                        "teen/YA",
+                        "adult (no content restriction intended)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"children (no content requiring adult context or discretion)\", integer 3 = \"adult (no content restriction intended)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'scholarly/niche' describes intended sophistication, not age-appropriateness, and isn't a further point past 'adult' -- treat as a categorical flag if it applies (e.g. an adult work aimed at a specialist audience)."
                 },
                 {
                     "name": "function/use context",
                     "description": "The primary purpose the piece is meant to serve beyond the story itself.",
-                    "examples": ["pure entertainment", "awards/prestige-oriented", "educational", "provocative/discourse-generating", "therapeutic/reflective", "commercial/tie-in"]
+                    "examples": [
+                        "pure entertainment",
+                        "awards/prestige-oriented",
+                        "educational",
+                        "provocative/discourse-generating",
+                        "therapeutic/reflective",
+                        "commercial/tie-in"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "production tier",
                     "description": "The implied scale of resources and craft behind the piece — mainly a flavor and tone signal for a text generator rather than a literal budget.",
-                    "examples": ["no-budget/amateur", "b-movie/pulp", "mid-budget/competent genre work", "prestige/lavish"]
+                    "examples": [
+                        "no-budget/amateur (little to no resources or craft polish)",
+                        "b-movie/pulp",
+                        "mid-budget/competent genre work",
+                        "prestige/lavish (maximal resources and craft investment)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"no-budget/amateur (little to no resources or craft polish)\", integer 3 = \"prestige/lavish (maximal resources and craft investment)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    }
                 },
                 {
                     "name": "distribution/venue",
                     "description": "Where and how the piece is imagined to reach its audience.",
-                    "examples": ["theatrical/event release", "broadcast/serialized", "web/self-published", "book/print", "interactive game release"]
+                    "examples": [
+                        "theatrical/event release",
+                        "broadcast/serialized",
+                        "web/self-published",
+                        "book/print",
+                        "interactive game release"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "corpus lineage/intertext",
                     "description": "The piece's relationship to a prior tradition or specific influential works it is responding to.",
-                    "examples": ["founding-text imitation (homage)", "revisionist (subverts the tradition)", "parody", "genre-blind (unaware of its own tradition)"]
+                    "examples": [
+                        "founding-text imitation (homage)",
+                        "revisionist (subverts the tradition)",
+                        "parody",
+                        "genre-blind (unaware of its own tradition)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "national/regional tradition",
                     "description": "The storytelling tradition and convention set the piece draws its structure and sensibility from.",
-                    "examples": ["k-drama", "telenovela", "hollywood blockbuster", "british realism", "japanese light novel", "russian literary tradition"]
+                    "examples": [
+                        "k-drama",
+                        "telenovela",
+                        "hollywood blockbuster",
+                        "british realism",
+                        "japanese light novel",
+                        "russian literary tradition",
+                        "scandinavian noir",
+                        "bollywood masala"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "star/auteur persona",
                     "description": "Whether the piece is built as a vehicle for a signature voice or persona. For a generative engine, express this as an archetype rather than naming a real person.",
-                    "examples": ["vehicle for a charismatic archetype (e.g. wisecracking action lead)", "house style of a genre-auteur archetype (e.g. moody neo-noir stylist)", "no persona-driven framing"]
+                    "examples": [
+                        "vehicle for a charismatic archetype (e.g. wisecracking action lead)",
+                        "house style of a genre-auteur archetype (e.g. moody neo-noir stylist)",
+                        "no persona-driven framing"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "cultural moment",
                     "description": "The real-world cultural or historical backdrop the piece is implicitly conversing with.",
-                    "examples": ["pre-code/transgressive era", "post-war anxiety", "cold war paranoia", "post-9/11", "post-pandemic", "current/contemporary zeitgeist"]
+                    "examples": [
+                        "pre-code/transgressive era",
+                        "post-war anxiety",
+                        "cold war paranoia",
+                        "post-9/11",
+                        "post-pandemic",
+                        "current/contemporary zeitgeist"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "relation to reality",
                     "description": "How the piece frames its own truth-claim relative to real events.",
-                    "examples": ["pure fiction", "based on a true story", "docudrama", "alternate history", "roman à clef"]
+                    "examples": [
+                        "pure fiction",
+                        "based on a true story",
+                        "docudrama",
+                        "alternate history",
+                        "roman à clef"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "franchise position",
                     "description": "Where the piece sits relative to other installments in a series.",
-                    "examples": ["standalone", "origin story", "sequel", "prequel", "reboot", "spin-off", "shared-universe entry"]
+                    "examples": [
+                        "standalone",
+                        "origin story",
+                        "sequel",
+                        "prequel",
+                        "reboot",
+                        "spin-off",
+                        "shared-universe entry"
+                    ],
+                    "encoding": "nominal"
                 }
             ]
         },
         {
             "name": "interactivity",
-            "description": "How the audience acts on and within the story.",
-            "axes":
-            [
+            "description": "PROPOSED NEW CATEGORY — how the audience acts on and within the story. This is the one dimension a pure prose taxonomy can't cover, and it's arguably central for an engine named stratum-if. Delete this block if interactivity is out of scope for this generator.",
+            "axes": [
                 {
                     "name": "branching structure",
                     "description": "The shape of the choice graph the player moves through.",
-                    "examples": ["linear with cosmetic choices", "branch-and-bottleneck (diverges then rejoins)", "fully branching tree", "open/hub-and-spoke", "simulation/state-based (no fixed graph)"]
+                    "examples": [
+                        "linear with cosmetic choices",
+                        "branch-and-bottleneck (diverges then rejoins)",
+                        "fully branching tree",
+                        "open/hub-and-spoke",
+                        "simulation/state-based (no fixed graph)"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "choice granularity",
                     "description": "How frequently, and at what scale, the player is asked to make decisions.",
-                    "examples": ["scene-level choices only", "frequent small choices", "dialogue-tree driven", "stat/resource management choices", "free-text parser input"]
+                    "examples": [
+                        "scene-level choices only",
+                        "frequent small choices",
+                        "dialogue-tree driven",
+                        "stat/resource management choices",
+                        "free-text parser input"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "player-protagonist relationship",
                     "description": "How the player relates to the character(s) they control.",
-                    "examples": ["silent self-insert avatar", "defined character with their own voice", "party/multiple controllable characters", "god-game/observer role"]
+                    "examples": [
+                        "silent self-insert avatar",
+                        "defined character with their own voice",
+                        "party/multiple controllable characters",
+                        "god-game/observer role"
+                    ],
+                    "encoding": "nominal"
                 },
                 {
                     "name": "failure & consequence model",
                     "description": "How the story handles player mistakes or 'bad' choices.",
-                    "examples": ["no fail state (all paths are valid)", "soft fail (setbacks, story continues)", "hard fail/death with retry", "permadeath, no retry", "consequences accumulate silently (delayed payoff)"]
+                    "examples": [
+                        "no fail state (every choice remains valid; nothing is punished)",
+                        "soft fail (setbacks, story continues)",
+                        "hard fail/death with retry",
+                        "permadeath, no retry (failure is total and irreversible)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 3,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"no fail state (every choice remains valid; nothing is punished)\", integer 3 = \"permadeath, no retry (failure is total and irreversible)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'consequences accumulate silently (delayed payoff)' describes timing (when consequences land), not severity, and can pair with any point on this scale -- treat as a categorical flag if it applies, not a position past permadeath."
                 },
                 {
                     "name": "ending multiplicity",
                     "description": "How many distinct endings the branching structure produces and how they relate to each other.",
-                    "examples": ["single ending, choices affect texture only", "a few (2-4) meaningfully distinct endings", "many endings on a spectrum (best to worst)", "combinatorial/many small variations", "open-ended/no true ending"]
+                    "examples": [
+                        "single ending, choices affect texture only",
+                        "a few (2-4) meaningfully distinct endings",
+                        "many endings on a spectrum (best to worst)",
+                        "combinatorial/many small variations",
+                        "open-ended/no true ending (closure itself is never defined)"
+                    ],
+                    "encoding": "ordinal",
+                    "scale": {
+                        "min": 0,
+                        "max": 4,
+                        "step": 0.5,
+                        "anchor_note": "integer 0 = \"single ending, choices affect texture only\", integer 4 = \"open-ended/no true ending (closure itself is never defined)\"; use the ordered examples above as anchors, half-steps allowed between adjacent anchors"
+                    },
+                    "scale_caveat": "'open-ended/no true ending' is a different kind of extreme than 'combinatorial' -- not simply more endings, but the absence of a defined endpoint at all."
                 }
             ]
         }
-    ]
+    ],
+    "encoding_legend": {
+        "ordinal": "Single meaningful scale. Judge model outputs an integer (or half-step) index against the axis's own ordered `examples` list per `scale.min`/`scale.max`. Normalize to [0,1] via value/scale.max for storage and distance math.",
+        "nominal": "No defensible single order. Judge model generates a short descriptive text targeted at this axis, which is then embedded and (ideally) reduced via per-axis PCA before use in distance math.",
+        "scale_caveat": "Present on some ordinal axes. Flags a named quality that doesn't sit cleanly on the scale itself (a different, orthogonal quality) -- the judge model should set 'applies: false' for concepts matching the flagged quality specifically, rather than forcing them onto the scale."
+    }
 }

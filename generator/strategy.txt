@@ -1,0 +1,69 @@
+# So I think the process is going to be:
+# 1) identify what our core assumptions are for the product
+#    (interactive, second person, audience)
+# 2*) get a kernel from the user
+#    (a blurb containing as much information as the user wants to give
+#     regarding the desired story)
+#   a) filter kernel to required levels wrt audience
+# 3) analyze the kernel to figure out core requirements
+#   a) rough minimal and maximal length
+#   b) affect extraction (primary, primary trajectory, secondaries, tone, somatic address, transgression level)
+#   c) thematic extraction (core thematic axis, secondary thematic axis, moral valence)
+#   d) rough viewpoint requirements (single person, multi-person hopping)
+#   e) rough timeline requirements/bounds (single time, linear, multiple times, clusterd, ...)
+#   f) rough setting requirements/bounds (single overall setting, multiple clustered, multiple dispersed)
+#   g) complexity of interactivity (number of possible major endings)
+# 4) initial structural shape
+#   a) plot architecture (quest, investigation, caper, ...)
+#   b) conflict type
+#   c) protaganist configuration
+#   d) scale of stakes
+# 5) initial world shape
+#   a) spatial settings
+#   b) temporal settings
+#   c) ontology / physics
+#   d) cosmology / metaphysics
+#   e) social order
+#   f) technological texture
+#   g) threat source
+# 6) figure out overall structure
+#   a) primary branch point is going to divide on the core thematic axis
+#      (*what* they choose to believe) (2 choices)
+#   b) secondary branch point is going to divide on *how* they choose to
+#      follow the core thematic choice (2-4 choices)
+#   c) now this will define between 4-8 main paths through the story
+#   d) calculate framework (hero's journey, 5-act tragedy, ...)
+#   e) expand framework beats + branches into initial story graph
+#   f) identify 1-2 possible beats in graph before primary branch and
+#      expand into diamond shaped subpaths, giving the user experiences
+#      to inform primary branch decision
+#   g) identify 1-2 possible beats in two paths steming from primary branch,
+#      before secondary branch point.  replace those beats with diamond shaped
+#      subgraphs, where the decisions made in those diamond branches will
+#      directly force the users path in the secondary branch
+#   h) ternary branch points (if used) will be more varied and relate to
+#      the consequences of the two previous branch choices, including the toll
+#      the what/how is taking on the character, or *who* the toll is inflicted
+#      upon, or a change of conflict type / threat source.
+# 7) world generation
+#   a) major locations
+#   b) location backstory
+# 8) character generation
+#   a) major characters
+#   b) character roles, relations and backstory
+# 9) plot generation 
+#   a) fill in structure from 6 using major locations and major characters
+#   b) ensure consistency in path-based use of locations and characters
+#   c) ensure major story requirements met (primary affect, resolution of plot, user agency)
+# 10) identify shortcomings
+#   a) pacing, character arcs, unaddressed plot references
+#   b) introduce new minor events, locations and characters to address these
+#   c) identify coherence or (opposite=lack of novelty) and address by adding elements to either reinforce coherence or add novelty
+#   d) update story structure to incorporate these new elements
+# 11) deep expansion of characters (no new characters, just full build out of existing)
+# 12) deep expansion of settings (build out of existing + definition and build out of minor areas like the parts of a larger setting)
+# 13) full node-based graph finalization pass
+# 14) for each node in graph, identify granular settings available (rooms) and characters directly involved.  Identify purpose of node, what needs to be achieved by it and possible quick exits (bad ends).
+# 15) ... (probably node-node transition point identification)
+# 16) for each node, full node build out (room connections, interactable objects, goals, transition states to next node or branch)... ensure arc/theme/affect trajectory
+# 17) for each node fully define actions in each room, generate prose
