@@ -1,3 +1,95 @@
+# ---
+# CHANGELOG FROM strategy.txt (this pass)
+# ---
+# Reviewed a set of proposed additions (interactive-contract extraction,
+# ontology-from-contract, framework ID, interactive components,
+# consolidation, contract-vs-interactive axis labeling, framework
+# finalization). Outcome:
+#   - GENUINE GAPS, added below: 3-0a/3-0b/3-0c (interactive question, "you"
+#     resolution, failure/consequence model), 5h/5i (agency scope,
+#     information topology), 6j (state model - FLAGGED, not designed).
+#   - ALREADY COVERED, unchanged: framework ID (4a, 6d), consolidation into
+#     one axes spec (Concept/AxisScore dataclasses + 3h).
+#   - FORMALIZED, not new work: contract axes vs. interactive axes - see
+#     note under 3h.
+#   - SOFT/DEFERRED: a dedicated "finalize against framework" pass. Likely
+#     already covered by the 4a -> 6d -> 6e -> 9c chain; watch 9c in
+#     practice for whether framework/profile conflicts actually surface
+#     there before building a dedicated step for it.
+#
+# OPEN DECISION THIS RAISES (unresolved, flagging rather than picking):
+# 3b/3c/3d/3e are already drafted and tested WITHOUT the new 3-0a/b/c fields
+# existing yet. 3-0a in particular (the interactive question - what does the
+# READER do, not what happens to the protagonist) is exactly the kind of
+# mechanical-vs-literary framing that reshaped 3d after the fact. Two paths:
+#   (1) retrofit - draft 3-0a/b/c now, then re-check 3b-3g's existing prompts
+#       and traces for literary-framing drift now that a mechanical frame
+#       exists to check them against.
+#   (2) layer forward - draft 3-0a/b/c as new steps, let them inform 3h's
+#       cross-check and everything downstream, and only revisit 3b-3g if 3h
+#       actually surfaces a contradiction traceable to missing mechanical
+#       framing.
+# Not resolved here. (2) is cheaper; (1) is more thorough. Recommend
+# deciding this deliberately before drafting 3-0a, same discipline as the
+# 3b/3c chaining question below.
+# ---
+ 
+# ---
+# PROCESS NOTES (standing practices - apply to every phase as it's built, not
+# just phase 3; revisit/refine as we learn more)
+# ---
+# - fields come in different flavors: CLASSIFICATION (pick from a small
+#   bounded set, lower risk), CONSTRUCTION (invent a structure from scratch,
+#   e.g. a thematic axis - higher risk of dressing genre convention up as
+#   forced inference), SCALAR-WITH-DOWNSTREAM-CONSTRAINT (a number/range a
+#   later phase's math depends on, e.g. endings count). construction and
+#   scalar-with-constraint fields need harder adversarial testing than
+#   classification fields do - identify which flavor a new field is before
+#   drafting it.
+#     - flavor call for the new fields below: 3-0a (recurring decision
+#       taxonomy) is CONSTRUCTION - treat with the same rigor as
+#       core_thematic_axis. 3-0b (who "you" is) is mostly CLASSIFICATION;
+#       its epistemic-state sub-field leans CONSTRUCTION. 3-0c (failure
+#       model) is CLASSIFICATION at the top level (does a failure state
+#       exist: yes/no/soft) but CONSTRUCTION in its specifics - flag for
+#       hard testing rather than assuming the top-level simplicity carries
+#       through.
+# - default posture for sibling fields within a phase: run extraction BLIND to
+#   each other unless a specific contamination or dependency risk is
+#   identified and documented for that pair (3b/3c: blind, to stop
+#   transgression from inflating valence). whatever blind execution misses
+#   across a phase's fields should get caught by that phase's own cross-check
+#   step (see 3h).
+#     - 3-0a/b/c are the first strong candidate for the OTHER posture -
+#       chained rather than blind. They describe the mechanical contract
+#       the reader is playing, and 3b-3g describe narrative content that
+#       arguably should be built to fit that contract, not the reverse.
+#       This is the same open architecture question already flagged
+#       (chain vs. blind, general policy still undecided) - 3-0a/b/c makes
+#       it concrete rather than resolving it. Decide deliberately before
+#       drafting, don't default silently.
+# - confirm a field's actual downstream consumer by rereading that later
+#   phase's own wording before finalizing the field's shape - don't assume a
+#   plausible-sounding consumer exists just because the shape seems to fit.
+# - the kernel (as filtered/adapted by 2a) persists and stays directly
+#   available to any later phase that needs specific texture or detail beyond
+#   what phase 3 distills. phase 3 intuits the core structural concepts we
+#   need to nail down before we can think about casting, structure, setting,
+#   etc - it's a distillation for early decisions, not a replacement for the
+#   source text.
+# - before sinking real design time into an unbuilt phase, run a crude,
+#   stubbed-out pass of the WHOLE pipeline (3 through 17) on one simple,
+#   low-complexity kernel, even with placeholder logic for phases not yet
+#   designed. goal is confirming info actually flows end-to-end the way we
+#   think it does, not producing a good story - cheaper to find a broken seam
+#   this way than after several more phases are individually polished.
+#     - this stub pass should now specifically confirm that a 3-0c failure
+#       model, once it exists, actually reaches step 14 (quick exits/bad
+#       ends) and step 16 (transition states) - those are currently the
+#       only two places anything failure-shaped is mentioned, and both
+#       predate 3-0c existing.
+# ---
+ 
 # So I think the process is going to be:
 # 1) identify what our core assumptions are for the product
 #    (interactive, second person, audience)
@@ -5,18 +97,81 @@
 #    (a blurb containing as much information as the user wants to give
 #     regarding the desired story)
 #   a) filter kernel to required levels wrt audience
-# 3) analyze the kernel to figure out core requirements
+#      (this filtered kernel is the version that persists downstream - see
+#      process notes above)
+# 3) analyze the (filtered) kernel to intuit the core structural concepts we
+#    need to nail down before we can think about casting, structure, setting
+#
+#   [NEW - unbuilt. These describe the INTERACTIVE CONTRACT: what kind of
+#    thing the reader is actually doing, as distinct from what the story is
+#    about. See CHANGELOG open decision above re: build/retrofit order.]
+#
+#   0a) the interactive question - what is the reader doing, not what is
+#       happening to the protagonist. what decision(s) recur across the
+#       story; is there one dominant repeated decision-type (e.g. "who to
+#       trust," "what to sacrifice") or several unrelated ones. this is the
+#       same mechanical-over-literary framing that reshaped 3d - apply that
+#       lesson here first, deliberately, rather than rediscovering it.
+#   0b) resolve "you" - who the reader is (may already be partly covered by
+#       3d's viewpoint work, but that's about IDENTITY persistence; this is
+#       about EPISTEMIC state) - what the reader-as-protagonist knows at
+#       story start vs. what's withheld, and whether that gap is itself
+#       part of the design (mystery/reveal-driven) or incidental.
+#   0c) consequence and failure model - does this story have a distinct
+#       failure/"game over" state at all, as opposed to pure branching
+#       narrative with no failure concept? if yes: roughly how failure is
+#       recognized and what it costs. currently the ONLY places failure is
+#       mentioned anywhere in this pipeline are step 14 ("quick exits/bad
+#       ends," per-node) and step 16 ("transition states next node or
+#       branch") - both far downstream and node-local. deciding this at the
+#       top level avoids re-deciding it piecemeal, inconsistently, at every
+#       node in step 14.
+#
 #   a) rough minimal and maximal length
 #   b) affect extraction (primary, primary trajectory, secondaries, tone, somatic address, transgression level)
+#      [run blind to 3c - see step3b_design_lessons.md]
 #   c) thematic extraction (core thematic axis, secondary thematic axis, moral valence)
+#      [run blind to 3b - see step3c_design_lessons.md]
 #   d) rough viewpoint requirements (single person, multi-person hopping)
-#   e) rough timeline requirements/bounds (single time, linear, multiple times, clusterd, ...)
+#   e) rough timeline requirements/bounds (single time, linear, multiple times, clustered, ...)
+#      + rough duration scale (hours/days, weeks/months, years, generations+)
 #   f) rough setting requirements/bounds (single overall setting, multiple clustered, multiple dispersed)
-#   g) complexity of interactivity (number of possible major endings)
+#      + rough scale indicator (room/building, city/region, world, multi-world)
+#   g) complexity of interactivity:
+#      i) target ending count - a soft RANGE, not an exact number (step 6's
+#         branch math can't hit every integer - see 6i)
+#      ii) branching density preference - how much mid-path player-facing
+#          branching the kernel wants, independent of final ending count;
+#          these are different things a kernel can weight differently
+#      iii) [NEW - unbuilt] state richness indicator - thin / moderate / rich,
+#           a coarse soft prior for how much tracked state (flags,
+#           inventory, relationship counters, world-variables) this kernel
+#           is likely to need. Feeds 6j (see below), the same way other 3g
+#           indicators feed 6i - a soft target for a later phase's harder
+#           math, not a hard commitment.
+#   h) cross-check 3a-g [and, once built, 3-0a/b/c] against each other for
+#      genuine mutual incoherence (not just stylistic difference) - same
+#      discipline as within-field contradiction handling: name the conflict,
+#      prefer the better-evidenced claim, flag what's unresolved for phase 4
+#      rather than silently picking a winner or averaging.
+#
+#      CONTRACT AXES vs. INTERACTIVE AXES: worth explicitly labeling for 3h's
+#      benefit, even though the split was already implicit. Contract axes
+#      describe the fictional content itself: 3b (affect), 3c (theme), 3d's
+#      identity component, 3e (timeline), 3f (setting), 3-0b's identity
+#      component. Interactive axes describe the mechanics of play: 3-0a
+#      (the interactive question), 3-0c (failure model), 3g (complexity),
+#      and downstream, 5h/5i/6j below. 3h should treat a contract/contract
+#      contradiction (e.g. transgression vs. valence) differently from a
+#      contract/interactive contradiction (e.g. a rich multi-timeline
+#      contract axis paired with a "thin" state-richness interactive axis) -
+#      the second kind is a much better early-warning signal for 6j's design
+#      than for anything narrative.
+#
 # 4) initial structural shape
 #   a) plot architecture (quest, investigation, caper, ...)
 #   b) conflict type
-#   c) protaganist configuration
+#   c) protagonist configuration
 #   d) scale of stakes
 # 5) initial world shape
 #   a) spatial settings
@@ -26,6 +181,20 @@
 #   e) social order
 #   f) technological texture
 #   g) threat source
+#   h) [NEW - unbuilt] agency scope - what the reader can actually affect
+#      vs. what's fixed backdrop the reader can observe/react to but not
+#      change. derives from the interactive contract (3-0a/0c) applied onto
+#      this phase's world shape (5a-g) - e.g. a rich cosmology (5d) the
+#      reader can merely witness is a different design than one they can
+#      alter. step 9c already names "user agency" as a requirement to
+#      verify - this is that requirement's actual source field, which
+#      doesn't currently exist anywhere upstream.
+#   i) [NEW - unbuilt] information topology - what's hidden from the reader,
+#      what's revealed, when, and through what channel (discovered object,
+#      dialogue, environmental detail, ...). derives from 3-0b's epistemic
+#      gap applied onto this phase's world shape. most load-bearing for
+#      mystery/investigation-flavored kernels, but worth extracting as a
+#      general field rather than only when genre makes it obviously salient.
 # 6) figure out overall structure
 #   a) primary branch point is going to divide on the core thematic axis
 #      (*what* they choose to believe) (2 choices)
@@ -41,10 +210,32 @@
 #      before secondary branch point.  replace those beats with diamond shaped
 #      subgraphs, where the decisions made in those diamond branches will
 #      directly force the users path in the secondary branch
-#   h) ternary branch points (if used) will be more varied and relate to
-#      the consequences of the two previous branch choices, including the toll
-#      the what/how is taking on the character, or *who* the toll is inflicted
-#      upon, or a change of conflict type / threat source.
+#   h) ternary branch points (if used, typically 2-3 choices) will be more
+#      varied and relate to the consequences of the two previous branch
+#      choices, including the toll the what/how is taking on the character,
+#      or *who* the toll is inflicted upon, or a change of conflict type /
+#      threat source.
+#   i) reconcile achieved path count against 3g(i)'s target range - primary x
+#      secondary alone only yields 4, 6, or 8 paths. if the target isn't met
+#      by that lattice, use ternary branch points (6h) at one or more
+#      secondary-path branches to adjust, and record the final achieved count
+#      for the phase 9 consistency check.
+#   j) [NEW - FLAGGED, not designed] state model - the tracked variables an
+#      Adrift/Inform-style engine needs: flags, inventory, relationship
+#      counters, world-state variables, and what reads/writes them. this is
+#      currently the single largest structural gap in this document - bigger
+#      in scope than a normal lettered sub-step, and probably deserves real
+#      design attention of its own (possibly its own phase between 6 and 7,
+#      not just a sub-step of 6). the only two places anything state-shaped
+#      is currently mentioned are step 14 (per-node, far downstream) and
+#      step 16 ("transition states next node or branch," equally downstream
+#      and equally node-local) - neither is a real design for this, both are
+#      just places state gets used once something upstream has already
+#      decided what it is. inputs once designed: 3g(iii)'s state richness
+#      indicator (soft prior), 5h's agency scope (what's actually
+#      changeable), 5i's information topology (what's revealed/tracked as
+#      known-vs-unknown). NOT started - do not assume this is handled by
+#      anything else in this document.
 # 7) world generation
 #   a) major locations
 #   b) location backstory
@@ -54,16 +245,37 @@
 # 9) plot generation 
 #   a) fill in structure from 6 using major locations and major characters
 #   b) ensure consistency in path-based use of locations and characters
-#   c) ensure major story requirements met (primary affect, resolution of plot, user agency)
+#   c) ensure major story requirements met: primary affect trajectory (3b),
+#      core thematic axis resolution + moral valence framing (3c), reconciled
+#      complexity target (3g/6i), and user agency (5h, once it exists -
+#      currently unsourced upstream, see above)
 # 10) identify shortcomings
 #   a) pacing, character arcs, unaddressed plot references
 #   b) introduce new minor events, locations and characters to address these
-#   c) identify coherence or (opposite=lack of novelty) and address by adding elements to either reinforce coherence or add novelty
+#   c) identify deficits in COHERENCE (do the added elements fit believably)
+#      and separately in NOVELTY (does the story feel generic/derivative
+#      despite being coherent) - these are two different failure modes, not
+#      opposite ends of one axis - address each independently
 #   d) update story structure to incorporate these new elements
 # 11) deep expansion of characters (no new characters, just full build out of existing)
 # 12) deep expansion of settings (build out of existing + definition and build out of minor areas like the parts of a larger setting)
 # 13) full node-based graph finalization pass
-# 14) for each node in graph, identify granular settings available (rooms) and characters directly involved.  Identify purpose of node, what needs to be achieved by it and possible quick exits (bad ends).
+#   a) reconcile the branch structure from 6 against everything added during
+#      7-12 (new minor characters/locations from 10, expanded detail from 11/12)
+#   b) verify no orphaned nodes or dangling branches
+#   c) verify the achieved ending count still matches 6i's reconciled target
+#   d) lock the graph structure before granular per-node buildout begins (14+)
+# 14) for each node in graph, identify granular settings available (rooms) and
+#     characters directly involved. identify purpose of node, what needs to
+#     be achieved by it and possible quick exits (bad ends) - governed by
+#     3-0c's failure model once it exists, rather than decided fresh per node.
 # 15) ... (probably node-node transition point identification)
-# 16) for each node, full node build out (room connections, interactable objects, goals, transition states to next node or branch)... ensure arc/theme/affect trajectory
+# 16) for each node, full node build out (room connections, interactable
+#     objects, goals, transition states to next node or branch - see 6j once
+#     designed) - keep each node's position in the graph consistent with the
+#     affect trajectory shape (3b) and thematic arc (3c/9c) expected at that
+#     point in the story
 # 17) for each node fully define actions in each room, generate prose
+#     (draws on the filtered kernel's own texture/detail directly, not just
+#     phase 3's distillation of it - see process notes)
+ 
