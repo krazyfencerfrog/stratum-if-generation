@@ -25,10 +25,11 @@ class StoryGenerator:
         self.story_path_str = os.path.join(THIS_DIR, "..", "stories", self.story_id)
         self.story_path = Path(self.story_path_str)
         self.story_path.mkdir(parents=True, exist_ok=True)
-
+        
         # set defaults, if resuming the specific stage will load from file
         self.kernel = None
         self.rating = DEFAULT_RATING
+        self.analysis = dict()
 
     def load_story_file(self, file_suffix):
         value = ''
@@ -118,7 +119,7 @@ class StoryGenerator:
         # this step is to run a content-rating filter over the kernel
         #  note if the rating is 'UNRATED' it will skip this step
         if self.rating != 'UNRATED':
-            filter_prompt = self.load_prompt('step2_filter.txt')
+            filter_prompt = self.load_prompt('s2_filter.prompt')
 
             # now fill in the args
             filter_prompt = filter_prompt.replace('$$KERNEL$$',self.kernel).replace('$$TARGET_RATING$$',self.rating)
@@ -135,185 +136,50 @@ class StoryGenerator:
         pass
     def s3a_determine_length(self):
         pass
-    def s3b_determine_affect(self):
 
-        # load the affect
-        self.s3b_affect = self.load_story_file('s3b_affect.json')
-        if self.s3b_affect:
-            self.s3b_affect = self.lenient_json_loads(self.s3b_affect)
+    def run_prompt(self,
+                   prefix,
+                   name,
+                   replacement_mapping,
+                   is_json=True):
+
+        # load the value from previous run
+        output_file_name = f'{prefix}_{name}.{"json" if is_json else "txt"}'
+        output_member_name = f'{prefix}_{name}'
+        prompt_file_name = f'{prefix}_{name}.prompt'
+        print(f'out: {output_file_name}')
+        val = self.load_story_file(output_file_name)
+        if val:
+            if is_json:
+                self.analysis[output_member_name] = self.lenient_json_loads(val)
+            else:
+                self.analysis[output_member_name] = val
             return
         
-        # this step is to run an affect-extraction over the kernel
-        affect_prompt = self.load_prompt('step3b_affect.txt')
+        # load the prompt
+        prompt = self.load_prompt(prompt_file_name)
 
         # now fill in the args
-        affect_prompt = affect_prompt.replace('$$KERNEL$$',self.kernel)
+        for k,v in replacement_mapping.items():
+            prompt = prompt.replace(k,v)
         
-        log_path = self.story_create_log('s3b')
+        log_path = self.story_create_log(prefix)
         with open(log_path, "w", encoding="utf-8") as f:
             with contextlib.redirect_stdout(f):
                 client = dynamic_config.get_client()
-                (thinking,response) = client.run_prompt(affect_prompt)
-                self.save_story_file('s3b_raw_output_thinking.txt', thinking)
-                self.save_story_file('s3b_raw_output_response.txt', response)
+                (thinking,response) = client.run_prompt(prompt)
+                self.save_story_file(f'{prefix}_raw_output_thinking.txt', thinking)
+                self.save_story_file(f'{prefix}_raw_output_response.txt', response)
 
-                # validate the json
-                self.s3b_affect = self.lenient_json_loads(response)
-                self.save_story_file('s3b_affect.json',
-                                     json.dumps(self.s3b_affect, indent=2, ensure_ascii=False))
-
-    def s3c_determine_theme(self):
-
-        # load the theme
-        self.s3c_theme = self.load_story_file('s3c_theme.json')
-        if self.s3c_theme:
-            self.s3c_theme = self.lenient_json_loads(self.s3c_theme)
-            return
-        
-        # this step is to run a theme-extraction over the kernel
-        theme_prompt = self.load_prompt('step3c_theme.txt')
-
-        # now fill in the args
-        theme_prompt = theme_prompt.replace('$$KERNEL$$',self.kernel)
-        
-        log_path = self.story_create_log('s3c')
-        with open(log_path, "w", encoding="utf-8") as f:
-            with contextlib.redirect_stdout(f):
-                client = dynamic_config.get_client()
-                (thinking,response) = client.run_prompt(theme_prompt)
-                self.save_story_file('s3c_raw_output_thinking.txt', thinking)
-                self.save_story_file('s3c_raw_output_response.txt', response)
-
-                # validate the json
-                self.s3c_theme = self.lenient_json_loads(response)
-                self.save_story_file('s3c_theme.json',
-                                     json.dumps(self.s3c_theme, indent=2, ensure_ascii=False))
-
-    def s3d_determine_viewpoint(self):
-
-        # load the viewpoint
-        self.s3d_viewpoint = self.load_story_file('s3d_viewpoint.json')
-        if self.s3d_viewpoint:
-            self.s3d_viewpoint = self.lenient_json_loads(self.s3d_viewpoint)
-            return
-        
-        # this step is to run a viewpoint-extraction over the kernel
-        viewpoint_prompt = self.load_prompt('step3d_viewpoint.txt')
-
-        # now fill in the args
-        viewpoint_prompt = viewpoint_prompt.replace('$$KERNEL$$',self.kernel)
-        
-        log_path = self.story_create_log('s3d')
-        with open(log_path, "w", encoding="utf-8") as f:
-            with contextlib.redirect_stdout(f):
-                client = dynamic_config.get_client()
-                (thinking,response) = client.run_prompt(viewpoint_prompt)
-                self.save_story_file('s3d_raw_output_thinking.txt', thinking)
-                self.save_story_file('s3d_raw_output_response.txt', response)
-
-                # validate the json
-                self.s3d_viewpoint = self.lenient_json_loads(response)
-                self.save_story_file('s3d_viewpoint.json',
-                                     json.dumps(self.s3d_viewpoint, indent=2, ensure_ascii=False))
-
-    def s3e_determine_timeline(self):
-
-        # load the timeline
-        self.s3e_timeline = self.load_story_file('s3e_timeline.json')
-        if self.s3e_timeline:
-            self.s3e_timeline = self.lenient_json_loads(self.s3e_timeline)
-            return
-        
-        # this step is to run a timeline-extraction over the kernel
-        timeline_prompt = self.load_prompt('step3e_timeline.txt')
-
-        # now fill in the args
-        timeline_prompt = timeline_prompt.replace('$$KERNEL$$',self.kernel)
-        
-        log_path = self.story_create_log('s3e')
-        with open(log_path, "w", encoding="utf-8") as f:
-            with contextlib.redirect_stdout(f):
-                client = dynamic_config.get_client()
-                (thinking,response) = client.run_prompt(timeline_prompt)
-                self.save_story_file('s3e_raw_output_thinking.txt', thinking)
-                self.save_story_file('s3e_raw_output_response.txt', response)
-
-                # validate the json
-                self.s3e_timeline = self.lenient_json_loads(response)
-                self.save_story_file('s3e_timeline.json',
-                                     json.dumps(self.s3e_timeline, indent=2, ensure_ascii=False))
+                if is_json:
+                    # validate the json
+                    self.analysis[output_member_name] = self.lenient_json_loads(response)
+                    self.save_story_file(output_file_name,
+                                         json.dumps(self.analysis[output_member_name], indent=2, ensure_ascii=False))
+                else:
+                    self.analysis[output_member_name] = response
+                    self.save_story_file(output_file_name, self.analysis[output_member_name])
                 
-                
-# So I think the process is going to be:
-# 1) identify what our core assumptions are for the product
-#    (interactive, second person, audience)
-# 2*) get a kernel from the user
-#    (a blurb containing as much information as the user wants to give
-#     regarding the desired story)
-#   a) filter kernel to required levels wrt audience
-# 3) analyze the kernel to figure out core requirements
-#   a) rough minimal and maximal length
-#   b) affect extraction (primary, primary trajectory, secondaries, tone, somatic address, transgression level)
-#   c) thematic extraction (core thematic axis, secondary thematic axis, moral valence)
-#   d) rough viewpoint requirements (single person, multi-person hopping)
-#   e) rough timeline requirements/bounds (single time, linear, multiple times, clusterd, ...)
-#   f) rough setting requirements/bounds (single overall setting, multiple clustered, multiple dispersed)
-#   g) complexity of interactivity (number of possible major endings)
-# 4) initial structural shape
-#   a) plot architecture (quest, investigation, caper, ...)
-#   b) conflict type
-#   c) protaganist configuration
-#   d) scale of stakes
-# 5) initial world shape
-#   a) spatial settings
-#   b) temporal settings
-#   c) ontology / physics
-#   d) cosmology / metaphysics
-#   e) social order
-#   f) technological texture
-#   g) threat source
-# 6) figure out overall structure
-#   a) primary branch point is going to divide on the core thematic axis
-#      (*what* they choose to believe) (2 choices)
-#   b) secondary branch point is going to divide on *how* they choose to
-#      follow the core thematic choice (2-4 choices)
-#   c) now this will define between 4-8 main paths through the story
-#   d) calculate framework (hero's journey, 5-act tragedy, ...)
-#   e) expand framework beats + branches into initial story graph
-#   f) identify 1-2 possible beats in graph before primary branch and
-#      expand into diamond shaped subpaths, giving the user experiences
-#      to inform primary branch decision
-#   g) identify 1-2 possible beats in two paths steming from primary branch,
-#      before secondary branch point.  replace those beats with diamond shaped
-#      subgraphs, where the decisions made in those diamond branches will
-#      directly force the users path in the secondary branch
-#   h) ternary branch points (if used) will be more varied and relate to
-#      the consequences of the two previous branch choices, including the toll
-#      the what/how is taking on the character, or *who* the toll is inflicted
-#      upon, or a change of conflict type / threat source.
-# 7) world generation
-#   a) major locations
-#   b) location backstory
-# 8) character generation
-#   a) major characters
-#   b) character roles, relations and backstory
-# 9) plot generation 
-#   a) fill in structure from 6 using major locations and major characters
-#   b) ensure consistency in path-based use of locations and characters
-#   c) ensure major story requirements met (primary affect, resolution of plot, user agency)
-# 10) identify shortcomings
-#   a) pacing, character arcs, unaddressed plot references
-#   b) introduce new minor events, locations and characters to address these
-#   c) identify coherence or (opposite=lack of novelty) and address by adding elements to either reinforce coherence or add novelty
-#   d) update story structure to incorporate these new elements
-# 11) deep expansion of characters (no new characters, just full build out of existing)
-# 12) deep expansion of settings (build out of existing + definition and build out of minor areas like the parts of a larger setting)
-# 13) full node-based graph finalization pass
-# 14) for each node in graph, identify granular settings available (rooms) and characters directly involved.  Identify purpose of node, what needs to be achieved by it and possible quick exits (bad ends).
-# 15) ... (probably node-node transition point identification)
-# 16) for each node, full node build out (room connections, interactable objects, goals, transition states to next node or branch)... ensure arc/theme/affect trajectory
-# 17) for each node fully define actions in each room, generate prose
-
 def slugify(name):
     s = name.strip().lower()
     s = re.sub(r"[^a-z0-9]+", "_", s)
@@ -338,8 +204,17 @@ if __name__ == "__main__":
 
     gen.s1_take_kernel(sys.stdin.read())
     gen.s2_apply_rating(rating=args.rating)
-    gen.s3b_determine_affect()
-    gen.s3c_determine_theme()
-    gen.s3d_determine_viewpoint()
-    gen.s3e_determine_timeline()
+
+    replace_kernel_only = {'$$KERNEL$$': gen.kernel}
+    gen.run_prompt('s3b','affect',replace_kernel_only)
+    gen.run_prompt('s3c','theme',replace_kernel_only)
+    gen.run_prompt('s3d','viewpoint',replace_kernel_only)    
+    gen.run_prompt('s3e','timeline',replace_kernel_only)
+    gen.run_prompt('s3f','setting', {
+        '$$VIEWPOINT_EXCURSIONS_JSON$$': json.dumps(gen.analysis['s3d_viewpoint'],
+                                                    indent=2,
+                                                    ensure_ascii=False),
+        '$$KERNEL$$': gen.kernel
+    })
+    gen.run_prompt('s3g','complexity',replace_kernel_only)
 

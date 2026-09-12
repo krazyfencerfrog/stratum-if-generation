@@ -1,5 +1,8 @@
 #!/bin/bash
 
+python main.py --story-id=kernel25 < ../tests/kernels/kernel25.txt
+python main.py --story-id=kernel26 < ../tests/kernels/kernel26.txt
+
 python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt
 python main.py --story-id=kernel2 < ../tests/kernels/kernel2.txt
 python main.py --story-id=kernel3 < ../tests/kernels/kernel3.txt
@@ -23,4 +26,3 @@ python main.py --story-id=kernel20 < ../tests/kernels/kernel20.txt
 python main.py --story-id=kernel21 < ../tests/kernels/kernel21.txt
 python main.py --story-id=kernel22 < ../tests/kernels/kernel22.txt
 python main.py --story-id=kernel23 < ../tests/kernels/kernel23.txt
-python main.py --story-id=kernel24 < ../tests/kernels/kernel24.txt
