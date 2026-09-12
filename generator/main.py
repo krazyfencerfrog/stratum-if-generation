@@ -12,6 +12,9 @@ import dynamic_config
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
+
+# by default, don't enforce a floor or ceiling on the kernel,
+#  but if specified, can keep things from wandering off
 DEFAULT_RATING = 'UNRATED'
 
 def print_usage():
@@ -206,6 +209,9 @@ if __name__ == "__main__":
     gen.s2_apply_rating(rating=args.rating)
 
     replace_kernel_only = {'$$KERNEL$$': gen.kernel}
+    gen.run_prompt('s3_0a','interactive_question',replace_kernel_only)
+    gen.run_prompt('s3_0b','identity_epistemic',replace_kernel_only)
+    gen.run_prompt('s3_0c', 'consequence_failure_model',replace_kernel_only)
     gen.run_prompt('s3b','affect',replace_kernel_only)
     gen.run_prompt('s3c','theme',replace_kernel_only)
     gen.run_prompt('s3d','viewpoint',replace_kernel_only)    
