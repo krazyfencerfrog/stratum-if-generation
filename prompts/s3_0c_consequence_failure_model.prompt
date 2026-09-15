@@ -17,16 +17,23 @@ Three things are NOT automatically a failure state, no matter how costly or blea
  - A costly outcome produced by the story's own central recurring decision. If any answer to that decision is a valid, intended path through the story, picking the "worse" option is not failure — it's just one of the designed branches, not something to retry.
  - General risk, danger, or mortality inherent to the premise, without a specific mechanic (a countdown, a depletable resource, a detection risk, etc.) that the Kernel gives you grounds to believe exists. Most premises involve some risk; only score "soft" or "hard" when there's a concrete, distinct mechanic, not merely that stakes are present.
 
+Two things worth checking explicitly before finalizing failure_presence:
+ - A Kernel can have BOTH a costly central recurring decision (not itself failure, per the carve-out above) AND a separate, genuinely distinct mechanical risk sitting alongside it (a resource that can run out, a deadline that can pass). Ruling out the first doesn't automatically rule out the second — check each independently rather than letting one judgment answer for both.
+ - THE BRANCH-PREFERENCE TEST: when a Kernel presents two or more branch outcomes side by side, ask whether the Kernel's own framing signals a preference — one outcome as the goal, the other as a shortfall to avoid (a missed deadline named as such, an opportunity described as wasted) — or presents both with equal narrative weight and interest. Equal weight with no stated or implied preference is presence "none" for that pair, even when one branch is objectively sadder than the other. Only score "soft" or "hard" for that pair when the Kernel's own framing marks one outcome as the one to avoid.
+
 This field is prone to the same trap 3b's transgression field warned about: a bare genre name can feel like insufficient grounds, tempting "no_signal" when genre convention actually does give a real basis to reason from. A stealth or heist premise conventionally implies a "getting caught" fail state even when unstated (genre_association). A cozy or slice-of-life premise conventionally implies no such state (genre_association). Reserve "no_signal" for when the Kernel gives no premise or genre at all to reason from.
 
 Because these stories branch, judge failure_presence and failure_scope (below) across the FULL SPACE of paths the story could plausibly take, not one playthrough. If at least one plausible branch would carry a distinct failure mechanic, presence is not "none" even if other branches are entirely failure-free — do not average down to "soft" or "none" just because some paths are safer. This is deliberately not a ceiling/floor split like 3b's transgression: we don't need a separate best-case/worst-case pair here, just a single yes/no/soft call at the "does this exist anywhere in the design space" level. How widely that risk is spread across the space is what failure_scope is for.
+
+Triggers name the CAUSE of failure — what makes it happen — not the RESULT, which belongs in failure_cost. If a Kernel describes two different outcomes of the same underlying failure event (e.g., "subpaths end in sudden death or resetting the loop"), that's a signal for failure_cost = "varies_by_trigger" (with a note mapping outcome to cost) — not a second, redundant trigger entry restating the same event's consequence. Only add a second trigger type when the Kernel implies a genuinely different CAUSE, not just a different consequence of the same one.
 
 FAILURE TRIGGERS — when presence is "soft" or "hard," name 1-3 short trigger types from the bounded set below. Each has a precise scope so they don't overlap:
  - time_pressure: a countdown or deadline running out (a clock, a shift change, "before dawn," a timer measured in duration). If a resource is framed strictly as a ticking deadline rather than a depletable stock, it belongs here, not resource_depletion.
  - resource_depletion: a tracked, depletable stock (fuel, oxygen as a quantity, ammunition, medical supplies, hull integrity) hitting zero, where the rate of depletion can vary with player behavior. If the same substance is framed purely as "you have until X" rather than a variable stock, that's time_pressure instead.
  - detection_or_exposure: being discovered, caught, or identified by an antagonist or authority — the discovery itself is the failure point, not necessarily what happens after.
  - incapacitation_or_death: the protagonist (or their operative embodiment — a ship's hull, an AI's sensors) is destroyed, killed, or rendered nonfunctional, ending the current attempt.
- - irreversible_foreclosure: no on-page failure event occurs, but a choice quietly and permanently closes off the story's intended positive resolution (a missed window, a trust that can never be rebuilt, a fact never learned in time). Recognized only in retrospect, not via an explicit game-over beat.
+ - incorrect_resolution: the protagonist commits, in a single on-page decision, to a wrong answer, verdict, or solution in a story built around reaching a correct one (a mystery's accusation, a trial's verdict, a puzzle's final move). There IS a decisive, recognizable beat here, so this can pair with either "terminal" (the wrong call ends the run as a bad end) or "narrative_setback" (the story continues carrying the consequences of having been wrong) — whichever the Kernel's framing supports.
+ - irreversible_foreclosure: no single on-page failure event occurs; a choice, or a small accumulation of choices, quietly and permanently closes off the story's intended positive resolution (a missed window, a trust that can never be rebuilt, a fact never learned in time). Recognized only in retrospect, never via an explicit game-over beat — this is why it structurally pairs with failure_cost "narrative_setback," not "terminal": there's no decisive moment for a terminal event to attach to. If the Kernel instead centers on one clear right-or-wrong beat, that's incorrect_resolution above, not this.
  - relational_collapse: a key relationship, alliance, or group's cohesion breaks down in a way the Kernel signals should be avoided — not a costly-but-intended dramatic turn (a betrayal that IS the point is not this; see the carve-outs above).
  - other: a real, distinct failure trigger that doesn't fit any category above. Explain what it is in the note; don't reach for this before ruling out the named categories.
 
@@ -144,6 +151,28 @@ Output:
   "failure_triggers": {"types": ["resource_depletion", "incapacitation_or_death"], "evidence_basis": "mixed", "note": "The flashlight-battery drain is explicit; a direct predation risk from the stalking entity is a genre_association default for survival-horror that the Kernel doesn't rule out."},
   "failure_cost": {"value": "terminal", "evidence_basis": "explicit"},
   "failure_scope": {"value": "pervasive", "evidence_basis": "strong_inference", "note": "A constantly-draining resource plus an ever-present stalker implies risk runs throughout, not at one juncture."}
+}
+
+Example G:
+Kernel: "A second-person legal thriller. You're a defense attorney building your closing argument across the trial. At the end you argue your case to the jury — argue it well based on what you actually uncovered and you win the acquittal; argue it based on a theory the evidence doesn't support and the jury convicts your client. There's one version of events that's actually true, and the verdict should reflect whether you found it."
+Reasoning: The Kernel frames the verdict as accountable to whether the attorney "found" the true version of events — an unsupported argument is a mistake to avoid, not an equally valid alternate path, so presence is hard, strong_inference. The failure crystallizes at a single named beat (the closing argument and verdict), not a quiet accumulation of missed details, so the trigger is incorrect_resolution rather than irreversible_foreclosure — strong_inference. A conviction is presented as the story's losing outcome rather than a setback the narrative continues past, so cost is terminal, strong_inference. Risk concentrates at the closing argument/verdict rather than running through the whole trial, so scope is isolated, strong_inference.
+Output:
+{
+  "failure_presence": {"value": "hard", "evidence_basis": "strong_inference", "note": "The Kernel frames the verdict as accountable to whether the attorney found the true version of events, making an unsupported argument a mistake to avoid rather than an equally valid path."},
+  "failure_triggers": {"types": ["incorrect_resolution"], "evidence_basis": "strong_inference", "note": "The closing argument is a single named, decisive beat, not a quiet accumulation of missed details."},
+  "failure_cost": {"value": "terminal", "evidence_basis": "strong_inference", "note": "A conviction is presented as the story's losing outcome, not a setback the narrative continues past."},
+  "failure_scope": {"value": "isolated", "evidence_basis": "strong_inference", "note": "Risk crystallizes at the closing argument/verdict rather than running through the whole trial."}
+}
+
+Example H:
+Kernel: "A second-person career drama. You're up for a partnership at your firm this year. Depending on how you play it, you either make partner — or you don't, and the story follows you finding your footing somewhere new."
+Reasoning: Applying the branch-preference test: both outcomes are described with equal narrative interest ("finding your footing somewhere new" gets the same texture as the partnership itself), and neither is framed as a mistake, a setback, or something the story wants the reader to avoid — it's presented as simply the other branch. No preference is stated or implied, so presence is none, strong_inference (not explicit, since the Kernel never says the branches are "equally valid" — that reading is inferred from the neutral, evenly-weighted framing).
+Output:
+{
+  "failure_presence": {"value": "none", "evidence_basis": "strong_inference", "note": "Both branches are described with equal narrative interest and neither is framed as a mistake to avoid — the branch-preference test finds no signal that one outcome is the goal and the other a shortfall."},
+  "failure_triggers": {"types": [], "evidence_basis": "strong_inference"},
+  "failure_cost": {"value": "not_applicable", "evidence_basis": "strong_inference"},
+  "failure_scope": {"value": "not_applicable", "evidence_basis": "strong_inference"}
 }
 
 --- USER KERNEL ---
