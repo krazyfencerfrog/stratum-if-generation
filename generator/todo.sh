@@ -28,3 +28,11 @@ python main.py --story-id=kernel24 < ../tests/kernels/kernel24.txt
 python main.py --story-id=kernel25 < ../tests/kernels/kernel25.txt
 python main.py --story-id=kernel26 < ../tests/kernels/kernel26.txt
 python main.py --story-id=kernel27 < ../tests/kernels/kernel27.txt
+
+# adversarial kernels for step 3.5 (premise expansion) and the 3d retrofit:
+#  28 - explicit hard negative against genre default (does enrichment invent a corpse?)
+#  29 - unusual positive: the genre's conventional fail state is the stated goal
+#  30 - a third-party POV excursion the kernel explicitly makes interactive
+python main.py --story-id=kernel28 < ../tests/kernels/kernel28.txt
+python main.py --story-id=kernel29 < ../tests/kernels/kernel29.txt
+python main.py --story-id=kernel30 < ../tests/kernels/kernel30.txt

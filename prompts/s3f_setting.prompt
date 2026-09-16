@@ -38,6 +38,8 @@ To set the floor, first judge whether the Kernel's footprint is STRUCTURAL (ever
 
 Floor equals ceiling whenever the Kernel gives no reason to expect any path to differ from any other in footprint — this is the normal, expected case for kernels without a real footprint-relevant fork, not something to avoid. Before scoring a genuine split, apply this check: does the specific branch the Kernel describes actually change how many or how far apart the required places are — not merely whether it changes the ending, the viewpoint, or the moral resolution? A branch that varies only in outcome, theme, or who's narrating does not by itself license a footprint split. Only a branch that concretely changes where the story physically goes does (see Calibration Example C, where the fork is explicitly about whether the protagonist leaves the local area at all).
 
+IF YOU CANNOT CITE THAT BRANCH, FLOOR EQUALS CEILING — full stop. Find the words in the Kernel that describe the fork and be able to point at them; if there are none, there is no split to score. A floor note of the form "a more contained telling could keep everything in one building," "the most restrained path could stay in the shop," or "these scenes could all be staged in the same place" is not a branch — it is your own uncertainty about a premise that does not fork, and scoring it as a split reports that uncertainty downstream as designed variance the later phases will try to build for. A premise that simply implies several places, with no fork about whether the story visits them, is a single footprint: score it once, at your best estimate, on both ends.
+
 --- EVIDENCE BASIS ---
 For every judgment, record how you arrived at it:
  - "explicit": the Kernel states this directly.

@@ -13,6 +13,49 @@ import dynamic_config
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
 
+# the phase-3 extraction steps, in the order they run, paired with the short
+#  field id the later prompts (3h, 3.5, 6.0) refer to them by
+STEP3_STEPS = [
+    ('s3_0a_interactive_question', '3-0a'),
+    ('s3_0b_identity_epistemic',   '3-0b'),
+    ('s3_0c_consequence_failure_model', '3-0c'),
+    ('s3b_affect',    '3b'),
+    ('s3c_theme',     '3c'),
+    ('s3d_viewpoint', '3d'),
+    ('s3e_timeline',  '3e'),
+    ('s3f_setting',   '3f'),
+    ('s3g_complexity','3g'),
+]
+
+# how an evidence tier reads to the phases that CONSTRUCT rather than extract:
+#  a constraint may not be contradicted, a default may be replaced with
+#  something more specific, a free variable is theirs to fill.
+EVIDENCE_CLASS = {
+    'explicit':          'constraint',
+    'strong_inference':  'constraint',
+    'mixed':             'constraint',
+    'genre_association': 'default',
+    'no_signal':         'free',
+}
+
+# how much each tier actually constrains the construction phase. A stated
+#  requirement binds fully; something merely forced by the kernel's details
+#  binds half as hard, because it's a reading rather than an instruction.
+#  Genre defaults and no_signal fallbacks constrain nothing - they're what
+#  3.5 exists to replace.
+CONSTRAINT_WEIGHT = {
+    'explicit':         1.0,
+    'mixed':            1.0,
+    'strong_inference': 0.5,
+    'genre_association': 0.0,
+    'no_signal':        0.0,
+}
+
+# thresholds for 3.5's enrichment budget, computed from the weighted share of
+#  extracted judgments that constrain rather than defer
+BUDGET_RULE = ('weighted constraint_share (explicit 1.0, strong_inference 0.5) '
+               '>= 0.5 -> minimal; >= 0.2 -> moderate; otherwise generous')
+
 # by default, don't enforce a floor or ceiling on the kernel,
 #  but if specified, can keep things from wandering off
 DEFAULT_RATING = 'UNRATED'
@@ -137,7 +180,89 @@ class StoryGenerator:
         
     def s3(self):
         pass
+
+    def analysis_json(self, member_name, indent=2):
+        """Pretty-printed JSON for one saved step's output, for substitution
+        into a later step's prompt. Returns "none" when the step hasn't run,
+        which every consuming prompt is written to tolerate."""
+        value = self.analysis.get(member_name)
+        if value is None:
+            return 'none'
+        return json.dumps(value, indent=indent, ensure_ascii=False)
+
+    def step3_bundle_json(self):
+        """All nine phase-3 extractions as one object keyed by field id.
+        3h, 3.5 and 6.0 each take the whole bundle rather than nine
+        placeholders."""
+        bundle = dict()
+        for member_name, field_id in STEP3_STEPS:
+            if member_name in self.analysis:
+                bundle[field_id] = self.analysis[member_name]
+        return json.dumps(bundle, indent=2, ensure_ascii=False)
+
+    def build_constraint_map(self):
+        """Walk every scored judgment in the phase-3 bundle and sort it by
+        evidence tier into constraint / default / free, then derive 3.5's
+        enrichment budget from the mix. This is deliberately computed here
+        rather than asked of the model: it's a count, and the model is
+        better spent on the construction it gates."""
+        fields = dict()
+
+        def walk(node, path):
+            if isinstance(node, dict):
+                basis = node.get('evidence_basis')
+                if isinstance(basis, str):
+                    fields[path] = {
+                        'evidence_basis': basis,
+                        'class': EVIDENCE_CLASS.get(basis, 'default'),
+                    }
+                for key, value in node.items():
+                    if key in ('evidence_basis', 'note'):
+                        continue
+                    if isinstance(value, (dict, list)):
+                        walk(value, f'{path}.{key}' if path else key)
+            elif isinstance(node, list):
+                for index, item in enumerate(node):
+                    if isinstance(item, (dict, list)):
+                        walk(item, f'{path}[{index}]')
+
+        for member_name, field_id in STEP3_STEPS:
+            if member_name in self.analysis:
+                walk(self.analysis[member_name], field_id)
+
+        counts = dict()
+        for entry in fields.values():
+            counts[entry['evidence_basis']] = counts.get(entry['evidence_basis'], 0) + 1
+        total = len(fields)
+        constraints = sum(1 for e in fields.values() if e['class'] == 'constraint')
+        weighted = sum(CONSTRAINT_WEIGHT.get(e['evidence_basis'], 0.0)
+                       for e in fields.values())
+        share = (weighted / total) if total else 0.0
+        if share >= 0.5:
+            budget = 'minimal'
+        elif share >= 0.2:
+            budget = 'moderate'
+        else:
+            budget = 'generous'
+
+        constraint_map = {
+            'fields': fields,
+            'counts': counts,
+            'total_scored_judgments': total,
+            'constraint_count': constraints,
+            'constraint_share': round(share, 3),
+            'suggested_budget': budget,
+            'budget_rule': BUDGET_RULE,
+        }
+        rendered = json.dumps(constraint_map, indent=2, ensure_ascii=False)
+        self.analysis['s3h_constraint_map'] = constraint_map
+        self.save_story_file('s3h_constraint_map.json', rendered)
+        return rendered
+
     def s3a_determine_length(self):
+        # folded into 3g: target_ending_count and branching_density already
+        #  bound the build, and nothing downstream consumed a separate length
+        #  field. See docs/strategy.txt 3a.
         pass
 
     def run_prompt(self,
@@ -217,10 +342,58 @@ if __name__ == "__main__":
     gen.run_prompt('s3d','viewpoint',replace_kernel_only)    
     gen.run_prompt('s3e','timeline',replace_kernel_only)
     gen.run_prompt('s3f','setting', {
-        '$$VIEWPOINT_EXCURSIONS_JSON$$': json.dumps(gen.analysis['s3d_viewpoint'],
-                                                    indent=2,
-                                                    ensure_ascii=False),
+        '$$VIEWPOINT_EXCURSIONS_JSON$$': gen.analysis_json('s3d_viewpoint'),
         '$$KERNEL$$': gen.kernel
     })
-    gen.run_prompt('s3g','complexity',replace_kernel_only)
+
+    # 3g is chained, not blind: branching density and tracked state aren't
+    #  well-defined without knowing what the player decides (3-0a) and what
+    #  the engine has to recognize as failure (3-0c). Chain only where a
+    #  field is undefined without the other's output - never for agreement.
+    gen.run_prompt('s3g','complexity', {
+        '$$INTERACTIVE_QUESTION_JSON$$': gen.analysis_json('s3_0a_interactive_question'),
+        '$$FAILURE_MODEL_JSON$$': gen.analysis_json('s3_0c_consequence_failure_model'),
+        '$$KERNEL$$': gen.kernel
+    })
+
+    # 3h: the phase's own cross-check. Classification only - it names
+    #  conflicts between the nine blind extractions and picks what the
+    #  primary branch point is built from; it fixes nothing.
+    step3_bundle = gen.step3_bundle_json()
+    gen.run_prompt('s3h','cross_check', {
+        '$$STEP3_BUNDLE_JSON$$': step3_bundle,
+        '$$KERNEL$$': gen.kernel
+    })
+
+    # constraint map: computed, not judged - sorts every extracted judgment
+    #  into constraint / default / free and sizes 3.5's enrichment budget.
+    constraint_map = gen.build_constraint_map()
+
+    # 3.5: the first step that CONSTRUCTS. Turns a sparse kernel into a
+    #  concrete premise before any world-building sees it.
+    gen.run_prompt('s3_5','premise_expansion', {
+        '$$STEP3_BUNDLE_JSON$$': step3_bundle,
+        '$$CONSTRAINT_MAP_JSON$$': constraint_map,
+        '$$CROSS_CHECK_JSON$$': gen.analysis_json('s3h_cross_check'),
+        '$$AVOID_LIST$$': 'none',
+        '$$KERNEL$$': gen.kernel
+    })
+
+    # 3.5's verification, deliberately a separate call: generation and
+    #  audit in one prompt means the audit half loses.
+    gen.run_prompt('s3_5v','fidelity_check', {
+        '$$CONSTRAINT_MAP_JSON$$': constraint_map,
+        '$$PREMISE_EXPANSION_JSON$$': gen.analysis_json('s3_5_premise_expansion'),
+        '$$KERNEL$$': gen.kernel
+    })
+
+    # steps 4 and 5 (structural shape, world shape) slot in here once built.
+
+    # 6.0: topology and state model. An INPUT to step 6, not a sub-step of
+    #  it - several kernels can't be built as a lattice at all.
+    gen.run_prompt('s6_0','state_topology', {
+        '$$STEP3_BUNDLE_JSON$$': step3_bundle,
+        '$$PREMISE_EXPANSION_JSON$$': gen.analysis_json('s3_5_premise_expansion'),
+        '$$KERNEL$$': gen.kernel
+    })
 
