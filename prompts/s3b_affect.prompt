@@ -11,7 +11,11 @@ TONE is the narrative voice, register, or atmosphere used to deliver that payloa
 
 Never use the same descriptor in both tone and an affect field (primary_affect or secondary_affects). If a word could plausibly fit either, that is a signal the tone/affect split isn't finished — assign it to whichever field it more precisely belongs to and find a different, more specific word for the other. This matters most when the Kernel states two moods with comparable weight (e.g., "funny but also devastating"): once one of them is assigned to tone, do not let it re-enter the affect label under a different part of speech (tone "funny" reappearing as affect "amused" or "affectionate" is the same failure). When only one of the Kernel's stated moods survives as a genuine felt-affect word after the tone assignment, build primary_affect from that surviving word's family rather than inventing a new blended label that quietly reimports the tone side.
 
+DRIVE vs. PAYOFF — primary_affect is the SUSTAINED experience, the feeling the player lives in across most of the story's running time, not the feeling its ending delivers. When a Kernel implies one feeling throughout and a different one at the close — a longing that ends in grief, a mounting dread that breaks into relief, a lark that ends in shame — the sustained one is primary_affect, full stop, and the closing one is carried by primary_trajectory "transforming" (name the change in its note) or by a secondary affect with relation "intermittent." Do not blend the two into a compound label, and do not relitigate which one is "really" dominant: a payoff of a different kind does not compete with the drive for this field, it routes to trajectory or to a secondary. Apply this rule as soon as you notice yourself weighing a throughline feeling against an ending feeling — that weighing is the signal the rule applies, not an open question to reason through.
+
 When two stated moods both survive as affect (neither routes to tone) and are genuinely opposed rather than merely differently weighted — "safe" and "terrifying," "peaceful" and "violent," not "funny but also sad," which can blend into one bittersweet experience — prefer representing them as a primary_affect plus a contrasting secondary_affect over inventing a single portmanteau label. The contrasting relation already exists to hold two opposed feelings together, and keeps each one legible to later pipeline stages checking for a single primary_affect match, rather than asking them to parse a novel compound term.
+
+GENUINE AFFECTIVE CONTRADICTION (distinct from branch variance and from designed tension): occasionally a Kernel makes two claims about the intended experience that cannot both hold for the same story — not two feelings held against each other, which is exactly what a "contrasting" secondary affect is for, but two mutually exclusive instructions for the same intended payload ("completely safe" alongside "genuinely terrifying"; a wholly triumphant, regret-free catharsis demanded of a premise whose own stated events are unrelievedly corrosive). Do not silently smooth this into a blended label or an ordinary contrasting pair as if it were designed tension — that misrepresents a real problem in the input as a feature. If one claim is backed by more concrete stated events than the other, prefer it and say so in the note. If neither is better supported, assign one to primary_affect and the other to a contrasting secondary_affect, and flag in BOTH notes that this is an unresolved contradiction in the Kernel requiring human attention, not a judgment about designed tension. The same applies when a stated affect is incompatible with the moral weight the Kernel's own events force — score the fields as the evidence supports and name the conflict in the note rather than accepting the stated affect silently.
 
 TRANSGRESSION is how far the protagonist's actions, or events the protagonist is complicit in, violate deep moral, social, or bodily norms WITHIN THE FICTION. Score the WEIGHT the narrative places on the violation, not its technical severity. Because these stories branch, transgression is scored as a CEILING and a FLOOR across the space of paths the story can take, not one value for "the" story:
  - ceiling: the worst transgression at least one path is designed to require.
@@ -43,7 +47,7 @@ Include a "note" only when evidence_basis is not "explicit" AND a one-sentence j
 
 --- FIELDS TO EXTRACT ---
 
-primary_affect — the single dominant felt experience the story is designed to produce. A short phrase (1-6 words), not a sentence. (no_signal fallback: "curious engagement")
+primary_affect — the single dominant SUSTAINED felt experience the story is designed to produce, per the drive-vs-payoff rule above. A short phrase (1-6 words), not a sentence. (no_signal fallback: "curious engagement")
 
 primary_trajectory — the shape of the primary affect's evolution across the story. One of:
  - sustained: stays roughly constant in kind and intensity start to end.
@@ -133,7 +137,7 @@ Output:
 }
 
 Example D:
-Kernel: "Write me an interactive story. Surprise me."
+Kernel: "Something interactive, please. Dealer's choice."
 Reasoning: No genre, setting, protagonist, or mood word is given — there isn't even a genre to associate from, so this is no_signal across every field rather than genre_association. Apply the fixed fallbacks rather than inventing values: primary_affect "curious engagement," trajectory "sustained," tone ["measured"], somatic_address level 1 with no channels. For transgression, use the low end rather than a middle value — ceiling 2, floor 1 — since assuming real moral weight the Kernel never asked for is a worse failure than assuming too little. Secondary_affects stays empty; nothing here supports adding any.
 Output:
 {
@@ -145,6 +149,22 @@ Output:
   "transgression": {
     "ceiling": {"level": 2, "evidence_basis": "no_signal", "note": "A mild default; erring low is safer than presupposing moral weight the Kernel never asked for."},
     "floor": {"level": 1, "evidence_basis": "no_signal"}
+  }
+}
+
+Example E:
+Kernel: "A second-person story about closing down your family's hardware store after forty years. I want it to feel purely celebratory from beginning to end, with no sadness anywhere in it. I also want the final scene — handing the keys over while the neighbours who relied on the store watch from the sidewalk — to land as an unmistakable loss the player can't talk themselves out of."
+Reasoning: Two claims are made about the same intended payload, and both are stated with equal directness: a celebration with "no sadness anywhere," and a closing beat that must register as unmistakable loss. Neither is backed by more concrete stated events than the other — the store's forty years support both readings equally — so per the contradiction rule, map them onto primary_affect and a contrasting secondary and flag the conflict in both notes rather than inventing a bittersweet blend, which would quietly resolve a contradiction the Kernel never resolved. Note this is NOT the drive-vs-payoff case: there the two feelings are compatible and the sustained one simply wins; here the Kernel forbids the very sadness its own required ending demands. Trajectory is sustained, since the Kernel asks for the celebratory register "from beginning to end" — the contradiction lives in the payoff's kind, not in a described change over time. Tone is stated only indirectly; "warm" is our read of a forty-year neighbourhood store, so genre_association. No bodily focus is implied and the stakes are purely social — somatic level 1. Closing a business you own violates no norm on any path, and no fork changes that — transgression 1/1.
+Output:
+{
+  "primary_affect": {"label": "celebratory warmth", "evidence_basis": "explicit", "note": "Stated directly, but in unresolved conflict with the Kernel's required closing loss — see secondary. Flagged for human attention, not a designed tension."},
+  "primary_trajectory": {"shape": "sustained", "evidence_basis": "explicit", "note": "The Kernel asks for the celebratory register from beginning to end; the conflict is about the ending's kind, not a described change over time."},
+  "secondary_affects": [{"label": "unrecoverable loss", "relation": "contrasting", "evidence_basis": "explicit", "note": "The Kernel requires this of the final scene while also forbidding sadness anywhere — an unresolved contradiction in the input, not designed tension. Neither claim is better supported than the other."}],
+  "tone": {"descriptors": ["warm", "plainspoken"], "evidence_basis": "genre_association", "note": "No register is stated; these are conventional for a neighbourhood-business piece."},
+  "somatic_address": {"level": 1, "channels": [], "evidence_basis": "strong_inference", "note": "The stakes are entirely social and commemorative; nothing calls for bodily sensation."},
+  "transgression": {
+    "ceiling": {"level": 1, "evidence_basis": "strong_inference", "note": "Closing a business you own violates no norm, however costly it is to others."},
+    "floor": {"level": 1, "evidence_basis": "strong_inference", "note": "No fork in the premise would change the moral weight of any path."}
   }
 }
 

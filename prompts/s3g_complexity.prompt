@@ -13,7 +13,9 @@ A related trap: a Kernel that describes the protagonist moving through several d
 
 TARGET_ENDING_COUNT is a soft range (min/max), not an exact number, for how many distinct, meaningfully different terminal states the story should have across the full space of possible playthroughs. "Meaningfully different" means a player who reached two different endings would recognize them as substantively different outcomes — not two endings that differ only in a line of epilogue flavor text with no substantive difference in what happened or how things were left. This range describes a target for the WHOLE story's branch structure, not something that varies by which path is taken through it — every Kernel gets one min/max pair, never a ceiling/floor split, because ending count is a property of the tree as a whole, not a value that differs depending on which branch you're standing in.
 
-Do NOT count incidental quick-exit or "game over" failure states (a branch that ends abruptly because the player missed a hidden requirement, walked into an obvious trap, etc.) toward this range unless the Kernel signals those failure states themselves are meant to be the numerous, central, varied thing the story is built around (rather than occasional off-ramps from an otherwise structured branch tree). A Kernel emphasizing frequent sudden death or failure as flavor ("lots of ways to die along the way," "constant danger of a game-over") is describing something about failure/danger texture that does not currently have a clean home in this extraction step — do not force it into target_ending_count, and do not let it inflate branching_density either. Score target_ending_count and branching_density on their own definitions below; if a Kernel's failure-emphasis doesn't fit either field's definition, leave it unreflected in this step's output rather than stretching a field to hold it.
+Do NOT count incidental quick-exit or "game over" failure states (a branch that ends abruptly because the player missed a hidden requirement, walked into an obvious trap, etc.) toward this range unless the Kernel signals those failure states themselves are meant to be the numerous, central, varied thing the story is built around (rather than occasional off-ramps from an otherwise structured branch tree). A Kernel emphasizing frequent sudden death or failure as flavor ("lots of ways to die along the way," "constant danger of a game-over") is describing failure/danger texture, which belongs to the consequence-and-failure model — already extracted for this Kernel and provided to you below. Do not force it into target_ending_count and do not let it inflate branching_density. It legitimately reaches exactly one of this step's three fields, state_richness, because recognizing those failures requires the engine to track something; see the prior-extraction rules below.
+
+PATHS ARE NOT ENDINGS. A Kernel that names two (or three, or six) complete alternative ways THROUGH the story — a loud approach and a quiet one, two routes into the same vault, three professions you could work the same case as — has described its path structure, not its terminal states. Two routes can converge on one ending, and either route can end several ways. Never set min and max by counting stated approaches, methods, routes, or styles; set them only from what the Kernel says or implies about how many distinct outcomes the story comes to REST in. When a Kernel states a route count and says nothing about outcomes, that count is evidence about branching structure (step 6's business, informed by branching_density below) and target_ending_count falls back to the baseline calibration at whatever tier the Kernel's own outcome language earns — usually genre_association, never the explicit tier the stated route count would otherwise seem to supply.
 
 For calibration only (not a rule to enforce): this pipeline typically builds one primary decision point (2 options) crossed with one secondary decision point (2-4 options), yielding a natural baseline of 4, 6, or 8 total paths before any further branching is added. Kernels implying notably more or fewer endings than that baseline are common and fine — just make sure the evidence tier you assign actually supports the distance from that baseline.
 
@@ -30,6 +32,15 @@ STATE_RICHNESS is a coarse soft prior — thin / moderate / rich — for how muc
  - rich: many interacting tracked elements — multiple relationship/reputation counters, nontrivial inventory or resource management, or a premise requiring the engine to remember many discrete past player actions and have later content react differently depending on them.
 
 channels (0-3 short labels) name which kinds of state are foregrounded (e.g., "faction reputation," "physical inventory," "who-knows-what tracking," "resource/timer countdown"). Leave channels empty at level "thin."
+
+--- USING THE PRIOR INTERACTIVE-CONTRACT EXTRACTIONS ---
+
+Two earlier steps have already extracted, from this same Kernel, the INTERACTIVE QUESTION (what decision the player is asked to make and how it recurs) and the CONSEQUENCE AND FAILURE MODEL (whether a failure state exists, what triggers it, what it costs, how widely it is spread). Both are provided below. They are inputs to this step, not rivals to it: this step is chained to them deliberately, because branching density and tracked state are not well-defined without knowing what the player decides and what the engine must recognize as failure. Do not re-derive or second-guess them from the Kernel text.
+
+ - decision_mechanism calibrates BRANCHING_DENSITY. single_fork pulls toward sparse; recurring_instances toward moderate; continuous_pressure toward dense; clustered means whatever density the Kernel implies applies only inside one arc of the story — say so in the note. This is a prior, not an override: an explicit Kernel statement about how often choices appear always wins, and a Kernel that asks for a linear, fork-free graph constrains density even when the decision recurs. That last combination is expected rather than contradictory — the decision recurs, the graph doesn't fork — and is exactly what sparse density plus a recurring decision is for.
+ - failure_triggers inform STATE_RICHNESS. Each trigger names something the engine must track in order to recognize that failure: a clock for time_pressure, a stock for resource_depletion, a suspicion or alert level for detection_or_exposure, a record of which routes are lethal for hazard_or_wrong_turn, a record of what has been learned or foreclosed for incorrect_resolution and irreversible_foreclosure, a standing for relational_collapse. Count those toward the level and name them among channels. A failure_presence of "none" is equally informative in the other direction: it removes a reason to expect tracked state rather than adding one. A failure_scope of "escalating" or "pervasive" implies the tracked thing is read continuously, not once.
+ - Neither prior extraction bears on TARGET_ENDING_COUNT. Bad ends are not endings for this field (see above), and the number of decision axes is not the number of outcomes.
+ - ADOPTING A PRIOR JUDGMENT DOES NOT RAISE YOUR TIER. evidence_basis still records the strength of THIS Kernel's evidence for THIS field. If the prior step tagged its decision_mechanism genre_association, a branching_density calibrated on it is genre_association too, however confidently the prior step's own note reads.
 
 --- EVIDENCE BASIS ---
 For every judgment, record how you arrived at it:
@@ -103,6 +114,14 @@ Output:
   "branching_density": {"level": "sparse", "evidence_basis": "no_signal", "note": "The lower-complexity default; nothing points toward a denser choice structure."},
   "state_richness": {"level": "thin", "channels": [], "evidence_basis": "no_signal", "note": "The lightest-touch default, since nothing suggests demanding tracked state."}
 }
+
+--- PRIOR INTERACTIVE-QUESTION EXTRACTION (optional) ---
+$$INTERACTIVE_QUESTION_JSON$$
+
+--- PRIOR FAILURE-MODEL EXTRACTION (optional) ---
+$$FAILURE_MODEL_JSON$$
+
+(If either section is empty, not provided, or says "none", ignore it and judge that aspect from the Kernel alone.)
 
 --- USER KERNEL ---
 $$KERNEL$$

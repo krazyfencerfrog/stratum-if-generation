@@ -125,7 +125,7 @@ Output:
 }
 
 Example E:
-Kernel: "Write me an interactive story. Surprise me."
+Kernel: "Whatever you feel like writing — I'm not picky."
 Reasoning: No genre, setting, protagonist, or temporal detail at all — no_signal across both fields. Apply the fixed fallbacks: timeline_structure "linear" (the shape least likely to conflict with whatever gets built later); timeline_duration ceiling and floor both "hours_to_days" (the lowest-commitment default — easier for downstream world-building to expand from than to walk back).
 Output:
 {

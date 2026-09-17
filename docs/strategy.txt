@@ -1,5 +1,74 @@
 # ---
-# CHANGELOG FROM strategy.txt (this pass)
+# CHANGELOG (current pass) - implementing docs/fable_strategy_review.md
+# ---
+# An outside review read this document, all ten step-3 prompts, main.py, the
+# 27 test kernels, and the full 27-kernel output batch (JSON plus thinking
+# traces). Its findings are implemented here. What changed, and why:
+#
+#   STRUCTURAL (these move phases around, not just wording):
+#   - NEW PHASE 3.5, premise expansion. The first phase that CONSTRUCTS
+#     rather than extracts. Nothing between step 3 and step 7 could turn a
+#     one-line kernel into a concrete premise: steps 4 and 5 are
+#     classification fields, so on a sparse kernel they fall back the same
+#     way step 3 does, and step 7 (major locations) was the first
+#     construction step with nothing to build from. 3.5 sits after 3h (so it
+#     sees a reconciled field set) and before 4 (so nothing downstream ever
+#     sees a bare kernel). See its own block below.
+#   - NEW PHASE 6.0, topology and state model - this is the old 6j, promoted
+#     out of step 6 and moved in FRONT of 6a. 6a-6i assumed exactly one
+#     topology (a primary x secondary lattice); kernels 17, 25, 16 and 4
+#     cannot be built that way at all, and step 3 already extracted the
+#     break. A state model that arrives after 6 means step 6 lays a lattice
+#     over a kernel that isn't one. Its inputs already exist in phase 3; it
+#     does not have to wait for 5h/5i, which now REFINE the model rather
+#     than create it.
+#   - 6a's input contract rewritten. This document said the primary branch
+#     divides on the core thematic axis (3c); the 3-0a prompt said it was
+#     the raw material step 6 builds branch points from. Both are right and
+#     step 6 needed a rule - see 6a.
+#   - GENERATION AND VERIFICATION SPLIT in steps 9, 10 and 13. Each was a
+#     phase that generates and audits in the same breath. The consolidated
+#     lessons doc (S3.5) records this model generating the correct
+#     disqualifying counter-argument in its own trace and then arguing past
+#     it, within a single field; asking it to build a plot and audit that
+#     plot in one call reproduces that at scale, and the audit half is the
+#     half that loses.
+#   - 3a (rough length) FOLDED INTO 3g. It never had a consumer: 3g's
+#     ending-count range and branching-density already bound the build.
+#
+#   WITHIN-PHASE (prompt-level, already applied in prompts/):
+#   - 3g is now CHAINED to 3-0a and 3-0c (the first deliberate break from
+#     blind execution since 3f/3d). Rule that licensed it, now the general
+#     policy: chain only when a field is UNDEFINED without the other's
+#     output; never chain for agreement. Agreement is 3h's job.
+#   - 3d retrofitted with a third_party_pov excursion type and an
+#     interactivity flag - kernel15's sister chapter was being read three
+#     different ways by three blind fields, and 3-0a needs to know whether
+#     to mine an excursion for decisions.
+#   - 3-0c: genre convention alone now caps failure presence at "soft"
+#     (hard requires a stated or forced mechanic), and a
+#     hazard_or_wrong_turn trigger was added. Two mystery kernels were
+#     landing on opposite failure models on a coin flip.
+#   - 3b: primary_affect is the sustained drive, not the payoff; and it
+#     carries the same contradiction rule 3c has.
+#   - 3-0b: an obstacle to defeat is not an epistemic gap.
+#   - 3f: no citable branch of the right kind means floor equals ceiling
+#     (the 3e lesson, retroactively applied where it was already failing).
+#   - Calibration examples that were verbatim test kernels, or the same
+#     judgment shape in a thin disguise, were rewritten. Kernel8 was not
+#     testing no_signal generalization at all.
+#
+#   ANSWERED (the four open questions this document carried):
+#   - Chain vs. blind: blind stays the default; see the chain rule above.
+#   - 3-0a/b/c retrofit vs. layer forward: layer forward, with 3d as the
+#     one targeted retrofit, and 3h built BEFORE any further fields.
+#   - Is deferring 6j safe: no. See 6.0.
+#   - Retroactive 3e mechanism-check: mandatory for 3f (which was already
+#     showing the failure), one-pass audit of 3b's floors, no action for
+#     3c/3d.
+#
+# ---
+# CHANGELOG (previous pass)
 # ---
 # Reviewed a set of proposed additions (interactive-contract extraction,
 # ontology-from-contract, framework ID, interactive components,
@@ -60,14 +129,31 @@
 #   transgression from inflating valence). whatever blind execution misses
 #   across a phase's fields should get caught by that phase's own cross-check
 #   step (see 3h).
-#     - 3-0a/b/c are the first strong candidate for the OTHER posture -
-#       chained rather than blind. They describe the mechanical contract
-#       the reader is playing, and 3b-3g describe narrative content that
-#       arguably should be built to fit that contract, not the reverse.
-#       This is the same open architecture question already flagged
-#       (chain vs. blind, general policy still undecided) - 3-0a/b/c makes
-#       it concrete rather than resolving it. Decide deliberately before
-#       drafting, don't default silently.
+#     - THE CHAIN RULE (resolved, was an open question): chain only when a
+#       field is UNDEFINED without the other's output. Never chain for
+#       agreement. 3f consumes 3d because setting footprint is not
+#       well-defined without the required-excursion list - a dependency.
+#       3g now consumes 3-0a and 3-0c for the same reason: branching
+#       density and tracked state are not well-defined without knowing what
+#       the player decides and what counts as failure. 3-0a/b/c were
+#       considered as a chained frame for all of 3b-3g and rejected: the
+#       argument for that was CONSISTENCY, and consistency is 3h's job.
+#       Blind execution is what makes disagreement legible - on kernel12
+#       one field flagged the kernel's own contradiction and another
+#       didn't, and that disagreement is the signal 3h needs. A chained
+#       run would have hidden it.
+# - GENERATION AND VERIFICATION NEVER SHARE A PROMPT. A phase that builds
+#   something and checks its own work will talk itself past its own correct
+#   objection - observed in-trace at field scale, and it gets worse at
+#   structure scale. Split every build/check pair into separate calls with
+#   separate JSON, make the checker a CLASSIFICATION task (it lists
+#   violations against a fixed checklist and fixes nothing), and make repair
+#   a third call that receives the violation list. This costs calls, not
+#   design time, and it's the discipline already used between phase 3's
+#   fields and 3h.
+# - ANYTHING THAT RUNS PER-NODE NEEDS A FIXED INPUT PACKET, defined before
+#   the phases upstream of it produce material that won't fit in one. See
+#   the node packet note under step 14.
 # - confirm a field's actual downstream consumer by rereading that later
 #   phase's own wording before finalizing the field's shape - don't assume a
 #   plausible-sounding consumer exists just because the shape seems to fit.
@@ -102,9 +188,10 @@
 # 3) analyze the (filtered) kernel to intuit the core structural concepts we
 #    need to nail down before we can think about casting, structure, setting
 #
-#   [NEW - unbuilt. These describe the INTERACTIVE CONTRACT: what kind of
-#    thing the reader is actually doing, as distinct from what the story is
-#    about. See CHANGELOG open decision above re: build/retrofit order.]
+#   [BUILT. These describe the INTERACTIVE CONTRACT: what kind of thing the
+#    reader is actually doing, as distinct from what the story is about.
+#    Layer-forward was chosen over retrofit; 3d was the one targeted
+#    retrofit (third_party_pov excursion type + interactivity flag).]
 #
 #   0a) the interactive question - what is the reader doing, not what is
 #       happening to the protagonist. what decision(s) recur across the
@@ -127,7 +214,12 @@
 #       top level avoids re-deciding it piecemeal, inconsistently, at every
 #       node in step 14.
 #
-#   a) rough minimal and maximal length
+#   a) [FOLDED INTO 3g - do not build separately] rough minimal and maximal
+#      length. It had no consumer: 3g(i)'s ending-count range and 3g(ii)'s
+#      branching density already bound the build, and nothing downstream
+#      ever asked for a word or node count at this stage. If a node-count
+#      target is ever genuinely needed, it belongs in 3g as a derived
+#      target_node_count range, not as its own extraction.
 #   b) affect extraction (primary, primary trajectory, secondaries, tone, somatic address, transgression level)
 #      [run blind to 3c - see step3b_design_lessons.md]
 #   c) thematic extraction (core thematic axis, secondary thematic axis, moral valence)
@@ -143,17 +235,48 @@
 #      ii) branching density preference - how much mid-path player-facing
 #          branching the kernel wants, independent of final ending count;
 #          these are different things a kernel can weight differently
-#      iii) [NEW - unbuilt] state richness indicator - thin / moderate / rich,
+#      iii) [BUILT] state richness indicator - thin / moderate / rich,
 #           a coarse soft prior for how much tracked state (flags,
 #           inventory, relationship counters, world-variables) this kernel
-#           is likely to need. Feeds 6j (see below), the same way other 3g
+#           is likely to need. Feeds 6.0 (see below), the same way other 3g
 #           indicators feed 6i - a soft target for a later phase's harder
-#           math, not a hard commitment.
-#   h) cross-check 3a-g [and, once built, 3-0a/b/c] against each other for
-#      genuine mutual incoherence (not just stylistic difference) - same
-#      discipline as within-field contradiction handling: name the conflict,
-#      prefer the better-evidenced claim, flag what's unresolved for phase 4
-#      rather than silently picking a winner or averaging.
+#           math, not a hard commitment. Its `channels` list turned out to
+#           be the right vocabulary for 6.0's variable table; 6.0 starts
+#           from that list rather than inventing a parallel one.
+#      [3g RUNS CHAINED, not blind: it takes 3-0a's decision mechanism and
+#       3-0c's failure model as inputs. Density is calibrated on the
+#       decision's recurrence shape; each failure trigger names something
+#       the engine must track, which is state richness's own subject. The
+#       "failure emphasis has no clean home in this step" paragraph the
+#       prompt used to carry is gone - it has one now.]
+#   h) [BUILT - build this BEFORE any further phase-3 fields; it is the
+#      instrument that tells you whether anything else needs changing]
+#      cross-check 3b-3g and 3-0a/b/c against each other for genuine mutual
+#      incoherence (not just stylistic difference) - name the conflict,
+#      prefer the better-evidenced claim, flag what's unresolved for the
+#      next phase rather than silently picking a winner or averaging.
+#      Shape: a fixed CHECKLIST of twelve field pairs, each returning
+#      coherent / conflict / not_applicable. That makes it a classification
+#      task, which is the flavor this model handles well, and it makes the
+#      output diffable across kernels. It FIXES NOTHING - downstream phases
+#      read the original fields, not 3h's summary of them, so a compromise
+#      value invented here would simply be lost.
+#      Two things beyond the checklist:
+#        - PRIMARY_BRANCH_SOURCE. 3h answers, mechanically, what step 6's
+#          primary branch point is built from: 3-0a's decision axis when
+#          that axis is explicit/strong_inference; 3c's thematic axis when
+#          3-0a is only genre_association and 3c isn't; and
+#          "deferred_to_enrichment" when both are weak - which is 3.5's
+#          case. See 6a.
+#        - THE CONSTRAINT MAP, computed in code from the saved JSON rather
+#          than asked of the model (it's a count): every scored judgment
+#          sorted by evidence tier into constraint (explicit /
+#          strong_inference / mixed - may not be contradicted), default
+#          (genre_association - may be replaced with something more
+#          specific) and free variable (no_signal - should be filled).
+#          That three-way reading is what turns the evidence tiers into an
+#          instruction set for every phase that constructs, and it sizes
+#          3.5's enrichment budget.
 #
 #      CONTRACT AXES vs. INTERACTIVE AXES: worth explicitly labeling for 3h's
 #      benefit, even though the split was already implicit. Contract axes
@@ -168,7 +291,131 @@
 #      the second kind is a much better early-warning signal for 6j's design
 #      than for anything narrative.
 #
+# 3.5) PREMISE EXPANSION [NEW - built. The first phase that CONSTRUCTS.]
+#    Runs after 3h (so it sees a reconciled field set) and before 4 (so no
+#    later phase ever sees a bare kernel). Flavor: CONSTRUCTION, the highest
+#    risk shape there is - treat it as the single most adversarially tested
+#    prompt in the pipeline.
+#
+#    WHY IT EXISTS: "I want a mystery" leaves phase 3 with nearly every
+#    field on a genre default or a fallback, exactly as designed - phase 3
+#    is extraction and refuses to invent. But 4 and 5 are classification
+#    fields, so they fall back the same way, and step 7 (major locations) is
+#    the first phase that builds anything - with nothing to build from. The
+#    invention has to happen somewhere; the only question is whether it
+#    happens on purpose, in one place, with a record, or silently and
+#    inconsistently across five later phases.
+#
+#    WHY NOT ELSEWHERE:
+#      - not step 10. That's repair, and it runs after 6-9 have locked
+#        structure and cast; graph repair is the hardest task in the
+#        pipeline to hand this model. Its NOVELTY diagnosis stays, but as an
+#        audit that sends work BACK here with a do-not-reuse list (see 10c).
+#      - not 4/5 as they stand. Classification can't make a kernel richer.
+#        They now CONSUME the expanded premise instead: 4a classifies the
+#        plot architecture of the premise 3.5 wrote.
+#      - not a phase-3 sub-step. Phase 3's no-invention posture is what
+#        makes its evidence tags trustworthy; mixing construction into it
+#        would erode the thing the rest of this document leans on.
+#
+#    THE TIERS ALREADY SAY WHAT MAY BE TOUCHED - this is what the constraint
+#    map (3h) is for. explicit/strong_inference = a constraint enrichment
+#    must not contradict. genre_association = a default it may replace with
+#    something more specific, saying so. no_signal = a free variable it must
+#    fill. So step 3 is not "anti-invention" - it is invention deferred with
+#    a receipt. kernel9's genre-supplied failure model is already invention;
+#    it's just tagged as such, which is exactly right.
+#
+#    FIELDS (each carries provenance = kernel_stated / kernel_implied /
+#    genre_default / invented, and `serves` = the phase-3 field id it exists
+#    to satisfy. Nothing is added that serves nothing - that is the whole
+#    defence against decorative invention):
+#      i)   enrichment_budget - minimal / moderate / generous, COMPUTED from
+#           the constraint map's weighted share, not judged. This is the
+#           restraint control; without it the model will "improve" an
+#           over-specified kernel.
+#           CALIBRATION (run over the archived 27-kernel batch): explicit
+#           and mixed weigh 1.0, strong_inference 0.5 (a reading binds less
+#           hard than an instruction), genre_association and no_signal 0.0;
+#           >=0.5 minimal, >=0.2 moderate, else generous. That gives 8
+#           minimal / 17 moderate / 2 generous, and lands kernel1 and
+#           kernel11 on minimal and kernels 8 and 9 on generous, as the
+#           review predicted. It puts kernel23 ("someone finding something
+#           they weren't supposed to find") on moderate where the review
+#           expected generous - because that kernel's extraction produced
+#           16 strong_inference judgments from twelve words. Worth a look
+#           at 3b/3c/3d's tier discipline on very short kernels before
+#           adjusting the thresholds; the budget may be reporting a real
+#           upstream tier-creep problem rather than being miscalibrated.
+#      ii)  protagonist_situation - who "you" concretely are at open, what
+#           they want, what they can do. Serves 3-0b (whose role_descriptor
+#           is "unspecified" on exactly the kernels that need this most).
+#      iii) arena - one concrete setting instance inside 3f's footprint.
+#           Serves 3f. Does not widen the footprint.
+#      iv)  instance_generator - the load-bearing one. The concrete material
+#           that makes 3-0a's decision axis actually recur: for a mystery,
+#           the case (victim, parties, the true solution, the false leads);
+#           for a helping-people premise, the people and their problems; for
+#           a heist, the crew, the obstacle, the mark. Without this field,
+#           "recurring_instances" has no instances. Serves 3-0a.
+#      v)   complications - 2-4 invented turns (1 at minimal budget), each
+#           tagged with the affect trajectory point, thematic beat, or
+#           failure mechanic it serves. This is where "genuine twists" come
+#           from, and the serves tag is what keeps them from being generic.
+#      vi)  withheld - what it declines to specify and why ("left to step
+#           7/8", "the kernel is explicit here"). The receipt for restraint;
+#           a short list on a minimal budget is itself a defect.
+#      vii) fidelity_check - every explicit kernel clause, verbatim, with
+#           touched/consistent. FIRST PASS ONLY - the real check is a
+#           separate call (see below), because this model is bad at auditing
+#           its own construction.
+#
+#    THE CONTRACT/INTERACTIVE SPLIT FINALLY DOES WORK HERE. Until now it was
+#    organizational sugar. The rule: 3.5 may invent freely on CONTRACT axes
+#    (affect, theme, setting, identity, timeline) tagged default or free. It
+#    may NOT invent on INTERACTIVE axes (3-0a, 3-0c, 3g) - mechanics are
+#    chosen from the pipeline's own menus (3-0c's trigger set, 3g's levels,
+#    6.0's topology list), because the engine has to build whatever is
+#    chosen and an invented mechanic is an unbuildable one. It MAY give an
+#    already-extracted mechanic concrete fiction (the extracted
+#    time_pressure trigger becomes a tide). So for kernel8 it may invent a
+#    lighthouse, a grief, a stranger at the door; it may not invent a sanity
+#    meter.
+#
+#    VERIFICATION IS A SEPARATE CALL (3.5v), never part of 3.5: input is the
+#    kernel + the constraint map + 3.5's output, output is a list of
+#    findings - clause contradictions with quotes, constraint violations,
+#    and mechanic-boundary violations. Classification, which this model is
+#    good at, instead of self-audit, which it isn't.
+#
+#    HOW TO TEST IT (build these kernels on purpose, they don't occur
+#    naturally in the batch):
+#      - fidelity under sparsity with a hard negative: "A mystery. Nobody
+#        dies and there is no crime." Does instance_generator invent a
+#        corpse? This is the explicit-beats-genre_default test.
+#      - fidelity under sparsity with an unusual positive: "A heist where
+#        getting caught is the whole point." Does the genre's conventional
+#        detection failure state survive where the kernel has made capture
+#        the goal?
+#      - restraint on an over-specified kernel (kernel1, kernel11): expect
+#        budget minimal, a long withheld list, <=1 complication, and every
+#        kernel clause touched:false or consistent:true.
+#      - richness on the sparsest kernels (8, 9, 23): expect a concrete
+#        instance_generator with role-level entities, not "a mystery
+#        occurs".
+#      - GENERICNESS BY RESAMPLING: run kernel9 three times at nonzero
+#        temperature. If all three produce a rain-soaked detective and a
+#        femme fatale, the prompt is producing genre mean, not invention.
+#        Cheap locally, and the only direct test of "generic" that doesn't
+#        need a frontier judge.
+#      - contract/interactive boundary: on kernel8, any complication whose
+#        serves points at 3-0a/3-0c/3g and which would force a NEW mechanic
+#        is a violation.
+#
 # 4) initial structural shape
+#    [4 and 5 now CONSUME 3.5's expanded premise rather than classifying a
+#     bare kernel - on a sparse kernel they would otherwise fall back
+#     exactly the way phase 3 did, adding nothing.]
 #   a) plot architecture (quest, investigation, caper, ...)
 #   b) conflict type
 #   c) protagonist configuration
@@ -189,17 +436,97 @@
 #      alter. step 9c already names "user agency" as a requirement to
 #      verify - this is that requirement's actual source field, which
 #      doesn't currently exist anywhere upstream.
+#      [REFINES 6.0's state model against the built world; does not create
+#       it. 6.0 now runs on phase-3 output and is an input to step 6.]
 #   i) [NEW - unbuilt] information topology - what's hidden from the reader,
 #      what's revealed, when, and through what channel (discovered object,
 #      dialogue, environmental detail, ...). derives from 3-0b's epistemic
 #      gap applied onto this phase's world shape. most load-bearing for
 #      mystery/investigation-flavored kernels, but worth extracting as a
 #      general field rather than only when genre makes it obviously salient.
+#      [Same as 5h: refines 6.0's variable table - particularly its
+#       known/not-known flags - rather than being the place it originates.]
 # 6) figure out overall structure
-#   a) primary branch point is going to divide on the core thematic axis
-#      (*what* they choose to believe) (2 choices)
+#   0) TOPOLOGY AND STATE MODEL [NEW - built. This is the old 6j, promoted
+#      out of step 6 and moved in FRONT of 6a. It is an INPUT to step 6, not
+#      a sub-step of it.]
+#      WHY IT MOVED: 6a-6i assume exactly one shape - a primary x secondary
+#      lattice, with endings as leaf count. Four test kernels can't be built
+#      that way, and phase 3 already extracted the break:
+#        - kernel17 (tightly linear, no forks, a dozen+ endings): sparse
+#          density + a recurring decision + a high ending count. That's a
+#          linear spine with an accumulator selecting the ending. 6i's
+#          answer ("add ternary branch points") would violate the kernel's
+#          own "no real forks".
+#        - kernel25 ("remember exactly which clues you've found and which
+#          suspects you've confronted, and react accordingly"): a
+#          state-gated graph, not a tree.
+#        - kernel16 ("every choice tightens the clock"): a shared resource
+#          every branch writes to.
+#        - kernel4 (loop horror, subpaths that reset): a hub with resets.
+#      Deferring this means step 6 lays a lattice for kernel17, 9c finds the
+#      ending target unmet, and 13c finds the mismatch after 7-12 have been
+#      built on the wrong skeleton. That's the "bigger rewrite the later it
+#      goes" case, and it lands on step 6 itself.
+#      OUTPUT:
+#        i)   topology: tree_lattice | linear_accumulator | state_gated_web
+#             | hub_loop, chosen by a fixed rule order (loop/reset first,
+#             then forced-linear, then recorded reactivity, else lattice).
+#             6a-6i are now the tree_lattice CASE of a general step; the
+#             other three topologies get their own build rules (stubbed -
+#             see STATUS).
+#        ii)  a variable table: {name, kind: flag|counter|enum|inventory,
+#             written_by, read_by}. Writers come from 3-0a (each recurring
+#             decision writes at least one variable); readers come from
+#             3-0c's triggers (each reads a clock, a stock, an alert level,
+#             a foreclosure record), from the ending selector, and from
+#             gates (3-0b's gap contributes a known/not-known flag). Sized
+#             by 3g(iii), whose `channels` are already the right vocabulary.
+#             Every variable needs a writer AND a reader.
+#        iii) an ending selector: leaf | accumulated_read |
+#             state_combination, plus an arithmetic check that the
+#             variables can actually distinguish 3g(i)'s target count.
+#        iv)  RESERVED FAILURE EXITS. 3-0c's model previously reached only
+#             steps 14 and 16 - per-node and far downstream - so bad ends
+#             got invented one node at a time and 13b's orphan check had no
+#             way to tell an intentional dead end from a mistake. They are
+#             reserved here, as part of the locked graph. They are NOT
+#             endings and do not count toward 3g(i)'s target.
+#      STATUS: the tree_lattice path is 6a-6i below. The other three
+#      topologies are named and their variable tables are produced, but
+#      their BUILD rules are deliberately stubs - write them against
+#      kernels 17, 25, 4 and 16 before polishing anything in 6a-6i. Verify
+#      6.0 itself on 17, 25, 16, 4 and 19 (kernel19's years-or-hours split
+#      is also a state variable: elapsed time).
+#   a) primary branch point [INPUT CONTRACT - rewritten. This document used
+#      to say the primary branch divides on 3c's core thematic axis, while
+#      the 3-0a prompt said it was the raw material step 6 builds branch
+#      points from. Both were right, and the traces show what the missing
+#      rule cost: on kernel13, 3-0a found the real fork (go loud or go
+#      quiet) while 3c, obliged to produce a value pair, manufactured
+#      "unmediated vs. mediated selfhood" - a step 6 branching on 3c would
+#      have built a story about selfhood when the kernel asked for one
+#      about method. On kernel2 the kernel fixes the ending and says the
+#      player's choices only determine who else is dragged down; 3-0a got
+#      that, and a tradition/progress branch would contradict it.]
+#      THE RULE (3h computes it as primary_branch_source):
+#        - 3-0a's primary_decision_axis IS the primary branch point when it
+#          is tagged explicit or strong_inference. 3c's core_thematic_axis
+#          is then the MEANING assigned to that branch's two sides - what
+#          picking each side says about what the player believes - not the
+#          branch itself.
+#        - When 3-0a is only genre_association or no_signal and 3c is
+#          explicit or strong_inference, invert: the thematic axis supplies
+#          the branch, since a convention-supplied decision shouldn't
+#          outrank a stated value tension.
+#        - When both are weak, that is 3.5's case: the expanded premise
+#          decides, and step 6 branches on the decision axis as 3.5 made it
+#          concrete (instance_generator).
+#      Still 2 choices either way.
 #   b) secondary branch point is going to divide on *how* they choose to
-#      follow the core thematic choice (2-4 choices)
+#      follow the core thematic choice (2-4 choices) - 3c's
+#      secondary_thematic_axis approaches are the candidate list for this,
+#      whichever way 6a resolved
 #   c) now this will define between 4-8 main paths through the story
 #   d) calculate framework (hero's journey, 5-act tragedy, ...)
 #   e) expand framework beats + branches into initial story graph
@@ -220,62 +547,113 @@
 #      by that lattice, use ternary branch points (6h) at one or more
 #      secondary-path branches to adjust, and record the final achieved count
 #      for the phase 9 consistency check.
-#   j) [NEW - FLAGGED, not designed] state model - the tracked variables an
-#      Adrift/Inform-style engine needs: flags, inventory, relationship
-#      counters, world-state variables, and what reads/writes them. this is
-#      currently the single largest structural gap in this document - bigger
-#      in scope than a normal lettered sub-step, and probably deserves real
-#      design attention of its own (possibly its own phase between 6 and 7,
-#      not just a sub-step of 6). the only two places anything state-shaped
-#      is currently mentioned are step 14 (per-node, far downstream) and
-#      step 16 ("transition states next node or branch," equally downstream
-#      and equally node-local) - neither is a real design for this, both are
-#      just places state gets used once something upstream has already
-#      decided what it is. inputs once designed: 3g(iii)'s state richness
-#      indicator (soft prior), 5h's agency scope (what's actually
-#      changeable), 5i's information topology (what's revealed/tracked as
-#      known-vs-unknown). NOT started - do not assume this is handled by
-#      anything else in this document.
+#      [THIS IS THE tree_lattice CASE ONLY. Under the other three topologies
+#       the target is met by 6.0's ending selector reading accumulated
+#       state, not by adding forks - and on a kernel that asked for no forks,
+#       adding them to hit a number is the failure mode, not the fix. Check
+#       6.0's topology before applying this step at all. Reserved failure
+#       exits (6.0.iv) never count toward the target.]
+#   j) [MOVED - see 6.0 above] state model. Was flagged here as the single
+#      largest structural gap in this document; it turned out not to be a
+#      sub-step of 6 at all, because 6a-6i cannot be run correctly without
+#      it for at least four of the 27 test kernels. It now runs BEFORE 6a,
+#      from phase-3 output. 5h/5i refine it later; they do not create it.
 # 7) world generation
 #   a) major locations
 #   b) location backstory
 # 8) character generation
 #   a) major characters
 #   b) character roles, relations and backstory
-# 9) plot generation 
+# 9) plot generation
+#    [9a/9b GENERATE, 9c VERIFIES - these are separate calls with separate
+#     JSON, per the standing rule. 9c is a classification task: it lists
+#     violations against the fixed requirement list below and fixes none of
+#     them. Repair is a third call that receives the violation list.]
 #   a) fill in structure from 6 using major locations and major characters
 #   b) ensure consistency in path-based use of locations and characters
-#   c) ensure major story requirements met: primary affect trajectory (3b),
-#      core thematic axis resolution + moral valence framing (3c), reconciled
-#      complexity target (3g/6i), and user agency (5h, once it exists -
-#      currently unsourced upstream, see above)
+#   c) VERIFY (separate call) that major story requirements are met: primary
+#      affect trajectory (3b), core thematic axis resolution + moral valence
+#      framing (3c), reconciled complexity target (3g/6i), user agency (5h),
+#      and that every variable in 6.0's table is still both written and read
+#      by the built structure
 # 10) identify shortcomings
-#   a) pacing, character arcs, unaddressed plot references
-#   b) introduce new minor events, locations and characters to address these
-#   c) identify deficits in COHERENCE (do the added elements fit believably)
-#      and separately in NOVELTY (does the story feel generic/derivative
-#      despite being coherent) - these are two different failure modes, not
-#      opposite ends of one axis - address each independently
-#   d) update story structure to incorporate these new elements
+#    [10a/10c DIAGNOSE, 10b/10d REPAIR - separate calls, per the standing
+#     rule. The diagnosis calls list findings against a fixed checklist; the
+#     repair calls receive that list and act on it. Graph repair is the
+#     hardest thing this pipeline hands the model, which is exactly why it
+#     must not also be doing the diagnosing in the same breath.]
+#   a) DIAGNOSE: pacing, character arcs, unaddressed plot references
+#   b) REPAIR: introduce new minor events, locations and characters to
+#      address the findings from 10a
+#   c) DIAGNOSE, separately: deficits in COHERENCE (do the added elements fit
+#      believably) and in NOVELTY (does the story feel generic/derivative
+#      despite being coherent) - two different failure modes, not opposite
+#      ends of one axis.
+#      NOVELTY NOW HAS A MECHANISM instead of "introduce new minor events":
+#      re-run the resampling test (see 3.5's test list) against the built
+#      story's summary. If independent samples collapse to the genre mean,
+#      send the complications list BACK to 3.5 with a do-not-reuse list
+#      (3.5 takes one as an input) rather than trying to make a locked
+#      structure novel from the outside.
+#   d) REPAIR: update story structure to incorporate these new elements
 # 11) deep expansion of characters (no new characters, just full build out of existing)
+#     [TWO TIERS OF OUTPUT PER CHARACTER, both produced here: the long form
+#      for humans and later reference, and a <=150-word PACKET FORM keyed by
+#      id, which is what steps 14-17 actually receive. See the node packet
+#      note under 14 - this is a shaping decision for this step, not a
+#      formatting afterthought.]
 # 12) deep expansion of settings (build out of existing + definition and build out of minor areas like the parts of a larger setting)
+#     [Same two-tier output as 11: long form, plus a <=150-word packet form
+#      per location keyed by id.]
 # 13) full node-based graph finalization pass
+#    [13a/13d LOCK, 13b/13c VERIFY - separate calls, per the standing rule.]
 #   a) reconcile the branch structure from 6 against everything added during
 #      7-12 (new minor characters/locations from 10, expanded detail from 11/12)
-#   b) verify no orphaned nodes or dangling branches
-#   c) verify the achieved ending count still matches 6i's reconciled target
+#   b) VERIFY (separate call): no orphaned nodes or dangling branches.
+#      6.0's reserved failure exits are intentional dead ends - the checker
+#      is given that list so it can tell them from mistakes.
+#   c) VERIFY (separate call): the achieved ending count still matches 6i's
+#      reconciled target, counting endings only - reserved failure exits are
+#      not endings.
 #   d) lock the graph structure before granular per-node buildout begins (14+)
+# --- THE NODE PACKET (governs 14, 16, 17 - define this before 7-13 produce
+#     material that won't fit in one) ---
+#     Steps 14, 16 and 17 each run PER NODE, and 17 additionally per room. A
+#     6-8 path lattice with diamonds and a framework's worth of beats is
+#     40-100 nodes, so that is several hundred local-model calls, and an 8B
+#     model's usable context will not hold the story bible. Each per-node
+#     call receives exactly this, and nothing else:
+#       - the filtered kernel
+#       - this node's row from the locked graph: purpose, incoming state,
+#         outgoing state, exits (including any reserved failure exits from
+#         6.0 that attach here)
+#       - the 1-2 characters and 1 location involved, BY ID, in their
+#         <=150-word packet form from 11/12
+#       - the node's affect/thematic position tag (3b trajectory point, 3c
+#         arc position) as 9c/16 computed it
+#     Everything else stays out. If a per-node step turns out to need
+#     something not on this list, add it to the packet schema deliberately -
+#     don't pass the bible.
+#
 # 14) for each node in graph, identify granular settings available (rooms) and
 #     characters directly involved. identify purpose of node, what needs to
 #     be achieved by it and possible quick exits (bad ends) - governed by
-#     3-0c's failure model once it exists, rather than decided fresh per node.
+#     3-0c's failure model, and specifically by 6.0's RESERVED failure exits,
+#     which already say which nodes can carry one and what it costs. Nodes
+#     that weren't given a reserved exit don't invent one here; that was the
+#     whole point of reserving them upstream.
 # 15) ... (probably node-node transition point identification)
 # 16) for each node, full node build out (room connections, interactable
-#     objects, goals, transition states to next node or branch - see 6j once
-#     designed) - keep each node's position in the graph consistent with the
-#     affect trajectory shape (3b) and thematic arc (3c/9c) expected at that
-#     point in the story
+#     objects, goals, transition states to next node or branch - reads and
+#     writes come from 6.0's variable table, which by this point is a fixed
+#     list, not something to extend per node) - keep each node's position in
+#     the graph consistent with the affect trajectory shape (3b) and
+#     thematic arc (3c/9c) expected at that point in the story. Runs on the
+#     node packet.
 # 17) for each node fully define actions in each room, generate prose
 #     (draws on the filtered kernel's own texture/detail directly, not just
-#     phase 3's distillation of it - see process notes)
+#     phase 3's distillation of it - see process notes). Runs per room, on
+#     the node packet plus that room's own definition from 16 - this is the
+#     highest-volume step in the pipeline and the one most likely to be
+#     starved or drowned by a bad packet.
  

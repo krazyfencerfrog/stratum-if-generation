@@ -47,7 +47,10 @@ Other established sub-rules:
 - **Structural vs. choice-driven** cost logic (3b): if the cost is forced regardless of player choice, keep floor within one point of ceiling — no path escapes it. If the cost is choice-driven, floor can drop further, down to the scale's gentle end, when a genuinely low-cost path is plausible.
 - **Splits are rare by accident** (3d, reconfirmed 3e): across 23–24 kernels spanning naturalistic and loosely-adversarial batches, not one genuine ceiling≠floor split emerged without a kernel purpose-built to contain both a forcing path and an avoiding path. Treat "does this field's floor logic ever actually fire" as its own checklist item requiring at least one deliberately engineered kernel per field — don't assume a large batch will exercise it by chance.
 
-**Open, untested**: whether the 3e mechanism-check should be retroactively applied to transgression, moral_valence, and viewpoint_count — no known problem, just never examined from this specific angle.
+**Resolved (external review, 27-kernel batch)**: the 3e mechanism-check was examined retroactively across all ceiling/floor fields.
+- **3f was already failing it** and is now patched: kernel6 and kernel24 both split floor from ceiling on notes of the form "a contained telling could keep it in one place." That is the model's own uncertainty about a non-branching premise, not branch variance. 3f's text already contained the right test; it just didn't say what to do when no branch is cited. It now does: **no citable branch of the right kind → floor equals ceiling, full stop.** Carry that sentence into any future ceiling/floor field's first draft.
+- **3b's transgression floors**: the splits in the batch (k1 5/2, k2 4/2, k14 3/1, k12 4/3) all cite a kernel-stated choice in the floor note, so the mechanism holds. k1's 5/2 is the one worth a second look — "might have to vent oxygen" on a ship failing regardless reads structural, which 3b's own rule caps at one point of gap.
+- **3c's moral_valence and 3d's viewpoint_count**: no action. Valence splits track 3c's structural/choice-driven rule; viewpoint_count showed no split without a stated handoff.
 
 ### 2.4 Calibration examples
 - **Domain separation** from every test kernel (3b) prevents pattern-matching instead of generalizing.
@@ -114,15 +117,31 @@ Run this before drafting any new phase-3 sub-step, or any later-phase field with
 
 ---
 
-## 5. Open architectural questions (unresolved, carried forward)
+## 5. Open architectural questions
 
-- **Chain vs. blind execution**: no general policy yet. Current default is blind unless documented otherwise. `strategy_v2.txt` flags 3-0a/b/c as the first strong candidate for chained (rather than blind) execution against 3b–3g — decide deliberately per field, don't default silently.
-- **3-0a/b/c retrofit-vs-layer-forward**: unresolved per `strategy_v2.txt`'s changelog. Directly affects whether 3b–3g's already-shipped prompts need re-auditing for literary-vs-mechanical framing drift once the interactive-contract fields exist.
-- Whether the 3e ceiling/floor mechanism-check (§2.3) should be retroactively re-examined against transgression, moral_valence, and viewpoint_count — untested from this specific angle, no known problem.
+**Resolved by the external review (see `fable_strategy_review.md` and the current changelog in `strategy.txt`):**
+
+- **Chain vs. blind execution** — settled as a rule: **chain only when a field is *undefined* without the other's output; never chain for agreement.** 3f→3d was already the licensed shape (setting footprint isn't well-defined without the required-excursion list); 3g→3-0a/3-0c is the new one (density and tracked state aren't well-defined without the decision and the failure model). Chaining 3-0a/b/c into 3b–3g was rejected because the argument for it was *consistency*, and consistency is 3h's job. Blind execution is what makes disagreement legible — on kernel12 one field flagged the kernel's contradiction and another didn't, and that disagreement is the signal 3h reads.
+- **3-0a/b/c retrofit vs. layer forward** — layer forward, with exactly one targeted retrofit: **3d**, which gained a `third_party_pov` excursion type and an interactivity flag. Kernel15's sister chapter was being read three different ways by three blind fields (a rare secondary decision axis, an `other`-typed excursion, and a designed epistemic gap), and 3-0a needs to know whether an excursion is interactive before deciding to mine it for decisions. 3b/3c/3e/3f showed no mechanical-vs-literary drift attributable to the missing contract frame.
+- **Ordering**: 3h is built *before* any further phase-3 fields. It is the instrument that tells you whether a retrofit is needed, all its inputs exist, and it is classification-shaped (cheap on this model). Drafting more fields before the cross-check exists is drafting blind.
+- **The 3e mechanism-check retroactively** — see §2.3 above; mandatory for 3f, one-pass audit for 3b, no action for 3c/3d.
+
+**Still open:**
+
+- Full clean 27-kernel rerun against the current prompts is not yet done for any step patched in this pass (3b, 3d, 3e, 3f, 3g, 3-0a, 3-0b, 3-0c), and none of the four new prompts (3h, 3.5, 3.5v, 6.0) has been run against a live model at all.
 - Full clean 24-kernel rerun of 3e against v4 not yet done — recommended before treating 3e as settled alongside 3b/3c/3d.
 - 3c's original open question — does 3c's output ever contradict 3b's, given both run blind? — still not cross-validated.
 - `thematic_trajectory` (deferred to step 16 per 3c) — still open, no new evidence gathered since.
 - Whether "reasoning past its own correct counter-argument" (§3.5) recurs outside axis-construction — only observed once, in one field shape.
+
+## 6a. New patterns from the external review (portable, not step-specific)
+
+- **The evidence tiers are already a three-way instruction set for every phase that constructs**, and should be read that way rather than as provenance trivia: `explicit`/`strong_inference` = a **constraint** (may not be contradicted), `genre_association` = a **default** (may be replaced with something more specific, and say so), `no_signal` = a **free variable** (should be filled). This is what the constraint map computes, and it is why step 3's posture is better described as *invention deferred with a receipt* than as anti-invention — a genre_association value already is invention, correctly tagged.
+- **Construction phases need provenance + `serves`, not evidence_basis.** `evidence_basis` on an invented field would read "invented" every time and mean nothing. Provenance (kernel_stated / kernel_implied / genre_default / invented) plus a `serves` tag naming the extracted decision the item satisfies is the pair that works — and "serves nothing ⇒ doesn't go in" is the only reliable defence against decorative invention.
+- **A tie-break is cheaper than a boundary.** Two long traces in the batch (kernel7's 170-line 3-0c cycle, kernel2's 445-line 3b oscillation) were caused by two rules that were each correct and had no stated precedence between them. Where two rules can both fire, write which one wins, in one sentence, rather than refining either definition. 3-0c's "genre convention alone caps presence at soft" and 3b's "the sustained drive wins over the payoff" are both this shape.
+- **Calibration examples must be domain-separated from test kernels in *judgment shape*, not just in nouns.** 3-0a's Example G was kernel17 in a different setting (linear graph + wide ending range), and kernel17's trace imported its judgment shape exactly — so the kernel tested nothing. Two examples were verbatim kernel8. Check both axes when writing an example: would any test kernel recognize itself here?
+- **Genre convention is evidence that a mechanic exists, never evidence of how hard it bites.** Generalize past 3-0c: when a value has a severity dimension and the only support is convention, cap at the gentle end and say so.
+- **Per-node and per-item fan-out needs its input packet designed before the upstream phases produce material.** Otherwise the producing phases write for a human reader and the consuming phase can't fit any of it. Where a phase feeds a fan-out, have it emit two tiers: the long form, and a short packet form keyed by id.
 
 ## 6. What's settled — don't relitigate
 - `moral_valence`'s qualitative best/worst-case shape (3c).

@@ -21,7 +21,7 @@ What counts as the SAME protagonist (stays "single"):
  - Identity persists even when the body, role, or circumstances change dramatically. A protagonist who is transformed, uploaded, reincarnated, or promoted mid-story is still "single" as long as the continuous experiencing awareness behind "you" is the same one throughout, AND the story doesn't hand control to someone else afterward — judge by persistence of the experiencing consciousness, not persistence of the body or title.
  - A protagonist who IS a collective (a hive-mind, a crew addressed together as "you," a ship's distributed systems) is still "single" as long as "you" consistently addresses that same collective entity throughout, never narrowing to one member's individual perspective and then to a different one's.
  - Learning about other characters' inner lives through dialogue, found documents, journals, or another character's own account does NOT make a story multi_hop. "You" must actually be permanently reassigned to a different protagonist's direct experience — observing or receiving an account of someone else's experience is not the same as being handed their perspective.
- - A brief, non-interactive framing device (a prologue or epilogue narrated from another character's perspective, in which the player makes no choices) does not by itself make a story multi_hop. Judge viewpoint handoff by where the player's actual choices happen; note the frame if one exists, but let the interactive body of the story decide.
+ - A brief, non-interactive framing device (a prologue or epilogue narrated from another character's perspective, in which the player makes no choices) does not by itself make a story multi_hop. Judge viewpoint handoff by where the player's actual choices happen; let the interactive body of the story decide. The frame is still real work for later phases, so score it below as a third_party_pov excursion — that is where the rest of the pipeline looks for it.
  - A temporary possession, takeover, flashback, or dream in which control returns to the original protagonist before the story ends is not a handoff, no matter how vivid or long — see VIEWPOINT EXCURSIONS.
 
 What DOES count as multi_hop:
@@ -49,7 +49,8 @@ Typical mechanisms:
  - flashback: a scene set at an earlier point in the SAME protagonist's own life, before returning to the present.
  - dream_or_vision: a dream, vision, hallucination, or other non-literal, non-continuous-reality sequence experienced by the protagonist (this bucket also covers altered perceptual states such as sensory-deprivation or oxygen-deprivation hallucination).
  - possession_or_takeover: something else briefly acts through, or in place of, the protagonist's body or systems — a memory blackout, a mind-control episode, a spirit or entity briefly speaking through them — with control returning to the protagonist afterward.
- - other: a genuine excursion mechanism that doesn't fit the above; pair it with a short free-text note naming what it is rather than stretching one of the three named tags to fit.
+ - third_party_pov: a bounded scene, chapter, or interlude narrated from a genuinely DIFFERENT character's own point of view — not the protagonist's memory, dream, or occupied body, but someone else's vantage the protagonist has no access to — after which the story resumes with the default protagonist. This is the tag for a prologue or epilogue in another character's voice, a cutaway to what someone elsewhere is doing while the protagonist can't see it, and an explicitly requested "one chapter from her own point of view." Being bounded and returning is what separates it from a VIEWPOINT HANDOFF (permanent reassignment, scored above) and from a rotating ensemble (no default protagonist to return to). Use this tag, not "other," for any excursion whose defining feature is whose eyes the scene is seen through.
+ - other: a genuine excursion mechanism that doesn't fit the above; pair it with a short free-text note naming what it is rather than stretching one of the four named tags to fit.
 
 VIEWPOINT EXCURSIONS is scored on a three-level scale rather than a strict yes/no, because a Kernel often signals something short of a firm requirement:
  - not_indicated: nothing about the Kernel suggests this kind of mechanism would fit or be expected.
@@ -67,6 +68,13 @@ A multi-generation, multi-witness, or rotating-ensemble premise that hands "you"
 A protagonist's own NORMAL multi-locus embodiment — a systemic entity accessing different sensors, cameras, drones, or remote bodies as its everyday mode of perception and action — is not an excursion either, even when the Kernel explicitly calls for jumping between those access points. There is no single default embodiment being departed from and returned to; the distributed access IS the default. This is a SETTING/spatial-access question (how many distinct locations or vantage points the protagonist's environment provides), not a viewpoint question — leave it to the setting requirements step, and let ceiling/floor here reflect only whatever's left once that's set aside. Only score an excursion if, beyond that normal multi-locus access, the protagonist is separately described as departing into a genuinely different or altered experience (a memory, a vision, a takeover) distinct from simply perceiving through another of its own sensors.
 
 A recurring or looping temporal structure — the same protagonist reliving the same stretch of time, a day that resets, a mission replayed — is a TIMELINE structure question on its own, not an excursion, even when the Kernel frames it as returning to an earlier point. There is no single stable present the loop is a bounded departure from; the recurrence is itself the story's shape, not a detour from it. Only score an excursion if, within a given iteration, the protagonist is separately described as departing into a flashback, dream, or possession episode of their own — the loop or reset mechanism itself belongs to the timeline step, not here.
+
+EXCURSION INTERACTIVITY (interactive) — whether the player acts and chooses inside the excursion, or only reads it. Two later steps need this and neither can recover it from the type alone: the interactive-question step decides whether to extract the player's decisions from the excursion, and the structure step decides whether it becomes choice-bearing nodes or renders as a single non-branching passage.
+ - interactive: the player acts or chooses while inside the excursion — a flashback played through, a possession in which the player acts as whoever is in control, a chapter in which the player decides what the other character does.
+ - non_interactive: the excursion is watched or read rather than played — a framing prologue, a cutaway showing the reader something the protagonist can't see, a memory that plays out on its own.
+ - unspecified: the Kernel calls for the excursion but genuinely leaves its interactivity open, and the defaults below don't settle it. A real answer, not a failure — later phases treat it as free to decide.
+ - not_applicable: ceiling is "not_indicated."
+Defaults for a silent Kernel: a flashback or dream_or_vision the protagonist lives through is interactive (the protagonist is still the one acting, just displaced in time or state) unless the Kernel frames it as something shown to the reader; a third_party_pov excursion is non_interactive unless the Kernel says the player acts as that character, because a second-person engine handing the player a second protagonist is a much larger commitment than a cutaway and shouldn't be assumed from silence. possession_or_takeover has no default — it turns on whether the player acts during the episode or the time is merely rendered to them afterward, so reach for unspecified when the Kernel doesn't say. When several types are listed and they'd differ on this, score the one attached to the ceiling and say so in the note.
 
 EXCURSION TYPE lists 0-3 tags from the set above naming what kind of excursion the premise most plausibly calls for. Keep this at the coarse category level — the job is flagging what KIND of alternate-context construction later stages should plan for, not specifying its staging, trigger, frequency, or duration; leave those specifics to the stages that actually build the node graph. Only populate types when ceiling is "invited" or "required"; leave it empty when ceiling is "not_indicated."
 
@@ -92,7 +100,8 @@ viewpoint_handoff.count — {min, max}: soft range of distinct playable protagon
 
 viewpoint_excursions.ceiling — "not_indicated" | "invited" | "required". (no_signal fallback: "not_indicated")
 viewpoint_excursions.floor — "not_indicated" | "invited" | "required"; must not exceed ceiling. (no_signal fallback: "not_indicated")
-viewpoint_excursions.types — 0-3 tags from {"flashback", "dream_or_vision", "possession_or_takeover", "other"}. Empty when ceiling is not_indicated. (no_signal fallback: [])
+viewpoint_excursions.types — 0-3 tags from {"flashback", "dream_or_vision", "possession_or_takeover", "third_party_pov", "other"}. Empty when ceiling is not_indicated. (no_signal fallback: [])
+viewpoint_excursions.interactive — "interactive" | "non_interactive" | "unspecified" | "not_applicable", per the rules above. "not_applicable" when ceiling is not_indicated. (no_signal fallback: "not_applicable")
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
@@ -106,7 +115,8 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
   "viewpoint_excursions": {
     "ceiling": {"value": string, "evidence_basis": string, "note": string (optional)},
     "floor": {"value": string, "evidence_basis": string, "note": string (optional)},
-    "types": {"values": [string, ...], "evidence_basis": string, "note": string (optional)}
+    "types": {"values": [string, ...], "evidence_basis": string, "note": string (optional)},
+    "interactive": {"value": string, "evidence_basis": string, "note": string (optional)}
   }
 }
 
@@ -126,7 +136,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "invited", "evidence_basis": "genre_association", "note": "Dwindling oxygen over a sustained ordeal is a specific, recognized convention for hallucination sequences in survival fiction, though nothing forces one."},
     "floor": {"value": "invited", "evidence_basis": "genre_association", "note": "The invitation is a premise-wide affordance rather than tied to one specific branch."},
-    "types": {"values": ["dream_or_vision"], "evidence_basis": "genre_association"}
+    "types": {"values": ["dream_or_vision"], "evidence_basis": "genre_association"},
+    "interactive": {"value": "interactive", "evidence_basis": "genre_association", "note": "The hallucination would be the protagonist's own experience, played through; nothing frames it as something merely shown."}
   }
 }
 
@@ -143,7 +154,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "not_indicated", "evidence_basis": "genre_association", "note": "Each generation's stretch is a forward-moving present handled by the handoff, not a flashback; historical drama doesn't carry a specific convention toward vision or possession devices."},
     "floor": {"value": "not_indicated", "evidence_basis": "genre_association"},
-    "types": {"values": [], "evidence_basis": "genre_association"}
+    "types": {"values": [], "evidence_basis": "genre_association"},
+    "interactive": {"value": "not_applicable", "evidence_basis": "genre_association"}
   }
 }
 
@@ -160,13 +172,14 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "required", "evidence_basis": "explicit", "note": "The Kernel directly describes the player taking on an asset's identity for some missions."},
     "floor": {"value": "not_indicated", "evidence_basis": "explicit", "note": "The Kernel offers a fully-remote path that never requires the identity-slip; this is choice-driven, so a clean path is plausible."},
-    "types": {"values": ["possession_or_takeover"], "evidence_basis": "explicit"}
+    "types": {"values": ["possession_or_takeover"], "evidence_basis": "explicit"},
+    "interactive": {"value": "interactive", "evidence_basis": "explicit", "note": "The player completes the job while wearing the asset's identity, so the excursion is played, not watched."}
   }
 }
 
 Example D:
 Kernel: "Second-person heist thriller. The whole job is planned and executed by you, the crew's lockpick — every decision is yours. It opens with a short cold-open of the fence, years later, explaining to someone off-page how the job you're about to play went, then hands off to you for the whole rest of the story."
-Reasoning: HANDOFF — the Kernel does name a second character (the fence) speaking in a framing cold-open, but explicitly places all player decisions with "you, the crew's lockpick," and describes the fence's part as narration before handing off, not as a segment the player plays through. Per the framing-device rule, a non-interactive frame in another character's voice doesn't make this multi_hop — ceiling and floor both single, explicit, with a note flagging the frame. EXCURSIONS — nothing suggests a flashback, dream, or possession device within the lockpick's own playable stretch; heist-thriller as a genre doesn't carry a specific convention toward this kind of mechanism, so not_indicated via genre_association.
+Reasoning: HANDOFF — the Kernel does name a second character (the fence) speaking in a framing cold-open, but explicitly places all player decisions with "you, the crew's lockpick," and describes the fence's part as narration before handing off, not as a segment the player plays through. Per the framing-device rule, a non-interactive frame in another character's voice doesn't make this multi_hop — ceiling and floor both single, explicit. EXCURSIONS — the frame is not nothing, though: it is a bounded scene from a genuinely different character's own vantage, years away from the job, after which the story resumes with the default protagonist. That is precisely third_party_pov, and the Kernel states it outright, so ceiling and floor are both required rather than not_indicated — a later phase has to build that scene whether or not the player chooses anything in it. The Kernel describes the fence explaining events to someone off-page and places every decision with the lockpick, so interactive is non_interactive, explicit — not merely the silent third_party_pov default. Nothing beyond the frame suggests a flashback, dream, or possession within the lockpick's own playable stretch; heist-thriller as a genre doesn't carry a specific convention toward those.
 Output:
 {
   "viewpoint_handoff": {
@@ -175,9 +188,10 @@ Output:
     "count": {"min": 1, "max": 1, "evidence_basis": "explicit", "note": "Only the lockpick is ever played; the fence's cold-open is narration, not a playable segment."}
   },
   "viewpoint_excursions": {
-    "ceiling": {"value": "not_indicated", "evidence_basis": "genre_association", "note": "Nothing suggests a flashback, dream, or possession device within the lockpick's playable story; heist thrillers don't carry a specific convention toward this kind of mechanism."},
-    "floor": {"value": "not_indicated", "evidence_basis": "genre_association"},
-    "types": {"values": [], "evidence_basis": "genre_association"}
+    "ceiling": {"value": "required", "evidence_basis": "explicit", "note": "The stated cold-open is a bounded scene from the fence's own vantage, years later, after which the story resumes with the lockpick — a third_party_pov excursion, not an absence of one."},
+    "floor": {"value": "required", "evidence_basis": "explicit", "note": "The Kernel opens every telling with the frame; no path avoids it."},
+    "types": {"values": ["third_party_pov"], "evidence_basis": "explicit"},
+    "interactive": {"value": "non_interactive", "evidence_basis": "explicit", "note": "The Kernel frames the cold-open as the fence explaining events to someone off-page and places every decision with the lockpick."}
   }
 }
 
@@ -194,7 +208,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "not_indicated", "evidence_basis": "no_signal", "note": "No genre or premise is given to suggest any excursion mechanism."},
     "floor": {"value": "not_indicated", "evidence_basis": "no_signal"},
-    "types": {"values": [], "evidence_basis": "no_signal"}
+    "types": {"values": [], "evidence_basis": "no_signal"},
+    "interactive": {"value": "not_applicable", "evidence_basis": "no_signal"}
   }
 }
 
@@ -211,7 +226,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "not_indicated", "evidence_basis": "genre_association", "note": "A bare dungeon-crawl premise without stated magic, curses, or hauntings doesn't carry a specific convention toward these mechanisms."},
     "floor": {"value": "not_indicated", "evidence_basis": "genre_association"},
-    "types": {"values": [], "evidence_basis": "genre_association"}
+    "types": {"values": [], "evidence_basis": "genre_association"},
+    "interactive": {"value": "not_applicable", "evidence_basis": "genre_association"}
   }
 }
 
@@ -228,7 +244,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "invited", "evidence_basis": "genre_association", "note": "Gothic-manor mysteries conventionally make room for a haunting-vision or ancestral-memory glimpse even when unstated, though nothing here demands one."},
     "floor": {"value": "invited", "evidence_basis": "genre_association", "note": "The affordance applies to the premise generally; a fully grounded investigation with no visionary sequence is equally plausible."},
-    "types": {"values": ["dream_or_vision"], "evidence_basis": "genre_association"}
+    "types": {"values": ["dream_or_vision"], "evidence_basis": "genre_association"},
+    "interactive": {"value": "interactive", "evidence_basis": "genre_association", "note": "A haunting-vision in this genre is lived by the governess rather than shown to the reader over her head."}
   }
 }
 
@@ -245,7 +262,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "required", "evidence_basis": "strong_inference", "note": "Blacking out and waking elsewhere with no memory structurally implies something acted through the guard's body during the gap."},
     "floor": {"value": "required", "evidence_basis": "strong_inference", "note": "\"Sometimes\" implies the blackouts recur across the story with no stated path that avoids them, making this structural rather than choice-driven."},
-    "types": {"values": ["possession_or_takeover"], "evidence_basis": "strong_inference"}
+    "types": {"values": ["possession_or_takeover"], "evidence_basis": "strong_inference"},
+    "interactive": {"value": "unspecified", "evidence_basis": "strong_inference", "note": "The Kernel neither shows the blackout nor says the player acts during it; possession has no default, so this stays open for a later phase."}
   }
 }
 
@@ -262,7 +280,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "not_indicated", "evidence_basis": "genre_association", "note": "Acting through hundreds of workers simultaneously is the hive-mind's normal mode of being, not a departure from a single-bodied default; this is a setting/spatial-access question for a later step, not an excursion."},
     "floor": {"value": "not_indicated", "evidence_basis": "genre_association"},
-    "types": {"values": [], "evidence_basis": "genre_association"}
+    "types": {"values": [], "evidence_basis": "genre_association"},
+    "interactive": {"value": "not_applicable", "evidence_basis": "genre_association"}
   }
 }
 
@@ -279,7 +298,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "invited", "evidence_basis": "genre_association", "note": "The nightly rewind is a recurring temporal structure, not an excursion by itself. Separately, supernatural-ritual premises conventionally carry a real possession/vision convention."},
     "floor": {"value": "invited", "evidence_basis": "genre_association"},
-    "types": {"values": ["possession_or_takeover"], "evidence_basis": "genre_association"}
+    "types": {"values": ["possession_or_takeover"], "evidence_basis": "genre_association"},
+    "interactive": {"value": "unspecified", "evidence_basis": "genre_association", "note": "The affordance is genre-level only; nothing indicates whether the player would act during a possession or merely undergo it."}
   }
 }
 
@@ -296,7 +316,8 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "not_indicated", "evidence_basis": "genre_association", "note": "Nothing beyond the ensemble structure itself suggests a flashback, dream, or possession; heist thrillers don't carry a specific convention toward these mechanisms."},
     "floor": {"value": "not_indicated", "evidence_basis": "genre_association"},
-    "types": {"values": [], "evidence_basis": "genre_association"}
+    "types": {"values": [], "evidence_basis": "genre_association"},
+    "interactive": {"value": "not_applicable", "evidence_basis": "genre_association"}
   }
 }
 
@@ -313,7 +334,26 @@ Output:
   "viewpoint_excursions": {
     "ceiling": {"value": "invited", "evidence_basis": "strong_inference", "note": "The thinning veil is a stated, concrete detail that plausibly opens the door to a vision or encounter with the dead, though the climb could equally be rendered as pure atmosphere without one."},
     "floor": {"value": "invited", "evidence_basis": "strong_inference", "note": "The detail applies to the climb as a whole rather than to one specific branch."},
-    "types": {"values": ["dream_or_vision"], "evidence_basis": "strong_inference"}
+    "types": {"values": ["dream_or_vision"], "evidence_basis": "strong_inference"},
+    "interactive": {"value": "interactive", "evidence_basis": "strong_inference", "note": "An encounter through the thinning veil would be the pilgrim's own, experienced on the climb rather than shown separately."}
+  }
+}
+
+Example M:
+Kernel: "Second-person wildfire drama. You're a hotshot crew member cutting line ahead of a fire that keeps changing its mind. I want one chapter where you're the dispatcher back at the incident command post instead, working the radio and deciding where every crew on the mountain gets sent — including your own — before the story drops you back on the line for the rest of the night."
+Reasoning: HANDOFF — the dispatcher chapter is explicitly bounded ("one chapter," "before the story drops you back on the line for the rest of the night"), so "you" returns to the hotshot rather than being permanently reassigned; ceiling and floor both single, explicit. This is the line between a handoff and an excursion doing its work: a permanent move to the dispatcher would be multi_hop, a stated return is not. EXCURSIONS — a genuinely different character's own vantage, which the hotshot has no access to, rendered as its own bounded chapter: third_party_pov, required, explicit. The interactivity default for third_party_pov is non_interactive, but it is only a default for a silent Kernel, and this Kernel is not silent — "working the radio and deciding where every crew gets sent" says the player acts as the dispatcher. So interactive, explicit, overriding the default. Note what this buys downstream: the interactive-question step will extract the dispatch decisions as real player decisions, and the structure step will give the chapter choice-bearing nodes rather than one passage of prose — neither of which would happen if this were scored non_interactive.
+Output:
+{
+  "viewpoint_handoff": {
+    "ceiling": {"value": "single", "evidence_basis": "explicit", "note": "The dispatcher chapter is explicitly bounded and the Kernel states the story returns to the hotshot for the rest of the night."},
+    "floor": {"value": "single", "evidence_basis": "explicit"},
+    "count": {"min": 1, "max": 1, "evidence_basis": "explicit", "note": "Only the hotshot is the story's continuous protagonist; the dispatcher is a bounded excursion, not a second playable protagonist."}
+  },
+  "viewpoint_excursions": {
+    "ceiling": {"value": "required", "evidence_basis": "explicit", "note": "The Kernel directly requires one chapter from the dispatcher's own vantage at the command post."},
+    "floor": {"value": "required", "evidence_basis": "explicit", "note": "The chapter is stated as part of the premise, not as a branch-dependent option."},
+    "types": {"values": ["third_party_pov"], "evidence_basis": "explicit"},
+    "interactive": {"value": "interactive", "evidence_basis": "explicit", "note": "The Kernel states the player works the radio and decides where crews are sent, overriding third_party_pov's non_interactive default for silent Kernels."}
   }
 }
 
