@@ -387,13 +387,30 @@ if __name__ == "__main__":
         '$$KERNEL$$': gen.kernel
     })
 
-    # steps 4 and 5 (structural shape, world shape) slot in here once built.
-
-    # 6.0: topology and state model. An INPUT to step 6, not a sub-step of
-    #  it - several kernels can't be built as a lattice at all.
-    gen.run_prompt('s6_0','state_topology', {
-        '$$STEP3_BUNDLE_JSON$$': step3_bundle,
+    # 3.75 craft spine
+    gen.run_prompt('s3_75','craft_spine', {
+        '$$KERNEL$$': gen.kernel,
+        '$$INTERACTIVE_QUESTION_JSON$$': gen.analysis_json('s3_0a_interactive_question'),
+        '$$EPISTEMIC_GAP_JSON$$': gen.analysis_json('s3_0b_identity_epistemic'),
+        '$$FAILURE_MODEL_JSON$$': gen.analysis_json('s3_0c_consequence_failure_model'),
+        '$$AFFECT_JSON$$': gen.analysis_json('s3b_affect'),
+        '$$THEME_JSON$$': gen.analysis_json('s3c_theme'),
+        '$$COMPLEXITY_JSON$$': gen.analysis_json('s3g_complexity'),
         '$$PREMISE_EXPANSION_JSON$$': gen.analysis_json('s3_5_premise_expansion'),
-        '$$KERNEL$$': gen.kernel
+        '$$PREMISE_EXPANSION_FIDELITY_JSON$$': gen.analysis_json('s3_5v_fidelity_check')
     })
 
+    # 3.75v craft spine fidelity
+    gen.run_prompt('s3_75v','fidelity_check', {
+        '$$KERNEL$$': gen.kernel,
+        '$$INTERACTIVE_QUESTION_JSON$$': gen.analysis_json('s3_0a_interactive_question'),
+        '$$EPISTEMIC_GAP_JSON$$': gen.analysis_json('s3_0b_identity_epistemic'),
+        '$$FAILURE_MODEL_JSON$$': gen.analysis_json('s3_0c_consequence_failure_model'),
+        '$$AFFECT_JSON$$': gen.analysis_json('s3b_affect'),
+        '$$THEME_JSON$$': gen.analysis_json('s3c_theme'),
+        '$$COMPLEXITY_JSON$$': gen.analysis_json('s3g_complexity'),        
+        '$$PREMISE_EXPANSION_JSON$$': gen.analysis_json('s3_5_premise_expansion'),
+        '$$PREMISE_EXPANSION_FIDELITY_JSON$$': gen.analysis_json('s3_5v_fidelity_check'),
+        '$$CRAFT_SPINE_JSON$$': gen.analysis_json('s3_75_craft_spine')
+    })
+    

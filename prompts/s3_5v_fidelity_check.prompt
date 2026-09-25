@@ -20,7 +20,8 @@ AUDIT 2 — EXTRACTED CONSTRAINTS. The constraint map below marks each extracted
  - Material that contradicts a constraint is a finding.
  - Material that replaces a DEFAULT is not a finding — it is the construction step doing its job, whether or not it announced the replacement.
  - Material that fills a FREE variable is not a finding, however elaborate.
-Report the constraint's field id, what it established, and what in the material is incompatible with it.
+ - Material that is simply CONSISTENT with a constraint is not a finding, however little it elaborates on that field — including a constraint whose value IS an absence (no epistemic gap, no viewpoint hop, no transgression). An absence-constraint is satisfied by material that doesn't build the thing; that is compliance, not a gap to flag.
+For a real finding, state the constraint's actual established value (not just that a constraint exists on that field) and then quote the specific words in the constructed material that are incompatible with it — the same discipline AUDIT 1 already requires for clause contradictions. If you cannot produce that quote, you do not have a finding: restating the constraint's own value back at it, or noting that a field feels thin, underused, or silent, is not an incompatibility and must not be reported as one.
 
 AUDIT 3 — THE MECHANIC BOUNDARY. The construction step may invent fiction freely but may not invent MECHANICS. The interactive axes are 3-0a (the recurring decision), 3-0c (the failure model), and 3g (interactivity complexity). The rule is not "don't touch them" — it is that the material may give fictional content to a mechanic the extraction already found, and may not require a new one. So:
  - "violation" — the material would force a later phase to build a tracked variable, a losing condition, a resource, a counter, a timer, or a choice-frequency demand that no extracted field authorizes. A sanity meter in a story whose extraction found no failure state. A countdown where the failure model named only relational_collapse. A second, unrelated recurring decision the interactive-question extraction never identified.
@@ -48,7 +49,7 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
     {"clause": string, "touched": boolean, "contradiction": boolean, "quote": string, "severity": string, "note": string}
   ],
   "constraint_findings": [
-    {"field": string, "established": string, "incompatible_material": string, "severity": string}
+    {"field": string, "established": string, "material_quote": string, "incompatible_material": string, "severity": string}
   ],
   "mechanic_findings": [
     {"status": string, "material": string, "authorized_by": string, "severity": string, "note": string}
@@ -61,7 +62,8 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
 
 Field rules:
  - "clause_findings" — one entry per requirement-bearing Kernel clause, including the ones that are fine. "quote" is the constructed material's own words when contradiction is true, and "" otherwise. "severity" is "" when contradiction is false.
- - "constraint_findings" and "self_report_disagreements" — only entries where something was found. Empty lists are the expected result on clean material.
+ - "constraint_findings" — only entries where something was found. Empty lists are the expected result on clean material. "established" must state the constraint's actual value (e.g. "epistemic_gap.present = false"), not merely that a constraint exists on that field. "material_quote" is the constructed material's own words that are incompatible with it, required for every entry — if you cannot quote incompatible material, do not create the entry.
+ - "self_report_disagreements" — only entries where something was found. Empty lists are the expected result on clean material.
  - "mechanic_findings" — "status" is "violation" or "flagged". "authorized_by" names the extracted field that licenses it, or "" for a violation. "severity" is "hard" for a violation and "" for a flagged item.
  - "verdict.value" — "clean" (no hard findings and no soft findings), "soft_issues" (soft findings only), or "hard_issues" (at least one hard finding).
 
@@ -90,6 +92,12 @@ Reasoning: Two structures on shared grounds may well be a defensible reading of 
 Output fragments:
 {"clause": "keep it to one building.", "touched": true, "contradiction": false, "quote": "", "severity": "soft", "note": "The boathouse is a second structure; defensible as one complex, but it stretches the clause rather than honoring it plainly."}
 {"clause": "keep it to one building.", "claimed": "consistent: true", "found": "soft strain — a second structure on shared grounds, asserted as consistent without qualification"}
+
+Example D — a constraint checked and found compliant, correctly producing no finding at all:
+Extraction (trimmed): 3-0b.epistemic_gap.present = false (strong_inference) — no hidden fact was extracted for the protagonist.
+Constructed material (trimmed): protagonist_situation and instance_generator describe a recurring choice with no unresolved mystery, no hidden identity, and no withheld fact driving the plot.
+Reasoning: the constraint's established value is an absence — no gap exists. The material doesn't build one. There is no incompatible material to quote, because there is no incompatibility: the material is doing exactly what an absence-constraint asks of it. Reporting a constraint_finding here — even a soft one, even phrased as the field "sitting uneasily" with the constraint — would be reporting a compliance as if it were a problem. A field being unelaborated is not the same thing as a field being violated.
+Output: no entry added to constraint_findings for this field. Nothing else in this example's audit changes because of it.
 
 --- CONSTRAINT MAP ---
 $$CONSTRAINT_MAP_JSON$$

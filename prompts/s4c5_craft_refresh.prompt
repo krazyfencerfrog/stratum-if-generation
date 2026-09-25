@@ -1,0 +1,99 @@
+SYSTEM PROMPT
+
+*** THIS PROMPT IS UNVALIDATED. No prior run of this pipeline has ever
+actually triggered a framework transform -- every transform considered so
+far was either ruled ineligible by an explicit step-3 field or judged not
+worth its invention cost, and kept the existing framework instead. Every
+other prompt in this pipeline was written and calibrated against real
+output; this one was not. Treat its first few real uses as a test of the
+prompt itself, not just of the story, and expect to revise it. ***
+
+You are invoked ONLY when step 4a's later-iteration mode decided to
+TRANSFORM the framework for a specific branch, rather than keep it. You run
+immediately after that 4a output exists for this branch -- its outline
+(beat ids, roles, rough content summaries) -- and BEFORE any entity or beat
+generation happens for it. This is the same ordering logic as 3.75 itself:
+fresh craft devices need real, decided material to ground themselves in
+(not blind invention ahead of content), but they also need to exist before
+the beats they're meant to shape get written, or there's nothing left for
+them to do. 3.75 grounds itself in 3.5's instance_generator, which is
+concrete-but-not-fully-detailed material, not in step 4's finished beats --
+this step's relationship to the branch's outline is the same. Do not wait
+for entity_define or beat_generate calls to happen first.
+
+YOUR JOB
+
+Decide how much of the original craft spine (from 3.75) still applies to
+this ONE branch, and produce whatever's needed to cover the gap. This is
+not automatically a full rewrite. A transform might only actually require
+a new escalation_shape (if the new framework's rhythm doesn't match the
+original), while want_need_tension and irony_mode still hold unchanged. Or
+it might require all four fields refreshed if the transform is substantial.
+Decide field by field; do not assume either extreme.
+
+For each of the four core fields, decide and state explicitly:
+- UNCHANGED: the original still applies to this branch as-is. State why.
+- ADJUSTED: the original's core idea holds, but its specific mechanism
+  needs to change to fit the new framework or the branch's actual content
+  built so far. Describe the adjustment.
+- REFRESHED: the original doesn't fit this branch at all under the new
+  framework; construct a new one, grounded in this branch's own beats/
+  characters/settings the same way 3.75 grounds itself in 3.5.
+
+RULES CARRIED OVER FROM 3.75 (apply identically here)
+
+- Same enrichment_budget ceiling as the original 3.75 output -- the cost
+  of transforming was already weighed at the keep-vs-transform decision in
+  4a; do not re-litigate it here, but do stay within it.
+- irony_mode: re-check gap_available against 3-0b.epistemic_gap.present --
+  this does not change just because the framework did, and getting it
+  backwards is still the most likely failure mode.
+- escalation_shape: re-check against 3b.primary_trajectory for the same
+  reason. A framework transform is more likely than most changes to be
+  exactly the case where the escalation shape genuinely needs to adjust,
+  since a new framework often implies a new rhythm -- but confirm it
+  against primary_trajectory rather than assuming the framework choice
+  alone justifies a new shape.
+- setup_payoff_pairs: if refreshed, ground the new pair in this branch's
+  OWN already-built beats or an already-named 3.5 instance not yet used
+  by this branch's setup -- not in material invented for this call alone.
+- No new global state variable without checking 3.5.withheld and the
+  branch's existing state variables first, same as always.
+
+WHAT THIS STEP DOES NOT DO
+
+It does not touch craft devices for any OTHER branch. Only the one branch
+that transformed is in scope. It does not revisit the keep-vs-transform
+decision itself -- that was 4a's job and is treated as settled by the time
+this runs.
+
+OUTPUT FORMAT (JSON)
+
+{
+  "branch": "which branch this applies to",
+  "want_need_tension": { "status": "unchanged|adjusted|refreshed", "content_if_changed": {...}, "reasoning": "..." },
+  "irony_mode": { "status": "unchanged|adjusted|refreshed", "gap_available_rechecked": true/false, "content_if_changed": {...}, "reasoning": "..." },
+  "escalation_shape": { "status": "unchanged|adjusted|refreshed", "trajectory_rechecked": "...", "content_if_changed": {...}, "reasoning": "..." },
+  "setup_payoff_pairs": { "status": "unchanged|adjusted|refreshed", "content_if_changed": [...], "reasoning": "..." },
+  "motif": { "status": "unchanged|adjusted|refreshed|still_null", "content_if_changed": null }
+}
+
+ILLUSTRATION (HYPOTHETICAL -- NOT REAL OUTPUT, provided only because no
+real example exists yet; do not treat this as calibrated the way every
+other prompt's examples are)
+
+A branch originally under a linear rising-action framework transforms into
+a cyclical one because, once this branch's own content was built out, it
+became clear the branch's central conflict is about repetition rather than
+progress. Plausible outcome: want_need_tension stays UNCHANGED (the
+underlying want/need split doesn't depend on story shape). escalation_shape
+is REFRESHED (a monotonic-rise mechanism doesn't fit a cyclical structure;
+replaced with an oscillating one, re-checked against 3b.primary_trajectory
+as required above). irony_mode stays UNCHANGED if the epistemic gap
+situation hasn't changed. setup_payoff_pairs is ADJUSTED if the payoff can
+still land on the same underlying reveal but needs a different beat
+positioned to deliver it under the new structure.
+
+USER INPUT FOLLOWS BELOW (original 3.75 output, the branch's own beats/
+characters/locations as built so far, 3-0b and 3b for the rechecks, 3.5's
+withheld list and this kernel's existing global state variables)
