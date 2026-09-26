@@ -1,0 +1,33 @@
+This goal of this project is to take generate story content for the use in an interactive fiction engine.  It takes a user's minimal idea for a story (the kernel) and expand its it with not additional user involvement into a full story for use with the engine.
+
+The generation code has been through several major rewrites.  The current structure is a series of stages, each stage consisting of several prompts to be evaluated by a local ai model (currently qwen 3.8, but not set in stone):
+
+step 1) taking kernel from user
+   currently a no-op, the kernel is just passed in
+step 2) kernel filtration
+   currently allows the application of a content-rating ceiling to rewrite the kernel if need to obey the rating.
+step 3) kernel extraction
+   currently analyzes the kernel for different aspects that we want to build the story out of.
+step 3.5) premise expansion
+   intial step from the kernel to generating content
+step 3.75) craft spine
+   ensures the generated story will possess interesting writing constructs
+step 4) outline generation
+   this stage (not complete) is an iterative build-out of an outline
+
+The current prompts are in prompts/ and current generated output (up to 3.5v) is in stories/.  In docs/ are an *OLD* strategy.txt and a current document describing the idea of step 4.
+
+What is working:
+*) the current strategy seem to be heading in the right direction overall
+*) the generated output from the model is very reasonable and making good decisions
+
+What smells wrong:
+*) the validation phases 3.5v and 3.75v (and maybe 3h) are made to *find* problems with 3.5 and 3.75, but don't correct the problems into a new/improved 3.5 or 3.75 output.  I think that's a problem as there is no place that actually does this.
+*) some reasoning traces seem excessively long and repetitive.  The actual reasoning is quite good and I *do not* want to degrade it, but if we could remove some repitition we could likely speed up the runs
+*) step 4a probably needs to be split into two prompts (first run and subsequent runs)
+
+What we want to do:
+P1) inspect step 4 and integrate into main.py, modifying as needed. note that the current 4a prompt is a multi-mode abomination, probably needs to be split into a first pass and then iterative prompt.  main.py currently doesn't have support for an iterative step, so that would need to be supported.
+P2) look into validation phases from 3.5 and 3.75 (possibly 3h as well) and ensure recomendations are actually implemented somewhere in the overall architecture
+P3) look over all prompts and make improvements/corrections as needed
+P4) take a thorough look at the overall process and if additional steps are needed to make a better product, make them.
