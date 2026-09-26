@@ -42,10 +42,23 @@ WHAT TO CHECK
      3.5.instance_generator.instances by name/role? Does it invent any new
      cast, setting, or mechanic beyond what 3.5 already established?
 
-3. self_report_disagreements -- if the craft-spine material's own notes claim
-   something ("this matches X") that your independent check does not
-   support, record the disagreement explicitly rather than silently trusting
-   the claim.
+3. self_report_disagreements -- if the craft-spine material's own notes or
+   citations claim something ("this matches X", "serves 3b.secondary_affects:
+   uncanny wonder") that your independent check does not support, record the
+   disagreement explicitly rather than silently trusting the claim. A wrong
+   citation is a real disagreement, even when the underlying device is
+   sound: the repair pass corrects the citation.
+
+Where 3h (the cross-check, provided below) resolved a conflict between two
+extracted fields, the winning field is the one the spine had to honor;
+a device that follows the winner and not the loser is authorized.
+
+WHAT HAPPENS WITH YOUR VERDICT. "flagged" sends the spine to a repair pass
+that acts on exactly the entries you flag and the disagreements you record,
+then this check runs again. So each flagged entry's note must say what did
+not hold and against which upstream value -- that note is the repair's
+instruction. "authorized" entries and disagreements you leave out are not
+touched.
 
 OUTPUT FORMAT (JSON)
 
@@ -57,12 +70,24 @@ OUTPUT FORMAT (JSON)
     { "material": "escalation_shape", "authorized_by": "3b.primary_trajectory, 3g.state_richness", "verdict": "authorized|flagged", "note": "state explicitly whether pattern matched primary_trajectory, and whether the no-new-meter check was applied" },
     { "material": "setup_payoff_pairs[0]", "authorized_by": "3.5.instance_generator", "verdict": "authorized|flagged", "note": "..." }
   ],
-  "self_report_disagreements": [],
+  "self_report_disagreements": [
+    { "material": "the field whose claim is disputed, e.g. want_need_tension.need.serves", "claimed": "what the spine says, verbatim", "found": "what the upstream field actually says" }
+  ],
   "verdict": { "value": "clean|flagged", "summary": "..." }
 }
 
-If verdict is "flagged", the craft-spine step should be re-run, not silently
-patched downstream -- state this in the summary if it applies.
+Field rules:
+ - verdict.value is "flagged" when any mechanic_findings entry is flagged,
+   any clause_findings entry has contradiction true, or
+   self_report_disagreements is non-empty; otherwise "clean".
+ - self_report_disagreements is an empty list on clean material.
+
+REASONING DISCIPLINE
+Run the checks once each, in order. For a check that holds, one sentence is
+enough; record findings, not the reasons each non-finding is not a finding.
+Then write the JSON once: do not draft it in your reasoning and copy it out,
+and do not re-narrate the spine, the fields, or these instructions to
+yourself.
 
 USER INPUT FOLLOWS BELOW (original Kernel, 3-0a/3-0b/3-0c/3b/3c, 3.5, 3.5v,
 and the 3.75 material to check)
@@ -87,11 +112,14 @@ $$THEME_JSON$$
 - 3g (complexity)
 $$COMPLEXITY_JSON$$
 
-- 3.5 (premise expansion, finished)
+- 3h (cross-check; a resolved conflict's winning field binds)
+$$CROSS_CHECK_JSON$$
+
+- 3.5 (premise expansion, finished and verified)
 $$PREMISE_EXPANSION_JSON$$
 
-- 3.5v (its fidelity check, verdict should read clean or acceptable)
+- 3.5v (its fidelity check)
 $$PREMISE_EXPANSION_FIDELITY_JSON$$
 
-- 3.75 (craft spine)
+- 3.75 (craft spine, the material to check)
 $$CRAFT_SPINE_JSON$$

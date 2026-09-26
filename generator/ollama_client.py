@@ -16,13 +16,21 @@ def _ollama_url(host, path):
     return host.rstrip("/") + path
 
 class OllamaClient(LlmClient):
-    def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180, max_duration=1800, echo=True):
+    def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180, max_duration=1800, echo=True, options=None):
         self.host = host
         self.model = model
         self.keep_alive = keep_alive
         self.idle_timeout = idle_timeout
         self.max_duration = max_duration
         self.echo = echo
+        # Ollama model options sent with every request, e.g.
+        #   {"num_ctx": 32768, "temperature": 0.7}
+        # num_ctx matters: the later prompts (3.5, 3.75, step 4) carry
+        # 8-12k tokens of instructions plus upstream JSON, and a server left
+        # at its default context window truncates the prompt SILENTLY (the
+        # warning goes to the server log, not the response). If a model's
+        # output looks like it never saw the bundle, set this.
+        self.options = dict(options or {})
 
     def run_prompt(self, prompt):
         payload = {
@@ -31,6 +39,8 @@ class OllamaClient(LlmClient):
             "stream": True,
             "keep_alive": self.keep_alive,
         }
+        if self.options:
+            payload["options"] = self.options
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             _ollama_url(self.host, "/api/generate"),
@@ -62,13 +72,23 @@ class OllamaClient(LlmClient):
                         continue  # ignore stray non-JSON lines rather than aborting the call
                     if "error" in obj:
                         raise RuntimeError(f"ollama returned an error: {obj['error']}")
+                    # Newer servers (0.9+) return a thinking model's reasoning
+                    # in its own "thinking" field and keep "response" clean;
+                    # older ones inline it in "response" between <think>
+                    # tags. Handle both, so the saved thinking trace is never
+                    # silently empty.
+                    thought = obj.get("thinking", "")
+                    if thought:
+                        thinking_chunks.append(thought)
+                        if self.echo:
+                            print(thought, end="", flush=True)
                     fragment = obj.get("response", "")
                     if fragment:
                         chunks.append(fragment)
                         if self.echo:
                             print(fragment, end="", flush=True)
                         if fragment.find('</think>') != -1:
-                            thinking_chunks = chunks
+                            thinking_chunks = thinking_chunks + chunks
                             chunks = []
                     if obj.get("done"):
                         if self.echo:
@@ -89,13 +109,16 @@ class OllamaClient(LlmClient):
             if isinstance(e.reason, (socket.timeout, TimeoutError)):
                 raise RuntimeError(_idle_timeout_message(self.keep_alive, self.idle_timeout))
             raise RuntimeError(
-                f"could not reach ollama at {host} ({e.reason}). Is `ollama serve` running "
+                f"could not reach ollama at {self.host} ({e.reason}). Is `ollama serve` running "
                 f"there? Set --ollama-host or the OLLAMA_HOST environment variable if it's "
                 f"not on the default address."
             )
         except socket.timeout:
             raise RuntimeError(_idle_timeout_message(self.keep_alive, self.idle_timeout))
-        return ("".join(thinking_chunks).strip(), "".join(chunks).strip())
+        thinking = "".join(thinking_chunks).strip()
+        # strip the tags themselves when the server inlined them
+        thinking = thinking.replace("<think>", "").replace("</think>", "").strip()
+        return (thinking, "".join(chunks).strip())
 
 
 def _idle_timeout_message(keep_alive, idle_timeout):
@@ -147,6 +170,10 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=1800,
                          help="Overall wall-clock cap in seconds for a single generate call "
                               "(default: 1800 = 30 min). Separate from --idle-timeout.")
+    parser.add_argument("--num-ctx", type=int, default=0,
+                         help="Context window (tokens) to request from the server; 0 sends nothing "
+                              "and uses the server's default. The pipeline's later prompts need "
+                              "16k+ to avoid silent truncation.")
     parser.add_argument("--idle-timeout", type=int, default=180,
                          help="Seconds of complete silence (no new output at all) before giving up "
                               "on a call -- this is what actually catches the model getting "
@@ -159,6 +186,7 @@ if __name__ == "__main__":
                           keep_alive=args.keep_alive,
                           idle_timeout=args.idle_timeout,
                           max_duration=args.timeout,
-                          echo=True);
+                          echo=True,
+                          options={"num_ctx": args.num_ctx} if args.num_ctx else None)
     print('enter prompt and close stdin:')
     print(client.run_prompt(sys.stdin.read()))

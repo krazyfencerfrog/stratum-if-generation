@@ -126,10 +126,22 @@ non-clean cases call for different responses.
   written -- building setup_payoff_pairs against material that's already
   wrong risks legitimizing the error by citing it as though it were sound.
   Output only: { "status": "blocked", "reason": "3.5v verdict is
-  hard_issues", "hard_findings_summary": "..." } and stop. 3.5 needs to be
-  corrected and re-verified before this step should run. [UNVALIDATED: no
-  real run has ever produced a hard_issues verdict at this point in the
-  pipeline; this branch is a reasoned default, not confirmed behavior.]
+  hard_issues", "hard_findings_summary": "..." } and stop. The pipeline
+  routes a hard_issues verdict to a repair pass (3.5r) and re-verifies
+  before this step is ever run, so receiving one here means that loop
+  failed; the blocked output halts the run for a human.
+
+CITATIONS. Wherever a field cites upstream material (a `serves` tag, a
+setup/payoff pair's instance), cite by label or role text, never by list
+index: "3b.secondary_affects: moral complicity", "instances: the
+maintenance sector". A real prior run cited secondary_affects[1] for an
+affect that was at index 0, and the verification pass had to send the
+whole spine back for it.
+
+CROSS-CHECK. Where 3h resolved a conflict between two extracted fields
+("prefer_a" / "prefer_b"), read the winning field as the one that binds;
+3.5 was built to it. An unresolved conflict leaves both standing -- build
+devices that do not depend on either side, and say so in the note.
 
 INPUTS (provided below, read all before writing anything)
 - the original Kernel text
@@ -181,6 +193,17 @@ OUTPUT FORMAT (JSON)
   ],
   "motif": null
 }
+
+REASONING DISCIPLINE
+
+Check 3.5v's verdict, 3-0b.epistemic_gap.present, and
+3b.primary_trajectory.shape first, in three sentences -- those three reads
+decide the two most likely failure modes. Then settle each field once in
+prose and write the JSON once: do not draft the JSON in your reasoning and
+copy it out; do not re-narrate the inputs or these instructions to
+yourself; when a field is settled, move on unless a later field gives a
+concrete reason to reopen it; do not check the finished JSON key by key in
+your reasoning.
 
 CALIBRATION EXAMPLES
 
@@ -243,8 +266,11 @@ $$THEME_JSON$$
 - 3g (complexity)
 $$COMPLEXITY_JSON$$
 
-- 3.5 (premise expansion, finished)
+- 3h (cross-check; a resolved conflict's winning field binds)
+$$CROSS_CHECK_JSON$$
+
+- 3.5 (premise expansion, finished and verified)
 $$PREMISE_EXPANSION_JSON$$
 
-- 3.5v (its fidelity check, verdict should read clean or acceptable)
+- 3.5v (its fidelity check; the pipeline only runs this step when the verdict is clean or soft_issues)
 $$PREMISE_EXPANSION_FIDELITY_JSON$$

@@ -30,8 +30,10 @@ AUDIT 3 — THE MECHANIC BOUNDARY. The construction step may invent fiction free
 Judge by what a later phase would have to BUILD, not by which field the material's own `serves` tag names. The `serves` tag is a claim; your job is to check it against the material.
 
 AUDIT 3 also covers two mechanical bookkeeping checks, reported in the same list:
- - a `serves` tag naming a field that doesn't exist in the extraction bundle,
+ - a `serves` tag naming a field that doesn't exist in the extraction bundle. A tag names a field by its id and top-level key ("3f.setting_structure", "3-0a.primary_decision_axis"); the constraint map lists judgments by their full leaf path ("3f.setting_structure.ceiling"), so a tag that is a prefix of one or more map keys names a real field and is NOT a finding. Only a tag whose id or key appears nowhere in the bundle is.
  - a complication count that exceeds what the stated enrichment_budget allows (minimal: 1; moderate: 3; generous: 4).
+
+A CONSTRAINT THE CROSS-CHECK RULED AGAINST IS NOT A CONSTRAINT. The cross-check findings (below) may record a conflict between two extracted fields and resolve it in favor of one ("prefer_a" / "prefer_b", with the winner named in better_evidenced). The construction step was told to build to the winning field. Material that contradicts the LOSING field of a resolved conflict is therefore compliance, not a finding, for AUDIT 2 — do not report it. A conflict left "unresolved" leaves both fields standing as constraints, and material that depends on either side is a soft finding.
 
 --- SEVERITY ---
  - "hard": a direct contradiction of a Kernel clause or of an extracted constraint, or a mechanic violation. The material cannot be built as written.
@@ -40,6 +42,14 @@ Do not inflate a soft finding to hard to make it more likely to be acted on, and
 
 --- THE SELF-REPORT ---
 The constructed material contains the construction step's own `fidelity_check`. Read it AFTER forming your own findings, never before — it is a claim to be checked, not a starting point. Then report, per clause where you disagree, what it claimed and what you found. A clause the self-report omitted entirely is itself worth reporting as a soft finding: the omission is usually where the trouble is.
+
+--- REASONING DISCIPLINE ---
+Run the checks once each, then write the JSON once:
+ - For a check that finds nothing, one sentence is enough. Record findings, not the reasons each non-finding is not a finding.
+ - Do not draft the JSON in your reasoning and then copy it out; settle the findings in prose, then write the final JSON a single time.
+ - Do not re-narrate the material, the bundle, or these instructions back to yourself. Quote the material only where a finding turns on its exact words — and then quote it exactly, since that quote is the finding.
+ - When a check is settled, move on. Reopen it only if a later check gives a concrete reason.
+ - Do not check the finished JSON key by key in your reasoning; write it carefully once against the format below.
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
@@ -101,6 +111,10 @@ Output: no entry added to constraint_findings for this field. Nothing else in th
 
 --- CONSTRAINT MAP ---
 $$CONSTRAINT_MAP_JSON$$
+
+--- CROSS-CHECK FINDINGS (optional) ---
+$$CROSS_CHECK_JSON$$
+(A resolved conflict's losing field does not bind; see AUDIT 2 and AUDIT 3 above. If this section says "none", every constraint in the map binds.)
 
 --- CONSTRUCTED MATERIAL (from the premise-expansion step) ---
 $$PREMISE_EXPANSION_JSON$$

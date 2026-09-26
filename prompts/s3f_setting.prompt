@@ -61,6 +61,13 @@ setting_structure — ceiling and floor, each one of: "single", "clustered", "di
 setting_scale — ceiling and floor, each one of: "room_or_building", "city_or_region", "world", "multi_world" (ordered room_or_building < city_or_region < world < multi_world; floor's position in this order must not exceed ceiling's).
 (no_signal fallback: ceiling "room_or_building", floor "room_or_building")
 
+--- REASONING DISCIPLINE ---
+Reason through the judgments once, then write the JSON once:
+ - Do not draft the JSON in your reasoning and then copy it out. Settle each field's value and its evidence tier in prose, then write the final JSON a single time.
+ - A short working list of what the Kernel actually says is fine; re-narrating the whole Kernel, the inputs, or these instructions back to yourself is not. Quote a phrase only when a judgment turns on its exact wording.
+ - When a field is settled, move on. Reopen it only if a later field gives a concrete reason; a second pass over the same evidence is not new evidence. (This does not cancel the tie-break rules above: a correct objection that arrives late still wins — that is a concrete reason, not a re-pass.)
+ - Do not check the finished JSON key by key in your reasoning; write it carefully once against the format below.
+
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
 

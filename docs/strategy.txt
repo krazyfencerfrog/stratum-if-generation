@@ -1,4 +1,31 @@
 # ---
+# STATUS (2026-09-25): THIS DOCUMENT IS HISTORICAL FROM STEP 4 ON.
+# ---
+# Steps 1-3, 3h, the constraint map and 3.5 below are still accurate. The
+# craft spine (3.75) and the step-4 outline loop that replaced steps 4-6
+# (and absorbed the 6.0 topology question as 4a's "ending mechanism") are
+# described in docs/step4_design.md, which is the live design document for
+# everything after 3.5. Steps 7-17 below remain the intended direction for
+# what comes after the outline, but their inputs are now s4_story.json.
+#
+# What this pass changed structurally (details in step4_design.md):
+#   - VERIFY -> REPAIR -> RE-VERIFY. 3.5v and 3.75v used to find problems
+#     that nothing acted on. main.py now runs a repair prompt (3.5r, 3.75r)
+#     that receives the findings and returns the whole object revised, then
+#     re-audits, up to --max-repairs rounds, and halts if a hard finding
+#     survives. This is the standing "repair is a third call" rule, built.
+#   - 3h's resolutions now reach 3.5v, 3.75, 3.75v and 4a: a constraint 3h
+#     ruled against is not audited or built against as if it still bound.
+#   - Step 4 is routed: 4a split into first-pass and later-pass prompts, an
+#     iterative driver (generator/step4.py) with computed branch-point
+#     table, story digest and state registry, beat-level repair after each
+#     whole-story review, and s4_story.json/.md export.
+#   - Trace length: every prompt carries a reasoning-discipline block that
+#     stops the model drafting the JSON inside its reasoning and re-narrating
+#     its inputs; the reasoning rules themselves were not changed.
+# ---
+
+# ---
 # CHANGELOG (current pass) - implementing docs/fable_strategy_review.md
 # ---
 # An outside review read this document, all ten step-3 prompts, main.py, the
