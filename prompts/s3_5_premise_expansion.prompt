@@ -63,6 +63,13 @@ withheld — what you deliberately did NOT specify, each with a reason: "left to
 
 fidelity_check — your own first pass at whether you broke anything. For EVERY clause of the Kernel that states a requirement, quote the clause verbatim, say whether your material touches it (touched: true/false) and, when touched, whether your material is consistent with it (consistent: true/false). Quote, don't paraphrase — a paraphrase is how a violated clause gets marked consistent. Include clauses you left alone; "touched: false" is a normal, good answer. This is a first pass only: a separate step audits this same question independently, because self-auditing is the one thing this pipeline trusts least.
 
+--- REASONING DISCIPLINE ---
+Reason through the judgments once, then write the JSON once:
+ - Do not draft the JSON in your reasoning and then copy it out. Settle each field's value and its evidence tier in prose, then write the final JSON a single time.
+ - A short working list of what the Kernel actually says is fine; re-narrating the whole Kernel, the inputs, or these instructions back to yourself is not. Quote a phrase only when a judgment turns on its exact wording.
+ - When a field is settled, move on. Reopen it only if a later field gives a concrete reason; a second pass over the same evidence is not new evidence. (This does not cancel the tie-break rules above: a correct objection that arrives late still wins — that is a concrete reason, not a re-pass.)
+ - Do not check the finished JSON key by key in your reasoning; write it carefully once against the format below.
+
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
 

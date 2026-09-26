@@ -56,6 +56,14 @@ C10 — 3e.timeline_structure × 3f.setting_structure (contract × contract). Se
 C11 — floor/ceiling coherence across 3b, 3d, 3e, 3f (contract × contract). A split (floor ≠ ceiling) claims the story has a branch of a specific kind. If exactly one field splits and every other field reads the premise as unforked, ask whether the Kernel really describes that branch. One field's split alone is not proof of a fork.
 C12 — 3g.state_richness × 3d and 3e (contract × interactive). An elaborate contract — several protagonists, interwoven periods, a story that must "remember" things — paired with thin tracked state is the pipeline's standard early warning that the state model and topology phase has real work to do here. Flag it as such; do not resolve it.
 
+--- REASONING DISCIPLINE ---
+Run the checks once each, then write the JSON once:
+ - For a check that finds nothing, one sentence is enough. Record findings, not the reasons each non-finding is not a finding.
+ - Do not draft the JSON in your reasoning and then copy it out; settle the findings in prose, then write the final JSON a single time.
+ - Do not re-narrate the material, the bundle, or these instructions back to yourself. Quote the material only where a finding turns on its exact words — and then quote it exactly, since that quote is the finding.
+ - When a check is settled, move on. Reopen it only if a later check gives a concrete reason.
+ - Do not check the finished JSON key by key in your reasoning; write it carefully once against the format below.
+
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
 
