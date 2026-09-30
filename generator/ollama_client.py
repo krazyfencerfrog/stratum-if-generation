@@ -32,7 +32,7 @@ class OllamaClient(LlmClient):
         # output looks like it never saw the bundle, set this.
         self.options = dict(options or {})
 
-    def run_prompt(self, prompt):
+    def run_prompt(self, prompt, think=None):
         payload = {
             "model": self.model,
             "prompt": prompt,
@@ -41,6 +41,11 @@ class OllamaClient(LlmClient):
         }
         if self.options:
             payload["options"] = self.options
+        # think=False asks a thinking model (qwen3 and friends, Ollama >= 0.9)
+        # to answer without a reasoning trace; the pipeline passes it only for
+        # the calls listed in --no-think-steps. None sends nothing.
+        if think is not None:
+            payload["think"] = bool(think)
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             _ollama_url(self.host, "/api/generate"),

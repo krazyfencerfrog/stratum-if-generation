@@ -1,48 +1,36 @@
-"""Step 4: the iterative outline build-out.
+"""Step 4: the story-line build-out for a room-based engine.
 
-One iteration builds one complete path through the story:
+The unit of story is a NODE: a section of play in a subset of the world's
+rooms, with a goal, the cast present, and EXITS (states of play the player
+brings about, each leading to another node). A THROUGH-LINE is one
+complete story: a motivation, a strategy, a sequence of nodes, an ending.
 
-  iteration 1:  4a_first  -> framework, ending mechanism, main-path outline
-  iteration n:  4a_next   -> pick an unexplored branch-point outcome, outline
-                             the new branch from that beat forward
-                (4c5      -> only if 4a_next chose to TRANSFORM the framework)
+  iteration 1:  4a main line   -> through-line T1 and its nodes
+  iteration n:  4c divergence  -> a different motivation/strategy for the
+                                  protagonist, where it takes hold in the
+                                  existing story, the new nodes, its ending
   every iteration:
-                entity_define  for each role-level character/location the
-                               outline names that isn't on the roster yet
-                beat_generate  for each new beat, in path order
-                4d verify      whole-story review + termination judgment
-                beat repair    re-generate the beats 4d's findings name
-                4d re-verify   (once) so the termination call is made on the
+                4b node build  for each new node in play order, and a
+                               revision of any existing node the
+                               divergence changed or rejoined
+                computed checks (exit reachability, reads before writes,
+                               outline/build mismatches, menu interactions)
+                4d review      judgment checks + termination (next seed)
+                node repair    rebuild the nodes the findings name
+                4d re-review   once, so termination is judged on the
                                repaired story
 
 Everything the model produces goes through StoryGenerator.run_prompt with a
-unique prefix per call (s4a_i1, s4e_i1_03, s4b_i2_p2_b04, s4d_i2_r1, ...), so
+unique prefix per call (s4a_i1, s4c_i2, s4b_i2_p2_n01, s4d_i2_r1, ...), so
 a rerun replays this driver, finds every file, and rebuilds the same state
 without a model call. The assembled story is written to <id>_s4_story.json
-(machine) and <id>_s4_story.md (human) after every iteration.
-
-What is computed here rather than asked of the model: the branch-point table
-(which outcome values of which branch beats have a path built for them),
-the story digest the review and next-outline prompts read (everything but
-scene prose), the state-variable registry, and the path bookkeeping. Those
-are counts and lookups; the model is spent on outlining, writing and
-judging.
+and <id>_s4_story.md after every iteration.
 """
 
 import re
 import json
 
-
-ARTICLE_RE = re.compile(r'^(the|a|an|your|our|my)\s+', re.IGNORECASE)
-
-
-def norm_role(text):
-    """Normalized key for matching role-level entity references
-    ('the maintenance foreman' == 'Maintenance foreman')."""
-    s = (text or '').strip().lower()
-    s = ARTICLE_RE.sub('', s)
-    s = re.sub(r'[^a-z0-9]+', ' ', s).strip()
-    return s
+from brief import brief_lite, shape_targets
 
 
 def slug(text):
@@ -59,83 +47,116 @@ def as_list(value):
 
 
 def normalize_writes(writes):
-    """Beat outputs express state writes as [{"variable","value"}]; tolerate
-    a bare string ("orientation = collective"), a dict, or a list of
-    strings, since a small model will drift on this shape."""
+    """[{"variable","value"}], tolerating "var = value" strings and dicts
+    with drifted key names."""
     out = []
     for item in as_list(writes):
         if isinstance(item, dict):
-            var = item.get('variable') or item.get('var') or item.get('name')
+            var = item.get('variable') or item.get('var') or item.get('name') or item.get('key')
             if var:
+                val = item.get('value')
                 out.append({'variable': str(var).strip(),
-                            'value': '' if item.get('value') is None else str(item.get('value'))})
+                            'value': '' if val is None else str(val)})
         elif isinstance(item, str) and item.strip() and item.strip().lower() != 'none':
-            m = re.match(r'\s*([^=:]+?)\s*[=:]\s*(.+)$', item)
+            m = re.match(r'\s*([^=:]+?)\s*(?:==|=|:|\bis\b)\s*(.+)$', item)
             if m:
                 out.append({'variable': m.group(1).strip(), 'value': m.group(2).strip()})
             else:
-                out.append({'variable': item.strip(), 'value': ''})
+                out.append({'variable': item.strip(), 'value': 'true'})
     return out
+
+
+MENU_RE = re.compile(r'\b(choose|decide|select|pick)\b', re.IGNORECASE)
 
 
 class Step4Builder:
 
-    def __init__(self, gen, max_iterations=6, max_repair_beats=6):
+    def __init__(self, gen, max_iterations=4, max_repair_nodes=4):
         self.gen = gen
         self.max_iterations = max_iterations
-        self.max_repair_beats = max_repair_beats
+        self.max_repair_nodes = max_repair_nodes
 
-        self.framework = None
-        self.ending_mechanism = None
-        self.paths = {}          # path_id -> dict
-        self.beats = {}          # beat_id -> dict(outline, content, path_ids, iteration)
-        self.beat_order = []
-        self.roster = {'characters': {}, 'locations': {}}
-        self.role_map = {}       # norm_role(role) -> {'kind', 'name', 'decision', 'role'}
+        self.lines = {}          # line id -> dict
+        self.nodes = {}          # node id -> {'outline','content','line_ids','iteration','revisions'}
+        self.node_order = []
         self.state_variables = {}
         self.iterations = []
         self.stop_reason = None
         self.warnings = []
 
-    # ------------------------------------------------------------------ upstream material
+    # ------------------------------------------------------------------ upstream
 
     def upstream(self):
         g = self.gen
+        brief = g.analysis.get('s3_brief') or {}
         return {
             'kernel': g.kernel,
-            'bundle': g.step3_bundle_json(),
-            'cross_check': g.analysis_json('s3h_cross_check'),
+            'brief': brief,
+            'brief_lite': brief_lite(brief),
             'premise': g.analysis.get('s3_5_premise_expansion') or {},
-            'premise_json': g.analysis_json('s3_5_premise_expansion'),
+            'cast': g.analysis.get('s3_6_cast') or {},
+            'world': g.analysis.get('s3_7_world') or {},
             'craft': g.analysis.get('s3_75_craft_spine') or {},
-            'craft_json': g.analysis_json('s3_75_craft_spine'),
-            'failure_model': g.analysis_json('s3_0c_consequence_failure_model'),
-            'epistemic': g.analysis_json('s3_0b_identity_epistemic'),
-            'affect': g.analysis_json('s3b_affect'),
-            'theme': g.analysis_json('s3c_theme'),
-            'interactive': g.analysis_json('s3_0a_interactive_question'),
-            'complexity': g.analysis_json('s3g_complexity'),
+            'shape': shape_targets(g.shape),
         }
 
     def budget(self):
         premise = self.gen.analysis.get('s3_5_premise_expansion') or {}
         return str((premise.get('enrichment_budget') or {}).get('level', 'moderate'))
 
-    def instance(self, ref):
+    def turn(self, ref):
         premise = self.gen.analysis.get('s3_5_premise_expansion') or {}
-        instances = (premise.get('instance_generator') or {}).get('instances') or []
+        turns = premise.get('turns') or []
         if ref is None or ref == '':
             return None
+        for t in turns:
+            if isinstance(t, dict) and str(t.get('id')) == str(ref):
+                return t
         try:
             index = int(ref)
         except (TypeError, ValueError):
             return None
-        if 0 <= index < len(instances):
-            item = dict(instances[index])
-            item['index'] = index
-            item['true_state'] = (premise.get('instance_generator') or {}).get('true_state', '')
-            return item
+        if 0 <= index < len(turns):
+            return turns[index]
         return None
+
+    def cast_compact(self):
+        cast = self.upstream()['cast']
+        return {
+            'protagonist_name': cast.get('protagonist_name'),
+            'characters': [{'name': c.get('name'), 'role': c.get('role'), 'wants': c.get('wants'),
+                            'holds': c.get('holds'), 'speaks_for': c.get('speaks_for')}
+                           for c in as_list(cast.get('characters')) if isinstance(c, dict)],
+            'crowds': [{'name': c.get('name'), 'representatives': c.get('representatives')}
+                       for c in as_list(cast.get('crowds')) if isinstance(c, dict)],
+        }
+
+    def world_compact(self):
+        world = self.upstream()['world']
+        return {
+            'protagonist_presence': world.get('protagonist_presence'),
+            'rooms': [{'id': r.get('id'), 'name': r.get('name'), 'purpose': r.get('purpose'),
+                       'usually_here': r.get('usually_here')}
+                      for r in as_list(world.get('rooms')) if isinstance(r, dict)],
+        }
+
+    def room(self, room_id):
+        for r in as_list(self.upstream()['world'].get('rooms')):
+            if isinstance(r, dict) and r.get('id') == room_id:
+                return r
+        return None
+
+    def character(self, name):
+        for c in as_list(self.upstream()['cast'].get('characters')):
+            if isinstance(c, dict) and c.get('name') == name:
+                return c
+        return None
+
+    def room_ids(self):
+        return [r.get('id') for r in as_list(self.upstream()['world'].get('rooms')) if isinstance(r, dict)]
+
+    def character_names(self):
+        return [c.get('name') for c in as_list(self.upstream()['cast'].get('characters')) if isinstance(c, dict)]
 
     # ------------------------------------------------------------------ main loop
 
@@ -144,52 +165,43 @@ class Step4Builder:
         while n <= self.max_iterations:
             print(f'--- step 4, iteration {n}')
             if n == 1:
-                outline = self.first_outline()
-                new_beats = outline['main_path_outline']
-                path = self.register_path(n, new_beats, branch_from=None, reconverges_to=None)
+                outline = self.main_line()
+                line = self.register_main_line(outline)
+                modified, new_ids, rejoin = [], [b['id'] for b in outline['nodes']], None
             else:
-                if not self.unexplored_candidates():
-                    self.stop_reason = 'no unexplored branch-point outcomes remain'
+                proposal = self.divergence(n)
+                if proposal.get('status') != 'proposed':
+                    self.stop_reason = f"4c found nothing worth building at iteration {n}: {proposal.get('why', '')}"
                     break
-                try:
-                    nxt = self.next_outline(n)
-                except ValueError as e:
-                    self.stop_reason = f'4a_next produced no usable branch selection: {e}'
-                    self.warnings.append(self.stop_reason)
-                    break
-                if nxt.get('status') != 'branch_selected':
-                    self.stop_reason = '4a_next reports no unexplored branch points'
-                    break
-                new_beats = nxt['new_branch_outline']
-                path = self.register_path(n, new_beats,
-                                          branch_from=nxt['selected'],
-                                          reconverges_to=nxt.get('reconverges_to'))
-                decision = (nxt.get('framework_decision') or {}).get('keep_or_transform', 'keep')
-                if str(decision).lower().startswith('transform'):
-                    path['craft_spine_override'] = self.craft_refresh(n, path, nxt)
+                line, modified, new_ids, rejoin = self.apply_divergence(n, proposal)
 
-            self.resolve_entities(n, new_beats)
-            for beat_entry in new_beats:
-                self.generate_beat(n, beat_entry['id'], path['id'])
-            if path.get('reconverges_to'):
-                self.revise_shared_beat(n, path)
+            for nid in modified:
+                if self.nodes[nid]['content'] is not None:
+                    self.rebuild_for_change(n, nid, line)
+            for nid in new_ids:
+                self.build_node(n, nid, line['id'])
+            if rejoin and self.nodes[rejoin]['content'] is not None:
+                self.rebuild_for_rejoin(n, rejoin, line)
 
-            review = self.verify(n, round_no=0)
-            repaired = self.repair_beats(n, review)
+            computed = self.mechanical_checks()
+            review = self.review(n, computed, round_no=0)
+            repaired = self.repair_nodes(n, review, computed)
             if repaired:
-                review = self.verify(n, round_no=1)
+                computed = self.mechanical_checks()
+                review = self.review(n, computed, round_no=1)
 
             self.iterations.append({
                 'iteration': n,
-                'path_id': path['id'],
-                'new_beat_ids': [b['id'] for b in new_beats],
-                'repaired_beat_ids': repaired,
+                'line_id': line['id'],
+                'new_node_ids': new_ids,
+                'modified_node_ids': modified,
+                'repaired_node_ids': repaired,
                 'termination': review.get('termination', {}),
             })
             self.save_story()
 
             termination = review.get('termination') or {}
-            recommendation = str(termination.get('overall_recommendation', '')).lower()
+            recommendation = str(termination.get('recommendation', '')).lower()
             if 'stop' in recommendation:
                 self.stop_reason = f"4d recommended stopping after iteration {n}: {termination.get('reasoning', '')}"
                 break
@@ -205,606 +217,708 @@ class Step4Builder:
 
     # ------------------------------------------------------------------ 4a
 
-    def outline_validator(self, key):
+    def normalize_node_entry(self, entry, known_rooms, known_chars):
+        entry = dict(entry)
+        rooms = [r for r in as_list(entry.get('rooms')) if isinstance(r, str)]
+        unknown = [r for r in rooms if r not in known_rooms]
+        if unknown:
+            self.warnings.append(f"node {entry.get('id')}: unknown room ids {unknown} dropped")
+        entry['rooms'] = [r for r in rooms if r in known_rooms]
+        chars = [c for c in as_list(entry.get('characters')) if isinstance(c, str)]
+        unknown = [c for c in chars if c not in known_chars]
+        if unknown:
+            self.warnings.append(f"node {entry.get('id')}: unknown characters {unknown} dropped")
+        entry['characters'] = [c for c in chars if c in known_chars]
+        exits = []
+        for i, ex in enumerate(as_list(entry.get('exits'))):
+            if not isinstance(ex, dict):
+                continue
+            ex = dict(ex)
+            ex.setdefault('id', f"{entry.get('id')}.{chr(ord('a') + i)}")
+            ex.setdefault('leads_to', None)
+            exits.append(ex)
+        entry['exits'] = exits
+        entry.setdefault('turn_ref', None)
+        entry.setdefault('failure_exit', None)
+        return entry
+
+    def outline_validator(self, key, existing_ids=()):
         def validate(parsed):
-            beats = parsed.get(key)
-            if not isinstance(beats, list) or not beats:
-                raise ValueError(f'{key} must be a non-empty list')
+            nodes = parsed.get(key)
+            if not isinstance(nodes, list):
+                raise ValueError(f'{key} must be a list')
             seen = set()
-            for b in beats:
+            for b in nodes:
                 if not isinstance(b, dict):
-                    raise ValueError('outline entries must be objects')
-                for k in ('id', 'role', 'content_summary'):
+                    raise ValueError('node entries must be objects')
+                for k in ('id', 'title', 'goal'):
                     if not b.get(k):
-                        raise ValueError(f'outline entry missing {k}')
-                if b['id'] in seen:
-                    raise ValueError(f'duplicate beat id {b["id"]} in outline')
+                        raise ValueError(f'node entry missing {k}')
+                if b['id'] in seen or b['id'] in existing_ids:
+                    raise ValueError(f'node id {b["id"]} is not fresh')
                 seen.add(b['id'])
-                if b.get('is_branch_point') and not isinstance(b.get('branch'), dict):
-                    raise ValueError(f'beat {b["id"]} is a branch point but has no "branch" object')
+                if not isinstance(b.get('exits', []), list):
+                    raise ValueError(f'node {b["id"]}: exits must be a list')
+                for ex in b.get('exits') or []:
+                    if isinstance(ex, dict) and ex.get('leads_to') and ex['leads_to'] not in seen | set(existing_ids) \
+                            and ex['leads_to'] not in {x.get('id') for x in nodes if isinstance(x, dict)}:
+                        raise ValueError(f'node {b["id"]}: exit leads_to unknown node {ex["leads_to"]}')
         return validate
 
-    def first_outline(self):
+    def main_line(self):
         u = self.upstream()
+        shape = u['shape']
         repl = {
             '$$KERNEL$$': u['kernel'],
-            '$$STEP3_BUNDLE_JSON$$': u['bundle'],
-            '$$CROSS_CHECK_JSON$$': u['cross_check'],
-            '$$PREMISE_EXPANSION_JSON$$': u['premise_json'],
-            '$$CRAFT_SPINE_JSON$$': u['craft_json'],
-            '$$ENRICHMENT_BUDGET$$': self.budget(),
+            '$$BRIEF_LITE_JSON$$': self.gen.to_json(u['brief_lite']),
+            '$$PREMISE_EXPANSION_JSON$$': self.gen.to_json(self.premise_for_outline()),
+            '$$CAST_COMPACT_JSON$$': self.gen.to_json(self.cast_compact()),
+            '$$WORLD_COMPACT_JSON$$': self.gen.to_json(self.world_compact()),
+            '$$CRAFT_SPINE_JSON$$': self.gen.to_json(self.craft_compact()),
+            '$$SHAPE_JSON$$': self.gen.to_json(shape),
+            '$$NODES_MIN$$': str(shape['nodes_min']),
+            '$$NODES_MAX$$': str(shape['nodes_max']),
         }
-        outline = self.gen.run_prompt('s4a_i1', 'first_outline', repl,
-                                      prompt_file='s4a_first_outline.prompt',
-                                      validator=self.outline_validator('main_path_outline'))
-        self.framework = outline.get('framework_choice')
-        self.ending_mechanism = outline.get('ending_mechanism') or {}
-        for var in as_list(self.ending_mechanism.get('selector_variables')):
-            if isinstance(var, dict) and var.get('name'):
-                self.state_variables[var['name']] = {
-                    'kind': 'selector',
-                    'type': var.get('kind', 'enum'),
-                    'values': [str(v) for v in as_list(var.get('values'))],
-                    'declared_by': '4a_first',
-                    'written_by': [],
-                    'read_by': [],
-                }
-        beats = outline['main_path_outline']
-        if not any(b.get('is_terminal') for b in beats):
-            beats[-1]['is_terminal'] = True
-        return outline
 
-    def next_outline(self, n):
+        def validate(parsed):
+            if not isinstance(parsed.get('through_line'), dict) or not parsed['through_line'].get('id'):
+                raise ValueError('through_line with an id is required')
+            self.outline_validator('nodes')(parsed)
+            if not parsed['nodes']:
+                raise ValueError('nodes must be non-empty')
+            if not isinstance(parsed.get('ending'), dict):
+                raise ValueError('ending object is required')
+
+        return self.gen.run_prompt('s4a_i1', 'main_line', repl,
+                                   prompt_file='s4a_main_line.prompt', validator=validate)
+
+    def premise_for_outline(self):
+        p = self.upstream()['premise']
+        return {k: p.get(k) for k in ('protagonist', 'pressure', 'opposition', 'mediation', 'turns', 'complications')}
+
+    def craft_compact(self):
+        c = self.upstream()['craft']
+        wn = c.get('want_need_tension') or {}
+        return {
+            'want_need_tension': {'want': (wn.get('want') or {}).get('restated') if isinstance(wn.get('want'), dict) else wn.get('want'),
+                                  'need': (wn.get('need') or {}).get('description') if isinstance(wn.get('need'), dict) else wn.get('need'),
+                                  'tension': wn.get('tension'), 'enacts_via': wn.get('enacts_via')},
+            'irony': {'type': (c.get('irony_mode') or {}).get('type'), 'device': (c.get('irony_mode') or {}).get('device')},
+            'escalation': {'pattern': (c.get('escalation_shape') or {}).get('pattern'),
+                           'mechanism': (c.get('escalation_shape') or {}).get('mechanism'),
+                           'transformation_note': (c.get('escalation_shape') or {}).get('transformation_note')},
+            'setup_payoff': [{'setup': p.get('setup'), 'payoff': p.get('payoff')}
+                             for p in as_list(c.get('setup_payoff_pairs')) if isinstance(p, dict)],
+            'motif': c.get('motif'),
+        }
+
+    def register_main_line(self, outline):
+        known_rooms, known_chars = self.room_ids(), self.character_names()
+        entries = [self.normalize_node_entry(e, known_rooms, known_chars) for e in outline['nodes']]
+        entries[-1]['exits'] = []
+        for e in entries:
+            self.nodes[e['id']] = {'outline': e, 'content': None, 'line_ids': ['T1'], 'iteration': 1, 'revisions': []}
+            self.node_order.append(e['id'])
+        tl = dict(outline['through_line'])
+        tl['id'] = 'T1'
+        ending = dict(outline.get('ending') or {})
+        ending.setdefault('node', entries[-1]['id'])
+        line = {'id': 'T1', 'iteration': 1, 'through_line': tl, 'ending': ending,
+                'path': [e['id'] for e in entries], 'divergence': None, 'rejoins_at': None}
+        self.lines['T1'] = line
+        return line
+
+    # ------------------------------------------------------------------ 4c
+
+    def divergence(self, n):
         u = self.upstream()
-        table = self.branch_table()
+        digest = self.digest()
         last_review = self.iterations[-1]['termination'] if self.iterations else {}
+        shape = dict(u['shape'])
+        shape['through_lines_built'] = len(self.lines)
+        shape['iteration'] = n
+        existing = set(self.nodes)
+        open_exits = {(o['node'], o['exit_id']) for o in digest['open_exits']}
 
         def validate(parsed):
             status = parsed.get('status')
-            if status not in ('branch_selected', 'no_unexplored_branch_points'):
-                raise ValueError('status must be branch_selected or no_unexplored_branch_points')
-            if status == 'no_unexplored_branch_points':
+            if status not in ('proposed', 'nothing_worth_building'):
+                raise ValueError('status must be proposed or nothing_worth_building')
+            if status != 'proposed':
                 return
-            sel = parsed.get('selected') or {}
-            bid, val = sel.get('beat_id'), str(sel.get('outcome_value', ''))
-            match = [c for c in table['candidates'] if c['beat_id'] == bid and c['outcome_value'] == val]
-            if not match:
-                raise ValueError(
-                    f'selected {bid}/{val} is not an unexplored candidate; choose from '
-                    f'{[(c["beat_id"], c["outcome_value"]) for c in table["candidates"]]}')
-            self.outline_validator('new_branch_outline')(parsed)
-            for b in parsed['new_branch_outline']:
-                if b['id'] in self.beats:
-                    raise ValueError(f'new beat id {b["id"]} collides with an existing beat; new ids must be fresh')
-            rec = parsed.get('reconverges_to')
-            if rec and rec not in self.beats:
-                raise ValueError(f'reconverges_to names unknown beat {rec}')
+            tl = parsed.get('through_line') or {}
+            if not tl.get('id') or tl['id'] in self.lines:
+                raise ValueError('through_line needs a fresh id')
+            dv = parsed.get('divergence') or {}
+            if dv.get('node') not in self.nodes:
+                raise ValueError(f'divergence.node {dv.get("node")} is not an existing node')
+            kind = dv.get('kind')
+            if kind not in ('existing_exit', 'new_opportunity', 'state_variant'):
+                raise ValueError('divergence.kind must be existing_exit, new_opportunity or state_variant')
+            if kind == 'existing_exit' and (dv['node'], dv.get('exit_id')) not in open_exits:
+                raise ValueError(f'existing_exit must name an open exit; open exits are {sorted(open_exits)}')
+            self.outline_validator('new_nodes', existing_ids=existing)(parsed)
+            if kind == 'state_variant' and parsed.get('new_nodes'):
+                raise ValueError('state_variant adds no new nodes')
+            if kind != 'state_variant' and not parsed.get('new_nodes') and not parsed.get('rejoins_at'):
+                raise ValueError('a new line needs new nodes or a rejoin')
+            rec = parsed.get('rejoins_at')
+            if rec and rec not in self.nodes:
+                raise ValueError(f'rejoins_at names unknown node {rec}')
+            for m in as_list(parsed.get('modify_nodes')):
+                if isinstance(m, dict) and m.get('id') not in self.nodes:
+                    raise ValueError(f'modify_nodes names unknown node {m.get("id")}')
 
         repl = {
             '$$KERNEL$$': u['kernel'],
-            '$$STEP3_BUNDLE_JSON$$': u['bundle'],
-            '$$PREMISE_EXPANSION_JSON$$': u['premise_json'],
-            '$$CRAFT_SPINE_JSON$$': u['craft_json'],
-            '$$FRAMEWORK_JSON$$': self.gen.to_json({'framework_choice': self.framework,
-                                                    'ending_mechanism': self.ending_mechanism}),
-            '$$STORY_DIGEST_JSON$$': self.gen.to_json(self.digest()),
-            '$$BRANCH_POINT_TABLE_JSON$$': self.gen.to_json(table),
+            '$$BRIEF_LITE_JSON$$': self.gen.to_json(u['brief_lite']),
+            '$$PREMISE_EXPANSION_JSON$$': self.gen.to_json(self.premise_for_outline()),
+            '$$CAST_COMPACT_JSON$$': self.gen.to_json(self.cast_compact()),
+            '$$WORLD_COMPACT_JSON$$': self.gen.to_json(self.world_compact()),
+            '$$CRAFT_SPINE_JSON$$': self.gen.to_json(self.craft_compact()),
+            '$$STORY_DIGEST_JSON$$': self.gen.to_json(digest),
             '$$PRIOR_REVIEW_JSON$$': self.gen.to_json(last_review),
-            '$$ENRICHMENT_BUDGET$$': self.budget(),
+            '$$SHAPE_JSON$$': self.gen.to_json(shape),
             '$$ITERATION$$': str(n),
         }
-        nxt = self.gen.run_prompt(f's4a_i{n}', 'next_outline', repl,
-                                  prompt_file='s4a_next_outline.prompt', validator=validate)
-        if nxt.get('status') == 'branch_selected':
-            beats = nxt['new_branch_outline']
-            if not nxt.get('reconverges_to') and not any(b.get('is_terminal') for b in beats):
-                beats[-1]['is_terminal'] = True
-        return nxt
+        return self.gen.run_prompt(f's4c_i{n}', 'divergence', repl,
+                                   prompt_file='s4c_divergence.prompt', validator=validate)
 
-    def craft_refresh(self, n, path, nxt):
-        u = self.upstream()
-        prefix_ids = path['beat_ids'][:len(path['beat_ids']) - len(nxt['new_branch_outline'])]
-        repl = {
-            '$$CRAFT_SPINE_JSON$$': u['craft_json'],
-            '$$BRANCH_ID$$': path['id'],
-            '$$FRAMEWORK_DECISION_JSON$$': self.gen.to_json(nxt.get('framework_decision')),
-            '$$BRANCH_OUTLINE_JSON$$': self.gen.to_json(nxt['new_branch_outline']),
-            '$$SHARED_PREFIX_JSON$$': self.gen.to_json([self.beat_digest(b) for b in prefix_ids]),
-            '$$EPISTEMIC_GAP_JSON$$': u['epistemic'],
-            '$$AFFECT_JSON$$': u['affect'],
-            '$$PREMISE_EXPANSION_JSON$$': u['premise_json'],
-            '$$STATE_VARIABLES_JSON$$': self.gen.to_json(self.state_variables),
-        }
-        refresh = self.gen.run_prompt(f's4c5_i{n}', 'craft_refresh', repl,
-                                      prompt_file='s4c5_craft_refresh.prompt',
-                                      validator=self.gen.require_keys('want_need_tension', 'irony_mode',
-                                                                      'escalation_shape', 'setup_payoff_pairs'))
-        merged = dict(u['craft'])
-        for field in ('want_need_tension', 'irony_mode', 'escalation_shape', 'setup_payoff_pairs', 'motif'):
-            entry = refresh.get(field)
-            if isinstance(entry, dict) and str(entry.get('status', '')).lower() in ('adjusted', 'refreshed'):
-                if entry.get('content_if_changed') is not None:
-                    merged[field] = entry['content_if_changed']
-        merged['refreshed_for_branch'] = path['id']
-        return merged
+    def apply_divergence(self, n, proposal):
+        """Wire the proposal into the outlines: claim or add the exit at the
+        divergence node, register the new nodes, build the line's path.
+        Returns (line, modified_node_ids, new_node_ids, rejoin_node_id)."""
+        known_rooms, known_chars = self.room_ids(), self.character_names()
+        line_id = proposal['through_line']['id']
+        dv = proposal['divergence']
+        kind = dv['kind']
+        new_entries = [self.normalize_node_entry(e, known_rooms, known_chars) for e in proposal.get('new_nodes') or []]
+        rejoin = proposal.get('rejoins_at') or None
+        first_new = new_entries[0]['id'] if new_entries else rejoin
 
-    # ------------------------------------------------------------------ paths and beats
-
-    def register_path(self, n, new_beats, branch_from, reconverges_to):
-        path_id = f'P{n}'
-        if branch_from is None:
-            beat_ids = []
-        else:
-            parent = self.path_containing(branch_from['beat_id'])
-            ids = parent['beat_ids']
-            beat_ids = ids[:ids.index(branch_from['beat_id']) + 1]
-            for bid in beat_ids:
-                self.beats[bid]['path_ids'].append(path_id)
-        for entry in new_beats:
-            entry = dict(entry)
-            entry.setdefault('is_branch_point', False)
-            entry.setdefault('is_terminal', False)
-            self.beats[entry['id']] = {
-                'outline': entry,
-                'content': None,
-                'path_ids': [path_id],
-                'iteration': n,
-                'revisions': [],
-            }
-            self.beat_order.append(entry['id'])
-            beat_ids.append(entry['id'])
-        if reconverges_to:
-            rec_path = self.path_containing(reconverges_to)
-            tail = rec_path['beat_ids'][rec_path['beat_ids'].index(reconverges_to):]
-            for bid in tail:
-                self.beats[bid]['path_ids'].append(path_id)
-            beat_ids.extend(tail)
-        path = {
-            'id': path_id,
-            'iteration': n,
-            'beat_ids': beat_ids,
-            'branch_from': branch_from,
-            'reconverges_to': reconverges_to,
-            'craft_spine_override': None,
-        }
-        self.paths[path_id] = path
-        return path
-
-    def path_containing(self, beat_id):
-        for pid in sorted(self.paths, key=lambda p: self.paths[p]['iteration']):
-            if beat_id in self.paths[pid]['beat_ids']:
-                return self.paths[pid]
-        raise ValueError(f'no path contains beat {beat_id}')
-
-    def path_follows(self, beat_id, path_id):
-        """Which outcome value of a branch beat this path continues along."""
-        outline = self.beats[beat_id]['outline']
-        branch = outline.get('branch') or {}
-        path = self.paths[path_id]
-        bf = path.get('branch_from')
-        if bf and bf.get('beat_id') == beat_id:
-            return str(bf.get('outcome_value', ''))
-        # inherited: whichever path first contained this beat
-        origin = self.path_containing(beat_id)
-        obf = origin.get('branch_from')
-        if obf and obf.get('beat_id') == beat_id:
-            return str(obf.get('outcome_value', ''))
-        return str(branch.get('path_follows', ''))
-
-    def previous_beat_id(self, beat_id, path_id):
-        ids = self.paths[path_id]['beat_ids']
-        i = ids.index(beat_id)
-        return ids[i - 1] if i > 0 else None
-
-    def next_outline_entry(self, beat_id, path_id):
-        ids = self.paths[path_id]['beat_ids']
-        i = ids.index(beat_id)
-        if i + 1 < len(ids):
-            nxt = self.beats[ids[i + 1]]['outline']
-            return {'id': nxt['id'], 'role': nxt.get('role'), 'content_summary': nxt.get('content_summary')}
-        return None
-
-    # ------------------------------------------------------------------ entities
-
-    def resolve_entities(self, n, new_beats):
-        counter = 0
-        for entry in new_beats:
-            requests = []
-            if entry.get('location'):
-                requests.append(('location', entry['location']))
-            for c in as_list(entry.get('characters')):
-                if isinstance(c, str) and c.strip():
-                    requests.append(('character', c))
-            for kind, role in requests:
-                key = norm_role(role)
-                if not key or key in self.role_map:
-                    continue
-                existing = self.find_roster_name(kind, role)
-                if existing:
-                    self.role_map[key] = {'kind': kind, 'name': existing, 'decision': 'roster_name', 'role': role}
-                    continue
-                counter += 1
-                self.define_entity(n, counter, kind, role, entry)
-
-    def find_roster_name(self, kind, role):
-        bucket = 'characters' if kind == 'character' else 'locations'
-        key = norm_role(role)
-        for name in self.roster[bucket]:
-            if norm_role(name) == key:
-                return name
-        return None
-
-    def define_entity(self, n, k, kind, role, entry):
-        u = self.upstream()
-        repl = {
-            '$$ENTITY_REQUEST_JSON$$': self.gen.to_json({'kind': kind, 'role': role,
-                                                         'requested_by_beat': entry['id']}),
-            '$$BEAT_OUTLINE_JSON$$': self.gen.to_json(entry),
-            '$$ROSTER_JSON$$': self.gen.to_json(self.roster),
-            '$$STATE_VARIABLES_JSON$$': self.gen.to_json(self.state_variables),
-            '$$CRAFT_SPINE_JSON$$': u['craft_json'],
-            '$$PREMISE_EXPANSION_JSON$$': u['premise_json'],
-            '$$THEME_JSON$$': u['theme'],
-            '$$INTERACTIVE_QUESTION_JSON$$': u['interactive'],
-            '$$ENRICHMENT_BUDGET$$': self.budget(),
-            '$$KERNEL$$': u['kernel'],
-        }
-
-        def validate(parsed):
-            d = parsed.get('decision')
-            if d not in ('reuse', 'new_character', 'new_location', 'none_needed'):
-                raise ValueError('decision must be reuse / new_character / new_location / none_needed')
-            if d == 'reuse' and not parsed.get('existing_entity'):
-                raise ValueError('reuse needs existing_entity')
-            if d in ('new_character', 'new_location') and not parsed.get('name'):
-                raise ValueError('a new entity needs a name')
-            if kind == 'location' and d == 'none_needed':
-                raise ValueError('a location cannot be none_needed; reuse one or define one')
-
-        prefix = f's4e_i{n}_{k:02d}_{slug(role)[:24]}'
-        out = self.gen.run_prompt(prefix, 'entity', repl,
-                                  prompt_file='s4_entity_define.prompt', validator=validate)
-        key = norm_role(role)
-        decision = out['decision']
-        if decision == 'reuse':
-            name = self.find_roster_name(kind, out['existing_entity']) or out['existing_entity']
-            if not self.find_roster_name(kind, name):
-                self.warnings.append(f'{prefix}: reused "{name}" which is not on the roster; mapped by name anyway')
-            self.role_map[key] = {'kind': kind, 'name': name, 'decision': 'reuse', 'role': role}
-        elif decision == 'none_needed':
-            self.role_map[key] = {'kind': kind, 'name': None, 'decision': 'none_needed', 'role': role,
-                                  'why': out.get('why', '')}
-        else:
-            bucket = 'characters' if decision == 'new_character' else 'locations'
-            record = {k2: v for k2, v in out.items() if k2 != 'decision'}
-            record['roles'] = [role]
-            record['defined_in'] = prefix
-            self.roster[bucket][out['name']] = record
-            self.role_map[key] = {'kind': kind, 'name': out['name'], 'decision': decision, 'role': role}
-            for flag in as_list(out.get('local_state')):
-                if isinstance(flag, dict) and flag.get('key'):
-                    self.state_variables.setdefault(flag['key'], {
-                        'kind': 'local', 'type': flag.get('type', 'bool'),
-                        'values': [], 'initial': flag.get('initial'),
-                        'declared_by': out['name'], 'written_by': [], 'read_by': [],
-                        'traces_to': flag.get('traces_to', ''),
-                    })
-
-    def resolved_entities(self, entry):
-        """The roster entries a beat's outline references, resolved."""
-        location = None
-        chars = []
-        notes = []
-        if entry.get('location'):
-            m = self.role_map.get(norm_role(entry['location']))
-            if m and m.get('name'):
-                location = m['name']
-        for c in as_list(entry.get('characters')):
-            m = self.role_map.get(norm_role(c)) if isinstance(c, str) else None
-            if m is None:
+        modified = []
+        for m in as_list(proposal.get('modify_nodes')):
+            if not isinstance(m, dict) or m.get('id') not in self.nodes:
                 continue
-            if m.get('name'):
-                chars.append(m['name'])
-            else:
-                notes.append(f'"{c}": none_needed - {m.get("why", "deliver through the environment")}')
-        return location, chars, notes
+            node = self.nodes[m['id']]
+            change = {'add': m.get('add')}
+            ex = m.get('add_exit')
+            if isinstance(ex, dict) and ex.get('id'):
+                ex = dict(ex)
+                if kind != 'state_variant' and m['id'] == dv['node']:
+                    ex['leads_to'] = first_new
+                existing = [e for e in node['outline']['exits'] if e.get('id') == ex['id']]
+                if existing:
+                    existing[0].update(ex)
+                else:
+                    node['outline']['exits'].append(ex)
+                change['add_exit'] = ex
+            node.setdefault('changes', []).append({'line_id': line_id, 'iteration': n, **change})
+            modified.append(m['id'])
 
-    # ------------------------------------------------------------------ beats
+        if kind == 'existing_exit':
+            node = self.nodes[dv['node']]
+            for ex in node['outline']['exits']:
+                if ex.get('id') == dv.get('exit_id'):
+                    ex['leads_to'] = first_new
+            node.setdefault('changes', []).append({'line_id': line_id, 'iteration': n,
+                                                   'claimed_exit': dv.get('exit_id'), 'leads_to': first_new})
+            if dv['node'] not in modified:
+                modified.append(dv['node'])
+        elif kind == 'new_opportunity' and dv['node'] not in modified:
+            # the model put the opportunity in divergence but forgot modify_nodes
+            node = self.nodes[dv['node']]
+            ex = {'id': f"{dv['node']}.{chr(ord('a') + len(node['outline']['exits']))}",
+                  'summary': dv.get('opportunity') or 'the new line takes hold here', 'leads_to': first_new}
+            node['outline']['exits'].append(ex)
+            node.setdefault('changes', []).append({'line_id': line_id, 'iteration': n,
+                                                   'add': dv.get('opportunity'), 'add_exit': ex})
+            modified.append(dv['node'])
 
-    def beat_validator(self, expected_id):
+        parent = self.line_containing(dv['node'])
+        prefix = parent['path'][:parent['path'].index(dv['node']) + 1]
+        for nid in prefix:
+            if line_id not in self.nodes[nid]['line_ids']:
+                self.nodes[nid]['line_ids'].append(line_id)
+
+        for i, e in enumerate(new_entries):
+            if i == len(new_entries) - 1:
+                if rejoin:
+                    if not e['exits']:
+                        e['exits'] = [{'id': f"{e['id']}.a", 'summary': 'the line rejoins the story', 'leads_to': rejoin}]
+                    else:
+                        e['exits'][0]['leads_to'] = rejoin
+                else:
+                    e['exits'] = []
+            self.nodes[e['id']] = {'outline': e, 'content': None, 'line_ids': [line_id], 'iteration': n, 'revisions': []}
+            self.node_order.append(e['id'])
+
+        path = list(prefix) + [e['id'] for e in new_entries]
+        if kind == 'state_variant':
+            path = list(parent['path'])
+            for nid in path:
+                if line_id not in self.nodes[nid]['line_ids']:
+                    self.nodes[nid]['line_ids'].append(line_id)
+        elif rejoin:
+            rec_line = self.line_containing(rejoin)
+            tail = rec_line['path'][rec_line['path'].index(rejoin):]
+            for nid in tail:
+                if line_id not in self.nodes[nid]['line_ids']:
+                    self.nodes[nid]['line_ids'].append(line_id)
+            path.extend(tail)
+
+        ending = dict(proposal.get('ending') or {})
+        if kind == 'state_variant':
+            ending.setdefault('node', parent['path'][-1])
+        elif rejoin:
+            ending.setdefault('node', self.line_containing(rejoin)['path'][-1])
+        elif new_entries:
+            ending.setdefault('node', new_entries[-1]['id'])
+        tl = dict(proposal['through_line'])
+        line = {'id': line_id, 'iteration': n, 'through_line': tl, 'ending': ending, 'path': path,
+                'divergence': dv, 'rejoins_at': rejoin, 'why': proposal.get('why')}
+        self.lines[line_id] = line
+        rejoin_node = rejoin if rejoin else (ending.get('node') if kind == 'state_variant' else None)
+        return line, modified, [e['id'] for e in new_entries], rejoin_node
+
+    def line_containing(self, node_id):
+        for lid in sorted(self.lines, key=lambda l: self.lines[l]['iteration']):
+            if node_id in self.lines[lid]['path']:
+                return self.lines[lid]
+        raise ValueError(f'no line contains node {node_id}')
+
+    # ------------------------------------------------------------------ 4b
+
+    def node_validator(self, node_id, outline):
+        expected_exits = {ex['id'] for ex in outline.get('exits') or [] if ex.get('id')}
+
         def validate(parsed):
             if not isinstance(parsed, dict):
                 raise ValueError('expected an object')
-            if not parsed.get('scene'):
-                raise ValueError('beat needs scene text')
-            actions = parsed.get('available_actions')
-            if not isinstance(actions, list) or not [a for a in actions if str(a).strip()]:
-                raise ValueError('available_actions must be a non-empty list')
-            if 'decision' not in parsed:
-                raise ValueError('decision is required ("none" or an object)')
-            d = parsed['decision']
-            if isinstance(d, dict) and not isinstance(d.get('outcomes'), list):
-                raise ValueError('decision.outcomes must be a list')
+            if not parsed.get('arrival'):
+                raise ValueError('node needs arrival text')
+            rooms = parsed.get('rooms')
+            if not isinstance(rooms, list) or not rooms:
+                raise ValueError('rooms must be a non-empty list')
+            for r in rooms:
+                if not isinstance(r, dict) or not isinstance(r.get('interactions'), list):
+                    raise ValueError('each room needs an interactions list')
+            exits = parsed.get('exits')
+            if not isinstance(exits, list):
+                raise ValueError('exits must be a list')
+            got = {ex.get('id') for ex in exits if isinstance(ex, dict)}
+            missing = expected_exits - got
+            if missing:
+                raise ValueError(f'exits missing the outline ids {sorted(missing)}')
         return validate
 
-    def generate_beat(self, n, beat_id, path_id, revision=None, round_no=0):
-        u = self.upstream()
-        beat = self.beats[beat_id]
-        entry = beat['outline']
-        path = self.paths[path_id]
-        location, chars, notes = self.resolved_entities(entry)
-        prev_id = self.previous_beat_id(beat_id, path_id)
-
-        roster_packet = {
-            'this_beat': {
-                'location': self.roster['locations'].get(location) if location else None,
-                'characters': {c: self.roster['characters'].get(c) for c in chars},
-                'entity_notes': notes,
-            },
-            'all_names': {
-                'characters': sorted(self.roster['characters']),
-                'locations': sorted(self.roster['locations']),
-            },
+    def previous_context(self, node_id, line_id):
+        path = self.lines[line_id]['path']
+        i = path.index(node_id)
+        if i == 0:
+            return None
+        prev_id = path[i - 1]
+        prev = self.nodes[prev_id]
+        exit_entry = None
+        for ex in prev['outline'].get('exits') or []:
+            if ex.get('leads_to') == node_id:
+                exit_entry = dict(ex)
+                break
+        built = None
+        if prev['content'] and exit_entry:
+            for ex in prev['content'].get('exits') or []:
+                if isinstance(ex, dict) and ex.get('id') == exit_entry.get('id'):
+                    built = ex
+        return {
+            'node': prev_id, 'title': prev['outline'].get('title'),
+            'exit': exit_entry.get('id') if exit_entry else None,
+            'summary': exit_entry.get('summary') if exit_entry else None,
+            'when': built.get('when') if built else None,
+            'transition': built.get('transition') if built else None,
         }
-        outline_packet = dict(entry)
-        outline_packet['resolved_location'] = location
-        outline_packet['resolved_characters'] = chars
-        outline_packet['path_id'] = path_id
-        outline_packet['shared_with_paths'] = [p for p in beat['path_ids'] if p != path_id]
-        outline_packet['position'] = f"{path['beat_ids'].index(beat_id) + 1} of {len(path['beat_ids'])}"
-        outline_packet['next_beat'] = self.next_outline_entry(beat_id, path_id)
-        if entry.get('is_branch_point'):
-            outline_packet['this_path_follows'] = self.path_follows(beat_id, path_id)
 
-        craft = path.get('craft_spine_override') or u['craft']
+    def next_context(self, outline):
+        out = []
+        for ex in outline.get('exits') or []:
+            target = ex.get('leads_to')
+            if target and target in self.nodes:
+                t = self.nodes[target]['outline']
+                out.append({'exit': ex.get('id'), 'node': target, 'title': t.get('title'), 'goal': t.get('goal')})
+            else:
+                out.append({'exit': ex.get('id'), 'node': None, 'note': 'open exit: no line follows it yet'})
+        return out
+
+    def node_packet(self, node_id, line_id):
+        node = self.nodes[node_id]
+        o = node['outline']
+        line = self.lines[line_id]
+        packet = dict(o)
+        packet['line_id'] = line_id
+        packet['position'] = f"{line['path'].index(node_id) + 1} of {len(line['path'])}"
+        packet['previous'] = self.previous_context(node_id, line_id)
+        packet['next'] = self.next_context(o)
+        packet['shared_with'] = [l for l in node['line_ids'] if l != line_id]
+        packet['is_ending'] = not (o.get('exits') or [])
+        if packet['is_ending']:
+            packet['ending'] = line.get('ending')
+        if node.get('changes'):
+            packet['changes'] = node['changes']
+        return packet
+
+    def build_node(self, n, node_id, line_id, revision=None, round_no=0):
+        u = self.upstream()
+        node = self.nodes[node_id]
+        o = node['outline']
+        line = self.lines[line_id]
+        entities = {
+            'rooms': [self.room(r) for r in o.get('rooms') or [] if self.room(r)],
+            'characters': [self.character(c) for c in o.get('characters') or [] if self.character(c)],
+        }
+        tone = {'brief': u['brief_lite'], 'craft_spine': self.craft_compact()}
         repl = {
             '$$KERNEL$$': u['kernel'],
-            '$$BEAT_OUTLINE_JSON$$': self.gen.to_json(outline_packet),
-            '$$PREVIOUS_BEAT_JSON$$': self.gen.to_json(self.beat_digest(prev_id)) if prev_id else 'none',
-            '$$ROSTER_JSON$$': self.gen.to_json(roster_packet),
-            '$$INSTANCE_JSON$$': self.gen.to_json(self.instance(entry.get('instance_ref'))),
-            '$$STATE_VARIABLES_JSON$$': self.gen.to_json(self.state_variables),
-            '$$CRAFT_SPINE_JSON$$': self.gen.to_json(craft),
-            '$$FAILURE_MODEL_JSON$$': u['failure_model'],
+            '$$THROUGH_LINE_JSON$$': self.gen.to_json(line['through_line']),
+            '$$NODE_OUTLINE_JSON$$': self.gen.to_json(self.node_packet(node_id, line_id)),
+            '$$TURN_JSON$$': self.gen.to_json(self.turn(o.get('turn_ref'))),
+            '$$MEDIATION_JSON$$': self.gen.to_json((u['premise'] or {}).get('mediation')),
+            '$$NODE_ENTITIES_JSON$$': self.gen.to_json(entities),
+            '$$PRESENCE_JSON$$': self.gen.to_json((u['world'] or {}).get('protagonist_presence')),
+            '$$TONE_JSON$$': self.gen.to_json(tone),
+            '$$STATE_VARIABLES_JSON$$': self.gen.to_json(self.state_compact()),
             '$$ENRICHMENT_BUDGET$$': self.budget(),
             '$$REVISION_JSON$$': self.gen.to_json(revision) if revision else 'none',
         }
-        prefix = f's4b_i{n}_{slug(beat_id)}'
+        prefix = f's4b_i{n}_{slug(node_id)}'
         if round_no:
             prefix += f'_r{round_no}'
-        content = self.gen.run_prompt(prefix, 'beat', repl, prompt_file='s4_beat_generate.prompt',
-                                      validator=self.beat_validator(beat_id))
+        content = self.gen.run_prompt(prefix, 'node', repl, prompt_file='s4b_node_build.prompt',
+                                      validator=self.node_validator(node_id, o))
         content = dict(content)
-        content['id'] = beat_id
-        if beat['content'] is not None:
-            beat['revisions'].append({'prefix': prefix, 'reason': revision})
-        beat['content'] = content
-        self.register_state(beat_id, content)
+        content['id'] = node_id
+        self.normalize_content(content)
+        if node['content'] is not None:
+            node['revisions'].append({'prefix': prefix, 'reason': revision})
+        node['content'] = content
+        self.rebuild_state_registry()
         return content
 
-    def register_state(self, beat_id, content):
-        decision = content.get('decision')
-        if isinstance(decision, dict):
-            for outcome in as_list(decision.get('outcomes')):
-                if not isinstance(outcome, dict):
-                    continue
-                writes = normalize_writes(outcome.get('writes'))
-                outcome['writes'] = writes
-                for w in writes:
-                    self.touch_variable(w['variable'], w['value'], beat_id, 'written_by')
-        effects = normalize_writes(content.get('state_effects'))
-        content['state_effects'] = effects
-        for w in effects:
-            self.touch_variable(w['variable'], w['value'], beat_id, 'written_by')
-        reads = []
-        for r in as_list(content.get('reads')):
-            if isinstance(r, dict) and r.get('variable'):
-                reads.append({'variable': str(r['variable']), 'condition': str(r.get('condition', ''))})
-            elif isinstance(r, str) and r.strip():
-                reads.append({'variable': r.strip(), 'condition': ''})
-        content['reads'] = reads
-        for r in reads:
-            self.touch_variable(r['variable'], None, beat_id, 'read_by')
+    def normalize_content(self, content):
+        for room in as_list(content.get('rooms')):
+            if not isinstance(room, dict):
+                continue
+            for it in as_list(room.get('interactions')):
+                if isinstance(it, dict):
+                    it['requires'] = normalize_writes(it.get('requires'))
+                    it['sets'] = normalize_writes(it.get('sets'))
+        exits = []
+        for ex in as_list(content.get('exits')):
+            if isinstance(ex, dict):
+                ex['when'] = normalize_writes(ex.get('when'))
+                exits.append(ex)
+        content['exits'] = exits
+        variants = content.get('ending_variants')
+        if isinstance(variants, list):
+            for v in variants:
+                if isinstance(v, dict):
+                    v['when'] = normalize_writes(v.get('when'))
 
-    def touch_variable(self, name, value, beat_id, relation):
+    def rebuild_for_change(self, n, node_id, line):
+        node = self.nodes[node_id]
+        changes = [c for c in node.get('changes', []) if c.get('line_id') == line['id']]
+        findings = []
+        for c in changes:
+            if c.get('add'):
+                findings.append({'issue': f"A new story line ({line['id']}: {line['through_line'].get('title')}) takes hold in this node.",
+                                 'fix': f"Add to this node: {c['add']}. Make the new exit "
+                                        f"{(c.get('add_exit') or {}).get('id')} reachable through interactions, with its own cost."})
+            if c.get('claimed_exit'):
+                findings.append({'issue': f"Exit {c['claimed_exit']} is now followed by line {line['id']} "
+                                          f"({line['through_line'].get('title')}).",
+                                 'fix': 'Keep the exit reachable through interactions and make its transition lead into the new line; '
+                                        f"the line's motivation: {line['through_line'].get('motivation')}"})
+        if not findings:
+            return None
+        revision = {'prior_node': node['content'], 'findings': findings}
+        origin = self.line_containing(node_id)
+        return self.build_node(n, node_id, origin['id'], revision=revision, round_no=len(node['revisions']) + 1)
+
+    def rebuild_for_rejoin(self, n, node_id, line):
+        node = self.nodes[node_id]
+        dv = line.get('divergence') or {}
+        if dv.get('kind') == 'state_variant':
+            issue = (f"Line {line['id']} ({line['through_line'].get('title')}) plays the same nodes with a different "
+                     f"strategy and needs its own ending variant here, selected when {line['ending'].get('when')}.")
+        else:
+            issue = (f"This node is now reached by line {line['id']} ({line['through_line'].get('title')}) as well, "
+                     f"arriving from {line['path'][line['path'].index(node_id) - 1] if node_id in line['path'] and line['path'].index(node_id) > 0 else 'its own nodes'}.")
+        revision = {'prior_node': node['content'], 'findings': [{
+            'issue': issue,
+            'fix': 'Keep the node; add ending_variants (or vary the arrival and exits) by the state each arriving line '
+                   f"carries. The new line's ending: {self.gen.to_json(line.get('ending'))}",
+        }]}
+        origin = self.line_containing(node_id)
+        return self.build_node(n, node_id, origin['id'], revision=revision, round_no=len(node['revisions']) + 1)
+
+    # ------------------------------------------------------------------ state
+
+    def state_compact(self):
+        return {k: {'kind': v.get('kind'), 'values': v.get('values')} for k, v in self.state_variables.items()}
+
+    def rebuild_state_registry(self):
+        """Recomputed from every built node after each build, so a repaired
+        node's old variables do not linger in what later nodes are shown."""
+        self.state_variables = {}
+        for nid in self.node_order:
+            if self.nodes[nid]['content']:
+                self.register_state(nid, self.nodes[nid]['content'])
+
+    def register_state(self, node_id, content):
+        for room in as_list(content.get('rooms')):
+            if not isinstance(room, dict):
+                continue
+            for it in as_list(room.get('interactions')):
+                if not isinstance(it, dict):
+                    continue
+                for w in it.get('sets') or []:
+                    self.touch_variable(w['variable'], w['value'], node_id, 'written_by')
+                for r in it.get('requires') or []:
+                    self.touch_variable(r['variable'], None, node_id, 'read_by')
+        for ex in content.get('exits') or []:
+            for r in ex.get('when') or []:
+                self.touch_variable(r['variable'], None, node_id, 'read_by')
+        for v in as_list(content.get('ending_variants')):
+            if isinstance(v, dict):
+                for r in v.get('when') or []:
+                    self.touch_variable(r['variable'], None, node_id, 'read_by')
+
+    def touch_variable(self, name, value, node_id, relation):
         var = self.state_variables.setdefault(name, {
-            'kind': 'local', 'type': 'flag', 'values': [],
-            'declared_by': beat_id, 'written_by': [], 'read_by': [],
+            'kind': 'flag', 'values': [], 'declared_by': node_id, 'written_by': [], 'read_by': [],
         })
         if value not in (None, '') and str(value) not in var['values']:
             var['values'].append(str(value))
-        if beat_id not in var[relation]:
-            var[relation].append(beat_id)
+        if node_id not in var[relation]:
+            var[relation].append(node_id)
 
-    def revise_shared_beat(self, n, path):
-        """A path that reconverges onto an existing beat makes that beat a
-        shared terminal; regenerate it once with that fact as a revision
-        request so its content varies by final state."""
-        bid = path['reconverges_to']
-        beat = self.beats[bid]
-        if beat['content'] is None:
-            return
-        revision = {
-            'prior_beat': beat['content'],
-            'findings': [{
-                'issue': f"This beat is now shared: path {path['id']} reaches it via "
-                         f"{path['branch_from']['beat_id']} = {path['branch_from']['outcome_value']}, "
-                         f"in addition to {[p for p in beat['path_ids'] if p != path['id']]}.",
-                'fix': 'Keep the beat, but describe how its content varies by the final state each '
-                       'arriving path carries (shared_terminal_variants), reading the selector '
-                       'variables rather than assuming one path.',
-            }],
+    def writes_of(self, node_id):
+        content = self.nodes[node_id]['content'] or {}
+        out = set()
+        for room in as_list(content.get('rooms')):
+            if isinstance(room, dict):
+                for it in as_list(room.get('interactions')):
+                    if isinstance(it, dict):
+                        for w in it.get('sets') or []:
+                            out.add(w['variable'])
+        return out
+
+    # ------------------------------------------------------------------ computed checks
+
+    def mechanical_checks(self):
+        """Findings the pipeline can compute: an exit whose conditions no
+        interaction on any path can satisfy, an interaction that requires a
+        variable nothing earlier sets, outline rooms/characters missing from
+        the build, an interaction that is a menu. Each names its node."""
+        findings = []
+        for nid in self.node_order:
+            node = self.nodes[nid]
+            content = node['content']
+            if not content:
+                continue
+            o = node['outline']
+            # what can be set before this node, per line through it
+            available_by_line = {}
+            for lid in node['line_ids']:
+                path = self.lines[lid]['path']
+                if nid not in path:
+                    continue
+                avail = set()
+                for earlier in path[:path.index(nid)]:
+                    avail |= self.writes_of(earlier)
+                available_by_line[lid] = avail
+            here = self.writes_of(nid)
+
+            def satisfiable(conds):
+                names = {c['variable'] for c in conds}
+                if not names:
+                    return True
+                for avail in available_by_line.values() or [set()]:
+                    if names <= (avail | here):
+                        return True
+                return False
+
+            for ex in content.get('exits') or []:
+                if not satisfiable(ex.get('when') or []):
+                    findings.append({'kind': 'unreachable_exit', 'node_ids': [nid],
+                                     'issue': f"exit {ex.get('id')} requires {[c['variable'] for c in ex.get('when') or []]}, "
+                                              f"and no interaction in this node or earlier on its lines sets all of them",
+                                     'fix': 'add the interactions that set those variables here, or change the exit condition '
+                                            'to variables the node actually sets'})
+            built_rooms = {r.get('room') for r in as_list(content.get('rooms')) if isinstance(r, dict)}
+            missing_rooms = [r for r in o.get('rooms') or [] if r not in built_rooms]
+            if missing_rooms:
+                findings.append({'kind': 'missing_room', 'node_ids': [nid],
+                                 'issue': f'outline rooms {missing_rooms} have no entry in the build',
+                                 'fix': 'give each outline room an entry with at least two interactions'})
+            built_chars = {c.get('name') for c in as_list(content.get('characters')) if isinstance(c, dict)}
+            missing_chars = [c for c in o.get('characters') or [] if c not in built_chars]
+            if missing_chars:
+                findings.append({'kind': 'missing_character', 'node_ids': [nid],
+                                 'issue': f'outline characters {missing_chars} are absent from the build',
+                                 'fix': 'place each one in a room with an agenda, a talk interaction, and moved_by'})
+            for room in as_list(content.get('rooms')):
+                if not isinstance(room, dict):
+                    continue
+                for it in as_list(room.get('interactions')):
+                    if not isinstance(it, dict):
+                        continue
+                    if MENU_RE.search(str(it.get('action', ''))) or MENU_RE.match(str(it.get('target', ''))):
+                        findings.append({'kind': 'menu', 'node_ids': [nid],
+                                         'issue': f"interaction '{it.get('action')}' on '{it.get('target')}' in {room.get('room')} is a menu pick",
+                                         'fix': 'replace it with the acts in the world that bring the outcome about, each setting its own state'})
+                    if not satisfiable(it.get('requires') or []):
+                        findings.append({'kind': 'unsatisfiable_requires', 'node_ids': [nid],
+                                         'issue': f"interaction '{it.get('action')}' on '{it.get('target')}' requires "
+                                                  f"{[c['variable'] for c in it.get('requires') or []]}, which nothing earlier sets",
+                                         'fix': 'drop the requirement or add the interaction that sets it'})
+                if not [it for it in as_list(room.get('interactions')) if isinstance(it, dict)]:
+                    findings.append({'kind': 'empty_room', 'node_ids': [nid],
+                                     'issue': f"room {room.get('room')} has no interactions in this node",
+                                     'fix': 'give it at least two interactions that serve the goal'})
+        used_rooms = set()
+        seen_chars = set()
+        for nid in self.node_order:
+            used_rooms |= set(self.nodes[nid]['outline'].get('rooms') or [])
+            seen_chars |= set(self.nodes[nid]['outline'].get('characters') or [])
+        notes = {
+            'rooms_never_used': [r for r in self.room_ids() if r not in used_rooms],
+            'characters_never_present': [c for c in self.character_names() if c not in seen_chars],
         }
-        origin = self.path_containing(bid)
-        self.generate_beat(n, bid, origin['id'], revision=revision, round_no=len(beat['revisions']) + 1)
+        return {'findings': findings, 'notes': notes}
 
     # ------------------------------------------------------------------ 4d
 
-    def verify(self, n, round_no=0):
+    def review(self, n, computed, round_no=0):
         u = self.upstream()
-        it_beats = [bid for bid in self.beat_order if self.beats[bid]['iteration'] == n]
+        premise = u['premise'] or {}
+        shape = dict(u['shape'])
+        shape['through_lines_built'] = len(self.lines)
+        it_nodes = [nid for nid in self.node_order if self.nodes[nid]['iteration'] == n]
+        line = self.iterations[-1]['line_id'] if self.iterations and self.iterations[-1]['iteration'] == n else f'T{n}'
         repl = {
             '$$KERNEL$$': u['kernel'],
-            '$$STORY_DIGEST_JSON$$': self.gen.to_json(self.digest()),
-            '$$STATE_VARIABLES_JSON$$': self.gen.to_json(self.state_variables),
-            '$$ROSTER_JSON$$': self.gen.to_json(self.roster),
-            '$$BRANCH_POINT_TABLE_JSON$$': self.gen.to_json(self.branch_table()),
-            '$$PREMISE_EXPANSION_JSON$$': u['premise_json'],
-            '$$COMPLEXITY_JSON$$': u['complexity'],
-            '$$THEME_JSON$$': u['theme'],
             '$$THIS_ITERATION_JSON$$': self.gen.to_json({
-                'iteration': n, 'path_id': f'P{n}', 'new_beat_ids': it_beats,
-                'review_round': round_no,
+                'iteration': n, 'line_id': line, 'new_node_ids': it_nodes, 'review_round': round_no,
             }),
-            '$$ENRICHMENT_BUDGET$$': self.budget(),
+            '$$BRIEF_LITE_JSON$$': self.gen.to_json(u['brief_lite']),
+            '$$TURNS_JSON$$': self.gen.to_json({'turns': premise.get('turns'), 'mediation': premise.get('mediation')}),
+            '$$ESCALATION_JSON$$': self.gen.to_json((u['craft'] or {}).get('escalation_shape')),
+            '$$STORY_DIGEST_JSON$$': self.gen.to_json(self.digest(with_interactions=True)),
+            '$$CAST_AND_ROOMS_JSON$$': self.gen.to_json({'characters': self.character_names(), 'rooms': self.room_ids()}),
+            '$$COMPUTED_CHECKS_JSON$$': self.gen.to_json(computed),
+            '$$SHAPE_JSON$$': self.gen.to_json(shape),
         }
         prefix = f's4d_i{n}' + (f'_r{round_no}' if round_no else '')
-        return self.gen.run_prompt(prefix, 'verify', repl, prompt_file='s4d_verify.prompt',
-                                   validator=self.gen.require_keys('consistency', 'coherence_and_novelty',
-                                                                   'pacing_and_arcs', 'state_validity',
-                                                                   'termination'))
+        return self.gen.run_prompt(prefix, 'review', repl, prompt_file='s4d_review.prompt',
+                                   validator=self.gen.require_keys('earned_choices', 'continuity', 'cast_and_rooms',
+                                                                   'through_line_novelty', 'pacing', 'termination'))
 
-    def collect_findings(self, review):
-        """Findings that name beats, grouped by beat id, from every section."""
-        by_beat = {}
-        for section in ('consistency', 'coherence_and_novelty', 'pacing_and_arcs', 'state_validity'):
+    def collect_findings(self, review, computed):
+        by_node = {}
+        for f in computed.get('findings') or []:
+            for nid in f.get('node_ids') or []:
+                if nid in self.nodes:
+                    by_node.setdefault(nid, []).append({'section': 'computed:' + f.get('kind', ''),
+                                                        'issue': f.get('issue', ''), 'fix': f.get('fix', '')})
+        for section in ('earned_choices', 'continuity', 'cast_and_rooms', 'through_line_novelty', 'pacing'):
             block = review.get(section) or {}
             if not isinstance(block, dict):
                 continue
-            verdicts = [str(block.get(k, '')).lower() for k in ('verdict', 'coherence_verdict', 'novelty_verdict')]
             for finding in as_list(block.get('findings')):
                 if not isinstance(finding, dict):
                     continue
-                ids = [b for b in as_list(finding.get('beat_ids')) if b in self.beats]
-                if not ids:
-                    continue
-                if 'flagged' not in verdicts and not finding.get('fix'):
-                    continue
-                for bid in ids:
-                    by_beat.setdefault(bid, []).append({
-                        'section': section,
-                        'issue': finding.get('issue', ''),
-                        'fix': finding.get('fix', ''),
-                        'affected_paths': as_list(finding.get('affected_paths')),
-                    })
-        return by_beat
+                ids = [b for b in as_list(finding.get('node_ids')) if b in self.nodes]
+                for nid in ids:
+                    by_node.setdefault(nid, []).append({'section': section,
+                                                        'issue': finding.get('issue', ''),
+                                                        'fix': finding.get('fix', '')})
+        return by_node
 
-    def repair_beats(self, n, review):
-        by_beat = self.collect_findings(review)
+    def repair_nodes(self, n, review, computed):
+        by_node = self.collect_findings(review, computed)
         repaired = []
-        for bid in [b for b in self.beat_order if b in by_beat][:self.max_repair_beats]:
-            beat = self.beats[bid]
-            if beat['content'] is None:
+        for nid in [b for b in self.node_order if b in by_node][:self.max_repair_nodes]:
+            node = self.nodes[nid]
+            if node['content'] is None:
                 continue
-            path_id = self.path_containing(bid)['id']
-            revision = {'prior_beat': beat['content'], 'findings': by_beat[bid]}
-            self.generate_beat(n, bid, path_id, revision=revision, round_no=len(beat['revisions']) + 1)
-            repaired.append(bid)
-        skipped = [b for b in by_beat if b not in repaired]
+            line_id = self.line_containing(nid)['id']
+            revision = {'prior_node': node['content'], 'findings': by_node[nid]}
+            self.build_node(n, nid, line_id, revision=revision, round_no=len(node['revisions']) + 1)
+            repaired.append(nid)
+        skipped = [b for b in by_node if b not in repaired]
         if skipped:
             self.warnings.append(f'iteration {n}: findings on {skipped} left for the next review '
-                                 f'(--max-repair-beats={self.max_repair_beats})')
+                                 f'(--max-repair-nodes={self.max_repair_nodes})')
         return repaired
 
     # ------------------------------------------------------------------ computed views
 
-    def branch_table(self):
-        selector_names = {k for k, v in self.state_variables.items() if v.get('kind') == 'selector'}
-        rows = []
-        candidates = []
-        for bid in self.beat_order:
-            outline = self.beats[bid]['outline']
-            if not outline.get('is_branch_point'):
-                continue
-            branch = outline.get('branch') or {}
-            values = [str(v) for v in as_list(branch.get('outcome_values'))]
-            explored = {}
-            for pid in self.beats[bid]['path_ids']:
-                val = self.path_follows(bid, pid)
-                if val:
-                    explored.setdefault(val, []).append(pid)
-            unexplored = [v for v in values if v not in explored]
-            rows.append({'beat_id': bid, 'variable': branch.get('variable'), 'outcome_values': values,
-                         'explored': explored, 'unexplored': unexplored,
-                         'paths_through': self.beats[bid]['path_ids']})
-            for v in unexplored:
-                candidates.append({'beat_id': bid, 'variable': branch.get('variable'), 'outcome_value': v})
-        unmarked = []
-        for bid in self.beat_order:
-            content = self.beats[bid]['content'] or {}
-            outline = self.beats[bid]['outline']
-            if outline.get('is_branch_point') or not isinstance(content.get('decision'), dict):
-                continue
-            for outcome in as_list(content['decision'].get('outcomes')):
-                for w in as_list((outcome or {}).get('writes')):
-                    if isinstance(w, dict) and w.get('variable') in selector_names:
-                        unmarked.append({'beat_id': bid, 'variable': w['variable'],
-                                         'note': 'writes an ending-selector variable but was not outlined as a branch point'})
-        return {'branch_points': rows, 'candidates': candidates,
-                'unmarked_selector_writes': unmarked}
-
-    def unexplored_candidates(self):
-        return self.branch_table()['candidates']
-
-    def beat_digest(self, bid):
-        if not bid or bid not in self.beats:
-            return None
-        beat = self.beats[bid]
-        o = beat['outline']
-        c = beat['content'] or {}
-        decision = c.get('decision')
-        if isinstance(decision, dict):
-            decision = {'action': decision.get('action'),
-                        'outcomes': [{'choice': oc.get('choice'), 'writes': oc.get('writes'),
-                                      'meaning': oc.get('meaning')}
-                                     for oc in as_list(decision.get('outcomes')) if isinstance(oc, dict)]}
-        return {
-            'id': bid,
-            'path_ids': beat['path_ids'],
-            'role': o.get('role'),
-            'content_summary': o.get('content_summary'),
-            'location': c.get('location') or o.get('location'),
-            'characters': c.get('characters') or o.get('characters'),
-            'instance_ref': o.get('instance_ref'),
-            'is_branch_point': o.get('is_branch_point', False),
-            'branch': o.get('branch'),
-            'is_terminal': o.get('is_terminal', False),
+    def node_digest(self, nid, with_interactions=False):
+        node = self.nodes[nid]
+        o, c = node['outline'], node['content'] or {}
+        built_exits = {ex.get('id'): ex for ex in c.get('exits') or [] if isinstance(ex, dict)}
+        exits = []
+        for ex in o.get('exits') or []:
+            b = built_exits.get(ex.get('id')) or {}
+            exits.append({'id': ex.get('id'), 'summary': ex.get('summary'), 'leads_to': ex.get('leads_to'),
+                          'when': b.get('when'), 'transition': b.get('transition')})
+        d = {
+            'id': nid, 'title': o.get('title'), 'goal': o.get('goal'), 'turn_ref': o.get('turn_ref'),
+            'rooms': o.get('rooms'), 'characters': o.get('characters'), 'pressure': o.get('pressure'),
+            'on_lines': node['line_ids'], 'built': node['content'] is not None,
+            'exits': exits, 'is_ending': not (o.get('exits') or []),
             'failure_exit': o.get('failure_exit'),
-            'generated': beat['content'] is not None,
-            'available_actions': c.get('available_actions'),
-            'decision': decision if decision is not None else ('none' if beat['content'] else None),
-            'state_effects': c.get('state_effects'),
-            'reads': c.get('reads'),
-            'shared_terminal_variants': c.get('shared_terminal_variants'),
-            'design_note': c.get('design_note'),
+            'clock': c.get('clock'), 'ending_variants': c.get('ending_variants'),
         }
+        if with_interactions and c:
+            d['interactions'] = [
+                f"{room.get('room')}: {it.get('action')} {it.get('target')}"
+                + (f" -> {', '.join(w['variable'] + '=' + w['value'] for w in it.get('sets') or [])}" if it.get('sets') else '')
+                for room in as_list(c.get('rooms')) if isinstance(room, dict)
+                for it in as_list(room.get('interactions')) if isinstance(it, dict)
+            ]
+            d['characters_built'] = [{'name': ch.get('name'), 'agenda': ch.get('agenda'), 'moved_by': ch.get('moved_by')}
+                                     for ch in as_list(c.get('characters')) if isinstance(ch, dict)]
+        return d
 
-    def digest(self):
+    def digest(self, with_interactions=False):
+        open_exits = []
+        for nid in self.node_order:
+            for ex in self.nodes[nid]['outline'].get('exits') or []:
+                if not ex.get('leads_to'):
+                    open_exits.append({'node': nid, 'exit_id': ex.get('id'), 'summary': ex.get('summary')})
         return {
-            'framework_choice': self.framework,
-            'ending_mechanism': self.ending_mechanism,
-            'paths': [{'id': p['id'], 'iteration': p['iteration'], 'beat_ids': p['beat_ids'],
-                       'branch_from': p['branch_from'], 'reconverges_to': p['reconverges_to'],
-                       'terminal_beat': p['beat_ids'][-1] if p['beat_ids'] else None,
-                       'framework_transformed': p['craft_spine_override'] is not None}
-                      for p in self.paths.values()],
-            'beats': [self.beat_digest(b) for b in self.beat_order],
+            'through_lines': [{'id': l['id'], **l['through_line'], 'ending': l['ending'], 'path': l['path'],
+                               'divergence': l['divergence'], 'rejoins_at': l['rejoins_at']}
+                              for l in self.lines.values()],
+            'nodes': [self.node_digest(nid, with_interactions) for nid in self.node_order],
+            'open_exits': open_exits,
         }
 
     # ------------------------------------------------------------------ output
 
     def story_json(self):
+        u = self.upstream()
         return {
             'story_id': self.gen.story_id,
-            'framework_choice': self.framework,
-            'ending_mechanism': self.ending_mechanism,
-            'paths': self.paths,
-            'beats': {bid: {'outline': b['outline'], 'content': b['content'], 'path_ids': b['path_ids'],
-                            'iteration': b['iteration'], 'revisions': b['revisions']}
-                      for bid, b in self.beats.items()},
-            'beat_order': self.beat_order,
-            'roster': self.roster,
-            'role_map': self.role_map,
+            'kernel': u['kernel'],
+            'shape': u['shape'],
+            'through_lines': self.lines,
+            'nodes': {nid: {'outline': b['outline'], 'content': b['content'], 'line_ids': b['line_ids'],
+                            'iteration': b['iteration'], 'revisions': b['revisions'], 'changes': b.get('changes', [])}
+                      for nid, b in self.nodes.items()},
+            'node_order': self.node_order,
+            'cast': u['cast'],
+            'world': u['world'],
             'state_variables': self.state_variables,
             'iterations': self.iterations,
             'stop_reason': self.stop_reason,
@@ -816,65 +930,89 @@ class Step4Builder:
         self.gen.save_story_file('s4_story.md', self.story_markdown())
 
     def story_markdown(self):
-        out = [f'# {self.gen.story_id} - step 4 outline', '']
-        out.append(f'Kernel: {self.gen.kernel.strip()}')
+        u = self.upstream()
+        out = [f'# {self.gen.story_id} - step 4 story', '']
+        out.append(f'Kernel: {(u["kernel"] or "").strip()}')
         out.append('')
-        if self.framework:
-            out.append(f"Framework: **{self.framework.get('value', '')}** - {self.framework.get('why', '')}")
-        if self.ending_mechanism:
-            out.append(f"Ending mechanism: {self.ending_mechanism.get('type', '')} - {self.ending_mechanism.get('note', '')}")
+        out.append('## Through-lines')
+        for l in self.lines.values():
+            tl, e = l['through_line'], l.get('ending') or {}
+            out.append(f"- **{l['id']} {tl.get('title', '')}**: {tl.get('motivation', '')} / strategy: {tl.get('strategy', '')}")
+            out.append(f"  path: {' -> '.join(l['path'])}")
+            out.append(f"  ending {e.get('id', '')} {e.get('title', '')}: {e.get('summary', '')}")
+            if l.get('divergence'):
+                dv = l['divergence']
+                out.append(f"  diverges at {dv.get('node')} ({dv.get('kind')}): {dv.get('how_the_shift_is_explained', '')}")
         out.append('')
-        out.append('## Paths')
-        for p in self.paths.values():
-            bf = p['branch_from']
-            src = f" (branches from {bf['beat_id']} = {bf['outcome_value']})" if bf else ' (main path)'
-            rec = f", reconverges to {p['reconverges_to']}" if p['reconverges_to'] else ''
-            out.append(f"- **{p['id']}**{src}{rec}: {' -> '.join(p['beat_ids'])}")
+        out.append('## Cast')
+        for c in as_list((u['cast'] or {}).get('characters')):
+            if isinstance(c, dict):
+                out.append(f"- **{c.get('name')}** ({c.get('role', '')}): wants {c.get('wants', '')}; holds {c.get('holds', '')}"
+                           + (f"; speaks for {c['speaks_for']}" if c.get('speaks_for') else ''))
+        for c in as_list((u['cast'] or {}).get('crowds')):
+            if isinstance(c, dict):
+                out.append(f"- crowd **{c.get('name')}**: {c.get('who', '')} (represented by {', '.join(as_list(c.get('representatives')))})")
         out.append('')
-        out.append('## Roster')
-        for name, c in self.roster['characters'].items():
-            out.append(f"- character **{name}**: {c.get('manner', '')} (topics: {', '.join(as_list(c.get('baseline_topics')))})")
-        for name, l in self.roster['locations'].items():
-            out.append(f"- location **{name}**: objects {', '.join(as_list(l.get('static_objects')))}; exits {', '.join(as_list(l.get('exits')))}")
+        out.append('## Rooms')
+        pres = (u['world'] or {}).get('protagonist_presence') or {}
+        if pres:
+            out.append(f"Protagonist presence: {pres.get('how', '')}")
+        for r in as_list((u['world'] or {}).get('rooms')):
+            if isinstance(r, dict):
+                out.append(f"- **{r.get('id')} {r.get('name')}**: {r.get('purpose', '')}; fixtures {', '.join(as_list(r.get('fixtures')))}; "
+                           f"connects {', '.join(as_list(r.get('connections')))}")
         out.append('')
-        out.append('## Beats')
-        for bid in self.beat_order:
-            b = self.beats[bid]
+        out.append('## Nodes')
+        for nid in self.node_order:
+            b = self.nodes[nid]
             o, c = b['outline'], b['content'] or {}
             flags = []
-            if o.get('is_branch_point'):
-                flags.append('BRANCH POINT')
-            if o.get('is_terminal'):
-                flags.append('TERMINAL')
-            out.append(f"### {bid} - {o.get('role', '')} {'[' + ', '.join(flags) + ']' if flags else ''}")
-            out.append(f"paths: {', '.join(b['path_ids'])}; location: {c.get('location') or o.get('location')}; "
-                       f"characters: {', '.join(as_list(c.get('characters') or o.get('characters')))}")
+            if o.get('turn_ref') is not None:
+                flags.append(f"turn {o['turn_ref']}")
+            if not (o.get('exits') or []):
+                flags.append('ENDING')
+            out.append(f"### {nid} - {o.get('title', '')} {'[' + ', '.join(flags) + ']' if flags else ''}")
+            out.append(f"lines: {', '.join(b['line_ids'])}; rooms: {', '.join(as_list(o.get('rooms')))}; "
+                       f"characters: {', '.join(as_list(o.get('characters')))}")
             out.append('')
-            out.append(o.get('content_summary', ''))
-            if c.get('scene'):
+            out.append(f"Goal: {o.get('goal', '')}")
+            if o.get('what_happens'):
+                out.append(f"On the line: {o['what_happens']}")
+            if c.get('arrival'):
                 out.append('')
-                out.append(c['scene'])
-            if c.get('available_actions'):
+                out.append(c['arrival'])
+            for room in as_list(c.get('rooms')):
+                if not isinstance(room, dict):
+                    continue
                 out.append('')
-                out.append('Actions: ' + '; '.join(str(a) for a in c['available_actions']))
-            d = c.get('decision')
-            if isinstance(d, dict):
-                out.append('')
-                out.append(f"Decision: {d.get('action', '')}")
-                for oc in as_list(d.get('outcomes')):
-                    if isinstance(oc, dict):
-                        writes = ', '.join(f"{w['variable']}={w['value']}" for w in as_list(oc.get('writes')) if isinstance(w, dict))
-                        out.append(f"  - {oc.get('choice', '')} -> {writes} ({oc.get('meaning', '')})")
-            if c.get('shared_terminal_variants'):
-                out.append('')
-                out.append('Shared terminal variants: ' + json.dumps(c['shared_terminal_variants'], ensure_ascii=False))
+                out.append(f"**{room.get('room')}** ({room.get('now', '')})")
+                for it in as_list(room.get('interactions')):
+                    if isinstance(it, dict):
+                        sets = ', '.join(f"{w['variable']}={w['value']}" for w in it.get('sets') or [])
+                        req = ', '.join(f"{w['variable']}={w['value']}" for w in it.get('requires') or [])
+                        out.append(f"- {it.get('action')} {it.get('target')}: {it.get('result', '')}"
+                                   + (f" [sets {sets}]" if sets else '') + (f" [requires {req}]" if req else ''))
+            for ch in as_list(c.get('characters')):
+                if isinstance(ch, dict):
+                    out.append(f"- {ch.get('name')} in {ch.get('in_room')}: {ch.get('agenda', '')} (moved by: {ch.get('moved_by', '')})")
+            if c.get('clock'):
+                out.append(f"Clock: {json.dumps(c['clock'], ensure_ascii=False)}")
+            built = {ex.get('id'): ex for ex in c.get('exits') or [] if isinstance(ex, dict)}
+            for ex in o.get('exits') or []:
+                bx = built.get(ex.get('id')) or {}
+                when = ', '.join(f"{w['variable']}={w['value']}" for w in bx.get('when') or [])
+                out.append(f"- exit {ex.get('id')} -> {ex.get('leads_to') or '(open)'}: {ex.get('summary', '')}"
+                           + (f" [when {when}]" if when else '') + (f" {bx.get('transition', '')}" if bx.get('transition') else ''))
+            if c.get('failure_exit'):
+                out.append(f"Failure exit: {json.dumps(c['failure_exit'], ensure_ascii=False)}")
+            if c.get('ending_variants'):
+                out.append('Ending variants: ' + json.dumps(c['ending_variants'], ensure_ascii=False))
             out.append('')
         out.append('## Iterations')
         for it in self.iterations:
             t = it.get('termination') or {}
-            out.append(f"- iteration {it['iteration']} ({it['path_id']}): new beats {it['new_beat_ids']}, "
-                       f"repaired {it['repaired_beat_ids']}; review says: {t.get('overall_recommendation', '')} "
-                       f"- {t.get('reasoning', '')}")
+            out.append(f"- iteration {it['iteration']} ({it['line_id']}): new {it['new_node_ids']}, modified {it['modified_node_ids']}, "
+                       f"repaired {it['repaired_node_ids']}; review: {t.get('recommendation', '')} - {t.get('reasoning', '')}")
         out.append('')
         out.append(f'Stop reason: {self.stop_reason}')
         if self.warnings:

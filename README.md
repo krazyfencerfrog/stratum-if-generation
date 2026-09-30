@@ -2,10 +2,12 @@
 story/content generator for the stratum-if engine
 
 A user supplies a short story premise (a kernel); a multi-step pipeline of
-local-LLM prompts analyzes it, expands it into a concrete premise, adds craft
-devices, and builds a branching outline of beats with characters, locations
-and state. See `docs/step4_design.md` for the current pipeline and
-`CLAUDE.md` for the file conventions.
+local-LLM prompts analyzes it, builds a premise with a real obstacle, names a
+cast and draws a room map, and then lays down story lines (a main line, then
+one divergent line per iteration) as nodes: sections of play in a subset of
+rooms, with exits reached through what the player did. See
+`docs/step4_design.md` for the current pipeline and `CLAUDE.md` for the file
+conventions.
 
 ## Setup
 
@@ -38,7 +40,7 @@ upstream JSON, and an Ollama server at its default window truncates silently.
 cd generator
 python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt       # whole pipeline
 python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt   # rating filter, stop after 3.5
-python main.py --story-id=kernel1 --max-iterations=3 < ...             # cap step-4 paths
+python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap step-4 story lines (default 4)
 ./todo.sh                                                              # all 30 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt   # no model
 ```
@@ -47,3 +49,6 @@ Output lands in `stories/<story_id>/`; every model call is saved and skipped on
 rerun, so an interrupted run resumes where it stopped. Delete a step's output
 file to redo that step (and its downstream dependants). Final step-4 output is
 `<id>_s4_story.json` and `<id>_s4_story.md`.
+
+Story directories written before 2026-09-29 use older schemas; the pipeline
+names the stale file and stops. Delete the directory for a fresh run.

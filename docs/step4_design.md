@@ -1,246 +1,308 @@
-# Pipeline design: verify/repair loops and step 4
+# Pipeline design: step 2's shape split, the dramatic engine, and the story-line loop
 
-This is the current description of everything after phase 3. `strategy.txt` is the
-historical plan (its numbered steps 4–17 are superseded from step 4 on); this
-document is what `generator/main.py` and `generator/step4.py` actually do, why,
-and what is still unvalidated. Read `step3_consolidated_design_lessons.md` first
-for the rules every prompt follows.
+This is the current description of everything after phase 3, plus the step-2
+change that feeds it. `strategy.txt` is the historical plan; this document is
+what `generator/main.py`, `generator/brief.py` and `generator/step4.py`
+actually do, why, and what is still unvalidated. Read
+`step3_consolidated_design_lessons.md` first for the rules every prompt
+follows, and `fable_response_3.md` for the analysis of the kernel1 run that
+produced this shape.
 
 ## 1. Shape of the pipeline
 
 ```
-s1 kernel
-s2 rating filter
-phase 3 (blind extraction ×9, chained only where a field is undefined otherwise)
-s3h cross-check  ──►  constraint map (computed)
-s3.5  premise expansion   ─► s3.5v audit ─► s3.5r repair ─► s3.5v re-audit   (≤ --max-repairs rounds)
-s3.75 craft spine         ─► s3.75v audit ─► s3.75r repair ─► s3.75v re-audit
-step 4 outline loop, one path per iteration:
-    4a_first (iteration 1) | 4a_next (+4c5 craft refresh if it transforms)
-    entity_define × new roles  →  beat_generate × new beats
-    4d review  →  beat repair × flagged beats  →  4d re-review
-    stop when 4d says stop, no candidates remain, or --max-iterations
+s1 kernel (as written)
+s2 rating filter (if --rating)  ─►  s2 shape split: content kernel + shape prefs
+phase 3 (blind extraction ×9 over the CONTENT kernel; chained only where a
+         field is undefined otherwise)
+s3h cross-check  ──►  constraint map + STORY BRIEF (both computed)
+s3.5  premise: the dramatic engine  ─► 3.5v audit ─► 3.5r repair ─► re-audit
+s3.75 craft spine                   ─► 3.75v ─► 3.75r ─► re-audit
+s3.6  cast   (named individuals; every crowd has a representative)
+s3.7  world  (the room map, drawn once; the premise's levers placed)
+step 4, one story line per iteration:
+    4a main line (iteration 1)  |  4c divergence (iteration n)
+    4b node build × new nodes (+ revision of nodes the line changed or rejoined)
+    computed checks → 4d review → node repair → 4d re-review
+    stop when 4d says stop, 4c finds nothing worth building, or --max-iterations
 export: <id>_s4_story.json, <id>_s4_story.md
 ```
 
-Three standing rules, now enforced in code rather than by hand:
+Standing rules, all enforced in code:
 
 1. **Generation and verification never share a prompt.** Every builder has a
    separate auditor with its own JSON.
-2. **Repair is a third call that receives the violation list.** The auditor fixes
-   nothing; a repair prompt receives the auditor's findings and returns the whole
-   object revised, changed only where the findings point. The auditor then runs
-   again on the revision. This is what was missing before this pass: 3.5v and
-   3.75v found problems and nothing acted on them.
-3. **Counts and lookups are computed, not asked.** The constraint map, the
-   step-4 branch-point table, the story digest and the state-variable registry
-   are all built in Python from saved JSON. The model is spent on judgment.
+2. **Repair is a third call that receives the violation list.** 3.5r, 3.75r,
+   and node rebuilds in revision mode.
+3. **Counts, lookups and mechanical checks are computed, not asked.** The
+   constraint map, the brief, the shape targets, the state registry, the story
+   digest, and step 4's reachability checks are all Python. The model is spent
+   on judgment.
+4. **Downstream prompts receive the brief, never the raw bundle.** See §3.
 
-## 2. The build/verify/repair loop (`StoryGenerator.run_verified_step`)
+## 2. Step 2: the shape split
 
-Inputs: a build call, a verify call whose replacements are a function of the
-current material, a repair call whose replacements are a function of the
-current material and the verdict, and `needs_repair(verdict)`.
+`s2_shape_split.prompt` separates the kernel into a CONTENT kernel (every word
+kept except the shape clauses) and SHAPE preferences: ending count as a tier
+(one / few / several / many / unstated, with the stated wording kept for the
+record), linearity, choice density, length. Files: `s2_shape.json`,
+`s2_kernel.txt` (the content kernel), `s2_rated_kernel.txt` when a rating
+filter ran, `s2_rating.txt`.
 
-| step | prefix / file | notes |
-|---|---|---|
-| build | `s3_5_premise_expansion.json` | the ORIGINAL, never overwritten |
-| verify | `s3_5v_fidelity_check.json` | verdict on the original |
-| repair n | `s3_5r<n>_premise_repair.json` | `{"repair_log": [...], "revised": {...}}` |
-| re-verify n | `s3_5v_r<n>_fidelity_check.json` | verdict on revision n |
-| accepted copy | `s3_5_premise_expansion_accepted.json` | what downstream actually read |
-| loop record | `s3_5_loop.json` | rounds, sources, verdicts, `still_failing` |
+Every later step reads the content kernel. The shape preferences reach only
+step 4, as computed targets (`brief.shape_targets`): a suggested number of
+through-lines (one→1, few→2, several→3, many→5, unstated→3), a node-count
+range for the main line, and a `linear` flag. They are advisory: the review
+decides whether each next line is worth building, and `--max-iterations` caps
+it. Why this split exists is argued in `fable_response_3.md` §4; the short
+form is that a stated ending count was being treated as an explicit
+constraint by every downstream step and the outline was designing selector
+variables to hit it arithmetically.
 
-The same scheme applies to 3.75 (`s3_75`, `s3_75v`, `s3_75r<n>`,
-`s3_75v_r<n>`). In memory the accepted revision replaces the original under the
-build's own key (`self.analysis['s3_5_premise_expansion']`), so 3.75 and step 4
-read the repaired premise without knowing a repair happened.
+## 3. The story brief (computed)
 
-What triggers repair:
+`generator/brief.py` builds `<id>_s3_brief.json` from the bundle, the
+constraint map and 3h: every phase-3 judgment keyed by its field id
+(`3-0a.primary_decision_axis`, `3b.transgression`, ...) with its VALUE and a
+binding class (`constraint` / `default` / `free`, the strongest class among
+the map's leaf paths under that id), the cross-check's resolved conflicts and
+`primary_branch_source`, and the suggested budget. No notes, no tiers. About
+3k characters against 10k+ tokens for the bundle.
 
-- 3.5v: `verdict.value == "hard_issues"`. Soft findings are notes for a human by
-  the auditor's own definition; repairing on them caused churn in the archived
-  batch (kernel4's soft findings were the auditor objecting to material that was
-  correctly withheld). `--repair-on-soft` opts in.
-- 3.75v: `verdict.value == "flagged"` (its vocabulary is clean/flagged; flagged
-  includes a self-report disagreement such as kernel2's wrong list index).
+`brief_lite()` is the further cut the per-node and review prompts get:
+decision, theme, protagonist, affect (primary, trajectory, tone, somatic
+channels, transgression ceiling), failure model, epistemic gap present.
 
-If the verdict still needs repair after `--max-repairs` rounds (default 2) the
-run **halts** with `PipelineHalt` (exit code 2) and names the loop file. The
-later phases assume verified material; building on a known contradiction
-produces a wrong story, not a slightly worse one. To re-run a loop, delete every
-file of its build/verify/repair prefixes (`*_s3_5*` for the premise loop).
+The `serves` vocabulary is unchanged: tags still name phase-3 field ids, and
+3.5v checks a tag against the brief's keys by prefix.
 
-3h is unchanged and still fixes nothing, by design: 3.5 already builds to the
-field 3h preferred. What changed is that 3h's output now also reaches 3.5v,
-3.75, 3.75v and 4a, with the rule that a constraint 3h ruled against is not a
-constraint for auditing or building.
+## 4. The dramatic engine (3.5)
 
-## 3. Step 4
+The old 3.5 built an `instance_generator`: N instances of the extracted
+decision, each "what the decision looks like here". On kernel1 that was four
+sectors, each "vent it or spare it", and the outline turned that directly into
+four vent/spare beats with consequence beats between them. Nothing in the
+pipeline asked what stood between the AI and venting, who wanted what, or
+what the player would do in a room. The one hard rule of the old prompt ("on
+interactive axes you may not invent") also read as "do not give the
+protagonist an obstacle".
 
-### 3.1 Why it is shaped this way
+The new 3.5 builds an engine. Fields, all mandatory at every budget:
 
-Steps 4–6 of the old plan (plot architecture classification, world shape, a
-fixed primary×secondary lattice with a separate topology step) were replaced by
-the prompts committed in cf0090d, which were hand-driven in earlier sessions.
-They build the story as an outline of beats, one complete path per iteration,
-with a review after each. This pass split the two-mode 4a prompt, gave every
-prompt real placeholders and a fixed JSON contract, and wrote the driver.
+| field | what it is |
+|---|---|
+| `protagonist` | who, wants, can_do, **cannot_do** (the limit the obstacle lives in) |
+| `arena` | the setting instance, inside the extracted footprint |
+| `pressure` | what forces the situation to a head; `clock_or_stock` says whether the engine tracks anything for it (only where 3-0c or the kernel licenses one) |
+| `opposition` | a force with its own want (not "to stop you") and means |
+| `mediation` | the decision axis restated as the question at stake; for each pole what the player must DO and what it costs; the levers (people, objects, facts, authorities) that stand between the protagonist and either answer |
+| `turns` | 3–5 escalating situations, each with what you must do, 2–3 ways through with costs, who is involved, and a **form** (discover, persuade, trade, confront, conceal_or_reveal, sabotage, endure, choose_whom, rescue, escape); no two turns share a form; no turn is the bare decision axis |
+| `cast_seeds` | 3–7 role-level people; every `crowd` seed has an individual who `speaks_for` it; the opposition is embodied |
+| `complications`, `withheld`, `fidelity_check` | as before |
 
-The old 6.0 topology question survives as 4a_first's **ending mechanism**:
-`forked_paths` (branch-point beats write selector variables), `accumulated_state`
-(no forks; a shared terminal beat reads state, which is kernel17's shape) or
-`both`. That is the minimum the driver needs to know how endings are reached; the
-full variable table was folded into the state-variable registry step 4 keeps
-anyway.
+The rule that replaced "no new mechanics": the engine's primitives (rooms,
+exits, objects to examine/take/use/give, characters with topics whose stance
+moves, a clock, flags and counters) are always available; what may not be
+invented is a different kind of game (combat, skill checks, minigames, an
+economy or reputation score) or a way to lose that 3-0c does not name. The
+enrichment budget governs texture (complications, arena elaboration), never
+the engine.
 
-### 3.2 One iteration
+3.5v gained a fourth audit, `engine_findings`, which is hard on: a
+cannot_do that is empty, an opposition without a want and means, a mediation
+pole that is just the pole restated, turns that share a form or are the bare
+axis, a crowd seed without a representative. 3.5r repairs those by supplying
+what is missing, the one kind of finding where repair adds material.
 
-1. **Outline.** Iteration 1 runs `s4a_first_outline.prompt` (framework, ending
-   mechanism, main path). Iteration n runs `s4a_next_outline.prompt` with the
-   story digest, the computed branch-point table and the last review's
-   termination judgment; it selects one `(beat_id, outcome_value)` from the
-   table's `candidates`, outlines only the new beats, and either ends in a
-   terminal beat or reconverges onto an existing one. Selecting an explored value
-   fails validation; the call is retried once, then the loop stops.
-2. **Craft refresh** (`s4c5`) only if 4a_next chose `transform`. Fields whose
-   status is adjusted/refreshed are substituted into a per-path copy of the
-   craft spine that this path's beats receive.
-3. **Entities.** Each role-level `location` / `characters` string in the new
-   outline that is not already mapped runs `s4_entity_define.prompt`. Outcomes:
-   `reuse` (mapped to the roster entry), `new_character` / `new_location` (added,
-   with the proper name the prompt assigns), `none_needed` (characters only; the
-   beat delivers that content through the environment). Matching is by
-   normalized string (articles stripped, case-folded), so outlines are told to
-   reuse roster names verbatim.
-4. **Beats**, in path order, each with `s4_beat_generate.prompt`: the outline
-   entry plus path context (previous beat digest, next beat summary, which
-   outcome this path follows at a branch point, which other paths share the
-   beat), the resolved roster entries, the 3.5 instance it dramatizes, the
-   state-variable registry, the craft spine, the failure model. Writes are
-   structured (`{"variable","value"}`) and registered as they arrive. A path
-   that reconverges onto an existing beat triggers one revision of that beat so
-   it varies by the state each arriving path carries.
-5. **Review** with `s4d_verify.prompt` over the digest (everything except scene
-   prose). Every finding carries `beat_ids`; the driver regenerates those beats
-   (up to `--max-repair-beats`) in revision mode, then reviews once more. The
-   second review's termination judgment decides whether to continue.
+3.75 is unchanged in judgment; its inputs are now the kernel, the brief and
+3.5, and its setup/payoff pair cites turns.
 
-Stop conditions: 4d says `stop here`; the branch table has no candidates;
-4a_next reports none; `--max-iterations`.
+## 5. Cast and world (3.6, 3.7)
 
-### 3.3 Files and resumability
+Both run once, after the spine and before any story line, because a node is
+a subset of rooms with a subset of the cast and the outline has to choose
+from something that exists.
 
-Every model call has a unique prefix, so a rerun replays the driver and loads
-every file instead of calling the model; the stub test confirms zero calls on
-resume and identical state.
+`s3_6_cast.prompt` → `s3_6_cast.json`: named individuals with `wants`,
+`holds`, `stance`, `moved_by`, `voice`, `topics`, `matters_to_turns`; crowds
+with `representatives`. The validator rejects a crowd with no representative
+among the characters. This is the fix for "Hydroponics Crew" as a character:
+a crowd may exist, but the player never talks to one.
+
+`s3_7_world.prompt` → `s3_7_world.json`: 6–12 rooms (`id`, `name`, `purpose`,
+`fixtures`, `connections`, `usually_here`, `protagonist_can`),
+`protagonist_presence` (how "you" are embodied and what you can act on
+without a person), and `levers_placed` (every mediation lever in a room, a
+character's holding, or a record). The validator drops unknown connections
+and names and makes connections mutual.
+
+## 6. Step 4
+
+### 6.1 Units
+
+A **node** is a section of play: `goal` (what the player is trying to do),
+`turn_ref`, `rooms` (1–3 ids), `characters` (1–3 names), `pressure`,
+`what_happens` (on the line that outlined it), and `exits`, each a state of
+play the player brings about, with `leads_to` (a node id, or null for an
+**open exit** no line follows yet). An ending node has no exits.
+
+A **through-line** is one complete story: `motivation`, `strategy`,
+`turning_point`, an `ending`, and a `path` of node ids. Iteration 1 builds
+T1; each later iteration adds one.
+
+### 6.2 One iteration
+
+1. **Outline.** Iteration 1 runs `s4a_main_line.prompt`: the canonical
+   telling, 5–8 nodes (from the shape's length), every turn in exactly one
+   node in order, the opposition acting in at least two nodes, at most one
+   open exit per node. No framework choice, no ending mechanism, no selector
+   variables: the craft spine's escalation shape and the turns' order carry
+   the structure. Iteration n runs `s4c_divergence.prompt`: a different
+   motivation or strategy for the protagonist, where it takes hold, how the
+   shift is explained, and the new nodes. Three kinds: `existing_exit`
+   (claims an open exit), `new_opportunity` (adds something to an existing
+   node and an exit from it), `state_variant` (linear shape: no new nodes; the
+   same nodes played differently, and an ending variant of the final node
+   selected by state). A line ends in its own ending node or `rejoins_at` an
+   existing node. The driver rejects a selection that is not an open exit, a
+   non-fresh id, or an unknown node, and retries once.
+2. **Rebuild changed nodes.** A node the divergence modified (or whose open
+   exit was claimed) is rebuilt in revision mode with the change as the
+   finding. A rejoined node is rebuilt to add `ending_variants` (or, for a
+   state variant, the variant the new line's `ending.when` selects).
+3. **Build new nodes** in path order with `s4b_node_build.prompt`. The packet:
+   the through-line, the outline entry with `previous` (the exit that led
+   here, its `when` and `transition`), `next`, `shared_with`, the turn, the
+   mediation, the full definitions of exactly this node's rooms and
+   characters, the protagonist's presence, tone (brief_lite + compact spine),
+   the state registry (name, kind, values), the budget, and the revision. The
+   output is per-room `interactions` (`target`, `action`, `requires`, `sets`),
+   per-character `agenda`/`moved_by`, an optional `clock`, and `exits` whose
+   `when` is a structured condition over variables. "Choose"/"decide"
+   interactions are forbidden.
+4. **Computed checks** (`Step4Builder.mechanical_checks`): an exit whose
+   `when` no interaction in the node or earlier on any of its lines sets; an
+   interaction whose `requires` nothing sets; outline rooms or characters
+   missing from the build; a room with no interactions; a menu interaction.
+   Each names its node. Also notes rooms never used and cast never present.
+5. **Review** with `s4d_review.prompt`: earned choices, continuity, cast and
+   rooms, through-line novelty, pacing, termination. It receives the computed
+   findings and is told not to repeat them. Every finding names node ids.
+   Termination proposes `next_seed` (motivation, strategy, where it could
+   diverge) or recommends stop.
+6. **Repair**: computed and review findings grouped by node, up to
+   `--max-repair-nodes` nodes rebuilt in revision mode, then one re-review.
+
+### 6.3 Files
 
 | call | prefix |
 |---|---|
-| first outline | `s4a_i1_first_outline.json` |
-| next outline | `s4a_i<n>_next_outline.json` |
-| craft refresh | `s4c5_i<n>_craft_refresh.json` |
-| entity | `s4e_i<n>_<k>_<role-slug>_entity.json` |
-| beat | `s4b_i<n>_<beat-slug>_beat.json`, revisions `…_r<k>_beat.json` |
-| review | `s4d_i<n>_verify.json`, re-review `s4d_i<n>_r1_verify.json` |
+| main line | `s4a_i1_main_line.json` |
+| divergence | `s4c_i<n>_divergence.json` |
+| node | `s4b_i<n>_<node-slug>_node.json`, revisions `…_r<k>_node.json` |
+| review | `s4d_i<n>_review.json`, re-review `s4d_i<n>_r1_review.json` |
 | assembled story | `s4_story.json`, `s4_story.md` (rewritten every iteration) |
 
-Because state is replayed, deleting one file re-runs exactly that call and
-everything the driver derives from it. Deleting an outline file re-runs that
-iteration's outline, and the entity/beat files from the old outline will only be
-reused where the new outline produces the same ids and roles.
+State is replayed from files; a rerun makes no model calls (the stub proves
+zero new logs). `run_prompt` now validates a loaded file too and names it if
+it no longer matches the schema, so an old story directory fails loudly
+instead of feeding stale shapes downstream.
 
-### 3.4 Schemas the code depends on
+### 6.4 Schemas the code depends on
 
-Outline entry (both 4a prompts):
-
+Outline node entry (4a `nodes`, 4c `new_nodes`):
 ```json
-{"id": "B03", "role": "...", "content_summary": "...",
- "location": "role-level or roster name", "characters": ["..."],
- "instance_ref": 1, "is_branch_point": true,
- "branch": {"variable": "orientation", "outcome_values": ["collective","fittest"], "path_follows": "collective"},
- "is_terminal": false,
- "failure_exit": null | {"trigger": "...", "cost": "terminal|loop_retry|narrative_setback", "description": "..."},
- "craft_note": ""}
+{"id": "N03", "title": "...", "goal": "...", "turn_ref": 2, "rooms": ["R02"], "characters": ["..."],
+ "pressure": "...", "what_happens": "...",
+ "exits": [{"id": "N03.a", "summary": "...", "leads_to": "N04"}, {"id": "N03.b", "summary": "...", "leads_to": null}],
+ "failure_exit": null, "craft_note": ""}
 ```
+4c: `status`, `through_line{id,...}`, `divergence{kind,node,exit_id,opportunity,how_the_shift_is_explained}`,
+`modify_nodes[{id,add,add_exit}]`, `new_nodes`, `rejoins_at`, `ending{...,node,when}`.
 
-Beat content: `decision` is `"none"` or `{action, outcomes: [{choice, writes: [{variable, value}], meaning}]}`;
-`state_effects` and `reads` are lists of the same shapes; `available_actions` is
-non-empty always; `shared_terminal_variants` is a list of `{when, variant}` on
-shared beats. `normalize_writes` in `step4.py` tolerates a bare
-`"variable = value"` string.
+Node build: `arrival`, `rooms[{room, now, interactions[{target, action, requires, result, sets}]}]`,
+`characters[{name,in_room,agenda,moved_by}]`, `clock`, `exits[{id, when, transition}]`
+(ids must match the outline's), `failure_exit`, `ending_variants`, `design_note`.
+`when`, `requires`, `sets` are `[{"variable","value"}]`; `normalize_writes`
+tolerates `"var = value"` strings.
 
-Review: each of the four check sections has `findings: [{issue, beat_ids,
-affected_paths, fix}]`; `termination` has `remaining_candidates`,
-`next_candidate`, `overall_recommendation` (`continue looping` | `stop here`).
+Review: six sections; each of the first five has `findings[{issue,node_ids,fix}]`;
+`termination{through_lines_built,target,next_seed,recommendation,reasoning}`.
 
-Branch-point table (computed): per branch beat, `outcome_values`, `explored`
-(value → paths), `unexplored`; `candidates` flattens the unexplored values;
-`unmarked_selector_writes` lists beats that wrote a selector variable without
-being outlined as branch points, which 4d must resolve.
+## 7. Trace length: what changed and why
 
-## 4. Trace length
+The reasoning-discipline blocks added in the previous pass did not shorten
+the kernel1 traces. Reading them shows why: the block stopped literal JSON
+drafting in some calls (4a's trace has no braces) but every trace still
+opened with 30–40 lines restating all its inputs, and closed with a
+"need maybe X ... good" pass over every rule and every output field. Both
+scale with the prompt, not with the block. The 4d review, with the full
+digest, took 2.6–5.3 hours per call and crashed twice.
 
-The archived batch shows thinking-to-response ratios of 5–17× on the
-construction and audit steps, and the traces have a recognisable structure:
-restate the inputs, reason, **draft the entire JSON in the trace**, verify it key
-by key, then emit it again. The drafted JSON alone is 30–40% of a 3.5/3.5v
-trace, and it is verbatim copying. Kernel1's 3.5v trace also spent ~40 lines on
-whether `3f.setting_structure` was a valid `serves` tag because the constraint
-map lists leaf paths (`3f.setting_structure.ceiling`).
+So this pass cuts inputs and outputs instead of adding instructions:
 
-Changes made: every prompt now carries a short REASONING DISCIPLINE block (reason
-once, write once; no JSON drafting in the trace; no re-narration of inputs; a
-settled field stays settled unless a later finding gives a concrete reason, with
-an explicit carve-out that the existing late-objection tie-break rules still
-win); the audit prompts add "one sentence per clean check"; and the `serves`
-prefix rule is now stated. The reasoning itself was not touched. Measure the
-effect on the next batch by comparing thinking word counts per step against
-`stories/current_output.tar` before judging the block.
+- the brief replaces the bundle everywhere downstream (3.5's prompt is now
+  kernel + brief; the old one was kernel + bundle + constraint map + 3h);
+- 3.75's nine raw inputs are now three;
+- the node packet carries only this node's rooms and characters;
+- the review's mechanical half is computed, and the review no longer has to
+  count endings against a target or scan for unexplored outcomes;
+- the outline has no framework, mechanism or selector-variable fields, and
+  its node entries have ten fields instead of eleven with three sub-objects;
+- the reasoning-discipline blocks are three lines.
 
-## 5. Testing without a model
+Measure on the next run: thinking bytes per call against
+`stories/current_output.tar` (s3_5 88k, s4a 79k, s4d 99–109k, s4b 20–52k).
+`--no-think-steps` can switch a thinking model's trace off for named
+prefixes (the Ollama client sends `think: false`); it is off by default
+everywhere.
 
-`generator/stub_client.py` answers every prompt with a schema-valid canned JSON
-(selected by a phrase in the prompt's first lines) and reads the JSON sections of
-the prompt it was given, so step 4's bookkeeping is exercised on data that
-actually flowed through the placeholders. `STRATUM_CLIENT=stub` in
-`dynamic_config.py` selects it; environment knobs make the loops take their
-non-trivial branches (repair rounds, halt, transform, reconverge, beat repair,
-stop). It proves plumbing, not quality:
+## 8. Testing without a model
+
+`STRATUM_CLIENT=stub` selects `generator/stub_client.py`, which answers every
+prompt with schema-valid JSON built from the JSON sections of the prompt it
+was given. Knobs:
 
 ```
 cd generator
 STRATUM_CLIENT=stub STUB_PREMISE_HARD_ROUNDS=1 STUB_SPINE_FLAGGED_ROUNDS=1 \
-  STUB_REVIEW_FLAG_FIRST=1 STUB_TRANSFORM_ON=2 STUB_RECONVERGE_ON=3 \
+  STUB_BAD_NODE=N02 STUB_REVIEW_FLAG_FIRST=1 STUB_REJOIN_ON=3 STUB_NOTHING_ON=4 STUB_STOP_AFTER=9 \
   python3 main.py --story-id=stubtest --max-iterations=5 < ../tests/kernels/kernel1.txt
+STRATUM_CLIENT=stub python3 main.py --story-id=stublin < ../tests/kernels/kernel17.txt   # linear: state variants
+STRATUM_CLIENT=stub STUB_PREMISE_ALWAYS_HARD=1 python3 main.py --story-id=stubhalt < ...  # exit 2
 ```
 
-## 6. Unvalidated against a live model (in order of risk)
+## 9. Unvalidated against a live model (in order of risk)
 
-1. **Every step-4 prompt.** The four originals were calibrated by hand-driven
-   runs; the placeholder versions, the schemas and 4a's split have not been run
-   against qwen3. First live run: one kernel with `--max-iterations=2`, read the
-   4a_first trace and the first 4d trace in full, then fix the narrowest thing.
-2. **Repair prompts 3.5r and 3.75r** have never produced a real revision; the
-   archived batch had one flagged 3.75v (kernel2) and no hard 3.5v. Kernel28/29
-   are the kernels most likely to produce a hard 3.5v finding.
-3. **The reasoning-discipline block** could, in principle, suppress a useful
-   late reconsideration. The carve-out is written in; check kernel2's 3b and
-   kernel7's 3-0c traces (the two known late-objection cases) after the next
-   batch.
-4. **Context window.** 3.5's prompt is ~10k tokens with the bundle and map;
-   4a_next and 4d grow with the story. The Ollama client now accepts
-   `options={"num_ctx": …}` (`STRATUM_NUM_CTX` in the local `dynamic_config`);
-   a server at its default window truncates silently.
-5. **`accumulated_state` stories** (kernel17) run iteration 1 only, with the
-   ending count carried by `shared_terminal_variants` on the terminal beat. 4d
-   counts variants as endings; nothing has checked that a model actually writes
-   enough of them.
-6. **Craft refresh (4c5)** was unvalidated before this pass and still is.
+1. **3.5's dramatic engine and the 3.5v engine audit.** Every other change
+   depends on 3.5 producing a real obstacle, mediation with costs, and turns
+   of distinct form. First live run: one kernel with `--stop-after=3.5`, read
+   the 3.5 trace and the 3.5v verdict in full. If 3.5v flags the engine, the
+   3.5r repair (which adds material) has never run either.
+2. **Every step-4 prompt.** 4a, 4b, 4c, 4d are new; their illustrations are
+   marked hypothetical. Run one kernel with `--max-iterations=2`, read the 4a
+   trace, one 4b trace, and the first 4d trace, then fix the narrowest thing.
+   Watch 4b for menu interactions the regex does not catch ("elect", "opt").
+3. **The shape split** on kernels that are mostly shape (kernel17) and on
+   kernels with none (kernel8, kernel9): check `s2_shape.json` and that the
+   content kernel is verbatim minus the clauses.
+4. **3.6 and 3.7** have no verifier; the review's cast_and_rooms check and
+   the computed notes (rooms never used, characters never present) are the
+   only feedback. If a live run shows the world step inventing rooms the
+   outline never uses, cap it at 8.
+5. **Phase 3 on the content kernel.** 3g will now fall back on ending count
+   for kernels that stated one; nothing downstream reads it any more except
+   as a brief field. 3-0a's `decision_mechanism` was inferred from plural
+   sectors on kernel1, not from the branching clause, so it should hold.
+6. **Context window.** The largest prompt is now 4c (premise + cast + world +
+   spine + digest). With the digest carrying only outline-level nodes it
+   should stay under 8k tokens through four lines; check `num_ctx` anyway.
 
-## 7. What comes after step 4
+## 10. What comes after step 4
 
-Nothing is built past the outline. The old plan's per-node fan-out (14–17) still
-applies in spirit: the beat content plus roster entries is already close to the
-"node packet" the strategy doc describes, and `s4_story.json` is the input the
-next phase (rooms, transitions, prose per beat) should consume.
+`s4_story.json` is close to the engine's needs: rooms with fixtures and
+connections, a cast with topics and agendas, nodes with per-room interactions,
+structured exit conditions, and state variables. The unbuilt phase is prose:
+room descriptions, interaction text, and transitions per node, on the node
+packet plus the room's definition, the shape the old plan's steps 14–17
+describe.

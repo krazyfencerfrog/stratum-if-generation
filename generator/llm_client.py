@@ -4,7 +4,9 @@ import dynamic_config
 class LlmClient:
     def __init__(self):
         pass
-    def run_prompt(self, prompt):
+    def run_prompt(self, prompt, **kwargs):
+        """Returns (thinking, response). Clients may accept think=False to
+        run without a reasoning trace; unknown kwargs are ignored."""
         pass
 
 if __name__ == "__main__":
