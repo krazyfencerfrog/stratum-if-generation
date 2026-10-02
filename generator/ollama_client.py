@@ -82,7 +82,7 @@ def _ollama_url(host, path):
 class OllamaClient(LlmClient):
     def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180,
                  max_duration=14400, echo=True, options=None, structured='no_think',
-                 no_think_suffix='/no_think', raw_template=CHATML_TEMPLATE):
+                 no_think_suffix='/no_think', raw_template=CHATML_TEMPLATE, implicit_think=True):
         self.host = host
         self.model = model
         self.keep_alive = keep_alive
@@ -102,6 +102,14 @@ class OllamaClient(LlmClient):
         self.no_think_suffix = no_think_suffix
         self.think_param = True    # goes False if the server rejects think:false
         self.raw_template = raw_template
+        # Some chat templates (Qwen-family imports among them) open the
+        # <think> block in the PROMPT, so the reasoning streams in
+        # `response` with no opening tag, closed by "</think>", and the
+        # server's thinking parser does not split it out. With
+        # implicit_think, a thinking call whose response starts with prose
+        # is read as reasoning until "</think>"; a response that never
+        # closes the block was all answer after all.
+        self.implicit_think = implicit_think
         self._call_format = None
         self.last_call = {}
 
@@ -197,17 +205,31 @@ class OllamaClient(LlmClient):
         # <think> tags. inline: None until the first non-blank response
         # text says which it is, then 'open' (inside the tags), 'closed'
         # (past them) or 'no' (this response has no inline reasoning).
+        # 'open' also covers a block the TEMPLATE opened (tagged False, see
+        # implicit_think in __init__).
         inline = None
+        tagged = True
         inline_closed_at = 0
+        implicit_ok = (self.implicit_think and payload.get('think') is not False and not payload.get('raw')
+                       and not str(payload.get('prompt', '')).rstrip().endswith('/no_think'))
 
         def split_inline():
             text = "".join(chunks)
             if inline in ('open', 'closed'):
-                body = text.lstrip()[len('<think>'):]
+                body = text.lstrip()
+                if tagged:
+                    body = body[len('<think>'):]
                 if '</think>' in body:
                     thought, _, answer = body.partition('</think>')
                     return thought, answer
+                if not tagged and not aborted:
+                    return '', body          # the implicit block never closed: it was all answer
                 return body, ''
+            if implicit_ok and '</think>' in text and '<think>' not in text:
+                # an answer-looking start (a drafted object) that turned out
+                # to be reasoning closed by the template's think block
+                thought, _, answer = text.partition('</think>')
+                return thought, answer
             return '', text
 
         def partial():
@@ -248,7 +270,10 @@ class OllamaClient(LlmClient):
                             if seen.startswith('<think>'):
                                 inline = 'open'
                             elif seen and not '<think>'.startswith(seen):
-                                inline = 'no'
+                                if implicit_ok and seen[0] not in '{[':
+                                    inline, tagged = 'open', False
+                                else:
+                                    inline = 'no'
                         if inline == 'open' and '</think>' in "".join(chunks[-3:]):
                             inline = 'closed'
                             inline_closed_at = response_bytes
@@ -311,7 +336,7 @@ class OllamaClient(LlmClient):
 
         thinking, text = partial()
         if (aborted == 'thinking_bytes' and limits.get('force_answer') and not text.strip()
-                and inline is None and not payload.get('raw')):
+                and inline in (None, 'open') and not payload.get('raw')):
             forced = self._force(payload, thinking, limits, start)
             if forced is not None:
                 return forced

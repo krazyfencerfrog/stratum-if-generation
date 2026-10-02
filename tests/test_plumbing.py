@@ -637,6 +637,12 @@ class FakeOllama(BaseHTTPRequestHandler):
         chunks = []
         if d.get('inline_think'):
             chunks.append({'response': '<think>' + 'r' * n_think + '</think>'})
+        elif d.get('implicit_think'):
+            # a template that opens <think> in the prompt: reasoning arrives in
+            # `response` with no opening tag, closed by </think>
+            chunks += [{'response': 'We need to reason here. '[:24] * 4} for _ in range(n_think // 96)]
+            if not d.get('never_close'):
+                chunks.append({'response': '\n</think>\n\n'})
         else:
             chunks += [{'thinking': 't' * 100} for _ in range(n_think // 100)]
         chunks += [{'response': response[i:i + 40]} for i in range(0, len(response), 40)]
@@ -686,6 +692,19 @@ def ollama_client_against_fake_server():
         client.run_prompt(json.dumps({}), format=schema)
         check('format' in FakeOllama.received[-1], "structured='always' did not send the schema on a thinking call")
         client.structured = 'no_think'
+
+        # template-opened think blocks (no opening tag in the response)
+        thinking, response = client.run_prompt(json.dumps({'implicit_think': True, 'thinking_bytes': 960, 'response': '{"a": 5}'}))
+        check(response == '{"a": 5}' and thinking.startswith('We need') and client.last_call['thinking_bytes'] > 900,
+              f'implicit think block not split: {thinking[:40]!r} / {response!r}')
+        thinking, response = client.run_prompt(json.dumps({'implicit_think': True, 'never_close': True, 'thinking_bytes': 192, 'response': ''}))
+        check(thinking == '' and response.startswith('We need'), 'an implicit block that never closes is all answer')
+        thinking, response = client.run_prompt(json.dumps({'implicit_think': True, 'thinking_bytes': 960, 'response': '{"a": 6}'}), think=False)
+        check('</think>' in response, 'with think:false the response is taken as is')
+        thinking, response = client.run_prompt(json.dumps({'implicit_think': True, 'thinking_bytes': 200000, 'delay': 0.001}),
+                                               limits={'max_thinking_bytes': 3000, 'force_answer': True})
+        check(client.last_call.get('forced_answer') and response == '{"forced": true}' and thinking.startswith('We need'),
+              f'implicit reasoning should count against the thinking limit and be forced: {client.last_call}')
 
         before = FakeOllama.disconnects
         started = time.time()
