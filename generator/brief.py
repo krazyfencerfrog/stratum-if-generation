@@ -9,8 +9,13 @@ default / free, from the constraint map) and drops the notes. A prompt that
 needs a note can still be given the raw field.
 
 Also here: the shape targets derived from step 2's shape preferences, so
-the numbers the outline loop steers by are computed once, not judged.
+the numbers the outline loop steers by are computed once, not judged; the
+compact one-line-per-field rendering the prompts after 3h receive
+(brief_lines); and the two tables the premise verifier is handed instead
+of being asked to find them (kernel_clauses, constraint_fields).
 """
+
+import re
 
 
 def g(node, *path, default=None):
@@ -209,10 +214,140 @@ def brief_lite(brief):
     }
 
 
+# ---------------------------------------------------------------- compact renderings
+
+def _flat(value):
+    if isinstance(value, list):
+        return ', '.join(_flat(v) for v in value) or '(none)'
+    if isinstance(value, dict):
+        return '; '.join(f'{k} {_flat(v)}' for k, v in value.items())
+    if value is None or value == '':
+        return '(none)'
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+    return str(value)
+
+
+def field_line(field_id, entry):
+    """One brief field as text: '3b.tone [constraint]: descriptors claustrophobic, tense'."""
+    entry = entry or {}
+    parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k != 'binding']
+    return f"{field_id} [{entry.get('binding', 'free')}]: " + '; '.join(parts)
+
+
+# Extracted answers about the story's SIZE (how many endings, how often it
+# forks). Step 2 strips the Kernel's shape clauses before phase 3 runs, so
+# these come back as fallbacks, and shape reaches only the outline loop, as
+# advisory targets. The premise steps are not shown them and the premise
+# audit does not check against them.
+SHAPE_LEVEL_FIELDS = ('3g.target_ending_count', '3g.branching_density')
+
+
+def brief_lines(brief, only=None, skip=SHAPE_LEVEL_FIELDS):
+    """The brief as one line per field. Every archived trace restated the
+    brief to itself in roughly this form before doing anything else; giving
+    it in this form to begin with is about half the characters of the JSON
+    and leaves nothing to restate. `only` restricts to field ids with one
+    of the given prefixes; `skip` drops field ids."""
+    fields = (brief or {}).get('fields') or {}
+    lines = []
+    for field_id, entry in fields.items():
+        if field_id in (skip or ()):
+            continue
+        if only and not any(field_id.startswith(p) for p in only):
+            continue
+        lines.append(field_line(field_id, entry))
+    cross = (brief or {}).get('cross_check') or {}
+    if not only:
+        for c in cross.get('conflicts') or []:
+            lines.append(f"cross-check {c.get('id')}: {c.get('summary')} -> the better-evidenced field is "
+                         f"{c.get('winner') or '(undecided)'}; {c.get('resolution') or ''}".rstrip('; '))
+        for u in cross.get('unresolved') or []:
+            lines.append(f'cross-check unresolved: {_flat(u)}')
+        if (brief or {}).get('enrichment_budget'):
+            lines.append(f"enrichment_budget: {brief['enrichment_budget']}")
+    return '\n'.join(lines)
+
+
+def constraint_fields(brief):
+    """[(n, field id, line)] for the fields whose binding is 'constraint':
+    the table the premise verifier checks, numbered so its answers can be
+    matched back without string comparison."""
+    fields = (brief or {}).get('fields') or {}
+    out = []
+    for field_id, entry in fields.items():
+        if (entry or {}).get('binding') == 'constraint' and field_id not in SHAPE_LEVEL_FIELDS:
+            out.append((len(out) + 1, field_id, field_line(field_id, entry)))
+    return out
+
+
+def field_ids(brief):
+    return list(((brief or {}).get('fields') or {}).keys())
+
+
+def valid_serves(tag, brief):
+    """A serves tag is valid when some part of it is a brief field id or a
+    prefix of one ('3-0a' covers '3-0a.primary_decision_axis'). The old
+    verifier spent forty lines of reasoning on this string comparison."""
+    ids = field_ids(brief)
+    for part in re.split(r'[,;]| and ', str(tag or '')):
+        part = part.strip().split(':')[0].strip()
+        if not part:
+            continue
+        if any(i == part or i.startswith(part + '.') or part.startswith(i) for i in ids):
+            return True
+    return False
+
+
+_CLAUSE_SPLIT = re.compile(r'(?<=[.!?;])\s+|\s+[—–]\s+|\s+-\s+')
+
+
+def kernel_clauses(kernel):
+    """The Kernel cut into numbered clauses at sentence ends, semicolons
+    and dashes. The verifier used to decide for itself what counted as a
+    clause and argued with itself about it; it is now handed the list."""
+    text = ' '.join((kernel or '').split())
+    parts = [p.strip() for p in _CLAUSE_SPLIT.split(text) if p and p.strip()]
+    merged = []
+    for p in parts:
+        # a fragment of one or two words belongs to its neighbour
+        if merged and len(p.split()) < 3:
+            merged[-1] = merged[-1] + ' ' + p
+        else:
+            merged.append(p)
+    return [(i + 1, c) for i, c in enumerate(merged)] or [(1, text)]
+
+
 # ---------------------------------------------------------------- shape
 
 ENDING_TIER_TO_LINES = {'one': 1, 'few': 2, 'several': 3, 'many': 5, 'unstated': 3}
 LENGTH_TO_NODES = {'short': (4, 6), 'medium': (5, 8), 'long': (7, 10), 'unstated': (5, 8)}
+
+
+_NUMBER_WORDS = {'two': 2, 'couple': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6,
+                 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': 12, 'dozen': 12}
+# "one" and "single" count only when the phrase is about exactly one ending:
+# "more than one ending" and "at least one of them happy" are not.
+_ONE_ENDING = re.compile(r'^\W*(only |just |exactly )?(a |the )?(one|single|1)\b(?! or\b)')
+
+
+def ending_tier_from_stated(stated):
+    """The ending tier as a lookup when the Kernel gave a number: the
+    smallest number stated ('6 or 7' -> 6 -> several), so a range never
+    rounds the story up. None when no number is stated."""
+    text = str(stated or '').lower()
+    numbers = [int(n) for n in re.findall(r'\d+', text) if int(n) > 1]
+    numbers += [v for w, v in _NUMBER_WORDS.items() if re.search(rf'\b{w}\b', text)]
+    if not numbers:
+        return 'one' if _ONE_ENDING.search(text) else None
+    n = min(numbers)
+    if n <= 1:
+        return 'one'
+    if n <= 3:
+        return 'few'
+    if n <= 6:
+        return 'several'
+    return 'many'
 
 
 def shape_targets(shape):

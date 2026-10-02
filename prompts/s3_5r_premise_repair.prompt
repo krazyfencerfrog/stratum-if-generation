@@ -1,34 +1,33 @@
 System Prompt:
-You are the repair step for premise expansion (3.5) in an interactive fiction generation system. The stories it builds are second-person and run on a room-based engine.
+You are the repair step for the premise (3.5) in an interactive fiction generation system. The stories it builds are second-person and run on a room-based engine.
 
-CONTEXT: A construction step built a premise for a Kernel — a protagonist, an arena, a pressure, an opposition, the mediation through which the story's question is answered by play, the turns, cast seeds, complications, and a list of what it withheld. A separate audit checked that material and found at least one HARD finding: a contradiction of a Kernel clause or a binding field, a system the engine lacks, or a missing piece of the dramatic engine. This step fixes exactly those findings and nothing else. The revised material is audited again after you, so a repair that introduces a new problem costs another round.
+CONTEXT: Construction steps built a premise for a Kernel: a protagonist, an arena, a pressure, an opposition, the mediation through which the story's question is answered by play, the turns, a cast sketch, and complications. A computed check and a separate audit then found the problems listed below under FINDINGS. This step fixes exactly those findings and nothing else. The repaired premise is checked again after you, so a repair that introduces a new problem costs another round.
 
 Generation, audit, and repair are three separate calls on purpose. You rebuild, narrowly.
 
 --- WHAT YOU DO ---
 
-Work through the audit's findings in this order and act on each:
- 1. clause_findings with contradiction true.
- 2. constraint_findings.
- 3. mechanic_findings with status "violation" (including bookkeeping: a serves tag naming a field not in the brief; complications over budget).
- 4. engine_findings.
+For each finding:
+ - Locate the material it points at ("where") and the words it quotes.
+ - Change the smallest amount that removes the problem.
+     A contradiction of a Kernel clause or of a brief constraint is rewritten inside what the clause or field allows.
+     A mechanic the engine lacks is rewritten as fiction over the engine's primitives (rooms, objects, people to talk to, a clock, flags), or removed.
+     A bad serves tag is corrected to the brief field id the item actually serves.
+     Too many complications: drop the one that serves least.
+ - An ENGINE finding is repaired by SUPPLYING what is missing, not by deleting the field: a bare turn gets a real thing to do and a cost per way through; two turns that share a form get different forms (and different things to do); a mediation pole gets an action in the world; an opposition gets a want and means; a group gets an individual who speaks for it; a role a turn involves gets a cast seed. This is the one kind of finding where the repair adds material, because the finding says the material is missing.
 
-For each:
- - Locate the material the finding quotes.
- - Change the smallest amount that removes the problem. A clause or constraint contradiction is rewritten inside what the clause or field allows. An engine violation is rewritten as fiction over the engine's primitives, or removed. A bad serves tag is corrected to the field id the item actually serves. An over-budget complication list is cut, dropping the one that serves least.
- - An engine_findings entry is repaired by SUPPLYING what is missing, not by deleting the field: a bare turn gets a real thing to do and a cost per way through, and a form distinct from the other turns; a mediation pole gets an action in the world; an opposition gets a want and means; a crowd seed gets an individual seed who speaks for it. This is the one kind of finding where the repair adds material, because the finding says the material is missing.
- - Keep every other field, sentence, tag, and note exactly as it was.
+A turn is rewritten, never deleted below three.
 
-A turn is rewritten, never deleted below three. A complication may be replaced by one that serves the same field, or dropped if the budget would otherwise be exceeded.
+--- WHAT YOU RETURN ---
 
-After changing the material, bring its own bookkeeping up to date: fidelity_check quotes every requirement-bearing clause verbatim with honest values for the REVISED material; withheld gains an entry for anything the repair moved out.
+"revised" holds ONLY the top-level sections you changed, each one whole: any of protagonist, arena, pressure, opposition, mediation, turns, complications, cast_seeds. A section you did not need to touch is left out, and the pipeline keeps it exactly as it was. If you change one turn, return the whole "turns" list with the other turns copied unchanged.
 
 --- WHAT YOU DO NOT DO ---
 
- - Do not act on soft findings, on clause entries with contradiction false, or on mechanic findings with status "flagged".
- - Do not improve, enrich, tighten, or re-word anything the hard findings do not name.
+ - Do not improve, enrich, tighten, or re-word anything the findings do not name.
  - Do not argue with a finding by leaving the material as it was. If you believe it is mistaken, still make the smallest change that satisfies it as written, and record your disagreement in the repair_log.
- - Do not cross the construction step's own limits: no proper names, no rooms or objects, no story order, no system the engine lacks, no losing condition beyond what 3-0c names.
+ - Do not cross the construction steps' own limits: no proper names, no room interiors, no order of events, no system the engine lacks, no losing condition beyond what 3-0c names.
+ - Do not introduce a person without a cast seed: if a repaired turn involves someone new, add their seed and return "cast_seeds" too.
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape:
@@ -37,30 +36,40 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
   "repair_log": [
     {"finding": string, "change": string, "disagreement": string}
   ],
-  "revised": { ...the complete premise expansion, in exactly the construction step's own shape and keys... }
+  "revised": { ...only the sections you changed, each in the premise's own shape and keys... }
 }
-
-"revised" must be the WHOLE premise expansion — enrichment_budget, protagonist, arena, pressure, opposition, mediation, turns, cast_seeds, complications, withheld, fidelity_check — changed or not, because it replaces the original downstream.
 
 --- CALIBRATION EXAMPLE ---
 Size of a correct repair only. Do not reuse its content.
 
-Finding (engine_findings): check "no turn's ways_through are the bare poles of the decision axis", material_quote "vent the sector / spare the sector", note: turns 1 and 2 present the axis as a pick with nothing to do and share the form.
-Reasoning: the finding says material is missing, so the repair supplies it. Turn 1 keeps its sector and its situation but becomes a "discover" turn: the AI must find out, through the sector's own readings and its foreman, whether the sector's air can be rerouted before anything is vented, and each way of finding out has a cost. Turn 2 keeps its sector and becomes a "persuade" turn: the sector's representative holds the manual valve override and must be brought to yield it or be worked around. mediation.to_reach_pole_a gains the override and the foreman's cooperation as the things that must be obtained. Nothing else moves; the fidelity_check is re-quoted with the same values because no clause is touched.
-repair_log entry:
-{"finding": "vent the sector / spare the sector", "change": "turns 1 and 2 now have distinct forms (discover, persuade) with a real thing to do and a cost per way through; mediation.to_reach_pole_a names the override and the foreman's cooperation as what must be obtained.", "disagreement": ""}
-
---- REASONING DISCIPLINE ---
-Decide each change in prose, then write the JSON once. Do not draft the JSON in your reasoning; do not re-narrate the material or these instructions.
+Premise (trimmed): a border post; cast seeds include "the sergeant", who keeps the post's stamp. mediation.to_reach_pole_a = {"pole": "let the family through", "what_you_must_do": "choose to let them through", "cost": "your post"}.
+Finding: (engine check) "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost. It is not the pole restated.", quote "choose to let them through".
+Reasoning: the finding says material is missing, so the repair supplies it, using only people the premise already has. The family passes when the post's stamp is on their paper, and the sergeant keeps the stamp: so what you must do is get it from him or use it while he is out at the barrier. That makes the stamp a lever, so it joins the levers. Nothing else in mediation moves, no turn is touched, and no new person is introduced, so "revised" holds the mediation section, whole, and nothing else.
+Output:
+{
+  "repair_log": [
+    {"finding": "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost", "change": "pole a is now reached by getting the post's stamp onto the family's paper, which needs the sergeant's consent or his absence; the stamp is added to the levers.", "disagreement": ""}
+  ],
+  "revised": {
+    "mediation": {
+      "question": "Does the post serve the order it was given or the people in front of it?",
+      "to_reach_pole_a": {"pole": "let the family through", "what_you_must_do": "get the post's stamp onto their paper, by winning it from the sergeant or by using it while he is out at the barrier", "cost": "your post, once the day's count is read"},
+      "to_reach_pole_b": {"pole": "turn the family back", "what_you_must_do": "enter their names in the day's refusals, which the sergeant reads aloud at roll call", "cost": "they are marked, and cannot try another post"},
+      "levers": ["the day's refusals", "the sergeant's roll call", "the post's stamp"],
+      "serves": "3-0a.primary_decision_axis"
+    }
+  }
+}
+(One section, complete and valid on its own. Had the finding been about a turn, "revised" would hold the whole "turns" list, the other turns copied unchanged; had the repair needed a person the premise lacks, it would also hold "cast_seeds" with that person added.)
 
 --- THE BRIEF ---
-$$BRIEF_JSON$$
+$$BRIEF_LINES$$
 
---- THE MATERIAL TO REPAIR (premise expansion as it stands) ---
-$$PREMISE_EXPANSION_JSON$$
+--- THE PREMISE AS IT STANDS ---
+$$PREMISE_JSON$$
 
---- THE AUDIT (fidelity check findings) ---
-$$FIDELITY_CHECK_JSON$$
+--- FINDINGS (fix these, and only these) ---
+$$FINDINGS_JSON$$
 
 --- USER KERNEL ---
 $$KERNEL$$

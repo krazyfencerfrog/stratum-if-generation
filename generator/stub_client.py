@@ -1,27 +1,41 @@
 """A model-free LlmClient for exercising the pipeline's plumbing.
 
 It recognizes each prompt by a distinctive phrase and returns a
-schema-valid canned answer, so `main.py` and `step4.py` can be run end to
-end (every step, every file, every loop) in seconds with no Ollama server.
-It proves that placeholders are filled, outputs parse, validators accept
-the documented shapes, repair loops fire and terminate, and step 4's
-bookkeeping (lines, nodes, exits, state, computed checks) holds together.
-It proves nothing about story quality.
+schema-valid canned answer built from the JSON sections of the prompt it
+was given, so `main.py` and `outline.py` can be run end to end (every
+step, every file, every loop) in seconds with no Ollama server. It proves
+that placeholders are filled, outputs parse, validators accept the
+documented shapes, the premise repair loop fires and terminates, rejected
+answers are re-asked with the complaint, the circuit-breaker fallback
+runs, and the outline loop's bookkeeping (lines, nodes, registers, graph
+checks) holds together. It proves nothing about story quality.
 
-Use it via dynamic_config:
+Use it with STRATUM_CLIENT=stub (main.py selects it; no dynamic_config.py
+is needed):
 
     STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt
 
+tests/test_plumbing.py runs every scenario below and asserts the graph
+invariants.
+
 Scenario knobs (environment variables):
 
-    STUB_PREMISE_HARD_ROUNDS=1   3.5v returns hard_issues this many times
-                                 before returning clean (tests 3.5r)
+    STUB_PREMISE_HARD_ROUNDS=1   3.5b invents a score the engine lacks and
+                                 3.5v reports it this many times (tests 3.5r)
     STUB_PREMISE_ALWAYS_HARD=1   3.5v never comes back clean (tests the halt)
-    STUB_SPINE_FLAGGED_ROUNDS=1  3.75v returns flagged this many times
-    STUB_BAD_NODE=N02            that node's first build carries a menu
-                                 interaction and an unreachable exit (tests
-                                 the computed checks and node repair)
-    STUB_REVIEW_FLAG_FIRST=1     4d flags the newest node on review round 0
+    STUB_BAD_CAST=1              3.5c's first answer leaves a crowd without a
+                                 representative (tests the informed retry)
+    STUB_BAD_PLAN=1              4a's first answer leaves a turn unplaced
+                                 (tests the informed retry)
+    STUB_SLOPPY=1                answers use beat names for ids, numbers as
+                                 strings, labels without their articles
+                                 (tests normalization)
+    STUB_ABORT=s4a               that step's thinking call reports a tripped
+                                 circuit breaker (tests the no-think fallback);
+                                 with STUB_ABORT_ALWAYS=1 its no-think call
+                                 does too (tests the stop)
+    STUB_NEW_CAST_ON=2           the line built on this iteration registers a
+                                 new character, a new crowd and a new place
     STUB_REJOIN_ON=3             the line built on this iteration rejoins the
                                  main line's ending node
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
@@ -33,6 +47,8 @@ import json
 import os
 import re
 from llm_client import LlmClient
+
+RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 
 def env_int(name, default):
@@ -47,16 +63,24 @@ class StubClient(LlmClient):
     def __init__(self):
         self.calls = []
         self.premise_verifies = 0
-        self.spine_verifies = 0
+        self.last_call = {}
 
     def run_prompt(self, prompt, **kwargs):
         kind = self.classify(prompt)
         self.calls.append(kind)
+        no_think = kwargs.get('think') is False
+        if os.environ.get('STUB_ABORT') == kind and (not no_think or env_int('STUB_ABORT_ALWAYS', 0)):
+            thinking = 'stub runaway reasoning. ' * 40
+            self.last_call = {'aborted': 'thinking_bytes', 'done_reason': None, 'format_sent': False}
+            print(f'[stub {kind}] (circuit breaker)')
+            return (thinking, '')
         handler = getattr(self, f'p_{kind}')
         answer = handler(prompt)
         text = answer if isinstance(answer, str) else json.dumps(answer, indent=2)
-        print(f'[stub {kind}]' + (' (no think)' if kwargs.get('think') is False else ''))
-        return (f'stub reasoning for {kind}', text)
+        self.last_call = {'aborted': None, 'done_reason': 'stop', 'format_sent': bool(kwargs.get('format')) and no_think,
+                          'prompt_tokens': len(prompt) // 4, 'output_tokens': len(text) // 4}
+        print(f'[stub {kind}]' + (' (no think)' if no_think else ''))
+        return ('' if no_think else f'stub reasoning for {kind}', text)
 
     # ------------------------------------------------------------------ routing
 
@@ -76,16 +100,14 @@ class StubClient(LlmClient):
             ('narrative setting analyst', 's3f'),
             ('interactivity-complexity analyst', 's3g'),
             ('You are a coherence auditor', 's3h'),
-            ('You are a premise builder', 's3_5'),
+            ('You are a premise builder', 's3_5a'),
+            ('You are the turn builder', 's3_5b'),
+            ('You are the cast-sketch step', 's3_5c'),
             ('You are a fidelity auditor', 's3_5v'),
-            ('You are the repair step for premise expansion', 's3_5r'),
-            ('You are the casting step', 's3_6'),
-            ('You are the world step', 's3_7'),
-            ('craft-spine construction step', 's3_75'),
-            ('verification step for 3.75', 's3_75v'),
-            ('repair step for the craft spine', 's3_75r'),
-            ('lays down the MAIN LINE', 's4a'),
-            ('You build ONE node of an interactive story', 's4b'),
+            ('You are the repair step for the premise', 's3_5r'),
+            ('You are the story-form step', 's3_8'),
+            ('You are step 4a', 's4a'),
+            ('You are step 4b', 's4b'),
             ('You are step 4c', 's4c'),
             ('You are step 4d', 's4d'),
         ]
@@ -95,19 +117,23 @@ class StubClient(LlmClient):
         raise ValueError('stub client does not recognize this prompt: ' + head[:200])
 
     @staticmethod
-    def section(prompt, marker):
-        """The JSON block that follows a '- marker' or '--- marker ---' line."""
-        i = -1
-        for form in ('\n- ' + marker, '\n--- ' + marker, marker):
-            i = prompt.find(form)
-            if i != -1:
-                break
+    def body(prompt):
+        """The prompt without the retry block main.py appends."""
+        i = prompt.find(RETRY_MARKER)
+        return prompt if i == -1 else prompt[:i]
+
+    @classmethod
+    def section(cls, prompt, marker):
+        """The JSON block that follows the LAST line containing `marker`
+        (inputs come after the examples in every prompt)."""
+        prompt = cls.body(prompt)
+        i = prompt.rfind(marker)
         if i == -1:
             return None
-        j = prompt.find('\n', i + 1)
+        j = prompt.find('\n', i)
         rest = prompt[j + 1:]
         m = re.search(r'[\[{]', rest)
-        if not m or rest[:m.start()].strip().startswith('none'):
+        if not m or rest[:m.start()].strip():
             return None
         start = m.start()
         depth = 0
@@ -136,12 +162,27 @@ class StubClient(LlmClient):
                         return None
         return None
 
-    @staticmethod
-    def text_after(prompt, marker):
+    @classmethod
+    def text_after(cls, prompt, marker):
+        prompt = cls.body(prompt)
         i = prompt.rfind(marker)
         if i == -1:
             return ''
         return prompt[i + len(marker):].strip()
+
+    @classmethod
+    def listed(cls, prompt, header, pattern=r'^\s*([A-Za-z]?\d+)\.\s'):
+        """Ids of the numbered lines under the last `header` line, up to the
+        next '---' header."""
+        prompt = cls.body(prompt)
+        i = prompt.rfind(header)
+        if i == -1:
+            return []
+        block = prompt[prompt.find('\n', i) + 1:]
+        end = block.find('\n---')
+        if end != -1:
+            block = block[:end]
+        return [m.group(1) for m in (re.match(pattern, line) for line in block.split('\n')) if m]
 
     # ------------------------------------------------------------------ s2
 
@@ -161,11 +202,13 @@ class StubClient(LlmClient):
             removed.append(m.group(0).strip())
             content = content.replace(m.group(0), '')
         linear = 'linear' in kernel.lower()
+        numbers = re.search(r'(\d+ or \d+|a dozen|\d+) (wildly different )?endings', kernel.lower())
         return {
+            'reading': 'stub: ' + ('; '.join(removed) or 'no shape clauses'),
             'content_kernel': content.strip() or kernel,
             'shape': {
                 'endings': {'tier': 'several' if 'ending' in kernel.lower() else 'unstated',
-                            'stated': ' / '.join(removed)},
+                            'stated': numbers.group(1) if numbers else ''},
                 'linearity': 'linear' if linear else ('branching' if removed else 'unstated'),
                 'choice_density': 'unstated',
                 'length': 'unstated',
@@ -253,308 +296,237 @@ class StubClient(LlmClient):
         return {"checks": checks, "primary_branch_source": {"source": "interactive_question", "rationale": "stub"},
                 "unresolved_for_next_phase": []}
 
-    # ------------------------------------------------------------------ 3.5 loop
+    # ------------------------------------------------------------------ 3.5
 
     VIOLATION = "a crew-trust score that rises with each favor and gates the manual override"
+    FIXED = "The council's warden quietly reroutes air to her own sector."
 
-    def premise(self, fixed=False):
-        complication = ("The council's warden quietly reroutes air to her own sector." if fixed else self.VIOLATION)
+    def p_s3_5a(self, p):
         return {
-            "enrichment_budget": {"level": "minimal", "reason": "stub"},
             "protagonist": {"who": "You are the ship's AI, present through cameras and drones.", "wants": "keep the core alive and the sectors breathing",
                             "can_do": "watch every sector, route air, open valves that have a drone at them",
                             "cannot_do": "vent a sector without the sector council's override code, or move a person",
-                            "provenance": "kernel_implied", "serves": "3-0b.protagonist_identity"},
-            "arena": {"description": "One generational ship, core amidships, four sectors around it.", "provenance": "kernel_stated", "serves": "3f.setting_structure"},
-            "pressure": {"description": "The core's margin falls each hour; every sector still breathing costs it.", "clock_or_stock": "core margin (stock), licensed by 3-0c resource_depletion",
-                         "provenance": "kernel_implied", "serves": "3-0c.failure_triggers"},
-            "opposition": {"who_or_what": "the sector council", "wants": "no sector vented, whatever the core costs", "means": "it holds the override codes and can lock the AI out of the valves",
-                           "provenance": "invented", "serves": "3c.core_thematic_axis"},
+                            "serves": "3-0b.protagonist_identity"},
+            "arena": {"description": "One generational ship, core amidships, four sectors around it.", "serves": "3f.setting_structure"},
+            "pressure": {"description": "The core's margin falls each hour; every sector still breathing costs it.",
+                         "clock_or_stock": "core margin (stock), licensed by 3-0c resource_depletion", "serves": "3-0c.failure_triggers"},
+            "opposition": {"who_or_what": "the sector council", "wants": "no sector vented, whatever the core costs",
+                           "means": "it holds the override codes and can lock the AI out of the valves", "serves": "3c.core_thematic_axis"},
             "mediation": {
                 "question": "Is the ship its people or its core?",
                 "to_reach_pole_a": {"pole": "fittest: vent", "what_you_must_do": "obtain a council override or a foreman's manual valve", "cost": "the council learns what you asked for"},
                 "to_reach_pole_b": {"pole": "collective: spare", "what_you_must_do": "find and reroute air the sectors are hiding", "cost": "the core margin falls faster"},
                 "levers": ["the council override codes", "the hydroponics scrubber feed", "the warden's private reroute"],
-                "provenance": "invented", "serves": "3-0a.primary_decision_axis"},
-            "turns": [
-                {"id": 1, "situation": "The nursery's air is short and the council will not say why.", "what_you_must_do": "find where the air is going",
-                 "ways_through": [{"way": "trace the ducts with a drone", "cost": "the drone is lost to the cold"}, {"way": "ask the warden", "cost": "she learns you suspect her"}],
-                 "involves": ["the nursery warden"], "form": "discover", "serves": "3-0a.primary_decision_axis"},
-                {"id": 2, "situation": "Hydroponics can feed the medical bay or itself, not both.", "what_you_must_do": "get the foreman to open the feed",
-                 "ways_through": [{"way": "promise his sector is never vented", "cost": "a promise you may break"}, {"way": "show him the medical bay", "cost": "hours of margin"}],
-                 "involves": ["the hydroponics foreman"], "form": "persuade", "serves": "3c.core_thematic_axis"},
-                {"id": 3, "situation": "The council offers the override for one sector of your choosing.", "what_you_must_do": "decide whom to tell",
-                 "ways_through": [{"way": "tell the sector first", "cost": "they barricade the valve"}, {"way": "tell no one", "cost": "you become the council's instrument"}],
-                 "involves": ["the council speaker", "the nursery warden"], "form": "conceal_or_reveal", "serves": "3c.core_thematic_axis"},
-            ],
-            "cast_seeds": [
-                {"role": "the nursery warden", "kind": "individual", "speaks_for": "the nursery families", "wants": "her sector spared", "holds": "a private reroute", "matters_to_turns": [1, 3], "provenance": "invented"},
-                {"role": "the hydroponics foreman", "kind": "individual", "speaks_for": None, "wants": "his scrubbers running", "holds": "the manual feed valve", "matters_to_turns": [2], "provenance": "invented"},
-                {"role": "the council speaker", "kind": "individual", "speaks_for": "the sector council", "wants": "the AI dependent on the council", "holds": "the override codes", "matters_to_turns": [3], "provenance": "invented"},
-                {"role": "the nursery families", "kind": "crowd", "speaks_for": None, "wants": "air", "holds": "the ship's sympathy", "matters_to_turns": [1], "provenance": "invented"},
-            ],
-            "complications": [{"description": complication, "serves": "3c.core_thematic_axis", "provenance": "invented"}],
-            "withheld": [{"item": "names", "reason": "left to casting"}],
-            "fidelity_check": [{"clause": "You play as the ship's AI.", "touched": True, "consistent": True}]
+                "serves": "3-0a.primary_decision_axis"},
         }
 
-    def p_s3_5(self, p):
-        return self.premise(fixed=False)
+    def p_s3_5b(self, p):
+        hard = env_int('STUB_PREMISE_HARD_ROUNDS', 0) > 0
+        return {
+            "turns": [
+                {"id": 1, "situation": "The nursery's air is short and the council will not say why.", "what_you_must_do": "find where the air is going",
+                 "ways_through": [{"way": "a drone traces the ducts", "cost": "the drone is lost to the cold"}, {"way": "the warden tells you", "cost": "she learns you suspect her"}],
+                 "involves": ["the nursery warden", "the nursery families"], "form": "discover", "serves": "3-0a.primary_decision_axis"},
+                {"id": 2, "situation": "Hydroponics can feed the medical bay or itself, not both.", "what_you_must_do": "get the foreman to open the feed",
+                 "ways_through": [{"way": "he opens it on your promise that his sector is never vented", "cost": "a promise you may break"}, {"way": "he opens it after seeing the medical bay", "cost": "hours of margin"}],
+                 "involves": ["the hydroponics foreman"], "form": "persuade", "serves": "3c.core_thematic_axis"},
+                {"id": 3, "situation": "The council offers the override for one sector of your choosing.", "what_you_must_do": "decide whom to tell",
+                 "ways_through": [{"way": "the sector hears first", "cost": "they barricade the valve"}, {"way": "nobody is told", "cost": "you become the council's instrument"}],
+                 "involves": ["the council speaker", "the nursery warden"], "form": "conceal_or_reveal", "serves": "3c.core_thematic_axis"},
+            ],
+            "complications": [{"description": self.VIOLATION if hard else self.FIXED, "serves": "3c.core_thematic_axis"}],
+        }
+
+    def p_s3_5c(self, p):
+        listed = self.text_after(p, 'ROLES THE TURNS NAME (one seed each, role copied exactly)').split('\n- the Kernel')[0]
+        roles = [m.group(1).strip() for m in re.finditer(r'^\s*- (.+)$', listed, re.M)]
+        bad = env_int('STUB_BAD_CAST', 0) and RETRY_MARKER not in p
+        known = {
+            "the nursery warden": ("individual", None if bad else "the nursery families", "her sector spared", "a private reroute", False),
+            "the nursery families": ("crowd", None, "air", "the ship's sympathy", False),
+            "the hydroponics foreman": ("individual", None, "his scrubbers running", "the manual feed valve", False),
+            "the council speaker": ("individual", "the sector council", "the AI dependent on the council", "the override codes", True),
+        }
+        seeds = []
+        for r in roles:
+            kind, speaks, wants, holds, opp = known.get(r, ("individual", None, "stub want", "stub holding", False))
+            seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds, "opposition": opp})
+        return {"notes": "stub", "cast_seeds": seeds}
 
     def p_s3_5v(self, p):
         self.premise_verifies += 1
-        hard_rounds = env_int('STUB_PREMISE_HARD_ROUNDS', 0)
-        material = self.section(p, 'CONSTRUCTED MATERIAL') or {}
+        clauses = self.listed(p, '--- LIST 1: KERNEL CLAUSES ---')
+        constraints = self.listed(p, '--- LIST 2: CONSTRAINTS ---')
+        engine = self.listed(p, '--- LIST 3: ENGINE CHECKS ---')
+        material = self.section(p, '--- THE PREMISE TO AUDIT ---') or {}
         has_meter = 'crew-trust score' in json.dumps(material)
-        hard = (has_meter and self.premise_verifies <= hard_rounds) or env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
-        findings = []
-        if hard:
-            findings.append({"status": "violation", "material": self.VIOLATION, "authorized_by": "",
-                             "severity": "hard", "note": "A reputation score the player watches; the engine has no such system."})
+        always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
+        hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         return {
-            "clause_findings": [{"clause": "You play as the ship's AI.", "touched": True, "contradiction": False, "quote": "", "severity": "", "note": "stub"}],
-            "constraint_findings": [],
-            "mechanic_findings": findings,
-            "engine_findings": [],
-            "self_report_disagreements": [],
-            "verdict": {"value": "hard_issues" if hard else "clean", "summary": "stub"}
+            "clauses": [{"n": int(n), "note": "stub: nothing incompatible", "contradiction": False, "quote": ""} for n in clauses],
+            "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": False, "quote": ""} for n in constraints],
+            "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
+                       for e in engine],
+            "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system."}]
+                          if hard else []),
         }
 
     def p_s3_5r(self, p):
-        current = self.section(p, 'THE MATERIAL TO REPAIR') or self.premise()
-        revised = json.loads(json.dumps(current))
-        revised['complications'] = self.premise(fixed=True)['complications']
         return {"repair_log": [{"finding": self.VIOLATION, "change": "replaced the score with a rerouting complication", "disagreement": ""}],
-                "revised": revised}
+                "revised": {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}}
 
-    # ------------------------------------------------------------------ 3.75 loop
+    # ------------------------------------------------------------------ 3.8
 
-    def spine(self, fixed=False):
-        return {
-            "invention_ceiling": {"source": "3.5.enrichment_budget", "level": "minimal", "note": "stub"},
-            "want_need_tension": {"want": {"pointer": "3.5.protagonist.wants", "restated": "keep the core alive"},
-                                  "need": {"description": "to be answerable to someone", "provenance": "invented",
-                                           "serves": "3b.secondary_affects: claustrophobic tension" if fixed else "3b.secondary_affects[1] moral complicity"},
-                                  "tension": "stub", "enacts_via": "colors how each turn is approached; advisory", "provenance": "invented", "serves": "3c.core_thematic_axis"},
-            "irony_mode": {"gap_available": False, "type": "situational", "note": "3-0b.epistemic_gap.present is false", "device": "stub", "resolution_note": "stub", "provenance": "invented", "serves": "3c.core_thematic_axis"},
-            "escalation_shape": {"pattern": "compounding", "mechanism": "stub", "transformation_note": None, "new_variable_required": False,
-                                 "state_note": "rides the core margin stock", "provenance": "invented", "serves": "3b.primary_trajectory, 3g.state_richness"},
-            "setup_payoff_pairs": [{"setup": "turn 1: the warden's private reroute", "payoff": "turn 3: the council's offer", "distance": "two turns", "reinforces": "want_need_tension, irony_mode",
-                                    "provenance": "invented", "serves": "3.5.turns: 1 (the nursery's air) and 3 (the council's offer)"}],
-            "motif": None
-        }
-
-    def p_s3_75(self, p):
-        return self.spine(fixed=False)
-
-    def p_s3_75v(self, p):
-        self.spine_verifies += 1
-        flagged_rounds = env_int('STUB_SPINE_FLAGGED_ROUNDS', 0)
-        material = self.section(p, 'the craft spine (3.75), the material to check') or {}
-        bad_cite = '[1]' in json.dumps(material)
-        flagged = bad_cite and self.spine_verifies <= flagged_rounds
-        return {
-            "clause_findings": [{"clause": "You play as the ship's AI.", "touched": True, "contradiction": False, "note": "stub"}],
-            "mechanic_findings": [
-                {"material": "want_need_tension.enacts_via", "authorized_by": "3-0a.primary_decision_axis", "verdict": "authorized", "note": "stub"},
-                {"material": "irony_mode", "authorized_by": "3-0b.epistemic_gap", "verdict": "authorized", "note": "gap_available matched present:false"},
-                {"material": "escalation_shape", "authorized_by": "3b.primary_trajectory, 3g.state_richness", "verdict": "authorized", "note": "matched escalating"},
-                {"material": "setup_payoff_pairs[0]", "authorized_by": "3.5.turns", "verdict": "authorized", "note": "stub"}
-            ],
-            "self_report_disagreements": ([{"material": "want_need_tension.need.serves", "claimed": "3b.secondary_affects[1] moral complicity",
-                                            "found": "index 1 does not exist; index 0 is claustrophobic tension"}] if flagged else []),
-            "verdict": {"value": "flagged" if flagged else "clean", "summary": "stub"}
-        }
-
-    def p_s3_75r(self, p):
-        return {"repair_log": [{"finding": "serves '3b.secondary_affects[1] moral complicity'", "change": "cite by label", "disagreement": ""}],
-                "revised": self.spine(fixed=True)}
-
-    # ------------------------------------------------------------------ 3.6 / 3.7
-
-    NAMES = ["Ilse Marrow", "Dov Kessler", "Speaker Quill", "Tamsin Reyes", "Oren Vale", "Petra Lund", "Hal Ondo"]
-
-    def p_s3_6(self, p):
-        premise = self.section(p, 'the premise (3.5)') or self.premise(fixed=True)
-        seeds = premise.get('cast_seeds') or []
-        chars, crowds = [], []
-        name_i = 0
-        for s in seeds:
-            if s.get('kind') == 'crowd':
-                crowds.append({"name": s['role'], "who": s.get('wants', ''), "representatives": []})
-                continue
-            name = self.NAMES[name_i % len(self.NAMES)]
-            name_i += 1
-            chars.append({"name": name, "role": s['role'], "speaks_for": s.get('speaks_for'),
-                          "wants": s.get('wants', ''), "holds": s.get('holds', ''), "stance": "wary",
-                          "moved_by": "being shown what the core costs", "voice": "clipped",
-                          "topics": ["the air", s.get('holds', 'the ship')], "matters_to_turns": s.get('matters_to_turns', [])})
-        for crowd in crowds:
-            reps = [c['name'] for c in chars if c.get('speaks_for') == crowd['name']]
-            if not reps:
-                reps = [chars[0]['name']] if chars else []
-                if chars:
-                    chars[0]['speaks_for'] = crowd['name']
-            crowd['representatives'] = reps
-        return {"protagonist_name": "AEGIS", "characters": chars, "crowds": crowds}
-
-    def p_s3_7(self, p):
-        cast = self.section(p, 'the cast (3.6)') or {}
-        names = [c['name'] for c in cast.get('characters', [])]
-        rooms = [
-            ("R01", "the core status bay", "where the margin is read", ["the margin readout", "the sector board"], ["R02", "R03", "R05"]),
-            ("R02", "the nursery deck", "the warden's sector", ["the crib alcoves", "the private reroute valve"], ["R01", "R04"]),
-            ("R03", "the hydroponics scrubber bay", "the foreman's feed valve", ["the scrubber racks", "the manual feed valve"], ["R01", "R04"]),
-            ("R04", "the medical bay", "where the air debt is visible", ["the cots", "the intake duct"], ["R02", "R03"]),
-            ("R05", "the council chamber", "where the override codes are kept", ["the code locker", "the speaker's desk"], ["R01", "R06"]),
-            ("R06", "the drone dock", "where drones are launched", ["the drone cradles"], ["R05"]),
-        ]
-        out = []
-        for i, (rid, name, purpose, fixtures, conns) in enumerate(rooms):
-            here = [names[i % len(names)]] if names and i in (1, 2, 4) else []
-            out.append({"id": rid, "name": name, "purpose": purpose, "fixtures": fixtures, "connections": conns,
-                        "usually_here": here, "protagonist_can": "watch through the camera; operate valves with a drone present"})
-        return {"protagonist_presence": {"how": "cameras in every room; two drones", "can_act_on": "valves and doors where a drone is", "cannot_act_on": "people"},
-                "rooms": out,
-                "levers_placed": [{"lever": "the council override codes", "where": "R05", "as": "a fixture"},
-                                  {"lever": "the hydroponics scrubber feed", "where": "R03", "as": "a fixture"},
-                                  {"lever": "the warden's private reroute", "where": "R02", "as": "a fixture"}]}
+    def p_s3_8(self, p):
+        candidates = self.section(p, '- CANDIDATES (choose one)') or []
+        ids = [c['id'] for c in candidates]
+        pick = 'fichtean_curve' if 'fichtean_curve' in ids else ids[0]
+        return {"reading": "stub: the story climbs through crises to one answer", "framework": pick,
+                "why": "stub (3b.primary_trajectory)", "modifier": "none", "modifier_why": ""}
 
     # ------------------------------------------------------------------ step 4
 
     def p_s4a(self, p):
-        cast = self.section(p, 'the cast (names, roles, wants, holds)') or {}
-        world = self.section(p, 'the world (rooms: id, name, purpose, who is usually there; how the protagonist is present)') or {}
-        names = [c['name'] for c in cast.get('characters', [])] or ["Ilse Marrow"]
-        rooms = [r['id'] for r in world.get('rooms', [])] or ["R01"]
-
-        def node(i, title, goal, turn, rs, cs, extra_open=False, ending=False):
-            nid = f"N{i:02d}"
-            exits = [] if ending else [{"id": f"{nid}.a", "summary": f"stub state of play after {title}", "leads_to": f"N{i + 1:02d}"}]
-            if extra_open and not ending:
-                exits.append({"id": f"{nid}.b", "summary": "a different conclusion nobody follows yet", "leads_to": None})
-            return {"id": nid, "title": title, "goal": goal, "turn_ref": turn, "rooms": rs, "characters": cs,
-                    "pressure": "the margin falls", "what_happens": f"stub: the player works toward {goal}",
-                    "exits": exits, "failure_exit": ({"trigger": "resource_depletion", "cost": "narrative_setback", "description": "the margin dips"} if i == 3 else None),
-                    "craft_note": "setup" if i == 2 else ("payoff" if i == 4 else "")}
-        nodes = [
-            node(1, "the alarm", "learn what the margin means", None, rooms[:1], names[:1]),
-            node(2, "the missing air", "find where the nursery's air goes", 1, rooms[1:2] or rooms[:1], names[:1], extra_open=True),
-            node(3, "the feed", "get the foreman to open the feed", 2, rooms[2:3] or rooms[:1], names[1:2] or names[:1]),
-            node(4, "the offer", "decide whom to tell about the override", 3, rooms[4:5] or rooms[:1], names[2:3] or names[:1]),
-            node(5, "the ruling", "live with what the ship has become", None, rooms[:1], names[:1], ending=True),
-        ]
-        return {"through_line": {"id": "T1", "title": "the keeper", "motivation": "keep everyone breathing, then keep the core",
+        fw = self.section(p, '- the framework and its beats') or {}
+        premise = self.section(p, '- the engine: protagonist') or {}
+        beats = fw.get('beats') or []
+        turns = [t['id'] for t in premise.get('turns') or []]
+        sloppy = env_int('STUB_SLOPPY', 0)
+        if env_int('STUB_BAD_PLAN', 0) and RETRY_MARKER not in p:
+            turns = turns[:-1]
+        entries = []
+        middle = beats[1:-1] if len(beats) > 2 else beats
+        queue = list(turns)
+        for i, b in enumerate(beats):
+            turn = None
+            if b in middle and queue:
+                turn = queue.pop(0)
+            entries.append({"beat": b['id'], "turn": turn, "way": 1 if turn is not None else None,
+                            "adapted": f"stub: {b['id']} in this story" + (f", playing turn {turn}" if turn is not None else '')})
+            if b is middle[-1]:
+                while queue:      # more turns than middle beats: double up on the last one
+                    turn = queue.pop(0)
+                    entries.append({"beat": b['id'], "turn": turn, "way": 1, "adapted": f"stub: {b['id']} again, playing turn {turn}"})
+        if sloppy and entries:
+            name = {'opening_crisis': 'Opening crisis', 'setup': 'Setup'}.get(entries[0]['beat'])
+            if name:
+                entries[0]['beat'] = name
+            for e in entries:
+                if e['turn'] is not None:
+                    e['turn'] = str(e['turn'])
+                else:
+                    e['way'] = 'null'
+        return {"through_line": {"title": "the keeper", "motivation": "keep everyone breathing, then keep the core",
                                  "strategy": "reroute rather than vent", "turning_point": "the council's offer"},
-                "nodes": nodes,
-                "ending": {"id": "E1", "title": "the strained collective", "summary": "everyone breathes, barely", "earned_by": "rerouting at every turn", "node": "N05"}}
+                "ending": {"title": "the strained collective", "summary": "everyone breathes, barely"},
+                "beats": entries, "skipped_beats": []}
+
+    PLACES = [("the core status bay", "a control space", "where the margin is read"),
+              ("the nursery deck", "an inhabited deck", "the warden's sector"),
+              ("the scrubber bay", "a work deck", "where the feed valve is"),
+              ("the council chamber", "a chamber", "where the override codes are kept")]
 
     def p_s4b(self, p):
-        outline = self.section(p, "this node's outline entry") or {}
-        entities = self.section(p, "this node's rooms (full definitions)") or {}
-        revision = self.section(p, 'REVISION (prior version')
-        nid = outline.get('id', 'N00')
-        bad = (os.environ.get('STUB_BAD_NODE') == nid) and not revision
-        rooms_out = []
-        set_vars = []
-        for r in entities.get('rooms') or [{"id": "R01", "fixtures": ["the margin readout"]}]:
-            fixtures = r.get('fixtures') or ["the readout"]
-            var = f"{nid.lower()}.{re.sub(r'[^a-z0-9]+', '_', fixtures[0].lower()).strip('_')}_examined"
-            interactions = [{"target": fixtures[0], "action": "examine", "requires": [], "result": "stub", "sets": [{"variable": var, "value": "true"}]}]
-            set_vars.append(var)
-            for ch in entities.get('characters') or []:
-                topic = (ch.get('topics') or ['the air'])[0]
-                cvar = f"char.{re.sub(r'[^a-z0-9]+', '_', ch['name'].lower())}.{nid.lower()}_talked"
-                interactions.append({"target": ch['name'], "action": f"talk:{topic}", "requires": [], "result": "stub", "sets": [{"variable": cvar, "value": "true"}]})
-                set_vars.append(cvar)
-            if bad:
-                interactions.append({"target": "the valve", "action": "choose whether to vent", "requires": [], "result": "stub menu", "sets": []})
-            rooms_out.append({"room": r.get('id'), "now": "as defined", "interactions": interactions})
-        exits = []
-        for i, ex in enumerate(outline.get('exits') or []):
-            when = [{"variable": set_vars[min(i, len(set_vars) - 1)], "value": "true"}] if set_vars else []
-            if bad and i == 0:
-                when = [{"variable": "never.set", "value": "true"}]
-            exits.append({"id": ex['id'], "when": when, "transition": "stub transition"})
-        shared = outline.get('shared_with') or []
-        variants = None
-        if shared or (revision and 'variant' in json.dumps(revision).lower()):
-            variants = [{"when": [{"variable": set_vars[0], "value": "true"}] if set_vars else [], "variant": "stub variant"}]
-        return {"id": nid, "arrival": "stub arrival" + (" (revised)" if revision else ""),
-                "rooms": rooms_out,
-                "characters": [{"name": ch['name'], "in_room": (rooms_out[0]['room'] if rooms_out else "R01"), "agenda": "stub", "moved_by": "stub"}
-                               for ch in entities.get('characters') or []],
-                "clock": None, "exits": exits,
-                "failure_exit": ({"reached_when": "the margin dips", "cost": outline['failure_exit']['cost'], "rendering": "stub"} if outline.get('failure_exit') else None),
-                "ending_variants": variants,
-                "design_note": "revised per findings" if revision else ""}
-
-    def p_s4c(self, p):
-        digest = self.section(p, 'the story so far') or {}
-        shape = self.section(p, 'shape targets (advisory) and iteration') or {}
-        it = int(re.search(r'This is iteration (\d+)', p).group(1))
-        if env_int('STUB_NOTHING_ON', 0) == it:
-            return {"status": "nothing_worth_building", "why": "stub: every candidate is a reskin", "through_line": None,
-                    "divergence": None, "modify_nodes": [], "new_nodes": [], "rejoins_at": None, "ending": None}
-        nodes = digest.get('nodes') or []
-        lines = digest.get('through_lines') or []
-        main_path = (lines[0].get('path') if lines else []) or [n['id'] for n in nodes]
-        tl = {"id": f"T{it}", "title": f"line {it}", "motivation": f"stub motivation {it}", "strategy": f"stub strategy {it}",
-              "differs_from": [{"through_line": l['id'], "how": "stub: different motivation"} for l in lines]}
-        if shape.get('linear'):
-            final = main_path[-1]
-            return {"status": "proposed", "why": "stub", "through_line": tl,
-                    "divergence": {"kind": "state_variant", "node": main_path[1] if len(main_path) > 1 else main_path[0], "exit_id": None,
-                                   "opportunity": "a second way of playing the same nodes", "how_the_shift_is_explained": "stub"},
-                    "modify_nodes": [{"id": main_path[1] if len(main_path) > 1 else main_path[0], "add": "an alternative the player can pursue", "add_exit": None}],
-                    "new_nodes": [], "rejoins_at": None,
-                    "ending": {"id": f"E{it}", "title": "stub variant ending", "summary": "stub", "earned_by": "stub", "node": final,
-                               "when": [{"variable": "stub.alt", "value": "true"}]}}
-        rejoin = env_int('STUB_REJOIN_ON', 0) == it
-        open_exits = digest.get('open_exits') or []
-        new_ids = [f"P{it}_N01"] if rejoin else [f"P{it}_N01", f"P{it}_N02"]
-        rooms = sorted({r for n in nodes for r in (n.get('rooms') or [])}) or ["R01"]
-        chars = sorted({c for n in nodes for c in (n.get('characters') or [])}) or []
-        new_nodes = []
-        for i, nid in enumerate(new_ids):
-            last = i == len(new_ids) - 1
-            exits = [] if (last and not rejoin) else [{"id": f"{nid}.a", "summary": "stub", "leads_to": (main_path[-1] if (last and rejoin) else new_ids[i + 1])}]
-            new_nodes.append({"id": nid, "title": f"stub node {nid}", "goal": "stub goal", "turn_ref": 3 if last else 2,
-                              "rooms": rooms[:2], "characters": chars[:1], "pressure": "stub", "what_happens": "stub",
-                              "exits": exits, "failure_exit": None, "craft_note": ""})
-        if open_exits:
-            oe = open_exits[0]
-            divergence = {"kind": "existing_exit", "node": oe['node'], "exit_id": oe['exit_id'], "opportunity": None,
-                          "how_the_shift_is_explained": "stub: the open exit shows the player something new"}
-            modify = []
-        else:
-            node = main_path[1] if len(main_path) > 1 else main_path[0]
-            divergence = {"kind": "new_opportunity", "node": node, "exit_id": None,
-                          "opportunity": "the speaker makes an offer", "how_the_shift_is_explained": "stub"}
-            modify = [{"id": node, "add": "the speaker's offer", "add_exit": {"id": f"{node}.z{it}", "summary": "you took the offer", "leads_to": new_ids[0]}}]
-        return {"status": "proposed", "why": "stub", "through_line": tl, "divergence": divergence,
-                "modify_nodes": modify, "new_nodes": new_nodes, "rejoins_at": (main_path[-1] if rejoin else None),
-                "ending": {"id": f"E{it}", "title": f"stub ending {it}", "summary": "stub", "earned_by": "stub",
-                           "node": (main_path[-1] if rejoin else new_ids[-1]), "when": None}}
+        packet = self.section(p, '- the line, what has already been told, and the nodes to fill') or {}
+        register = self.section(p, '- the registers so far') or {}
+        line_id = (packet.get('line') or {}).get('id', 'T1')
+        it = int(re.sub(r'\D', '', line_id) or 1)
+        sloppy = env_int('STUB_SLOPPY', 0)
+        labels = [c['label'] for c in register.get('characters') or [] if c.get('kind') != 'crowd']
+        known_places = {l['name'] for l in register.get('locations') or []}
+        nodes, new_locations, new_characters = [], [], []
+        declared = set()
+        extra = env_int('STUB_NEW_CAST_ON', 0) == it
+        for i, n in enumerate(packet.get('nodes_to_fill') or []):
+            place = self.PLACES[(i + it) % len(self.PLACES)]
+            if place[0] not in known_places and place[0] not in declared:
+                new_locations.append({"name": place[0], "kind": place[1], "why": place[2]})
+                declared.add(place[0])
+            who = list((n.get('turn') or {}).get('involves') or [])
+            if not who and labels:
+                who = [labels[(i + it) % len(labels)]]
+            if sloppy:
+                who = [re.sub(r'^the ', '', w) for w in who]
+            nodes.append({"id": n['id'], "title": f"stub {n['id']}", "summary": f"stub summary: {n.get('plan', '')}",
+                          "where": [place[0].upper() if sloppy else place[0]], "who": who})
+        if extra and nodes:
+            new_characters = [
+                {"label": "the drone technician", "kind": "individual", "speaks_for": "the dock crew", "wants": "her drones back", "holds": "the drone cradles", "why": "stub: someone has to launch the drone"},
+                {"label": "the dock crew", "kind": "crowd", "speaks_for": None, "wants": "overtime", "holds": "the dock", "why": "stub"},
+            ]
+            new_locations.append({"name": "the drone dock", "kind": "a work deck", "why": "where drones are launched"})
+            nodes[0]['where'] = ["the drone dock"]
+            nodes[0]['who'] = ["the dock crew"]     # a crowd alone: the driver adds its voice
+        return {"nodes": nodes, "new_locations": new_locations, "new_characters": new_characters}
 
     def p_s4d(self, p):
-        this = self.section(p, 'this iteration') or {}
-        shape = self.section(p, 'shape targets (advisory)') or {}
-        it, rnd = this.get('iteration', 1), this.get('review_round', 0)
-        flag = rnd == 0 and env_int('STUB_REVIEW_FLAG_FIRST', 0)
-        new_nodes = this.get('new_node_ids') or []
-        built = shape.get('through_lines_built', it)
-        target = shape.get('through_lines', 3)
+        counts = self.section(p, '- counts and where a line may leave') or {}
+        hooks = (self.section(p, '- ways through a turn that no line has taken') or {}).get('unused_ways') or []
+        built = counts.get('lines_built', 1)
+        target = counts.get('lines_the_kernel_suggests', 3)
+        valid = counts.get('valid_divergence_nodes') or []
         stop_after = env_int('STUB_STOP_AFTER', 0)
-        stop = (stop_after and it >= stop_after) or (not stop_after and built >= target)
+        stop = (stop_after and built >= stop_after) or (not stop_after and built >= target) or not valid
+        if stop:
+            return {"assessment": "stub: every remaining candidate is a reskin", "recommendation": "stop", "seed": None}
+        usable = [h for h in hooks if h['node'] in valid]
+        at = usable[(built - 1) % len(usable)]['node'] if usable else valid[min(built, len(valid) - 1)]
+        return {"assessment": "stub: one answer to the question is still unbuilt", "recommendation": "continue",
+                "seed": {"motivation": f"stub motivation {built + 1}", "strategy": f"stub strategy {built + 1}",
+                         "diverges_at": at, "trigger": "you told the sector first", "why_different": "stub: a different price"}}
+
+    def p_s4c(self, p):
+        digest = self.section(p, '- the story so far (one entry per node)') or {}
+        fw = self.section(p, '- the framework and its beats') or {}
+        premise = self.section(p, '- the engine: protagonist') or {}
+        seed = self.section(p, '- THE SEED for this line') or {}
+        hooks = (self.section(p, '- ways through a turn that no line has taken') or {}).get('unused_ways') or []
+        it = int(re.search(r'This is iteration (\d+)', p).group(1))
+        linear = 'LINEAR SHAPE' in self.body(p)
+        if env_int('STUB_NOTHING_ON', 0) == it:
+            return {"status": "nothing_worth_building", "why": "stub: the seed is a reskin", "through_line": None,
+                    "divergence": None, "ending": None, "beats": [], "skipped_beats": [], "rejoins_at": None}
+        beat_ids = [b['id'] for b in fw.get('beats') or []]
+        required = [b['id'] for b in fw.get('beats') or [] if b.get('required', True)]
+        nodes = {n['id']: n for n in digest.get('nodes') or []}
+        lines = digest.get('lines') or []
+        at = seed.get('diverges_at')
+        parent = next(l for l in lines if at in l['path'])
+        prefix = parent['path'][:parent['path'].index(at) + 1]
+        taken = [nodes[x]['turn'] for x in prefix if nodes[x].get('turn') is not None]
+        remaining = [t['id'] for t in premise.get('turns') or [] if t['id'] not in taken and (not taken or t['id'] > max(taken))]
+        at_index = beat_ids.index(nodes[at]['beat'])
+        later = beat_ids[at_index + 1:] or beat_ids[-1:]
+        rejoin = None
+        if linear:
+            new_beats = [beat_ids[-1]]
+        elif env_int('STUB_REJOIN_ON', 0) == it:
+            new_beats = later[:1]
+            rejoin = lines[0]['path'][-1]
+            if rejoin in prefix or beat_ids.index(nodes[rejoin]['beat']) < beat_ids.index(new_beats[-1]):
+                rejoin = None
+        else:
+            new_beats = later
+        entries = []
+        for b in new_beats:
+            turn = remaining.pop(0) if remaining and (b != beat_ids[-1] or len(new_beats) == 1) and not linear else None
+            entries.append({"beat": b, "turn": turn, "way": (2 if turn is not None else None),
+                            "adapted": f"stub: {b} on line T{it}" + (f", playing turn {turn}" if turn is not None else '')})
+        covered = {nodes[x]['beat'] for x in prefix} | {e['beat'] for e in entries}
+        if rejoin:
+            covered.add(nodes[rejoin]['beat'])
+        skipped = [{"beat": b, "reason": "stub: the line does not pass through it"} for b in required if b not in covered]
+        hook = next((h for h in hooks if h['node'] == at), None)
         return {
-            "earned_choices": {"verdict": "flagged" if flag else "clean",
-                               "findings": ([{"issue": "stub: the exit is reached by watching", "node_ids": new_nodes[-1:], "fix": "add an act that earns it"}] if flag else [])},
-            "continuity": {"verdict": "clean", "findings": []},
-            "cast_and_rooms": {"verdict": "clean", "findings": []},
-            "through_line_novelty": {"verdict": "clean", "lines": [{"id": f"T{i}", "device": "stub"} for i in range(1, built + 1)], "findings": []},
-            "pacing": {"verdict": "clean", "note": "stub", "findings": []},
-            "termination": {"through_lines_built": built, "target": target,
-                            "next_seed": (None if stop else {"motivation": "stub next motivation", "strategy": "stub", "diverges_at": "N02", "why_worth_building": "stub"}),
-                            "recommendation": "stop" if stop else "continue", "reasoning": "stub"}
+            "status": "proposed", "why": "stub: the seed holds",
+            "through_line": {"title": f"line {it}", "motivation": seed.get('motivation', 'stub'), "strategy": seed.get('strategy', 'stub'),
+                             "turning_point": "stub", "differs_from": "stub: a different answer at a different price"},
+            "divergence": {"diverges_at": at, "trigger": seed.get('trigger', 'you told the sector first'),
+                           "trigger_kind": "accumulated" if linear else "act",
+                           "way": hook['way'] if hook else None,
+                           "instead_of": "you told no one",
+                           "opportunity": None if hook else "the speaker makes a private offer",
+                           "shift": "stub: what you learn there changes what you want"},
+            "ending": {"title": f"stub ending {it}", "summary": f"stub: line {it} ends differently"},
+            "beats": entries, "skipped_beats": skipped, "rejoins_at": rejoin,
         }

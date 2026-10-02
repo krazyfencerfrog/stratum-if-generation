@@ -1,0 +1,123 @@
+{
+  "_about": "The story-framework library the outline loop scaffolds on. Each framework is a short ordered list of BEATS; a beat has a job (what it does for the story), not content. generator/frameworks.py scores these against the brief to produce a shortlist; prompts/s3_8_story_form.prompt picks one; step 4 tags every node with a beat id. Long frameworks are condensed to at most eight beats so one beat is one or two nodes. 'required': false marks a beat a line may leave out without giving a reason. Editing a job line changes prompt text; adding or renaming a beat id changes the stub and any saved story.",
+  "frameworks": [
+    {
+      "id": "three_act",
+      "name": "Three-act structure",
+      "shape": "a want is disturbed, pursued through complications that reverse at the midpoint and bottom out in a crisis, then settled in one decisive confrontation",
+      "beats": [
+        {"id": "setup", "name": "Setup", "job": "the protagonist's situation and want before the disturbance, shown through something they do", "required": true},
+        {"id": "inciting_incident", "name": "Inciting incident", "job": "the disturbance that makes the want urgent and the old way of getting by impossible", "required": true},
+        {"id": "commitment", "name": "Commitment", "job": "the protagonist commits to one way of pursuing the want; from here there is no going back to the setup", "required": true},
+        {"id": "midpoint", "name": "Midpoint", "job": "a reversal or revelation that changes what the pursuit means or what it will cost", "required": true},
+        {"id": "crisis", "name": "Crisis", "job": "the low point: the chosen way fails or its price comes due, and the opposition has the upper hand", "required": true},
+        {"id": "climax", "name": "Climax", "job": "the decisive confrontation, where the story's question is answered by what the protagonist does", "required": true},
+        {"id": "resolution", "name": "Resolution", "job": "the new state of things: what the answer cost and what it left", "required": true}
+      ]
+    },
+    {
+      "id": "freytag",
+      "name": "Five-part dramatic arc (Freytag)",
+      "shape": "fortunes rise to a reversal at the center and then unwind to a catastrophe or release that the reversal made inevitable",
+      "beats": [
+        {"id": "exposition", "name": "Exposition", "job": "the protagonist's standing, what they are owed or want, and the first sign of the force against them", "required": true},
+        {"id": "rising_action", "name": "Rising action", "job": "the protagonist advances; each gain commits them further and narrows what they can still do", "required": true},
+        {"id": "reversal", "name": "Reversal", "job": "the center of the story: the protagonist's fortunes reverse on something they themselves do; after this the ending is in motion", "required": true},
+        {"id": "falling_action", "name": "Falling action", "job": "the consequences of the reversal unwind, with one last moment where it might still go otherwise", "required": true},
+        {"id": "denouement", "name": "Catastrophe or release", "job": "the end the reversal made inevitable, and who is left standing in it", "required": true}
+      ]
+    },
+    {
+      "id": "heros_journey",
+      "name": "Hero's journey (condensed)",
+      "shape": "the protagonist leaves a known world for an unknown one, is remade by an ordeal there, and returns changed",
+      "beats": [
+        {"id": "ordinary_world", "name": "Ordinary world", "job": "the known world and the protagonist's place in it, with what is missing from it", "required": true},
+        {"id": "call", "name": "The call", "job": "what is asked of the protagonist, and why they would rather not", "required": true},
+        {"id": "threshold", "name": "Crossing the threshold", "job": "the protagonist enters the unfamiliar world; its rules are not the ones they know", "required": true},
+        {"id": "trials", "name": "Trials", "job": "tests, allies and enemies; the protagonist learns how the unfamiliar world works and what it wants from them", "required": true},
+        {"id": "ordeal", "name": "The ordeal", "job": "the central crisis: the protagonist faces losing what they most fear to lose", "required": true},
+        {"id": "reward", "name": "The reward", "job": "what the ordeal wins, and what it cost to win it", "required": true},
+        {"id": "road_back", "name": "The road back", "job": "the consequence follows them toward home: a pursuit, a debt, a price still unpaid", "required": false},
+        {"id": "return", "name": "Return", "job": "home again, changed: what the protagonist brings back and what no longer fits", "required": true}
+      ]
+    },
+    {
+      "id": "save_the_cat",
+      "name": "Save the Cat (condensed)",
+      "shape": "the premise delivers what it promised, a false victory or defeat at the midpoint raises the stakes, everything is lost, and the finale mirrors the opening",
+      "beats": [
+        {"id": "opening_image", "name": "Opening image", "job": "a snapshot of the protagonist's life before; the last beat will mirror it", "required": true},
+        {"id": "catalyst", "name": "Catalyst", "job": "the event that knocks the protagonist out of that life", "required": true},
+        {"id": "debate", "name": "Debate", "job": "the protagonist weighs the cost of acting, then steps into the new situation", "required": false},
+        {"id": "promise_of_premise", "name": "Promise of the premise", "job": "the story delivers what its premise promised: the protagonist at work in the new situation, with things going partly right", "required": true},
+        {"id": "midpoint", "name": "Midpoint", "job": "a false victory or a false defeat that raises the stakes", "required": true},
+        {"id": "closing_in", "name": "Closing in", "job": "the opposition regroups and presses; allies fray; what worked stops working", "required": true},
+        {"id": "all_is_lost", "name": "All is lost", "job": "the lowest point, and the hard look at why", "required": true},
+        {"id": "finale", "name": "Finale", "job": "the protagonist acts on what the low point taught them; the closing image mirrors the opening one", "required": true}
+      ]
+    },
+    {
+      "id": "fichtean_curve",
+      "name": "Fichtean curve",
+      "shape": "the story opens inside the first crisis and climbs through crises of different kinds to a climax, with almost no preamble and a short aftermath",
+      "beats": [
+        {"id": "opening_crisis", "name": "Opening crisis", "job": "the story opens inside the first crisis; who the protagonist is and what is at stake are shown by how it is met", "required": true},
+        {"id": "second_crisis", "name": "Second crisis", "job": "a worse crisis, different in kind; what the first one spent or revealed shapes it", "required": true},
+        {"id": "third_crisis", "name": "Third crisis", "job": "the price of the earlier ways through comes due, and the opposition makes its strongest move", "required": true},
+        {"id": "climax", "name": "Climax", "job": "the last crisis, where the story's question is answered by what the protagonist does", "required": true},
+        {"id": "aftermath", "name": "Aftermath", "job": "brief: what is left, and what it cost", "required": true}
+      ]
+    },
+    {
+      "id": "seven_point",
+      "name": "Seven-point structure",
+      "shape": "the story runs from a hook to its opposite, driven by two turns and tightened by two pinches around a midpoint where the protagonist stops reacting",
+      "beats": [
+        {"id": "hook", "name": "Hook", "job": "the starting state, chosen as the opposite of where the story ends", "required": true},
+        {"id": "plot_turn_1", "name": "First plot turn", "job": "the conflict arrives and the protagonist is pulled into it", "required": true},
+        {"id": "pinch_1", "name": "First pinch", "job": "pressure: the opposition shows what it can do, and the protagonist must act without the help they counted on", "required": true},
+        {"id": "midpoint", "name": "Midpoint", "job": "the protagonist stops reacting and starts acting on a plan of their own", "required": true},
+        {"id": "pinch_2", "name": "Second pinch", "job": "the worst pressure: the plan fails, or an ally or a lever is lost", "required": true},
+        {"id": "plot_turn_2", "name": "Second plot turn", "job": "the last piece: the protagonist obtains or understands what makes the ending possible", "required": false},
+        {"id": "resolution", "name": "Resolution", "job": "the conflict is settled; the end state answers the hook", "required": true}
+      ]
+    },
+    {
+      "id": "story_circle",
+      "name": "Story circle",
+      "shape": "the protagonist leaves comfort for something they need, gets it at a price, and comes back to where they started as someone else",
+      "beats": [
+        {"id": "comfort", "name": "Comfort", "job": "the protagonist in a place of comfort or routine", "required": true},
+        {"id": "need", "name": "Need", "job": "something is missing or wanted, and it will not come to them", "required": true},
+        {"id": "go", "name": "Go", "job": "they enter an unfamiliar situation to get it", "required": true},
+        {"id": "search", "name": "Search", "job": "they adapt to it by trial and error", "required": true},
+        {"id": "find", "name": "Find", "job": "they get what they wanted", "required": true},
+        {"id": "take", "name": "Take", "job": "and pay a heavy price for it", "required": true},
+        {"id": "return", "name": "Return", "job": "they go back to where they started", "required": false},
+        {"id": "change", "name": "Change", "job": "the same place, seen by someone who has changed", "required": true}
+      ]
+    },
+    {
+      "id": "kishotenketsu",
+      "name": "Kishotenketsu",
+      "shape": "a situation is introduced and deepened without conflict, an unexpected element recasts it, and the two are reconciled",
+      "beats": [
+        {"id": "ki", "name": "Introduction (ki)", "job": "the people and the place at rest: what an ordinary day here is", "required": true},
+        {"id": "sho", "name": "Development (sho)", "job": "the same situation, deepened: more of what was introduced, with no new conflict required", "required": true},
+        {"id": "ten", "name": "Turn (ten)", "job": "an unexpected element or viewpoint that recasts what came before", "required": true},
+        {"id": "ketsu", "name": "Reconciliation (ketsu)", "job": "the turn and the earlier material are brought together into a new whole", "required": true}
+      ]
+    }
+  ],
+  "modifiers": [
+    {"id": "none", "name": "no modifier", "effect": ""},
+    {"id": "in_medias_res", "name": "In medias res", "effect": "Open inside the first premise turn's situation and fold the first beat's job into it; what the first beat would have shown arrives through what people do and say under pressure."},
+    {"id": "countdown", "name": "Countdown", "effect": "Every beat says what the premise's clock or stock has taken since the last one; the final beats happen with it nearly gone."},
+    {"id": "frame", "name": "Frame", "effect": "The first and last beats stand outside the main action (another time or another viewpoint the brief licenses) and the last one answers the first."},
+    {"id": "braided_timelines", "name": "Braided timelines", "effect": "The beats alternate between the timelines the brief names; each beat in one timeline changes how the next beat in the other one reads."},
+    {"id": "loop", "name": "Loop", "effect": "The beats are passes through the same span of time; each pass repeats the last with one thing changed, and the final beat breaks or accepts the loop."},
+    {"id": "episodic", "name": "Episodic middle", "effect": "Each middle beat is a self-contained instance of the story's recurring decision with its own small ending; what carries across them is what the protagonist is becoming."},
+    {"id": "relay", "name": "Relay", "effect": "The viewpoint passes between the protagonists the brief names; each beat belongs to one of them and hands something on to the next."}
+  ]
+}

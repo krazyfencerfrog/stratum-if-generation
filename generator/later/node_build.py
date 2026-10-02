@@ -1,3 +1,36 @@
+# =====================================================================
+# LATER-STAGE MATERIAL (stage D: the per-node room build). NOT RUN.
+# =====================================================================
+# This is generator/step4.py as it stood on 2026-09-29, moved here whole
+# when the outline loop (generator/outline.py) replaced it. Nothing
+# imports it. It is kept because it is good work done at the wrong time:
+# when stage D is built (docs/later_stages.md, section D) these are the
+# parts to lift, in this order:
+#
+#   normalize_writes()            tolerant parser for requires / sets / when
+#   Step4Builder.node_validator   shape check for one built node
+#   Step4Builder.node_packet,     the per-node input packet (to be rebuilt
+#     previous_context,           from <id>_story.json: the node's summary
+#     next_context                and expansion, its locations' rooms, its
+#                                 characters' packets, its outgoing triggers)
+#   rebuild_state_registry,       the state registry, recomputed from every
+#     register_state,             built node so a repaired node's variables
+#     touch_variable, writes_of   do not linger
+#   mechanical_checks()           exit reachability, reads before writes,
+#                                 outline/build mismatches, menu interactions
+#   repair_nodes, collect_findings  node rebuild from a finding list
+#   story_markdown()              rendering of built nodes
+#
+# What does NOT carry over: main_line / divergence / apply_divergence and
+# the review loop (the outline loop owns lines now), and the outline's
+# `exits` with leads_to (edges and plain-language triggers live in the
+# story document; stage D turns each trigger into a `when` condition and
+# writes it to edge.trigger.formal).
+#
+# Prompts that go with this file: prompts/later/sD_node_build.prompt and
+# prompts/later/sD_review.prompt. The stub handlers that answered them are
+# in generator/later/stub_handlers_2026_09_29.py (p_s4b, p_s4d).
+# =====================================================================
 """Step 4: the story-line build-out for a room-based engine.
 
 The unit of story is a NODE: a section of play in a subset of the world's

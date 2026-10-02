@@ -9,42 +9,64 @@ that decides how many story lines to build, and there they are a soft
 target, not a specification.
 
 SHAPE clauses are the ones that state or imply:
- - how many endings ("6 or 7 endings", "a dozen endings", "one ending")
- - how many paths, branches, forks or choices ("lots of branching paths",
-   "a choice on every page", "keep it linear", "no real forks")
+ - how many endings ("four or five endings", "twenty endings", "a single
+   ending")
+ - how many paths, branches, forks or choices ("plenty of forks", "a
+   choice on every page", "one road only", "nothing that splits")
  - how long the story is ("short", "an evening's play", "epic length")
 
 Everything else is CONTENT, including: genre, setting, protagonist, theme,
 tone, rating, what the decisions are about, what must happen no matter
-what, what the endings depend on ("depending on how the case plays out",
-"the player's choices decide who else goes down with them"), viewpoint,
-time structure, and any named form ("a 5-act tragedy", "a chamber piece").
-A named form is content: it says what kind of story this is, not how many
-endings to build.
+what, what the outcome depends on ("depending on what the jury heard",
+"the player decides who gets the blame"), viewpoint, time structure, and
+any named form ("a one-act farce", "a chamber piece"). A named form is
+content: it says what kind of story this is, not how many endings to
+build.
 
 RULES
  1. content_kernel is the Kernel with only the SHAPE clauses removed. Keep
     every other word exactly as written: do not paraphrase, reorder,
     improve, summarize or add. If a sentence mixes shape and content, cut
-    only the shape words and leave a grammatical sentence. If nothing in
-    the Kernel is a shape clause, content_kernel is the Kernel verbatim.
- 2. shape records what was removed as coarse tiers. A stated number is
-    kept in "stated" for the record; later steps read only the tier.
-      endings:        one | few | several | many | unstated
-                      (few = 2-3, several = 4-6, many = 7 or more; a wish
-                      for varied endings with no number is "several")
+    only the shape words and leave a grammatical sentence (fix the
+    capital letter and the punctuation at the cut, nothing else). If
+    nothing in the Kernel is a shape clause, content_kernel is the Kernel
+    verbatim.
+ 2. shape records the Kernel's shape preferences as coarse tiers:
+      endings.tier:   one | few | several | many | unstated
+                      (few: two or three, "a couple"; several: four to
+                      six, or varied endings with no number; many: seven
+                      or more, "dozens", "tons of")
+      endings.stated: the Kernel's own words about how many endings, copied
+                      as written ("four or five", "at least five"); "" if
+                      it gives no count and does not say there are
+                      several. When those words contain a number the
+                      pipeline works the tier out from the number itself,
+                      so give your best tier and do not weigh a boundary.
       linearity:      linear | branching | unstated
+                      ("plenty of forks" is branching; it says nothing
+                      about choice_density)
       choice_density: sparse | moderate | dense | unstated
+                      (how often the player is asked to choose: "a choice
+                      on every page" is dense, "only a few big decisions"
+                      is sparse)
       length:         short | medium | long | unstated
- 3. A preference the Kernel does not state is "unstated". Never infer one
+                      ("an evening's play" is short; "epic length" is
+                      long)
+ 3. A clause that says what the outcome DEPENDS on is content and stays.
+    It sets endings.tier only if it also says outright that there is more
+    than one ending ("different endings depending on ..." is several, and
+    the words "different endings" are the shape part).
+ 4. A preference the Kernel does not state is "unstated". Never infer one
     from genre or from the other preferences.
 
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or
-after:
+after. "reading" comes first: one or two sentences naming each shape
+clause you found, or saying there are none.
 
 {
+  "reading": "...",
   "content_kernel": "...",
   "shape": {
     "endings": { "tier": "...", "stated": "..." },
@@ -61,6 +83,7 @@ Kernel: "A haunted-lighthouse story with at least five endings and a choice
 on every page. You're the new keeper. Keep it PG."
 Output:
 {
+  "reading": "Two shape clauses: 'with at least five endings' (ending count) and 'and a choice on every page' (choice density). The rest is content.",
   "content_kernel": "A haunted-lighthouse story. You're the new keeper. Keep it PG.",
   "shape": {
     "endings": { "tier": "several", "stated": "at least five" },
@@ -71,26 +94,29 @@ Output:
   }
 }
 
-Kernel: "A courtroom drama. Keep it strictly linear, one road through, but
-the verdict should vary with what the jury heard."
+Kernel: "A river journey downstream to the sea, second person, melancholy.
+One road only, please: I want a single continuous trip, something for one
+evening."
 Output:
 {
-  "content_kernel": "A courtroom drama. The verdict should vary with what the jury heard.",
+  "reading": "Two shape clauses: 'One road only, please: I want a single continuous trip' (linearity) and 'something for one evening' (length). Nothing is said about endings.",
+  "content_kernel": "A river journey downstream to the sea, second person, melancholy.",
   "shape": {
-    "endings": { "tier": "several", "stated": "the verdict should vary" },
+    "endings": { "tier": "unstated", "stated": "" },
     "linearity": "linear",
     "choice_density": "unstated",
-    "length": "unstated",
-    "removed_clauses": ["Keep it strictly linear, one road through, but"]
+    "length": "short",
+    "removed_clauses": ["One road only, please: I want a single continuous trip", "something for one evening"]
   }
 }
 
-Kernel: "An interactive 5-act tragedy about a dethroned queen. It must end
-badly for her no matter what; the player only decides who she takes down
-with her."
+Kernel: "A one-act farce set in a hotel kitchen during a health
+inspection. Everything that can go wrong should, and whether the hotel
+keeps its licence depends on what the inspector actually sees."
 Output:
 {
-  "content_kernel": "An interactive 5-act tragedy about a dethroned queen. It must end badly for her no matter what; the player only decides who she takes down with her.",
+  "reading": "No shape clauses. 'One-act farce' is a named form and stays; what the licence depends on is content and does not say there are several endings.",
+  "content_kernel": "A one-act farce set in a hotel kitchen during a health inspection. Everything that can go wrong should, and whether the hotel keeps its licence depends on what the inspector actually sees.",
   "shape": {
     "endings": { "tier": "unstated", "stated": "" },
     "linearity": "unstated",
@@ -99,12 +125,6 @@ Output:
     "removed_clauses": []
   }
 }
-(The fixed bad ending and what the player decides are content; "5-act" is a
-named form and stays.)
-
-REASONING DISCIPLINE
-Decide clause by clause, once, then write the JSON once. Do not draft the
-JSON in your reasoning.
 
 USER INPUT FOLLOWS BELOW
 

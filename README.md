@@ -2,12 +2,17 @@
 story/content generator for the stratum-if engine
 
 A user supplies a short story premise (a kernel); a multi-step pipeline of
-local-LLM prompts analyzes it, builds a premise with a real obstacle, names a
-cast and draws a room map, and then lays down story lines (a main line, then
-one divergent line per iteration) as nodes: sections of play in a subset of
-rooms, with exits reached through what the player did. See
-`docs/step4_design.md` for the current pipeline and `CLAUDE.md` for the file
-conventions.
+local-LLM prompts analyzes it, builds a premise with a real obstacle, chooses
+a story framework, and then outlines the story one line at a time (a main
+line, then lines that leave it and end differently). The result is a story
+graph: nodes with short summaries, where and who; plain-language branch
+triggers; and rough character and location registers. See
+`docs/outline_design.md` for the pipeline, `docs/fable_response_4.md` for why
+it has this shape, and `CLAUDE.md` for the file conventions.
+
+Everything runs on a local model through Ollama. The stages after the outline
+(beat expansion, character and setting buildout, reconciliation, per-node room
+build) are designed in `docs/later_stages.md` and not yet built.
 
 ## Setup
 
@@ -16,23 +21,40 @@ python -m venv .env
 pip install -e .
 ```
 
-Create `generator/dynamic_config.py` (not committed) that returns the LLM
-client, e.g.
+Create `generator/dynamic_config.py` (gitignored) that returns the LLM client:
 
 ```python
-import os
 from ollama_client import OllamaClient
 
 def get_client():
-    if os.environ.get("STRATUM_CLIENT") == "stub":
-        from stub_client import StubClient      # model-free plumbing test
-        return StubClient()
-    return OllamaClient(model=os.environ.get("STRATUM_MODEL", "qwen3:8b"),
-                        options={"num_ctx": 32768})
+    return OllamaClient(host="http://localhost:11434",
+                        model="qwen3.8_27b_q5-128k",
+                        keep_alive="30m",
+                        idle_timeout=180,
+                        max_duration=14400,
+                        echo=True,
+                        options={"num_ctx": 32768},
+                        structured="no_think")
 ```
 
-`num_ctx` matters: the later prompts carry 8–12k tokens of instructions and
-upstream JSON, and an Ollama server at its default window truncates silently.
+- `options={"num_ctx": 32768}`: the largest prompt is about 13k tokens and
+  the largest allowed output about 14k, so 32k is enough for every call. A
+  much larger window costs memory the model's layers could have used; too
+  small a window truncates the prompt silently. `python probe_ollama.py
+  --ctx-test 32768` measures the difference on your machine.
+- `structured`: `"no_think"` sends JSON schemas only on calls that run with
+  thinking off. Run `python probe_ollama.py`; if it reports that structured
+  output works with thinking on, set `"always"`.
+- Options you set here override the sampler settings the pipeline sends per
+  call (`generator/stats.py`).
+
+## Before spending model time
+
+```
+python tests/test_plumbing.py        # ~8 s, no model: every code path on the stub client
+cd generator
+python probe_ollama.py               # a couple of minutes: what your Ollama server supports
+```
 
 ## Running
 
@@ -40,15 +62,22 @@ upstream JSON, and an Ollama server at its default window truncates silently.
 cd generator
 python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt       # whole pipeline
 python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt   # rating filter, stop after 3.5
-python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap step-4 story lines (default 4)
+python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap the outline at two lines (default 4)
+python main.py --story-id=kernel1 --framework=seven_point < ...        # choose the story framework yourself
+python report.py kernel1 --baseline ../docs/baseline_kernel1_run_stats.json   # time and trace size per stage
 ./todo.sh                                                              # all 30 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt   # no model
 ```
 
-Output lands in `stories/<story_id>/`; every model call is saved and skipped on
-rerun, so an interrupted run resumes where it stopped. Delete a step's output
-file to redo that step (and its downstream dependants). Final step-4 output is
-`<id>_s4_story.json` and `<id>_s4_story.md`.
+Output lands in `stories/<story_id>/`. The outline is `<id>_story.md` (to
+read) and `<id>_story.json` (the document later stages build on). Every model
+call is saved and skipped on rerun, so an interrupted run resumes where it
+stopped. Delete a step's output file to redo that step (and its downstream
+dependants). `<id>_run_stats.json` records every call attempt.
 
-Story directories written before 2026-09-29 use older schemas; the pipeline
-names the stale file and stops. Delete the directory for a fresh run.
+Each call has a budget. A call whose reasoning trace runs past its limit is
+cut off and re-run once with thinking off; `report.py` shows which calls did.
+`--no-breakers` turns that off.
+
+Story directories written by an older version of the pipeline stop the run
+with a message saying what to delete; their phase-3 outputs can be kept.

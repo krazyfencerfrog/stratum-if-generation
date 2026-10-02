@@ -1,3 +1,12 @@
+> **SUPERSEDED 2026-10-01.** This describes the pipeline as it stood on
+> 2026-09-29: cast and world before any story line, and a step 4 that built
+> every node down to per-room interactions, state variables and exit
+> conditions. `docs/outline_design.md` is the live design document. This file
+> is kept because §6 (the node build, its packet, the computed checks, the
+> review) is the specification of what is now stage D, and §4 is the
+> rationale for the 3.5 engine, which is unchanged in substance. The code and
+> prompts it describes are in `generator/later/` and `prompts/later/`.
+
 # Pipeline design: step 2's shape split, the dramatic engine, and the story-line loop
 
 This is the current description of everything after phase 3, plus the step-2

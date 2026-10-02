@@ -1,9 +1,53 @@
 #!/usr/bin/env python3
-from llm_client import LlmClient
+"""Ollama backend: one streamed /api/generate call per prompt.
+
+run_prompt(prompt, think=None, format=None, options=None, limits=None)
+returns (thinking, response) and leaves what happened in self.last_call:
+
+  seconds, thinking_bytes, response_bytes
+  aborted        None, or the circuit breaker that cut the call off:
+                 'thinking_bytes' | 'response_bytes' | 'wall_clock' (the
+                 limits the caller passed) | 'max_duration' (this client's
+                 own cap, a last resort: 4 hours unless configured)
+  done_reason    the server's own reason ('stop', 'length', ...); 'length'
+                 means num_predict or the context window ran out
+  prompt_tokens, output_tokens, eval_seconds, load_seconds
+  think_sent, format_sent, options  what was actually put on the wire
+
+The caller decides what an aborted or truncated call means (main.py retries
+a thinking call once with thinking off). A transport failure raises
+LlmCallError, which carries whatever had streamed so far, so a call that
+dies mid-sentence still leaves its partial trace on disk.
+
+think:   None sends nothing (the model's default), False sends think:false.
+         A server that does not treat the model as a thinking model
+         rejects that parameter (HTTP 400); the call is then repeated
+         without it, with `no_think_suffix` appended to the prompt instead
+         (Qwen's own soft switch, "/no_think"), and the parameter is not
+         sent again this run.
+format:  a JSON schema (or "json") for Ollama's structured outputs. Whether
+         it is sent depends on `structured`:
+           'no_think' (default)  only when think is False. Structured output
+                                 without thinking is long-supported; with
+                                 thinking it has depended on the server
+                                 version, so it is off until probe_ollama.py
+                                 says it works on yours.
+           'always'              on every call that passes a schema.
+           'never'               never.
+         If the server rejects the schema (HTTP 400), the call is repeated
+         without it and schemas are switched off for the rest of the run.
+options: per-call model options (sampler settings, num_predict). Options
+         given to the constructor win over per-call ones, so what you put
+         in dynamic_config.py is what runs.
+limits:  {'max_thinking_bytes', 'max_response_bytes', 'max_seconds'}; any
+         may be missing or None. Checked as chunks arrive; on a breach the
+         connection is closed, which stops generation on the server.
+"""
+
+from llm_client import LlmClient, LlmCallError
 import argparse
 import json
 import os
-import re
 import socket
 import sys
 import time
@@ -12,11 +56,15 @@ import urllib.request
 
 DEFAULT_OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
+
 def _ollama_url(host, path):
     return host.rstrip("/") + path
 
+
 class OllamaClient(LlmClient):
-    def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180, max_duration=1800, echo=True, options=None):
+    def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180,
+                 max_duration=14400, echo=True, options=None, structured='no_think',
+                 no_think_suffix='/no_think'):
         self.host = host
         self.model = model
         self.keep_alive = keep_alive
@@ -24,28 +72,86 @@ class OllamaClient(LlmClient):
         self.max_duration = max_duration
         self.echo = echo
         # Ollama model options sent with every request, e.g.
-        #   {"num_ctx": 32768, "temperature": 0.7}
-        # num_ctx matters: the later prompts (3.5, 3.75, step 4) carry
-        # 8-12k tokens of instructions plus upstream JSON, and a server left
-        # at its default context window truncates the prompt SILENTLY (the
-        # warning goes to the server log, not the response). If a model's
-        # output looks like it never saw the bundle, set this.
+        #   {"num_ctx": 32768}
+        # num_ctx matters twice. Too small and the server truncates the
+        # prompt SILENTLY (the warning goes to the server log). Too large
+        # and the context cache takes memory the model's layers could have
+        # used: a 128k window on a 16 GB card pushes a 27B model onto the
+        # CPU. The largest prompt here is about 13k tokens and the largest
+        # allowed output about 14k, so 32768 is enough for every call.
         self.options = dict(options or {})
+        self.structured = structured
+        self.no_think_suffix = no_think_suffix
+        self.think_param = True    # goes False if the server rejects think:false
+        self.last_call = {}
 
-    def run_prompt(self, prompt, think=None):
+    # ------------------------------------------------------------------ request
+
+    def _use_format(self, think, format):
+        if format is None or self.structured == 'never':
+            return False
+        if self.structured == 'always':
+            return True
+        return think is False
+
+    def _payload(self, prompt, think, format, options, limits):
+        opts = dict(options or {})
+        limits = limits or {}
+        if limits.get('num_predict') and 'num_predict' not in opts:
+            opts['num_predict'] = int(limits['num_predict'])
+        opts.update(self.options)
         payload = {
             "model": self.model,
             "prompt": prompt,
             "stream": True,
             "keep_alive": self.keep_alive,
         }
-        if self.options:
-            payload["options"] = self.options
-        # think=False asks a thinking model (qwen3 and friends, Ollama >= 0.9)
-        # to answer without a reasoning trace; the pipeline passes it only for
-        # the calls listed in --no-think-steps. None sends nothing.
+        if opts:
+            payload["options"] = opts
         if think is not None:
-            payload["think"] = bool(think)
+            if self.think_param:
+                payload["think"] = bool(think)
+            elif think is False:
+                self._soft_no_think(payload)
+        if self._use_format(think, format):
+            payload["format"] = format
+        return payload
+
+    def _soft_no_think(self, payload):
+        if self.no_think_suffix and not payload["prompt"].rstrip().endswith(self.no_think_suffix):
+            payload["prompt"] = payload["prompt"].rstrip() + "\n\n" + self.no_think_suffix
+
+    def run_prompt(self, prompt, think=None, format=None, options=None, limits=None, **_ignored):
+        payload = self._payload(prompt, think, format, options, limits)
+        for _ in range(3):
+            try:
+                return self._stream(payload, limits or {})
+            except LlmCallError as e:
+                # A server that cannot take a parameter answers 400 before
+                # generating anything. Drop the parameter it objects to and
+                # run without it rather than fail the step.
+                if e.http_status != 400:
+                    raise
+                message = str(e).lower()
+                if 'think' in payload and 'think' in message:
+                    print(f'NOTE: ollama rejected the think parameter ({e}); using the prompt suffix '
+                          f'{self.no_think_suffix!r} to switch reasoning off for the rest of this run.', file=sys.stderr)
+                    self.think_param = False
+                    wanted_off = payload.pop('think') is False
+                    if wanted_off:
+                        self._soft_no_think(payload)
+                elif 'format' in payload:
+                    print(f'NOTE: ollama rejected the output schema ({e}); continuing without structured '
+                          f'outputs for the rest of this run.', file=sys.stderr)
+                    self.structured = 'never'
+                    payload.pop('format')
+                else:
+                    raise
+        return self._stream(payload, limits or {})
+
+    # ------------------------------------------------------------------ stream
+
+    def _stream(self, payload, limits):
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             _ollama_url(self.host, "/api/generate"),
@@ -53,21 +159,46 @@ class OllamaClient(LlmClient):
             headers={"Content-Type": "application/json"},
             method="POST",
         )
+        max_thinking = limits.get('max_thinking_bytes')
+        max_response = limits.get('max_response_bytes')
+        max_seconds = limits.get('max_seconds')
 
         start = time.time()
-        thinking_chunks = []
-        chunks = []
+        thinking_chunks = []     # the server's separate `thinking` field
+        chunks = []              # the `response` field, as it arrived
+        thinking_bytes = 0
+        response_bytes = 0
+        aborted = None
+        final = None
+        # Servers before 0.9 put the reasoning inside `response`, between
+        # <think> tags. inline: None until the first non-blank response
+        # text says which it is, then 'open' (inside the tags), 'closed'
+        # (past them) or 'no' (this response has no inline reasoning).
+        inline = None
+        inline_closed_at = 0
+
+        def split_inline():
+            text = "".join(chunks)
+            if inline in ('open', 'closed'):
+                body = text.lstrip()[len('<think>'):]
+                if '</think>' in body:
+                    thought, _, answer = body.partition('</think>')
+                    return thought, answer
+                return body, ''
+            return '', text
+
+        def partial():
+            thought, answer = split_inline()
+            return ("".join(thinking_chunks) + thought).strip(), answer.strip()
+
+        def fail(message, http_status=None):
+            thinking, response = partial()
+            self.last_call = self._info(payload, start, thinking, response, 'error', {})
+            return LlmCallError(message, thinking=thinking, response=response, http_status=http_status)
+
         try:
             with urllib.request.urlopen(req, timeout=self.idle_timeout) as response:
                 for raw_line in response:
-                    if time.time() - start > self.max_duration:
-                        raise RuntimeError(
-                            f"ollama call exceeded the overall {self.max_duration}s limit "
-                            f"(see --timeout). This is a total-duration safety cap, separate "
-                            f"from --idle-timeout ({self.idle_timeout}s), which fires only if the "
-                            f"model stops producing output entirely rather than just taking "
-                            f"a long time."
-                        )
                     line = raw_line.decode("utf-8", errors="replace").strip()
                     if not line:
                         continue
@@ -76,90 +207,121 @@ class OllamaClient(LlmClient):
                     except json.JSONDecodeError:
                         continue  # ignore stray non-JSON lines rather than aborting the call
                     if "error" in obj:
-                        raise RuntimeError(f"ollama returned an error: {obj['error']}")
-                    # Newer servers (0.9+) return a thinking model's reasoning
-                    # in its own "thinking" field and keep "response" clean;
-                    # older ones inline it in "response" between <think>
-                    # tags. Handle both, so the saved thinking trace is never
-                    # silently empty.
+                        raise fail(f"ollama returned an error: {obj['error']}")
                     thought = obj.get("thinking", "")
                     if thought:
                         thinking_chunks.append(thought)
+                        thinking_bytes += len(thought.encode("utf-8"))
                         if self.echo:
                             print(thought, end="", flush=True)
                     fragment = obj.get("response", "")
                     if fragment:
                         chunks.append(fragment)
+                        response_bytes += len(fragment.encode("utf-8"))
                         if self.echo:
                             print(fragment, end="", flush=True)
-                        if fragment.find('</think>') != -1:
-                            thinking_chunks = thinking_chunks + chunks
-                            chunks = []
+                        if inline is None:
+                            seen = "".join(chunks).lstrip()
+                            if seen.startswith('<think>'):
+                                inline = 'open'
+                            elif seen and not '<think>'.startswith(seen):
+                                inline = 'no'
+                        if inline == 'open' and '</think>' in "".join(chunks[-3:]):
+                            inline = 'closed'
+                            inline_closed_at = response_bytes
                     if obj.get("done"):
+                        final = obj
                         if self.echo:
                             print()  # newline after the streamed response
                         break
+                    # breakers, checked only after a chunk that did not finish
+                    # the call, so a complete answer is never thrown away
+                    elapsed = time.time() - start
+                    if inline == 'open':        # everything in `response` so far is reasoning
+                        thought_so_far, answer_so_far = thinking_bytes + response_bytes, 0
+                    elif inline == 'closed':    # counted to the fragment that closed the tag
+                        thought_so_far = thinking_bytes + inline_closed_at
+                        answer_so_far = response_bytes - inline_closed_at
+                    else:
+                        thought_so_far, answer_so_far = thinking_bytes, response_bytes
+                    if max_thinking and thought_so_far > max_thinking:
+                        aborted = 'thinking_bytes'
+                    elif max_response and answer_so_far > max_response:
+                        aborted = 'response_bytes'
+                    elif max_seconds and elapsed > max_seconds:
+                        aborted = 'wall_clock'
+                    elif self.max_duration and elapsed > self.max_duration:
+                        aborted = 'max_duration'
+                    if aborted:
+                        break
+                # leaving the with-block closes the connection; the server
+                # stops generating when its client goes away
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"ollama HTTP {e.code} error: {body}")
+            raise fail(f"ollama HTTP {e.code} error: {body}", http_status=e.code)
         except urllib.error.URLError as e:
-            # A timeout that occurs during connection/header setup sometimes
-            # surfaces wrapped inside URLError rather than as a raw
-            # socket.timeout (which python raises instead if the timeout
-            # happens later, while iterating the streamed body -- the more
-            # likely case here). Check for both so the diagnostic message is
-            # never misleadingly "can't reach ollama" when the real problem is
-            # exactly the idle-timeout / mid-generation-unload scenario this
-            # script exists to catch.
+            # A timeout during connection/header setup sometimes surfaces
+            # wrapped inside URLError rather than as a raw socket.timeout
+            # (which python raises instead if the timeout happens later,
+            # while iterating the streamed body). Check for both so the
+            # message is never "can't reach ollama" when the real problem is
+            # the idle-timeout / mid-generation-unload scenario.
             if isinstance(e.reason, (socket.timeout, TimeoutError)):
-                raise RuntimeError(_idle_timeout_message(self.keep_alive, self.idle_timeout))
-            raise RuntimeError(
+                raise fail(_idle_timeout_message(self.keep_alive, self.idle_timeout))
+            raise fail(
                 f"could not reach ollama at {self.host} ({e.reason}). Is `ollama serve` running "
-                f"there? Set --ollama-host or the OLLAMA_HOST environment variable if it's "
-                f"not on the default address."
+                f"there? Set the host in dynamic_config.py or the OLLAMA_HOST environment variable "
+                f"if it's not on the default address."
             )
-        except socket.timeout:
-            raise RuntimeError(_idle_timeout_message(self.keep_alive, self.idle_timeout))
-        thinking = "".join(thinking_chunks).strip()
-        # strip the tags themselves when the server inlined them
-        thinking = thinking.replace("<think>", "").replace("</think>", "").strip()
-        return (thinking, "".join(chunks).strip())
+        except (socket.timeout, TimeoutError):
+            raise fail(_idle_timeout_message(self.keep_alive, self.idle_timeout))
+        except (ConnectionError, OSError) as e:
+            raise fail(f"connection to ollama at {self.host} failed mid-stream: {e}")
+
+        if final is None and not aborted:
+            # the stream stopped without the server's closing object: the
+            # server died or something between us cut the connection. What
+            # arrived is a fragment, not an answer.
+            raise fail(f"the stream from ollama at {self.host} ended before the call finished "
+                       f"(no closing 'done' object); check `ollama ps` and the server log")
+        final = final or {}
+
+        thinking, text = partial()
+        if aborted and self.echo:
+            print(f'\n[call cut off: {aborted}]')
+        self.last_call = self._info(payload, start, thinking, text, aborted, final)
+        return (thinking, text)
+
+    @staticmethod
+    def _info(payload, start, thinking, response, aborted, final):
+        eval_ns = final.get('eval_duration') or 0
+        return {
+            'seconds': round(time.time() - start, 2),
+            'thinking_bytes': len(thinking.encode('utf-8')),
+            'response_bytes': len(response.encode('utf-8')),
+            'aborted': aborted,
+            'done_reason': final.get('done_reason'),
+            'prompt_tokens': final.get('prompt_eval_count'),
+            'output_tokens': final.get('eval_count'),
+            'eval_seconds': round(eval_ns / 1e9, 2) if eval_ns else None,
+            'load_seconds': round((final.get('load_duration') or 0) / 1e9, 2) if final.get('load_duration') else None,
+            'think_sent': payload.get('think'),
+            'soft_no_think': str(payload.get('prompt', '')).rstrip().endswith('/no_think'),
+            'format_sent': 'format' in payload,
+            'options': payload.get('options') or {},
+        }
 
 
 def _idle_timeout_message(keep_alive, idle_timeout):
     return (
-        f"ollama produced no output for more than --idle-timeout ({idle_timeout}s). "
-        f"This is the exact symptom of the model unloading mid-generation -- check "
+        f"ollama produced no output for more than the idle timeout ({idle_timeout}s). "
+        f"This is the symptom of the model unloading mid-generation -- check "
         f"`ollama ps` right after this fails; if the model is gone, try a longer "
-        f"--keep-alive (currently {keep_alive!r}; '-1' means never expire from "
-        f"idleness), or raise --idle-timeout if this is just a slow cold model load."
+        f"keep_alive (currently {keep_alive!r}; '-1' means never expire from "
+        f"idleness), or raise idle_timeout if this is just a slow cold model load."
     )
 
-'''
-def unload_model(model, host):
-    """Best-effort: ask ollama to unload the model immediately (keep_alive=0),
-    so it doesn't sit resident in memory until the idle timer eventually
-    expires on its own. Called from a `finally` block, so this runs whether
-    the overall generation run succeeded or failed. Never raises -- this is
-    cleanup, not critical path, and a failure here shouldn't mask or replace
-    whatever real error the run may have already hit."""
-    try:
-        payload = {"model": model, "prompt": "", "keep_alive": 0}
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            _ollama_url(host, "/api/generate"),
-            data=data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            resp.read()
-        print(f"(asked ollama to unload {model})")
-    except Exception as e:
-        print(f"NOTE: could not confirm ollama unloaded '{model}' ({e}) -- not fatal.", file=sys.stderr)
-'''
 
-        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -171,20 +333,19 @@ if __name__ == "__main__":
                          help="Sent on every request so the server has no ambiguity about the model "
                               "being in use. Ollama duration string ('30m'), seconds as a number, "
                               "or '-1' for never-expire-from-idleness. Default: 30m")
-    parser.add_argument("--retries", type=int, default=1, help="Retries per group on validation failure")
-    parser.add_argument("--timeout", type=int, default=1800,
+    parser.add_argument("--timeout", type=int, default=14400,
                          help="Overall wall-clock cap in seconds for a single generate call "
-                              "(default: 1800 = 30 min). Separate from --idle-timeout.")
+                              "(default: 14400 = 4 h). Separate from --idle-timeout.")
     parser.add_argument("--num-ctx", type=int, default=0,
                          help="Context window (tokens) to request from the server; 0 sends nothing "
-                              "and uses the server's default. The pipeline's later prompts need "
-                              "16k+ to avoid silent truncation.")
+                              "and uses the model's default. The pipeline needs about 32k.")
     parser.add_argument("--idle-timeout", type=int, default=180,
                          help="Seconds of complete silence (no new output at all) before giving up "
                               "on a call -- this is what actually catches the model getting "
                               "unloaded mid-generation. Also covers cold model load time, since "
                               "that's the wait before the first byte arrives; raise this if you're "
                               "using a large or slow-loading model. Default: 180")
+    parser.add_argument("--no-think", action="store_true", help="send think:false")
     args = parser.parse_args()
     client = OllamaClient(host=args.ollama_host,
                           model=args.model,
@@ -194,4 +355,5 @@ if __name__ == "__main__":
                           echo=True,
                           options={"num_ctx": args.num_ctx} if args.num_ctx else None)
     print('enter prompt and close stdin:')
-    print(client.run_prompt(sys.stdin.read()))
+    client.run_prompt(sys.stdin.read(), think=False if args.no_think else None)
+    print(json.dumps(client.last_call, indent=2))

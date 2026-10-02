@@ -1,4 +1,25 @@
 # ---
+# STATUS (2026-10-01): HISTORICAL. docs/outline_design.md IS CURRENT.
+# ---
+# The 2026-10-01 pass (docs/fable_response_4.md) turned step 4 into an
+# OUTLINE loop and moved the detailed work behind it, which is close to the
+# order this document always intended:
+#   - steps 4/6d here ("calculate framework", "expand framework beats +
+#     branches into initial story graph") are now 3.8 story form and the
+#     step-4 outline loop.
+#   - steps 7/8 (major locations, major characters) are the rough registers
+#     the outline loop fills as lines need them.
+#   - steps 10-12 (shortcomings, deep expansion of characters and settings)
+#     are stages A and B in docs/later_stages.md; step 13 is stage C.
+#   - steps 14-16 (per-node rooms, transition points, full node build) are
+#     stage D. The 2026-09-29 pass had pulled them forward into the outline
+#     loop, where they cost 68% of a 31.7-hour run; the code and prompts are
+#     parked in generator/later/ and prompts/later/.
+#   - 3.6 cast, 3.7 world and 3.75 craft spine no longer run before the
+#     outline; they are stage B and stage A material.
+# Read the blocks below as the record of how the design got here.
+#
+# ---
 # STATUS (2026-09-29): THIS DOCUMENT IS HISTORICAL FROM STEP 3.5 ON.
 # ---
 # The 2026-09-29 pass (docs/fable_response_3.md) rebuilt everything after
