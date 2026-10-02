@@ -1,0 +1,89 @@
+The goal of this project is to generate story content for use in an interactive fiction engine. It takes a user's minimal idea for a story (the kernel) and expands it, with no additional user involvement, into a full story for the engine.
+
+Hard constraint: production inference is local-model-only (a qwen3.8 27B-class thinking model via Ollama). Nothing you design may assume a frontier model in the runtime path. The real limits are wall-clock time per call and context size per prompt (measurable by the size of the reasoning trace).
+
+ollama version 0.32.13
+hardware: rx 9070xt, ryzen 7700x, 32gb main memory
+dynamic_config.py:
+from ollama_client import OllamaClient
+
+def get_client():
+    return OllamaClient(host="http://localhost:11434",
+                        model="qwen3.8_27b_q5-128k",
+                        keep_alive="30m",
+                        idle_timeout=180,
+                        max_duration=14400,
+                        echo=True);
+
+READ FIRST
+CLAUDE.md, docs/step4_design.md, docs/fable_response_3.md, docs/fable_request_3.txt (the previous request you fulfilled), docs/step3_consolidated_design_lessons.md, docs/strategy.txt (historical, but its steps 6-17 describe where this was originally headed), then prompts/ and generator/. The archived run is stories/current_output.tar: kernel1 through the whole pipeline and about two step-4 iterations, ~31.5 hours, stopped partway through the second iteration. Extract it and read the JSON AND the thinking traces. Other test kernels are in tests/kernels.
+
+WHAT WORKED LAST TIME (keep unless you have a strong reason)
+*) the shape split in step 2, and the rule that shape is advisory
+*) 3.5's obstacle/mediation engine. The kernel1 premise has an opposition with its own want, turns of different forms, and crowds with named representatives. This is a real improvement.
+*) build -> verify -> repair as separate calls, the computed brief, resume-by-files, the stub client
+*) divergence by motivation/strategy (4c). T2 "The Named Spare" in kernel1 is genuinely a different story from T1, not a reskin.
+
+THE PROBLEM
+I think step 4 is approaching the work at the wrong level, and 3.5-3.7 are probably over-built for where we are in the process.
+
+My goal for this stage is an OUTLINE that spans all the branches of the story: what happens, in what order, where the branches are, and which characters and settings are needed. Not how each scene plays out. Right now the loop builds every node down to per-room interactions, requires/sets state variables, and structured exit conditions (4b), then spends a review pass (4d) judging that interior machinery. That is roughly steps 14-16 of the original plan, pulled forward into the outline loop. From the kernel1 run (my numbers, from log timestamps and file sizes):
+
+*) ~31.5h total. 4b node builds were ~18.1h (10.0h first builds, 8.1h repairs/revisions), 4d reviews ~3.3h, 4a main line 0.9h, 4c divergence 0.8h. So ~68% of wall time went to building and reviewing node interiors; laying down the actual story line took under an hour.
+*) After 31.5h we have one finished through-line (7 nodes) and one partial second. The outline of those 7 nodes is ~8KB of JSON; the built node content is ~46KB; 65 state variables exist for 7 nodes. A 3-4 line outline at this rate is 80+ hours.
+*) The 4d findings are about interior mechanics: duplicate interactions, an exit satisfied by a single "talk" interaction, ending variants for arrival states. Also 4d keeps flagging the open exits (leads_to null) that 4a and 4c create ON PURPOSE as hooks; the repair "fixed" one by editing a transition's text while leaving leads_to null, and the re-review flagged it again.
+*) Setup before any outline exists (phase 3 plus 3.5-3.7) is ~8.4h. 3.5v and 3.75v both returned "clean" with zero findings on kernel1 (1.0h and 0.6h). One kernel is thin evidence, so I'm not asking you to delete the repair loops, but that is a lot of time for a pass that found nothing.
+
+REASONING TRACES: THE TRIM INSTRUCTIONS DID NOTHING
+The reasoning-discipline blocks have no visible effect. In the 4a/4b traces the model never refers to them. Sampled 4b traces still contain 44-76 JSON fragments (it drafts the output inside its reasoning despite the instruction not to) and 23-39 "Potential issue: ... Good." lines (one check per rule, per field). The trace opens by restating the outline and finishes with a checklist tail. Sizes: 3.5 96KB, 3.5v 68KB, 4a 46KB, 4b 62-124KB per node, 4d 72-93KB.
+My conclusion: for this model, instructions about HOW to reason are not a lever. Treat trace size as an engineering problem and solve it structurally: smaller tasks, smaller inputs, smaller output schemas, fewer rules per prompt, mechanical work moved into Python, and calls split where one call is doing two jobs. Please also evaluate, and use if they hold up:
+ - think=false for calls that are classification or transcription (the step-2 shape split cost 0.42h and 29KB of thinking for a classification job), and "schema-first reasoning": a short rationale field placed FIRST in the output schema so the deliberation happens in a bounded visible field rather than an unbounded hidden trace
+ - Ollama structured outputs (the `format` parameter with a JSON schema) to remove parse/retry failures; check whether the installed version supports it together with thinking
+ - num_predict or wall-clock circuit breakers (4d crashed twice in the earlier run and the log stopped mid-sentence, which looks like context exhaustion)
+ - sampler options: Qwen's own guidance for thinking mode is to avoid greedy decoding and to use specific temperature/top_p/top_k settings (and a presence penalty if repetition shows up). Check what we send and recommend values.
+ - per-call run statistics (prefix, prompt chars, thinking bytes, response bytes, seconds) written to stories/<id>/<id>_run_stats.json plus a small report script, so the next run can be compared against the baseline above without me doing log arithmetic by hand
+Set per-call targets and tell me what you chose and why (my suggestion: nothing over ~30KB of thinking or ~25 minutes, but you know the model's behavior better than I do from the archive).
+
+THE DIRECTION I WANT YOU TO EVALUATE (challenge it, don't just implement it)
+Make the loop a high-level story outline loop:
+1. Look at the step-3 output and the premise and decide "what kind of story should this be." Choose a story layout/framework (three-act, five-act/Freytag, hero's journey, save the cat, fichtean curve, seven-point, story circle, kishotenketsu, or your own shortlist), with an optional modifier, justified by the brief (affect trajectory, moral valence, ending shape, setting scale).
+2. List the framework's conceptual beats adapted to this story.
+3. For each beat, find something good and interesting that fills the beat's role AND obeys the step-3 targets, at summary level. Each node is a beat with a short summary of what happens, not what the player does in each room.
+4. Keep the path-per-iteration build-out (main line, then one divergent line per iteration, found by a different motivation or strategy). A branch should be expressible against the framework: same beats, different filler after the divergence point, or a changed beat. Think about whether a computed grid of lines x beats is a useful coverage check.
+5. Register characters and locations as they are needed. At this stage they are rough sketches (id, role or kind, one or two lines on why the story needs them, which nodes use them), not voice, topics, fixtures or connections. Whether this is its own small step per iteration or part of the line-building call is your call.
+6. A node should still say where (location sketches) and who (cast subset), because the engine is room-based and I said last time that room/character subsets matter early. It should NOT contain fixtures, interactions, state variables or structured exit conditions. Branch points are explicit in the graph and carry a plain-language trigger ("you exposed her private claim before the council") that a later stage will formalize into state.
+7. The end product of the loop is a story graph: beats/nodes with brief summaries, edges with plain-language branch triggers, through-lines as paths, a rough character register and a rough location register.
+
+The point of "choose a framework" is variety and structure, but last time you removed framework choice from 4a because it was tangled up with ending-count arithmetic and selector variables. Keep that lesson: the framework scaffolds beats, it does not drive ending counts or become a combinatorial lattice. Also guard against generic output: the premise's engine and divergence-by-motivation are what keep it specific.
+
+The stages I expect AFTER the loop (design them so this stage's schema leaves hooks for them; build them only after the loop work is done and passes the stub):
+ A) beat expansion: take each node and work out what needs to happen to serve character arcs and add interesting things, still a brief outline per node
+ B) a character and setting buildout loop: depth for people and places (this is where voice, topics, stances, fixtures and connections belong), producing a long form and a short packet form per entity
+ C) a story-graph reconciliation stage that makes sure the depth from B is reflected in the right paths and nothing is orphaned or contradicted
+ D) later, the per-node room-based build, which is essentially what 4b does today. Do NOT delete s4b_node_build.prompt, the node validator, the state registry or the mechanical checks. They are good work done at the wrong time. Move them somewhere clearly marked as later-stage material so they can be adapted.
+Annotating one evolving story document across these stages is probably cleaner than producing separate files per stage; your call.
+
+WHAT THE REVIEW AND CHECKS SHOULD BECOME
+Most of the loop's checking should be computed in Python: graph integrity, every framework beat covered on every line (or explicitly skipped with a reason), every premise turn placed, branch points reachable, characters and locations used or flagged as unused. The one judgment call worth an LLM pass each iteration is "is another line worth building, and what is its seed," because that is what makes the loop terminate sensibly. Keep it small, and give it a short digest, not the story.
+
+PLEASE ALSO LOOK AT
+*) 3.6 and 3.7 as currently written produce voice/stance/moved_by/topics and fixtures/protagonist_can/connections, which is stage-B material. Decide whether they become sketch-level registers, fold into the loop, or move later. Same question for the "ways_through" and costs in 3.5's turns: they are the beginning of the "how."
+*) whether 3.5v and 3.75v can be cheaper (computed checks, think=false for the classification part) without losing the findings they do catch.
+*) calibration examples are load-bearing precedent (see the lessons doc): when you write examples for the new prompts, keep them domain-separated from the test kernels in judgment shape, not just nouns. Do not use kernel1 as an example.
+*) a hand-written target for kernel1: what a good outline of T1 and T2 looks like at the granularity I'm asking for. Put it in docs/ as a reference for what "right-sized" means; do not paste it into prompts.
+*) stale or wrong docs: CLAUDE.md still describes current_output.tar as a pre-redesign baseline but it is now a run of the post-redesign pipeline; docs/step4_design.md will be superseded; strategy.txt is historical. Update them. Stamp saved outputs with a schema version so old story directories fail loudly like they do now.
+*) a stub-driven test script (even without a framework) that runs the stub and asserts graph invariants, so I can check plumbing in seconds before spending hours of model time. Keep the stub in sync with whatever schemas you change.
+*) your own list of improvements. I'd rather you make a good change I did not think of than wait to ask.
+
+WHAT NOT TO DO
+*) do not weaken phase 3 or the rules in the lessons doc (generation and verification never share a prompt, repair is a third call, a prompt receives the brief or a packet and never the raw bundle, the question is not the verb, counts and lookups are computed)
+*) do not add steps that cost hours for marginal gain; every new call needs a reason for existing and an estimate of its cost
+*) do not assume the 4a/4b/4c/4d prompts are sacred. Tear them apart if the new structure calls for it. Nothing is sacred except the goal.
+
+DELIVERABLES
+*) the overhauled generator, prompts, stub and tests, runnable with `python main.py --story-id=... < kernel`, still resumable from saved files
+*) a docs/fable_response_4.md in the same spirit as the last response: what you changed, why, the answers to my questions here (including where you disagree with my direction), the targets you set for trace size and time, and a first-live-run checklist in priority order, since nothing here will have run against a live model
+*) updated CLAUDE.md, README and design docs
+*) a short design sketch for stages A-D above (schemas and hooks), with prompts only if you finish the loop work first
+
+I believe in you. We are looking for a best-in-class story generator and we know you can make this happen.
