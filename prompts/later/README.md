@@ -8,7 +8,7 @@ runs. `docs/later_stages.md` has the design for the stages they belong to;
 
 | file | was | belongs to | what changes when it is adapted |
 |---|---|---|---|
-| `sA_craft_spine.prompt` | 3.75 build | A, beat expansion | Its devices cite outline nodes, not premise turns. `escalation_shape` goes (the framework is the escalation shape). One want/need per line, since each line has its own motivation. **Its Example A is kernel1; replace it before use.** |
+| `sA_craft_spine.prompt` | 3.75 build | A, beat expansion (an adapted copy now runs opt-in as `prompts/s3_75_craft_spine.prompt` with `--craft-spine`) | Its devices cite outline nodes, not premise turns. `escalation_shape` goes (the framework is the escalation shape). One want/need per line, since each line has its own motivation. **Its Example A is kernel1; replace it before use.** |
 | `sA_craft_spine_check.prompt` | 3.75v | A | Two of its four checks are lookups (irony type against `3-0b.epistemic_gap.present`; citations against real node ids) and move into Python. What is left is a short no-think audit, the shape `s3_5v_premise_check.prompt` has now. |
 | `sA_craft_spine_repair.prompt` | 3.75r | A | Return only the changed sections, as `s3_5r_premise_repair.prompt` does. |
 | `sB_cast.prompt` | 3.6 | B, character buildout | Runs per character (or in small batches) on a packet: the sketch from the register, the nodes the character appears in, how each line ends for them. Emits a long form and a packet form of 150 words or fewer. |

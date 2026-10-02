@@ -393,6 +393,23 @@ class OutlineBuilder:
 
     # ------------------------------------------------------------------ 4a: the main line
 
+    def craft_json(self):
+        """The optional craft spine (main.py --craft-spine), cut to what a
+        line call uses; the literal string none when it did not run."""
+        c = self.gen.analysis.get('s3_75_craft_spine')
+        if not isinstance(c, dict):
+            return 'none'
+        wn = c.get('want_need_tension') or {}
+        want, need = wn.get('want'), wn.get('need')
+        return compact_json({
+            'want': want.get('restated') if isinstance(want, dict) else want,
+            'need': need.get('description') if isinstance(need, dict) else need,
+            'tension': wn.get('tension'),
+            'irony': (c.get('irony_mode') or {}).get('device'),
+            'setup_payoff': [{'setup': p.get('setup'), 'payoff': p.get('payoff')}
+                             for p in c.get('setup_payoff_pairs') or [] if isinstance(p, dict)],
+        })
+
     def main_line(self):
         required = frameworks.required_beats({'beats': self.framework.get('beats') or []})
 
@@ -422,6 +439,7 @@ class OutlineBuilder:
             '$$BRIEF_LITE_JSON$$': self.brief_lite_json(),
             '$$PREMISE_JSON$$': compact_json(self.premise_digest()),
             '$$FRAMEWORK_JSON$$': compact_json(self.framework_block()),
+            '$$CRAFT_JSON$$': self.craft_json(),
             '$$NODES_MIN$$': str(self.shape['nodes_min']),
             '$$NODES_MAX$$': str(self.shape['nodes_max']),
         }, prompt_file='s4a_main_line.prompt', validator=validate, klass='build', schema=schemas.MAIN_LINE)
@@ -675,6 +693,7 @@ class OutlineBuilder:
             '$$BRIEF_LITE_JSON$$': self.brief_lite_json(),
             '$$PREMISE_JSON$$': compact_json(self.premise_digest()),
             '$$FRAMEWORK_JSON$$': compact_json(self.framework_block()),
+            '$$CRAFT_JSON$$': self.craft_json(),
             '$$STORY_DIGEST_JSON$$': compact_json(self.digest()),
             '$$HOOKS_JSON$$': compact_json({'unused_ways': self.hooks()}),
             '$$SEED_JSON$$': self.gen.to_json(seed),

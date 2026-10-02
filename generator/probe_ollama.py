@@ -20,6 +20,10 @@ answer the questions the pipeline's defaults had to guess at:
   6. does num_predict cut a call off with done_reason "length"
   7. does closing the connection stop generation (the circuit breakers
      depend on it)
+  7b. budget forcing: when a thinking call passes its limit, can the model
+     be made to answer from its partial thinking (a raw continuation in
+     Qwen's ChatML template)? If not, run with --no-force-answer or give
+     the client a raw_template that matches your model
   8. optionally, is a smaller num_ctx faster on this hardware
 
 It prints PASS / FAIL / INFO per check and, at the end, the client
@@ -249,6 +253,25 @@ def main():
     except LlmCallError as e:
         report('FAIL', 'circuit breaker', str(e))
 
+    # 7b ---- budget forcing: answer from the partial thinking
+    forced_ok = None      # None: not tested
+    try:
+        _, forced_text = client.run_prompt(JSON_QUESTION, options=dict(SAMPLER_THINK), format=PROBE_SCHEMA,
+                                           limits={'max_thinking_bytes': 400, 'max_seconds': 600, 'force_answer': True})
+        info = client.last_call
+        if info.get('forced_answer'):
+            ok, detail = valid_probe_json(forced_text)
+            forced_ok = ok
+            report('PASS' if ok else 'FAIL', 'budget forcing', detail + f" (forced after {info.get('thinking_at_force')} thinking bytes)")
+        elif info.get('aborted'):
+            forced_ok = False
+            report('FAIL', 'budget forcing', f"the call was cut ({info['aborted']}) and the forced continuation failed")
+        else:
+            report('INFO', 'budget forcing', 'the call finished before reaching the 400-byte limit; not tested')
+    except LlmCallError as e:
+        forced_ok = False
+        report('FAIL', 'budget forcing', str(e))
+
     # 8 ---- context window size against speed
     if args.ctx_test:
         try:
@@ -269,6 +292,9 @@ def main():
     print('\nrecommended client settings:')
     structured = 'always' if structured_think else ('no_think' if structured_no_think else 'never')
     print(f'  OllamaClient(..., structured={structured!r})')
+    if forced_ok is False:
+        print('  budget forcing did not pass: run main.py with --no-force-answer (a cut call then re-runs with thinking')
+        print('  off), or pass raw_template=... to OllamaClient with your model\'s chat template.')
     if not no_think_ok:
         print('  think:false is not honored by this model/server: the "classify" calls will run with a trace;')
         print('  expect them to cost minutes instead of seconds (report.py will show thinking bytes on them).')

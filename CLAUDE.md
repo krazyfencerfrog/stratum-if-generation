@@ -28,20 +28,20 @@ python tests/test_plumbing.py                                           # stub-d
 cd generator
 python probe_ollama.py                                                  # what the local server supports (thinking, schemas, breakers, speed)
 python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt      # one kernel, whole pipeline
-python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt  # rating filter; stop after 2 | 3 | 3.5 | 3.8
+python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt  # rating filter; stop after 2 | 3 | 3.5 | 3.75 | 3.8
 python main.py --story-id=kernel1 --max-iterations=2 < ...            # cap the outline's lines (default 4)
 python report.py kernel1 --baseline ../docs/baseline_kernel1_run_stats.json   # per-stage time and trace size against the archived run
 ./todo.sh                                                             # all 30 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt
 ```
 
-Other flags: `--max-repairs` (3.5 repair rounds, default 2), `--framework=<id>` (skip the 3.8 choice), `--no-think-steps` / `--think-steps` (comma-separated prefixes, steps or step_names to run with thinking off / on, overriding the call's class), `--no-breakers`. Environment: `STRATUM_SAMPLER=model` (send no sampler options), `STRATUM_PRESENCE_PENALTY`. Output goes to `stories/<story_id>/`. `stories/` is not gitignored; `*.log` is.
+Other flags: `--max-repairs` (3.5 repair rounds, default 2), `--framework=<id>` (skip the 3.8 choice), `--no-think-steps` / `--think-steps` (comma-separated prefixes, steps or step_names to run with thinking off / on, overriding the call's class), `--no-breakers`, `--no-force-answer` (skip budget forcing), `--craft-spine` (run the optional 3.75 craft spine). Environment: `STRATUM_SAMPLER=model` (send no sampler options), `STRATUM_PRESENCE_PENALTY`. Output goes to `stories/<story_id>/`. `stories/` is not gitignored; `*.log` is.
 
 ## Pipeline architecture
 
 `generator/main.py` — `StoryGenerator`. `run_prompt(prefix, name, replacements, prompt_file=None, validator=None, klass='extract', schema=None)` is the one model call: it loads `prompts/<prompt_file or prefix_name>.prompt`, substitutes `$$PLACEHOLDER$$`s by plain string replace (a leftover placeholder raises), calls the client, saves `<prefix>_raw_input_prompt.txt`, `<prefix>_raw_output_thinking.txt`, `<prefix>_raw_output_response.txt` and the parsed `<prefix>_<name>.json`, appends a record to `<id>_run_stats.json`, and returns the parsed value. A `validator` can reject an answer; the call is retried once **with the complaint and the previous answer appended**. A saved file that fails the validator is reported as stale and named. JSON goes through `lenient_json_loads`.
 
-**Call classes** (`generator/stats.py`): every call is `extract` (phase 3: untouched, no breaker), `classify` (thinking off, a rationale field first in the schema), `judge` or `build` (thinking on, with a target and a circuit breaker on thinking bytes and wall clock; a tripped breaker re-runs the call once with thinking off). Decide a new call's class before writing its prompt. `generator/schemas.py` holds the JSON schema for each new prompt (Ollama structured outputs); the client sends it on thinking-off calls by default.
+**Call classes** (`generator/stats.py`): every call is `extract` (phase 3: untouched, no breaker), `classify` (thinking off, a rationale field first in the schema), `judge` or `build` (thinking on, with a target and a circuit breaker on thinking bytes and wall clock; a call over its thinking limit first gets its answer forced from the partial thinking; if that fails, or another breaker tripped, it re-runs once with thinking off). Decide a new call's class before writing its prompt. `generator/schemas.py` holds the JSON schema for each new prompt (Ollama structured outputs); the client sends it on thinking-off calls by default.
 
 Order: `s1 → s2 (rating filter, shape split) → run_phase3()` (`s3_0a, s3_0b, s3_0c, s3b, s3c, s3d, s3e, s3f(←3d), s3g(←3-0a,3-0c), s3h(←bundle)`, then `build_constraint_map()` and `build_story_brief()`), then `run_premise_expansion()`, `run_story_form()`, `run_outline()`.
 

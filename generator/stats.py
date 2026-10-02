@@ -5,9 +5,10 @@ and what it is asked to return, not of instructions about how to reason
 (docs/fable_response_4.md, section 2). So every model call belongs to a
 CLASS that fixes how it runs (thinking on or off), what it is expected to
 cost (targets, reported), and where it is cut off (limits, enforced by the
-client as circuit breakers). When a thinking call trips a limit it is
-retried once with thinking off, so one runaway trace costs a bounded
-amount instead of the run.
+client as circuit breakers). When a thinking call passes its thinking
+limit, the client first forces an answer from the thinking so far; if that
+fails, or another limit tripped, the call is retried once with thinking
+off, so one runaway trace costs a bounded amount instead of the run.
 
 Every attempt of every call is appended to stories/<id>/<id>_run_stats.json;
 generator/report.py reads it.
@@ -36,6 +37,10 @@ SAMPLER_NO_THINK = {'temperature': 0.7, 'top_p': 0.8, 'top_k': 20, 'repeat_penal
 # target_*: what a healthy call costs; over-target calls are flagged in the
 #        report and nothing else happens.
 # limit_*: circuit breakers. None = no breaker of that kind.
+# force_answer: when the thinking-byte breaker trips before any answer has
+#        started, the client first tries budget forcing (it closes the think
+#        block and asks for the answer from the thinking so far; see
+#        ollama_client.py). Only if that fails does `fallback` apply.
 # fallback: what to do when a breaker trips on a thinking call.
 CALL_CLASSES = {
     # phase 3 and the rating filter: untouched judgment prompts. Reported
@@ -62,14 +67,14 @@ CALL_CLASSES = {
         'think': None,
         'target_thinking_bytes': 12000, 'target_seconds': 720,
         'limit_thinking_bytes': 24000, 'limit_seconds': 1500, 'limit_response_bytes': 8000,
-        'num_predict': 8192, 'fallback': 'no_think',
+        'num_predict': 8192, 'fallback': 'no_think', 'force_answer': True,
     },
     # construction: the premise pieces, the line plans, the node fill.
     'build': {
         'think': None,
         'target_thinking_bytes': 25000, 'target_seconds': 1500,
         'limit_thinking_bytes': 40000, 'limit_seconds': 2700, 'limit_response_bytes': 24000,
-        'num_predict': 14000, 'fallback': 'no_think',
+        'num_predict': 14000, 'fallback': 'no_think', 'force_answer': True,
     },
 }
 

@@ -201,6 +201,36 @@ def breaker_falls_back_to_no_think():
 
 
 @test
+def breaker_forces_the_answer_first():
+    run('forced', env={'STUB_FORCE': 's4a'})
+    attempts = [c for c in calls('forced') if c['step'] == 's4a']
+    check(len(attempts) == 1 and attempts[0]['ok'] and attempts[0].get('forced_answer'),
+          f'a forced answer should be accepted in one attempt: {attempts}')
+    assert_story_ok('forced')
+    run('forced_off', env={'STUB_FORCE': 's4a'}, args=['--no-force-answer'])
+    attempts = [c for c in calls('forced_off') if c['step'] == 's4a']
+    check(len(attempts) == 1 and not attempts[0].get('forced_answer'), '--no-force-answer still forced')
+
+
+@test
+def craft_spine_opt_in():
+    run('craft', env={'STUB_SPINE_FLAGGED_ROUNDS': '1'}, args=['--craft-spine'])
+    loop = load('craft', 's3_75_loop.json')
+    check(loop['repair_rounds_used'] == 1 and not loop['still_failing'], f'the craft spine should be repaired once: {loop}')
+    r0 = load('craft', 's3_75_check_r0.json')
+    check(any('index' in f['check'] for f in r0['findings']), f'the index citation was not found by code: {r0}')
+    prompt = load('craft', 's4a_i1_raw_input_prompt.txt')
+    check('to be answerable to someone' in prompt, 'the main line call did not receive the craft spine')
+    assert_story_ok('craft')
+    # off by default: no craft files, and the line calls say none
+    run('nocraft')
+    check(not os.path.exists(os.path.join(story_dir('nocraft'), f'{PREFIX}nocraft_s3_75_craft_spine.json')),
+          'the craft spine ran without --craft-spine')
+    prompt = load('nocraft', 's4a_i1_raw_input_prompt.txt')
+    check('(or none)\nnone' in prompt, 'without --craft-spine the main line should receive "none"')
+
+
+@test
 def rejoin_new_cast_and_nothing():
     run('graph', args=['--max-iterations=6'],
         env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
@@ -553,6 +583,7 @@ class FakeOllama(BaseHTTPRequestHandler):
     directives: thinking_bytes, response, delay (seconds per chunk),
     done_reason, inline_think, reject_format."""
     received = []
+    raw_prompts = []
     disconnects = 0
     reject_think = False
 
@@ -588,6 +619,10 @@ class FakeOllama(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b'{"error": "\\"fake\\" does not support thinking"}')
             return
+        if body.get('raw'):
+            # the budget-forcing continuation: answer at once, no thinking
+            d = {'thinking_bytes': 0, 'response': '{"forced": true}', 'raw_seen': True}
+            FakeOllama.raw_prompts.append(body.get('prompt', ''))
         if d.get('reject_format') and 'format' in body:
             self.send_response(400)
             self.end_headers()
@@ -659,6 +694,17 @@ def ollama_client_against_fake_server():
         check(time.time() - started < 5, 'the thinking breaker did not cut the call short')
         time.sleep(0.2)
         check(FakeOllama.disconnects > before, 'the server never saw the client hang up')
+
+        thinking, response = client.run_prompt(json.dumps({'thinking_bytes': 200000, 'delay': 0.002}),
+                                               format={'type': 'object'},
+                                               limits={'max_thinking_bytes': 3000, 'force_answer': True})
+        info = client.last_call
+        check(response == '{"forced": true}' and info.get('forced_answer') and info['aborted'] is None
+              and 3000 < info['thinking_at_force'] < 4000, f'budget forcing: {info}')
+        raw = FakeOllama.received[-1]
+        check(raw.get('raw') is True and raw.get('format') == {'type': 'object'} and 'think' not in raw
+              and FakeOllama.raw_prompts[-1].startswith('<|im_start|>user\n') and '\n</think>\n\n' in FakeOllama.raw_prompts[-1],
+              f'forced continuation request: { {k: v for k, v in raw.items() if k != "prompt"} }')
 
         client.run_prompt(json.dumps({'thinking_bytes': 0, 'response': 'x' * 50000, 'delay': 0.001}), think=False, limits={'max_response_bytes': 2000})
         check(client.last_call['aborted'] == 'response_bytes', 'response breaker')

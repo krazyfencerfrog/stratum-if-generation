@@ -41,6 +41,7 @@ from stats import RunStats, call_profile, sampler_for, step_of, SCHEMA_VERSION
 import frameworks
 import schemas
 from outline import OutlineBuilder, compact_json, norm
+from craft_checks import spine_findings
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -127,12 +128,13 @@ def get_client():
 
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
-                 breakers=True, framework_override=None):
+                 breakers=True, framework_override=None, force_answer=True):
         self.story_id = story_id
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
         self.think_steps = set(think_steps or ())
         self.breakers = breakers
+        self.force_answer = force_answer
         self.framework_override = framework_override
 
         self.story_path_str = os.path.join(THIS_DIR, "..", "stories", self.story_id)
@@ -275,6 +277,8 @@ class StoryGenerator:
             'max_seconds': profile['limit_seconds'],
             'num_predict': profile['num_predict'],
         }
+        if think is not False and self.force_answer and profile.get('force_answer'):
+            limits['force_answer'] = True
         if think is False and klass != 'classify' and limits.get('num_predict'):
             # the fallback run of a thinking call: only the answer is wanted
             limits['num_predict'] = 6000
@@ -382,6 +386,9 @@ class StoryGenerator:
                 'output_tokens': info.get('output_tokens'),
                 'format_sent': info.get('format_sent'),
             })
+            if info.get('forced_answer'):
+                rec['forced_answer'] = True
+                rec['thinking_at_force'] = info.get('thinking_at_force')
             breaker = info.get('aborted') or ('num_predict' if info.get('done_reason') == 'length' else None)
 
             if call_error is not None:
@@ -1064,6 +1071,70 @@ class StoryGenerator:
         StoryGenerator.index_cast(merged)
         return merged
 
+    # ------------------------------------------------------------------ 3.75: craft spine (opt-in)
+
+    def run_craft_spine(self):
+        """Optional (--craft-spine). The craft spine: the protagonist's want
+        against an invented inner need, an irony device, an escalation
+        shape, one setup/payoff pair. Built over the accepted premise,
+        checked in code (craft_checks.py), repaired by a third call while a
+        hard finding stands (up to --max-repairs rounds). A finding that
+        survives is recorded and the run continues. The outline's line
+        calls receive the want, the need and the setup/payoff; without this
+        step they receive "none" and each line's motivation carries it.
+
+        Files: s3_75_craft_spine.json (as built), s3_75_check_r<n>.json,
+        s3_75r<n>_craft_spine_repair.json, s3_75_craft_spine_accepted.json,
+        s3_75_loop.json."""
+        brief = self.analysis.get('s3_brief')
+        premise = self.analysis.get('s3_5_premise') or {}
+        base = {
+            '$$KERNEL$$': self.kernel,
+            '$$BRIEF_JSON$$': self.to_json(brief),
+            '$$PREMISE_EXPANSION_JSON$$': self.to_json(premise),
+        }
+        required = ('invention_ceiling', 'want_need_tension', 'irony_mode', 'escalation_shape', 'setup_payoff_pairs')
+
+        def validate(parsed):
+            if not isinstance(parsed, dict):
+                raise ValueError('expected a JSON object')
+            missing = [k for k in required if k not in parsed]
+            if missing:
+                raise ValueError(f'missing keys {missing}')
+
+        def validate_repair(parsed):
+            if not isinstance(parsed, dict) or not isinstance(parsed.get('revised'), dict):
+                raise ValueError('repair output must carry a "revised" object')
+            validate(parsed['revised'])
+
+        current = self.run_prompt('s3_75', 'craft_spine', base, validator=validate, klass='build')
+        findings = spine_findings(current, brief, premise)
+        self.save_story_json('s3_75_check_r0.json', {'findings': findings})
+        rounds = [{'round': 0, 'hard': sum(f['severity'] == 'hard' for f in findings)}]
+        n = 0
+        while any(f['severity'] == 'hard' for f in findings) and n < self.max_repairs:
+            n += 1
+            repl = dict(base)
+            repl['$$CRAFT_SPINE_JSON$$'] = self.to_json(current)
+            repl['$$FINDINGS_JSON$$'] = self.to_json({'findings': [f for f in findings if f['severity'] == 'hard']})
+            repaired = self.run_prompt(f's3_75r{n}', 'craft_spine_repair', repl,
+                                       prompt_file='s3_75r_craft_spine_repair.prompt',
+                                       validator=validate_repair, klass='build')
+            current = repaired['revised']
+            findings = spine_findings(current, brief, premise)
+            self.save_story_json(f's3_75_check_r{n}.json', {'findings': findings})
+            rounds.append({'round': n, 'hard': sum(f['severity'] == 'hard' for f in findings),
+                           'repair_log': repaired.get('repair_log', [])})
+        still = [f for f in findings if f['severity'] == 'hard']
+        if still:
+            print(f'WARNING (continuing): the craft spine still has {len(still)} hard finding(s) after {n} '
+                  f'repair round(s); see {self.story_file_path("s3_75_loop.json")}', file=sys.stderr)
+        self.save_story_json('s3_75_craft_spine_accepted.json', current)
+        self.save_story_json('s3_75_loop.json', {'repair_rounds_used': n, 'still_failing': bool(still),
+                                                 'rounds': rounds})
+        self.analysis['s3_75_craft_spine'] = current
+        return current
+
     # ------------------------------------------------------------------ 3.8: story form
 
     def run_story_form(self):
@@ -1177,10 +1248,16 @@ if __name__ == "__main__":
     parser.add_argument("--think-steps", default='',
                         help="comma-separated steps to run with thinking ON even though their class turns it "
                              "off (e.g. s3_5v to compare the audit both ways)")
+    parser.add_argument("--no-force-answer", action="store_true",
+                        help="when a thinking call passes its thinking limit, skip budget forcing and go "
+                             "straight to the thinking-off re-run")
     parser.add_argument("--no-breakers", action="store_true",
                         help="do not cut off calls that exceed their class's thinking or time limit")
     parser.add_argument("--stop-after", default='',
-                        help="stop after this step: 2, 3, 3.5, 3.8 (default: run through the outline loop)")
+                        help="stop after this step: 2, 3, 3.5, 3.75, 3.8 (default: run through the outline loop)")
+    parser.add_argument("--craft-spine", action="store_true",
+                        help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
+                             "the premise and give its want/need to the line calls (default: off)")
     args = parser.parse_args()
 
     story_id = slugify(args.story_id)
@@ -1190,7 +1267,8 @@ if __name__ == "__main__":
     try:
         gen = StoryGenerator(story_id=story_id, max_repairs=args.max_repairs,
                              no_think_steps=csv(args.no_think_steps), think_steps=csv(args.think_steps),
-                             breakers=not args.no_breakers, framework_override=args.framework.strip() or None)
+                             breakers=not args.no_breakers, framework_override=args.framework.strip() or None,
+                             force_answer=not args.no_force_answer)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
@@ -1218,6 +1296,12 @@ if __name__ == "__main__":
         #  (protagonist, pressure, opposition, mediation, turns, cast seeds).
         gen.run_premise_expansion()
         if args.stop_after == '3.5':
+            finish()
+
+        # 3.75 (opt-in): the craft spine; the line calls read its want/need.
+        if args.craft_spine:
+            gen.run_craft_spine()
+        if args.stop_after == '3.75':
             finish()
 
         # 3.8: what kind of story this is; the framework the lines are laid over.

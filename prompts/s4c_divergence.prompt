@@ -190,6 +190,9 @@ $$PREMISE_JSON$$
 - the framework and its beats
 $$FRAMEWORK_JSON$$
 
+- the craft spine: want, need, the tension between them (or none). A new line may answer the need differently from the lines before it.
+$$CRAFT_JSON$$
+
 - the story so far (one entry per node)
 $$STORY_DIGEST_JSON$$
 

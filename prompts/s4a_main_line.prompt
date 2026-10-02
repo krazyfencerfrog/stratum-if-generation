@@ -22,7 +22,8 @@ telling, the one a reader would give if asked what the story is about.
 It has ONE through-line:
  - motivation: what drives "you" at the start, and what that has become
    by the end (the want, and the need under it that getting the want
-   would not satisfy).
+   would not satisfy). When a craft spine is given below, its want and
+   need are this story's; build the motivation from them.
  - strategy: how you go about it.
  - turning_point: where and why the motivation or the strategy shifts.
 The ending is an ANSWER to the engine's question: which pole the story
@@ -147,3 +148,6 @@ $$PREMISE_JSON$$
 
 - the framework and its beats
 $$FRAMEWORK_JSON$$
+
+- the craft spine: want, need, the tension between them, irony, setup and payoff (or none)
+$$CRAFT_JSON$$

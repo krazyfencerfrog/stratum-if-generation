@@ -307,14 +307,30 @@ thinks, what it should cost, and where it is cut off.
 |---|---|---|---|---|---|
 | `extract` | phase 3, rating filter | model default | 30 KB, 30 min | none | reported only |
 | `classify` | s2 shape, 3.5c, 3.5v, 3.8 | off | 6 min | 45 min | stops the run, naming the partial trace |
-| `judge` | 4d | on | 12 KB, 12 min | 24 KB, 25 min | retried with thinking off |
-| `build` | 3.5a, 3.5b, 3.5r, 4a, 4b, 4c | on | 25 KB, 25 min | 40 KB, 45 min | retried with thinking off |
+| `judge` | 4d | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
+| `build` | 3.5a, 3.5b, 3.5r, 3.75, 3.75r, 4a, 4b, 4c | on | 25 KB, 25 min | 40 KB, 45 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 
 - **Breakers** are enforced by the client as the stream arrives
   (`max_thinking_bytes`, `max_response_bytes`, `max_seconds`); it closes the
   connection, which stops generation. `num_predict` is set as a backstop,
   and a `done_reason` of `length` is treated as a cut. `--no-breakers`
   disables them.
+- **Budget forcing.** When a `judge` or `build` call passes its thinking
+  limit before any answer has started, the client does not throw the trace
+  away: it sends one raw-mode continuation holding the prompt, the thinking
+  so far and a closed think block (Qwen's ChatML; `raw_template` on the
+  client for other models), so the model answers from what it has. The
+  record gets `forced_answer` and `thinking_at_force`. Only if forcing fails
+  does the thinking-off re-run happen. `probe_ollama.py` checks it against
+  your server; `--no-force-answer` skips it.
+- **Craft spine (opt-in).** `--craft-spine` runs 3.75 after the premise:
+  want against need, irony, escalation, one setup/payoff pair. Computed
+  checks (`craft_checks.py`: irony vs the epistemic gap, escalation family
+  vs the trajectory, real turn citations, no citation by index) send hard
+  findings to 3.75r, up to `--max-repairs` rounds; a finding that survives
+  is recorded and the run continues. 4a and 4c receive the want, the need
+  and the setup/payoff; without the flag they receive `none`. Off by
+  default; turn it on if main-line motivations come out flat.
 - **Sampler.** Thinking calls send temperature 0.6, top_p 0.95, top_k 20;
   thinking-off calls 0.7, 0.8, 20; both `repeat_penalty` 1.0. Options set on
   the client in `dynamic_config.py` win. `STRATUM_SAMPLER=model` sends

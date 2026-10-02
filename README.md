@@ -76,8 +76,11 @@ stopped. Delete a step's output file to redo that step (and its downstream
 dependants). `<id>_run_stats.json` records every call attempt.
 
 Each call has a budget. A call whose reasoning trace runs past its limit is
-cut off and re-run once with thinking off; `report.py` shows which calls did.
-`--no-breakers` turns that off.
+cut off and made to answer from the thinking it has; if that fails, it is
+re-run once with thinking off. `report.py` shows which calls did.
+`--no-force-answer` skips the forced answer; `--no-breakers` turns the
+limits off. `--craft-spine` adds the optional craft-spine step (3.75) after
+the premise.
 
 Story directories written by an older version of the pipeline stop the run
 with a message saying what to delete; their phase-3 outputs can be kept.

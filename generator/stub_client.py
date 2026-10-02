@@ -31,9 +31,15 @@ Scenario knobs (environment variables):
                                  strings, labels without their articles
                                  (tests normalization)
     STUB_ABORT=s4a               that step's thinking call reports a tripped
-                                 circuit breaker (tests the no-think fallback);
-                                 with STUB_ABORT_ALWAYS=1 its no-think call
-                                 does too (tests the stop)
+                                 circuit breaker whose forced answer also
+                                 failed (tests the no-think fallback); with
+                                 STUB_ABORT_ALWAYS=1 its no-think call does
+                                 too (tests the stop)
+    STUB_SPINE_FLAGGED_ROUNDS=1  with --craft-spine, 3.75's first build cites by
+                                 list index (a computed finding -> 3.75r)
+    STUB_FORCE=s4a               that step's thinking call passes its thinking
+                                 limit and the client forces the answer
+                                 (only when the call allows force_answer)
     STUB_NEW_CAST_ON=2           the line built on this iteration registers a
                                  new character, a new crowd and a new place
     STUB_REJOIN_ON=3             the line built on this iteration rejoins the
@@ -79,6 +85,11 @@ class StubClient(LlmClient):
         text = answer if isinstance(answer, str) else json.dumps(answer, indent=2)
         self.last_call = {'aborted': None, 'done_reason': 'stop', 'format_sent': bool(kwargs.get('format')) and no_think,
                           'prompt_tokens': len(prompt) // 4, 'output_tokens': len(text) // 4}
+        if (os.environ.get('STUB_FORCE') == kind and not no_think
+                and (kwargs.get('limits') or {}).get('force_answer')):
+            self.last_call.update({'forced_answer': True, 'thinking_at_force': 25000})
+            print(f'[stub {kind}] (forced answer)')
+            return ('stub reasoning that ran past its budget. ' * 40, text)
         print(f'[stub {kind}]' + (' (no think)' if no_think else ''))
         return ('' if no_think else f'stub reasoning for {kind}', text)
 
@@ -105,6 +116,8 @@ class StubClient(LlmClient):
             ('You are the cast-sketch step', 's3_5c'),
             ('You are a fidelity auditor', 's3_5v'),
             ('You are the repair step for the premise', 's3_5r'),
+            ('craft-spine construction step', 's3_75'),
+            ('repair step for the craft spine', 's3_75r'),
             ('You are the story-form step', 's3_8'),
             ('You are step 4a', 's4a'),
             ('You are step 4b', 's4b'),
@@ -376,6 +389,34 @@ class StubClient(LlmClient):
                 "revised": {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}}
 
     # ------------------------------------------------------------------ 3.8
+
+    # ------------------------------------------------------------------ 3.75 (opt-in)
+
+    def spine(self, fixed=False):
+        return {
+            "invention_ceiling": {"source": "3.5.enrichment_budget", "level": "minimal", "note": "stub"},
+            "want_need_tension": {"want": {"pointer": "3.5.protagonist.wants", "restated": "keep the core alive"},
+                                  "need": {"description": "to be answerable to someone", "provenance": "invented",
+                                           "serves": "3b.secondary_affects: claustrophobic tension" if fixed else "3b.secondary_affects[1] moral complicity"},
+                                  "tension": "stub", "enacts_via": "colors how each turn is approached", "provenance": "invented",
+                                  "serves": "3c.core_thematic_axis"},
+            "irony_mode": {"gap_available": False, "type": "situational", "note": "3-0b.epistemic_gap.present is false",
+                           "device": "stub", "resolution_note": "stub", "provenance": "invented", "serves": "3c.core_thematic_axis"},
+            "escalation_shape": {"pattern": "compounding", "mechanism": "stub", "transformation_note": None,
+                                 "new_variable_required": False, "state_note": "rides the core margin stock",
+                                 "provenance": "invented", "serves": "3b.primary_trajectory"},
+            "setup_payoff_pairs": [{"setup": "turn 1: the warden's private reroute", "payoff": "turn 3: the council's offer",
+                                    "distance": "two turns", "reinforces": "want_need_tension", "provenance": "invented",
+                                    "serves": "3.5.turns: 1 and 3"}],
+            "motif": None,
+        }
+
+    def p_s3_75(self, p):
+        return self.spine(fixed=env_int('STUB_SPINE_FLAGGED_ROUNDS', 0) == 0)
+
+    def p_s3_75r(self, p):
+        return {"repair_log": [{"finding": "cites by index", "change": "cite by label", "disagreement": ""}],
+                "revised": self.spine(fixed=True)}
 
     def p_s3_8(self, p):
         candidates = self.section(p, '- CANDIDATES (choose one)') or []

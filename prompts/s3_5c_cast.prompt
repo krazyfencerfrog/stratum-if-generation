@@ -24,24 +24,28 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after. 
 
 CALIBRATION EXAMPLE (shape only; do not reuse its content)
 
-Engine (trimmed): you are a water agent in a dry valley; the opposition is the upstream rancher with the oldest recorded claim, quietly backed by the mill. Levers: the claims ledger, the deputy's loyalty, the mill's true draw figures, the widow's unrecorded claim.
+Engine (trimmed): you are the new editor of a small town's only newspaper; the opposition is the founder's son, the star columnist, who wants the paper sold to a regional chain. Levers: the late owner's files, the press foreman's loyalty, the chain's offer letter, the mayor's campaign advertising money.
 Roles the turns name:
- - the widow
- - the upstream rancher
- - your deputy
- - the mill foreman
- - the millhands
- - the mill owner
+ - the bank manager
+ - the late owner's secretary
+ - the founder's son
+ - the press foreman
+ - the pressmen
+ - the reporter
+ - the mayor
+ - the chain's manager
 Output:
 {
-  "notes": "The millhands are the only crowd; the mill foreman speaks for them. The opposition acts through the upstream rancher, whom the mill owner backs without being his hand.",
+  "notes": "The pressmen are the only crowd; the press foreman speaks for them. The opposition acts through the founder's son; the chain's manager backs him without being his hand.",
   "cast_seeds": [
-    {"role": "the widow", "kind": "individual", "speaks_for": null, "wants": "her unrecorded claim honored", "holds": "her own account of the old agent's promise", "opposition": false},
-    {"role": "the upstream rancher", "kind": "individual", "speaks_for": null, "wants": "his paper right enforced before the season is lost", "holds": "the oldest claim and the fence that can cut the creek", "opposition": true},
-    {"role": "your deputy", "kind": "individual", "speaks_for": null, "wants": "to be owed by everyone", "holds": "the only force behind the office, and a side trade in water access", "opposition": false},
-    {"role": "the mill foreman", "kind": "individual", "speaks_for": "the millhands", "wants": "the mill running, whoever owns the water", "holds": "whether the millhands talk, and to whom", "opposition": false},
-    {"role": "the millhands", "kind": "crowd", "speaks_for": null, "wants": "wages", "holds": "what they remember of the old agent, and the town's tolerance for any ruling", "opposition": false},
-    {"role": "the mill owner", "kind": "individual", "speaks_for": null, "wants": "the mill's draw kept off the record", "holds": "the draw figures and the town's payroll", "opposition": false}
+    {"role": "the bank manager", "kind": "individual", "speaks_for": null, "wants": "the loan repaid or the paper sold to someone who will", "holds": "the loan and its terms", "opposition": false},
+    {"role": "the late owner's secretary", "kind": "individual", "speaks_for": null, "wants": "to keep her job whoever owns the paper", "holds": "the late owner's files and what he told her about them", "opposition": false},
+    {"role": "the founder's son", "kind": "individual", "speaks_for": null, "wants": "the paper sold to the chain and a column of his own in every one of its papers", "holds": "half the newsroom's loyalty and the chain's offer", "opposition": true},
+    {"role": "the press foreman", "kind": "individual", "speaks_for": "the pressmen", "wants": "the pressmen's contract renewed", "holds": "whether the press runs", "opposition": false},
+    {"role": "the pressmen", "kind": "crowd", "speaks_for": null, "wants": "their contract", "holds": "the press itself", "opposition": false},
+    {"role": "the reporter", "kind": "individual", "speaks_for": null, "wants": "her story printed somewhere", "holds": "the proof about the mayor's advertising", "opposition": false},
+    {"role": "the mayor", "kind": "individual", "speaks_for": null, "wants": "re-election and a quiet front page", "holds": "a third of the paper's advertising income", "opposition": false},
+    {"role": "the chain's manager", "kind": "individual", "speaks_for": null, "wants": "the town's paper in the chain before the election", "holds": "the offer and the press in the next town", "opposition": false}
   ]
 }
 

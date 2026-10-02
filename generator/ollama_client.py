@@ -42,6 +42,15 @@ options: per-call model options (sampler settings, num_predict). Options
 limits:  {'max_thinking_bytes', 'max_response_bytes', 'max_seconds'}; any
          may be missing or None. Checked as chunks arrive; on a breach the
          connection is closed, which stops generation on the server.
+         With 'force_answer': True, a call cut by max_thinking_bytes before
+         any answer text arrived is not thrown away: the client sends one
+         raw-mode continuation holding the prompt, the thinking so far and
+         a CLOSED think block, so the model writes its answer from what it
+         has ("budget forcing"). last_call then has forced_answer True,
+         thinking_at_force, and aborted None. The continuation needs the
+         model's chat template (raw_template, Qwen's ChatML by default);
+         probe_ollama.py checks it. If forcing fails, the call is reported
+         as cut, exactly as without it.
 """
 
 from llm_client import LlmClient, LlmCallError
@@ -56,6 +65,15 @@ import urllib.request
 
 DEFAULT_OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
+# A plain /api/generate request to a Qwen-family model becomes ChatML with
+# the whole prompt as the user turn. The forced continuation rebuilds that
+# by hand, in raw mode, with the thinking so far inside a closed think block.
+CHATML_TEMPLATE = ("<|im_start|>user\n{prompt}<|im_end|>\n"
+                   "<|im_start|>assistant\n<think>\n{thinking}\n</think>\n\n")
+FORCE_CLOSE = ("\n\nI have deliberated enough. I will stop here and write the final answer "
+               "now, exactly in the requested output format.")
+FORCED_ANSWER_TOKENS = 6144
+
 
 def _ollama_url(host, path):
     return host.rstrip("/") + path
@@ -64,7 +82,7 @@ def _ollama_url(host, path):
 class OllamaClient(LlmClient):
     def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180,
                  max_duration=14400, echo=True, options=None, structured='no_think',
-                 no_think_suffix='/no_think'):
+                 no_think_suffix='/no_think', raw_template=CHATML_TEMPLATE):
         self.host = host
         self.model = model
         self.keep_alive = keep_alive
@@ -83,6 +101,8 @@ class OllamaClient(LlmClient):
         self.structured = structured
         self.no_think_suffix = no_think_suffix
         self.think_param = True    # goes False if the server rejects think:false
+        self.raw_template = raw_template
+        self._call_format = None
         self.last_call = {}
 
     # ------------------------------------------------------------------ request
@@ -122,6 +142,9 @@ class OllamaClient(LlmClient):
             payload["prompt"] = payload["prompt"].rstrip() + "\n\n" + self.no_think_suffix
 
     def run_prompt(self, prompt, think=None, format=None, options=None, limits=None, **_ignored):
+        # a forced continuation answers after a closed think block, so a
+        # schema is safe there even when this call could not send one
+        self._call_format = format if self.structured != 'never' else None
         payload = self._payload(prompt, think, format, options, limits)
         for _ in range(3):
             try:
@@ -287,10 +310,54 @@ class OllamaClient(LlmClient):
         final = final or {}
 
         thinking, text = partial()
+        if (aborted == 'thinking_bytes' and limits.get('force_answer') and not text.strip()
+                and inline is None and not payload.get('raw')):
+            forced = self._force(payload, thinking, limits, start)
+            if forced is not None:
+                return forced
         if aborted and self.echo:
             print(f'\n[call cut off: {aborted}]')
         self.last_call = self._info(payload, start, thinking, text, aborted, final)
         return (thinking, text)
+
+    def _force(self, payload, thinking, limits, start):
+        """Budget forcing: one raw continuation that closes the think block
+        and asks for the answer. Returns (thinking, response), or None if
+        the continuation failed (the caller then reports the cut)."""
+        if self.echo:
+            print('\n[thinking budget reached: forcing the answer]', flush=True)
+        opts = dict(payload.get('options') or {})
+        opts['num_predict'] = min(int(opts.get('num_predict') or FORCED_ANSWER_TOKENS), FORCED_ANSWER_TOKENS)
+        raw = {
+            "model": self.model,
+            "prompt": self.raw_template.format(prompt=payload["prompt"], thinking=thinking + FORCE_CLOSE),
+            "raw": True,
+            "stream": True,
+            "keep_alive": self.keep_alive,
+            "options": opts,
+        }
+        if self._call_format is not None:
+            raw["format"] = self._call_format
+        spent = time.time() - start
+        sub_limits = {'max_response_bytes': limits.get('max_response_bytes')}
+        if limits.get('max_seconds'):
+            # the continuation gets what is left of the wall clock, and at
+            # least ten minutes: the answer is the point of the whole call
+            sub_limits['max_seconds'] = max(600, limits['max_seconds'] - spent)
+        try:
+            extra, answer = self._stream(raw, {k: v for k, v in sub_limits.items() if v})
+        except LlmCallError as e:
+            print(f'NOTE: the forced answer failed ({e}); reporting the call as cut.', file=sys.stderr)
+            return None
+        sub = self.last_call
+        if sub.get('aborted') or not answer.strip():
+            return None
+        full_thinking = thinking + ("\n" + extra if extra else "")
+        info = self._info(payload, start, full_thinking, answer, None, {})
+        info.update({'forced_answer': True, 'thinking_at_force': len(thinking.encode('utf-8')),
+                     'done_reason': sub.get('done_reason'), 'output_tokens': sub.get('output_tokens')})
+        self.last_call = info
+        return (full_thinking, answer)
 
     @staticmethod
     def _info(payload, start, thinking, response, aborted, final):
