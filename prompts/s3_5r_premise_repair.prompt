@@ -14,13 +14,13 @@ For each finding:
      A mechanic the engine lacks is rewritten as fiction over the engine's primitives (rooms, objects, people to talk to, a clock, flags), or removed.
      A bad serves tag is corrected to the brief field id the item actually serves.
      Too many complications: drop the one that serves least.
- - An ENGINE finding is repaired by SUPPLYING what is missing, not by deleting the field: a bare turn gets a real thing to do and a cost per way through; two turns that share a form get different forms (and different things to do); a mediation pole gets an action in the world; an opposition gets a want and means; a group gets an individual who speaks for it; a role a turn involves gets a cast seed. This is the one kind of finding where the repair adds material, because the finding says the material is missing.
+ - An ENGINE finding is repaired by SUPPLYING what is missing, not by deleting the field: a bare turn gets a real thing to do and a cost per way through; two turns that share a form get different forms (and different things to do); a mediation pole gets an action in the world; an opposition gets a want and means; a group gets an individual who speaks for it; a role a turn involves gets a cast seed. A term nobody can picture is rewritten as the physical thing it stands for (what it is, what it does when used), everywhere it appears. A turn that repeats another's choice gets a local goal of its own and ways that change something different (who is with you, what you hold, what is damaged). A missing hidden truth is stated: what it is, who knows it, what it changes. This is the one kind of finding where the repair adds material, because the finding says the material is missing.
 
 A turn is rewritten, never deleted below three.
 
 --- WHAT YOU RETURN ---
 
-"revised" holds ONLY the top-level sections you changed, each one whole: any of protagonist, arena, pressure, opposition, mediation, turns, complications, cast_seeds. A section you did not need to touch is left out, and the pipeline keeps it exactly as it was. If you change one turn, return the whole "turns" list with the other turns copied unchanged.
+"revised" holds ONLY the top-level sections you changed, each one whole: any of protagonist, arena, pressure, opposition, hidden_truth, mediation, turns, complications, cast_seeds. A section you did not need to touch is left out, and the pipeline keeps it exactly as it was. If you change one turn, return the whole "turns" list with the other turns copied unchanged.
 
 --- WHAT YOU DO NOT DO ---
 

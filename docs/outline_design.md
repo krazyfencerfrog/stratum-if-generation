@@ -77,9 +77,9 @@ calls in the order the old prompt asked the model to think in.
 
 | call | builds | output |
 |---|---|---|
-| `s3_5a_engine` | protagonist (with `cannot_do`), arena, pressure, opposition, mediation | about 2.5 KB |
+| `s3_5a_engine` | protagonist (with `cannot_do`), arena, pressure, opposition, `hidden_truth` (when the brief has an epistemic gap: what it is, who knows, what it changes; else null), mediation | about 2.5 KB |
 | `s3_5b_turns` | 3 to 5 turns (situation, task, `ways_through` with costs, `involves`, `form`), complications by budget | about 3 KB |
-| `s3_5c_cast` | one sketch per role the turns name: kind, speaks_for, wants, holds, opposition | about 1.5 KB |
+| `s3_5c_cast` | one sketch per role the turns name: kind, speaks_for, wants, holds, `edge` (a contradiction, flaw or secret), `tie` (to you or another seed), opposition | about 2 KB |
 
 `assemble_premise` puts them side by side as `s3_5_premise.json` and looks up
 each seed's `matters_to_turns` from the turns. Dropped from the old single
@@ -104,7 +104,8 @@ involves with no seed; a crowd with nobody who speaks for it; a way through writ
 lists and one search. One entry per numbered Kernel clause (`contradiction`),
 per numbered constraint (`violated`), per engine check (`holds`: E1 the limit
 is real, E2 the opposition has its own want, E3/E4 each pole takes an action
-with a cost, T<n> turn n is not the axis handed over as a pick), plus any
+with a cost, E5 everything named can be pictured, E6 no two turns pose the
+same choice, T<n> turn n is not the axis handed over as a pick), plus any
 mechanic the engine lacks. In each entry `note` precedes the verdict, so the
 deliberation is one visible sentence per item. The verdict is computed from
 the entries; there is no severity field to agonize over. Any failure is a
@@ -406,3 +407,31 @@ are listed at the top of `generator/stub_client.py`.
 
 Everything after phase 3. `docs/fable_response_4.md` section 9 is the
 checklist, in priority order.
+
+## 10. Story-quality rules (2026-10-03)
+
+From the first fantasy kernels (31, 32): outlines were well formed but flat.
+The causes were upstream, and each now has a rule:
+
+- **Threat is not loss.** 3.5a read a relational-only failure model as "nothing
+  in the world is dangerous" (kernel31's dragon never acted) and setting
+  "single" as one room (kernel32's dungeon crawl). The failure model bounds how
+  the player loses, not how dangerous the world is; "single" is one place with
+  many rooms. 3.5b and 4a say the world can hurt and that damage is shown.
+- **Turns build toward the question.** Each turn has a local goal; only the last
+  one or two put the decision axis at stake. Audit check E6.
+- **Picturable.** Levers, ways and summaries are people, places, objects,
+  documents, events: no coined abstractions ("the dragon's wake"). Audit
+  check E5; 4a and 4b say what physically happens.
+- **Hidden truth.** When phase 3 finds an epistemic gap, the premise states it
+  (`hidden_truth`); a computed finding reports it missing, or present when the
+  brief rules one out. 3.5b plants a clue and a way to bring it out; 4a places
+  where it is suspected and where it comes out.
+- **Cast edges and ties.** Each seed has an `edge` and a `tie`, shown in the
+  story document and in the register 4b reads. At least one complication is a
+  reversal.
+- **Agency.** 4d prefers lines that leave early and may seed a line from an
+  accumulated pattern; 4c prefers `accumulated` triggers for relationship
+  lines. A computed note (`late_forks`) flags a story whose lines all leave
+  in the main line's second half. Moving a price onto a different payer, with
+  the same people standing at the end, no longer counts as a different ending.

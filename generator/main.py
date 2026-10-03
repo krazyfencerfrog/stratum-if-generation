@@ -100,7 +100,7 @@ SHAPE_TIERS = {
 TURN_FORMS = ('discover', 'persuade', 'trade', 'confront', 'conceal_or_reveal', 'sabotage',
               'endure', 'choose_whom', 'rescue', 'escape')
 COMPLICATION_BUDGET = {'minimal': 1, 'moderate': 3, 'generous': 4}
-PREMISE_KEYS = ('protagonist', 'arena', 'pressure', 'opposition', 'mediation', 'turns',
+PREMISE_KEYS = ('protagonist', 'arena', 'pressure', 'opposition', 'hidden_truth', 'mediation', 'turns',
                 'complications', 'cast_seeds')
 
 # Files a story directory from before this schema would contain. Phase-3
@@ -700,6 +700,11 @@ class StoryGenerator:
             for sk in subkeys:
                 if block.get(sk) in (None, '', [], {}):
                     problems.append(f'{key}.{sk} is missing or empty')
+        hidden = parsed.get('hidden_truth')
+        if hidden in ('', {}, [], 'null', 'none'):
+            parsed['hidden_truth'] = hidden = None
+        if hidden is not None and not (isinstance(hidden, dict) and str(hidden.get('truth') or '').strip()):
+            problems.append('hidden_truth must be null or an object whose "truth" states the truth itself')
         med = parsed.get('mediation') if isinstance(parsed.get('mediation'), dict) else {}
         for pole in ('to_reach_pole_a', 'to_reach_pole_b'):
             p = med.get(pole)
@@ -798,7 +803,7 @@ class StoryGenerator:
         """The premise downstream reads: the three builds side by side, with
         each seed's matters_to_turns looked up from the turns."""
         premise = {'enrichment_budget': {'level': budget}}
-        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'mediation'):
+        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'hidden_truth', 'mediation'):
             premise[key] = engine.get(key)
         premise['turns'] = turns.get('turns')
         premise['complications'] = turns.get('complications') or []
@@ -900,6 +905,14 @@ class StoryGenerator:
         if len(copied) >= example_guard.MIN_HITS:
             add('premise', f"the premise copies the prompts' calibration example ({len(copied)} of its phrases); "
                            f"rebuild every section copied from it from this Kernel", '; '.join(copied[:6]))
+        gap = ((brief or {}).get('fields') or {}).get('3-0b.epistemic_gap') or {}
+        hidden = premise.get('hidden_truth')
+        if gap.get('present') is True and not (isinstance(hidden, dict) and str(hidden.get('truth') or '').strip()):
+            add('hidden_truth', f'the brief has an epistemic gap ({gap.get("description") or "unnamed"}) but the premise '
+                                'states no hidden truth; say what the truth IS, who knows it, and what it changes')
+        elif gap.get('present') is False and gap.get('binding') == 'constraint' and isinstance(hidden, dict) and hidden.get('truth'):
+            add('hidden_truth', 'the brief rules out a hidden truth (3-0b.epistemic_gap present false), but the premise '
+                                'builds one; set hidden_truth to null', str(hidden.get('truth')))
         turns = [t for t in premise.get('turns') or [] if isinstance(t, dict)]
         if len(turns) < 3:
             add('turns', f'there are {len(turns)} turns; a story needs at least 3')
@@ -963,6 +976,12 @@ class StoryGenerator:
                    'done, obtained or endured) with a cost. It is not the pole restated.'),
             ('E4', 'mediation.to_reach_pole_b.what_you_must_do is an action in the world with a cost. It is not '
                    'the pole restated.'),
+            ('E5', 'everything the engine and the turns name is something a reader can picture: the levers, the '
+                   'pressure, the situations and the ways through are people, places, objects, documents, events or '
+                   'things said, not coined abstractions. If one is not, quote it.'),
+            ('E6', 'no two turns pose the same choice: their ways are not the same outcomes with different nouns, and '
+                   'turns before the last two have local goals of their own rather than the decision axis in another '
+                   'form (unless the Kernel itself makes the decision recur). If they do, quote the later turn.'),
         ]
         for t in premise.get('turns') or []:
             if isinstance(t, dict):

@@ -69,6 +69,7 @@ ENGINE = obj(
     arena=obj(description=S, serves=S),
     pressure=obj(description=S, clock_or_stock=S, serves=S),
     opposition=obj(who_or_what=S, wants=S, means=S, serves=S),
+    hidden_truth=nullable(obj(truth=S, who_knows=S, what_it_changes=S, serves=S)),
     mediation=obj(question=S, to_reach_pole_a=POLE, to_reach_pole_b=POLE, levers=arr(S), serves=S),
 )
 
@@ -81,7 +82,7 @@ TURNS = obj(
 CAST = obj(
     notes=S,
     cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
-                       wants=S, holds=S, opposition=B)),
+                       wants=S, holds=S, edge=STR_OR_NULL, tie=S, opposition=B)),
 )
 
 PREMISE_CHECK = obj(

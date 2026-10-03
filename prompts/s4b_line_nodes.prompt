@@ -21,6 +21,9 @@ WHAT YOU WRITE FOR EACH NODE
    make it concrete. It is a summary of events, not a scene: no dialogue,
    no step-by-step actions, no objects handled one at a time, no "if you
    ... then ...".
+   Plain physical words: a reader should be able to picture what
+   happened. Where the plan or the engine uses a strange term, say what
+   the thing is.
  - where: one to three places, by name.
  - who: the people present, by label. "You" are always present and are
    not listed.

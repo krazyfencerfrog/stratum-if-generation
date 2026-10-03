@@ -147,6 +147,7 @@ class OutlineBuilder:
             'protagonist': pick(p.get('protagonist'), 'who', 'wants', 'can_do', 'cannot_do'),
             'pressure': (p.get('pressure') or {}).get('description'),
             'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
+            'hidden_truth': p.get('hidden_truth') or None,
             'question': med.get('question'),
             'pole_a': pick(med.get('to_reach_pole_a'), 'pole', 'what_you_must_do', 'cost'),
             'pole_b': pick(med.get('to_reach_pole_b'), 'pole', 'what_you_must_do', 'cost'),
@@ -206,6 +207,7 @@ class OutlineBuilder:
             if isinstance(seed, dict) and seed.get('role'):
                 self.add_character({'label': seed['role'], 'kind': seed.get('kind'), 'speaks_for': seed.get('speaks_for'),
                                     'wants': seed.get('wants'), 'holds': seed.get('holds'),
+                                    'edge': seed.get('edge'), 'tie': seed.get('tie'),
                                     'opposition': seed.get('opposition'), 'why': '',
                                     'matters_to_turns': seed.get('matters_to_turns') or []}, source='premise')
 
@@ -215,6 +217,7 @@ class OutlineBuilder:
             'id': cid, 'label': str(c.get('label')).strip(),
             'kind': 'crowd' if str(c.get('kind') or '').lower() == 'crowd' else 'individual',
             'speaks_for': c.get('speaks_for') or None, 'wants': c.get('wants') or '', 'holds': c.get('holds') or '',
+            'edge': c.get('edge') or '', 'tie': c.get('tie') or '',
             'opposition': bool(c.get('opposition')), 'why': c.get('why') or '',
             'matters_to_turns': c.get('matters_to_turns') or [], 'source': source, 'nodes': [],
             # filled by the character buildout (stage B)
@@ -266,7 +269,9 @@ class OutlineBuilder:
     def register_view(self):
         return {
             'characters': [{'label': c['label'], 'kind': c['kind'], 'speaks_for': c['speaks_for'],
-                            'wants': c['wants'], 'holds': c['holds']} for c in self.characters.values()],
+                            'wants': c['wants'], 'holds': c['holds'],
+                            **({'edge': c['edge']} if c.get('edge') else {}),
+                            **({'tie': c['tie']} if c.get('tie') else {})} for c in self.characters.values()],
             'locations': [{'name': l['name'], 'kind': l['kind'], 'why': l['why']} for l in self.locations.values()],
         }
 
@@ -875,6 +880,8 @@ class OutlineBuilder:
             if not self.match(loc['name'], self.locations, 'name'):
                 self.add_location(loc, source=line['id'])
         for c in fill.get('new_characters') or []:
+            if norm(c.get('label')) in ('protagonist', 'the protagonist', 'you', 'yourself'):
+                continue        # "you" is not a character in the register
             if not self.match(c['label'], self.characters, 'label'):
                 self.add_character(c, source=line['id'])
         for x in fill['nodes']:
@@ -1073,6 +1080,8 @@ def story_markdown(story):
         if c.get('speaks_for'):
             bits.append(f"speaks for {c['speaks_for']}")
         out.append(f"- **{c['label']}** ({', '.join(bits)}): wants {c.get('wants') or '?'}; holds {c.get('holds') or '?'}"
+                   + (f"; edge: {c['edge']}" if c.get('edge') else '')
+                   + (f"; tie: {c['tie']}" if c.get('tie') else '')
                    + (f"; {c['why']}" if c.get('why') else '')
                    + f" [{', '.join(c.get('nodes') or []) or 'unused'}]")
     out.append('')

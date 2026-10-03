@@ -177,6 +177,28 @@ def repair_breakage_is_caught_at_once():
 
 
 @test
+def hidden_truth_and_cast_edges():
+    run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
+    premise = load('gap', 's3_5_premise_accepted.json')
+    check((premise.get('hidden_truth') or {}).get('truth'), 'a brief with an epistemic gap should give a premise with a stated hidden truth')
+    loop = load('gap', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 0, f'a stated hidden truth should not cost a repair round: {loop["rounds"][0]["findings"]}')
+    seeds = premise['cast_seeds']
+    check(all(s.get('tie') for s in seeds) and all(s.get('edge') for s in seeds if s['kind'] == 'individual'),
+          'every seed should carry a tie, and every individual an edge')
+    # the engine forgets the truth the brief says is there: a computed finding, filled by the repair
+    run('gap_missing', env={'STUB_GAP': '2'}, args=['--stop-after=3.5'])
+    loop = load('gap_missing', 's3_5_loop.json')
+    check(any(f['where'] == 'hidden_truth' for f in loop['rounds'][0]['findings']), 'a missing hidden truth was not reported')
+    check(not loop['still_failing'] and (load('gap_missing', 's3_5_premise_accepted.json').get('hidden_truth') or {}).get('truth'),
+          'the repair should have supplied the hidden truth')
+    # with no gap the stub engine states none, and the outline shows the cast's edges and ties
+    story = open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.md')).read()
+    check('edge: stub edge of' in story and 'tie: stub tie of' in story, 'the story document should show edges and ties')
+    check(load('basic', 's3_5_premise_accepted.json').get('hidden_truth') is None, 'no gap, no hidden truth')
+
+
+@test
 def premise_halt():
     _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '1'}, expect=2)
     check('PIPELINE HALTED' in out, 'no halt message')
@@ -595,6 +617,16 @@ def example_copies_are_caught():
     kernel = open(os.path.join(KERNELS, 'kernel1.txt')).read()
     hits = example_guard.copied_phrases(premise, pf, [kernel])
     check(len(hits) < example_guard.MIN_HITS, f'the stub premise was flagged as a copy: {hits[:5]}')
+
+
+@test
+def late_forks_are_noted():
+    import checks
+    main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}
+    late = {'T1': main, 'T2': {'divergence': {'diverges_at': 'N04'}}, 'T3': {'divergence': {'diverges_at': 'N05'}}}
+    check(checks.late_forks(late), 'lines that all leave in the second half should be noted')
+    early = dict(late, T3={'divergence': {'diverges_at': 'N02'}})
+    check(checks.late_forks(early) is None, 'a line that leaves in the first half clears the note')
 
 
 @test

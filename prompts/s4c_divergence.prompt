@@ -30,9 +30,11 @@ WHAT YOU PRODUCE
 
 through_line: title, motivation (what "you" come to want, and what it
 becomes), strategy, turning_point, and differs_from: one sentence per
-existing line saying how this line differs from it in KIND (a different
-answer to the story's question, or the same answer at a different price
-paid by someone else).
+existing line saying how this line differs from it in KIND: a different
+answer to the story's question, or the same answer leaving a different
+world (who is still with you, who is lost, what stands or is destroyed).
+Moving the same price onto a different payer, with the same people
+standing at the end, is not a difference in kind.
 
 divergence:
  - diverges_at: the id of the last node this line shares with the
@@ -43,7 +45,9 @@ divergence:
    chose". A later stage turns this sentence into a condition.
  - trigger_kind: "act" when the trigger is something done in that node;
    "accumulated" when it is the pattern of what the player did across
-   the earlier nodes.
+   the earlier nodes. When the seed is about a relationship (a companion
+   who stays or leaves, someone won over or lost), prefer "accumulated":
+   loyalty is earned or spent over the whole road, not at one door.
  - way: if that node plays a premise turn and the trigger is one of the
    turn's numbered ways, its number; otherwise null. (unused_ways, below,
    lists the ways no line has taken yet, by node.)

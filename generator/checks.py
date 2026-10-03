@@ -376,5 +376,23 @@ def check_story(story):
     undescribed = [locs[l].get('name') for l in locs if not str(locs[l].get('why') or '').strip()]
     if undescribed:
         notes.append(_finding('undescribed_locations', f'locations used by a node but never described: {undescribed}'))
+    late = late_forks(lines)
+    if late:
+        notes.append(_finding('late_forks', late))
 
     return {'findings': findings, 'notes': notes}
+
+
+def late_forks(lines):
+    """A story whose lines all leave the main line in its second half is
+    one road with a choice of endings. Returns the note text, or None."""
+    main = next((l for l in lines.values() if not l.get('divergence')), None)
+    path = as_list((main or {}).get('path'))
+    forks = [(l.get('divergence') or {}).get('diverges_at') for l in lines.values() if l.get('divergence')]
+    forks = [f for f in forks if f in path]
+    if len(path) < 5 or len(forks) < 2:
+        return None
+    if all(path.index(f) + 1 > len(path) / 2 for f in forks):
+        return (f'every divergent line leaves the main line in its second half (at {", ".join(sorted(set(forks)))}, '
+                f'of {len(path)} nodes): one road with a choice of endings')
+    return None

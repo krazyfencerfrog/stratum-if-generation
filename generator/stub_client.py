@@ -27,6 +27,9 @@ Scenario knobs (environment variables):
                                  menu pick under an unknown form (tests the
                                  repair validator); =2 its retry does too
                                  (tests that the run goes on to the audit)
+    STUB_GAP=1                   the brief has an epistemic gap and the engine
+                                 states a hidden truth; =2 the engine omits it
+                                 (a computed finding the repair must fill)
     STUB_BAD_CAST=1              3.5c's first answer leaves a crowd without a
                                  representative (tests the informed retry)
     STUB_BAD_PLAN=1              4a's first answer leaves a turn unplaced
@@ -258,7 +261,9 @@ class StubClient(LlmClient):
     def p_s3_0b(self, p):
         return {
             "protagonist_identity": {"type": "systemic_entity", "role_descriptor": "generational-ship AI", "evidence_basis": "explicit"},
-            "epistemic_gap": {"present": False, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "strong_inference"},
+            "epistemic_gap": ({"present": True, "gap_description": "what the council is hiding about the air", "design_status": "incidental", "evidence_basis": "explicit"}
+                              if env_int('STUB_GAP', 0) else
+                              {"present": False, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "strong_inference"}),
             "gap_resolution": {"expectation": "not_applicable", "evidence_basis": "strong_inference"}
         }
 
@@ -347,6 +352,8 @@ class StubClient(LlmClient):
                 "to_reach_pole_b": {"pole": "collective: spare", "what_you_must_do": "find and reroute air the sectors are hiding", "cost": "the core margin falls faster"},
                 "levers": ["the council override codes", "the hydroponics scrubber feed", "the warden's private reroute"],
                 "serves": "3-0a.primary_decision_axis"},
+            # STUB_GAP=1: the brief has an epistemic gap; =2 the engine forgets to state it (a computed finding)
+            "hidden_truth": self.HIDDEN if env_int('STUB_GAP', 0) == 1 else None,
         }
 
     def p_s3_5b(self, p):
@@ -379,7 +386,8 @@ class StubClient(LlmClient):
         seeds = []
         for r in roles:
             kind, speaks, wants, holds, opp = known.get(r, ("individual", None, "stub want", "stub holding", False))
-            seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds, "opposition": opp})
+            seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds,
+                          "edge": None if kind == "crowd" else f"stub edge of {r}", "tie": f"stub tie of {r}", "opposition": opp})
         return {"notes": "stub", "cast_seeds": seeds}
 
     def p_s3_5v(self, p):
@@ -400,6 +408,10 @@ class StubClient(LlmClient):
                           if hard else []),
         }
 
+    HIDDEN = {"truth": "the council speaker has been venting the nursery's reserve into her own sector for a month",
+              "who_knows": "the nursery warden", "what_it_changes": "the council stops being the side that spares people",
+              "serves": "3-0b.epistemic_gap"}
+
     def p_s3_5r(self, p):
         revised = {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}
         breaks = env_int('STUB_REPAIR_BREAKS', 0)
@@ -412,6 +424,8 @@ class StubClient(LlmClient):
             revised['turns'] = turns
         elif 'written as a pick' in p.split(RETRY_MARKER)[0]:
             revised['turns'] = self.p_s3_5b(p)['turns']     # the finding list names the broken turn: restore it
+        if 'states no hidden truth' in p.split(RETRY_MARKER)[0]:
+            revised['hidden_truth'] = self.HIDDEN
         return {"repair_log": [{"finding": self.VIOLATION, "change": "replaced the score with a rerouting complication", "disagreement": ""}],
                 "revised": revised}
 

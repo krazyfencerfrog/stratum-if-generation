@@ -18,10 +18,11 @@ A new line is worth building when it would change what the story is ABOUT
 for the player: the same protagonist, wanting something else or going
 about it another way, arriving at an ending that differs in KIND from
 every ending already built. Endings differ in kind when they give a
-different answer to the story's question; or the same answer at a
-different price; or the same answer with someone else paying for it. A
-larger or smaller amount of the same price, paid by the same people, is a
-difference of degree.
+different answer to the story's question, or the same answer leaving a
+different world: someone else still with you or lost, something else
+standing or destroyed. A larger or smaller amount of the same price, or
+the same price moved onto a different payer while the same people stand
+at the end, is a difference of degree.
 
 A line is NOT worth building when it is:
  - the same strategy pointed at a different person or place;
@@ -40,8 +41,16 @@ WHERE A LINE CAN START
  - A line may also start from something new arriving in an existing node:
    an offer, a discovery, a refusal. Then the trigger says what.
  - diverges_at must be one of valid_divergence_nodes.
- - When two starting points would give the same line, take the later one:
-   it shares more of what is already built.
+ - Prefer a line that leaves EARLY. A story whose lines all part at the
+   last turn is one road with a choice of endings; a line that leaves in
+   the first half has its own middle, where the player feels the
+   difference. Take a later starting point only when an earlier one
+   cannot carry the line.
+ - When the kernel ties the outcome to relationships (who stays with
+   you, who you win over), a line may start from the pattern of what the
+   player did across the earlier nodes ("you broke every promise you
+   made the thief on the road"): name the node where that pattern comes
+   due.
 
 $$SHAPE_NOTE$$
 
