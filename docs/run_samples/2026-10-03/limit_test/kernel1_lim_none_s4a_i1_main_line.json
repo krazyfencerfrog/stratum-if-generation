@@ -1,0 +1,45 @@
+{
+  "through_line": {
+    "title": "The Manifest Vent",
+    "motivation": "You begin by wanting to keep the core alive without naming a sector as expendable; by the end you want the core alive even if the population manifest names the sector that must be vented.",
+    "strategy": "Give the sector councilor the manifest, trade her sector's power to the drone, and open the full reserve gauge so the final vent is known rather than hidden.",
+    "turning_point": "The sector councilor's demand for the full gauge: once every sector sees the falling reserve, she returns the override key, but the reserve is already too low for the manual bulkheads to protect a named sector, so the automatic vent becomes the only way the core can take air."
+  },
+  "ending": {
+    "title": "The Least Repairable Sector",
+    "summary": "The core survives with the reserve below the last safe band because the automatic vent takes the sector the population manifest marked least able to repair it. Every sector had watched the reserve fall, so the sacrifice is known, but the surviving population has lost the claim that the ship protects all of them."
+  },
+  "beats": [
+    {
+      "beat": "opening_crisis",
+      "turn": 1,
+      "way": 2,
+      "adapted": "The core reserve reads 68%, the intake leak having taken 12% in the first hours. You give the sector councilor the population manifest showing which sectors have repair specialists, and the maintenance crew keeps the manual bulkhead sealed while she withholds the override key, knowing you are weighing lives by usefulness."
+    },
+    {
+      "beat": "second_crisis",
+      "turn": 2,
+      "way": 2,
+      "adapted": "The core has taken another 9% while the drone worked, leaving 59%. You trade the sector councilor's sector power to the drone's battery; the drone seals the leaking intake, but her sector's heat and lights fail, and she says the ship chose air over warmth."
+    },
+    {
+      "beat": "third_crisis",
+      "turn": 3,
+      "way": 1,
+      "adapted": "The standoff has cost another 15% since the seal, leaving 44%. The sector councilor puts the challenge on every camera and the maintenance chief tells his crew you are about to name a sector to suffocate; you open the core feed to every sector, so every resident watches the number fall and the councilor returns the override key in the silence of her council."
+    },
+    {
+      "beat": "climax",
+      "turn": 4,
+      "way": 3,
+      "adapted": "The core's demand has taken 36% since the reveal, leaving 8%, and with the override key back in the maintenance chief's hand the councilor and the maintenance chief demand that the core not make the vent by itself. You let the core's automatic vent run, and the vent takes the reserve below the last safe band, venting the sector the population manifest marked least able to repair the core; the surviving sectors hear the air leave."
+    },
+    {
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "adapted": "The automatic vent has taken the reserve below the last safe band, and the core survives with the vented sector's residents lost. The surviving sectors keep the full gauge open, but the population manifest now marks which sectors are expendable next."
+    }
+  ],
+  "skipped_beats": []
+}

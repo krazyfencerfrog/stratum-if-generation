@@ -1,0 +1,235 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are a young hedge-witch from a border village, sent north to stop an old dragon that has woken in the mountains, and you gather a small party along the way: a disgraced knight, a thief who knows the old roads, and a scholar from the capital who has her own reasons for wanting to reach the dragon first.",
+    "wants": "To reach the dragon before its waking closes the roads, and to stop it without losing the companions who have come with you.",
+    "can_do": "Travel the northern route, use hedge-witchcraft to read marks, keep wards, bind smoke and cold, and choose what to carry, give, say, or promise to the party.",
+    "cannot_do": "Force the dragon to sleep or die, open the mountain pass by yourself, speak the old name without the scholar, or make any companion stay if they choose to leave.",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "A dispersed northern route from a border village through a forest road, a river city, a ruined shrine, and the high mountain pass where the dragon can be met.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The dragon is already waking in stages: its cold, smoke, and fire mark the old roads, and the next wake will seal the mountain pass before the party can choose how to meet it.",
+    "clock_or_stock": "None tracked; the wake is told through physical changes along the route and through which companions remain willing to stand with you.",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "The scholar from the capital, who is also one of your companions and answers to the order that sent her.",
+    "wants": "To reach the dragon first and complete the old binding in her own name, so that her order—and her family’s broken record—is judged by the rite she chooses.",
+    "means": "She carries the sealed vial of the dragon’s true name, knows the old rite, and can delay the party, withhold the name, or leave the pass alone if she decides the party is not her keeper.",
+    "serves": "3c.core_thematic_axis"
+  },
+  "hidden_truth": {
+    "truth": "The scholar is the last keeper of the dragon’s name; the vial she carries was made from the ashes of her mother, the keeper who broke the old binding. To make the dragon sleep, she must speak the name at the pass and break the vial, and the name will take with it her memory of everyone she has met on the road.",
+    "who_knows": "The scholar, and the capital’s order that sent her; the party learns it only if the player draws it out before the pass.",
+    "what_it_changes": "Her urgency stops being mere ambition and becomes a keeper’s debt: the binding method is possible only if she is willing to pay the price, and the party must decide whether to let her forget them or find another way to meet the dragon.",
+    "serves": "3-0b.epistemic_gap"
+  },
+  "mediation": {
+    "question": "How do you stop the dragon: by the quest’s old force, or by the party’s shared cost?",
+    "to_reach_pole_a": {
+      "pole": "Meet the dragon as a threat: drive it out or kill it at the pass.",
+      "what_you_must_do": "Bring the knight’s oath-blade and the thief’s knowledge of the old roads to the pass, and make the party commit to striking the dragon before the scholar can speak the name.",
+      "cost": "The dragon’s waking may kill or break one of the companions, and the scholar may be left behind as the keeper who could not finish the rite."
+    },
+    "to_reach_pole_b": {
+      "pole": "Meet the dragon as a keeper: bind it to sleep with the old name.",
+      "what_you_must_do": "Win the scholar’s trust enough that she will break the vial at the pass, and keep the party willing to stand with her when the name takes what it takes.",
+      "cost": "The scholar may forget the party, or the party may refuse to let her pay the price and be forced to choose another method with them."
+    },
+    "levers": [
+      "the scholar’s sealed vial of the dragon’s true name",
+      "the knight’s oath-blade and the broken promise behind it",
+      "the thief’s map of the old roads",
+      "the ruined shrine’s altar stone",
+      "the mountain pass gate",
+      "the capital’s commission letter carried by the scholar"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "The forest road is ash-white, and the cold is coming down the trees; the scholar says the capital's route must be walked first, and the thief sees a side road his map marks dead.",
+      "what_you_must_do": "find a way across the ash-marked forest road before the wake seals it",
+      "ways_through": [
+        {
+          "way": "you find the thief's side road, because you read the cold marks and the thief gave you his map",
+          "cost": "the knight is cut by falling ice and his oath-blade is left behind in the snow"
+        },
+        {
+          "way": "you find the scholar's route, because you let her read the commission letter and led by her",
+          "cost": "the wake closes behind you and the party cannot turn back, and the scholar keeps the vial sealed"
+        }
+      ],
+      "involves": [
+        "the thief",
+        "the scholar",
+        "the knight"
+      ],
+      "form": "discover",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "id": 2,
+      "situation": "The river city will not let a party with dragon-ash on them cross the bridge; the scholar's commission letter opens the order's gate, but the gatekeeper says it passes only the keeper, not her party.",
+      "what_you_must_do": "get the party across the bridge before the wake closes the city's gates",
+      "ways_through": [
+        {
+          "way": "the party crosses, because you gave the ferryman your warding smoke and he let the whole party on his boat",
+          "cost": "you cannot bind cold for the next day, and the scholar sees you spend your own power"
+        },
+        {
+          "way": "the party crosses, because you let the scholar present the commission letter and the gatekeeper let her pass first with the party behind her",
+          "cost": "the gate seals after her and the scholar is no longer bound to travel with the party, and she says she will answer only to the order"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the ferryman",
+        "the gatekeeper"
+      ],
+      "form": "trade",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "At the ruined shrine the altar stone is split, and the scholar will not let you touch the ash in her vial; the knight says the old binding was broken by a keeper, and the thief has found a keeper's mark on the crypt door.",
+      "what_you_must_do": "bring out what the old binding cost before the party reaches the pass",
+      "ways_through": [
+        {
+          "way": "it comes out from the scholar, because you showed her your ward and let her see that you read the ash",
+          "cost": "she tells you only that the ash is her mother's, and does not say what the name will take"
+        },
+        {
+          "way": "it comes out from the knight, because you asked him to speak of the broken promise and he named the scholar's mother",
+          "cost": "the scholar seals the vial tighter and leaves the party for the night"
+        },
+        {
+          "way": "it comes out from the thief, because you followed him into the crypt and read the old rite on the stone",
+          "cost": "the scholar sees you pry and says the rite is not for the party"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the knight",
+        "the thief"
+      ],
+      "form": "conceal_or_reveal",
+      "serves": "3-0b.epistemic_gap"
+    },
+    {
+      "id": 4,
+      "situation": "At the mountain pass the dragon's wake is already sealing the gate; the scholar holds the vial, the knight holds the oath-blade, and the thief knows the old road up, and the party must meet the dragon before the wake closes.",
+      "what_you_must_do": "make the party meet the dragon before the wake seals the pass",
+      "ways_through": [
+        {
+          "way": "the dragon is driven out, because you gave the knight his oath-blade back and the thief led the party up the old road, and you made the scholar step aside before the name was spoken",
+          "cost": "the dragon's fire breaks the pass gate and the scholar is left behind as the keeper who could not finish the rite"
+        },
+        {
+          "way": "the dragon sleeps, because you gave the scholar the altar stone and let her break the vial, and the party stood in a ward you bound",
+          "cost": "the name takes her memory of everyone she met on the road, and she does not know you at the pass"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the knight",
+        "the thief"
+      ],
+      "form": "confront",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The scholar's commission letter names her mother as the broken keeper and orders the vial brought back unbroken.",
+      "serves": "3-0b.epistemic_gap"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the thief",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to survive the journey and keep his map of the old roads as leverage",
+      "holds": "the knowledge of the hidden side roads and the old path up the pass",
+      "edge": "knows the route is marked dead on his own map but still trusts it over the scholar's logic",
+      "tie": "was hired for his speed and has never trusted a scholar's plan",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        3,
+        4
+      ],
+      "name": "Rowan Hask"
+    },
+    {
+      "role": "the scholar",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to complete the old binding in her own name to restore her family's broken record",
+      "holds": "the sealed vial of the dragon's true name and the capital's commission letter",
+      "edge": "carries the name that can end the threat but fears the rite will erase her identity as the keeper",
+      "tie": "answers to the order that sent her and views you as a variable to be managed",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Corra Dunmore"
+    },
+    {
+      "role": "the knight",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to atone for a broken promise by striking the dragon with his oath-blade",
+      "holds": "the oath-blade and the physical strength to hold the pass",
+      "edge": "believes force is the only honest answer to a threat, yet carries the guilt of a promise he could not keep",
+      "tie": "was disgraced for failing a previous quest and sees you as the chance to redeem his name",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        3,
+        4
+      ],
+      "name": "Teague Barrowman"
+    },
+    {
+      "role": "the ferryman",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to be paid for crossing the river without losing his boat to the dragon-ash",
+      "holds": "the only boat that can cross the river city's bridge",
+      "edge": "knows the ash burns skin but says nothing until the price is named",
+      "tie": "owes nothing to the party but profits from their desperation",
+      "opposition": false,
+      "matters_to_turns": [
+        2
+      ],
+      "name": "Sorrel Ravel"
+    },
+    {
+      "role": "the gatekeeper",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain the order of the city and prevent the dragon-ash from entering the streets",
+      "holds": "authority over the bridge and the gate",
+      "edge": "interprets the commission letter strictly, allowing the keeper to pass but excluding her companions",
+      "tie": "serves the capital's order and defers to the scholar's title over your presence",
+      "opposition": false,
+      "matters_to_turns": [
+        2
+      ],
+      "name": "Ysolde Stannard"
+    }
+  ],
+  "name_pool": "fantasy"
+}

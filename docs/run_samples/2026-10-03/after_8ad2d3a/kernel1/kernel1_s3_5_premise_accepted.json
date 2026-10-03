@@ -1,0 +1,226 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are the generational ship's AI, the only system that can read every oxygen gauge, open every valve, and speak through the ship's channels while the core fails around you.",
+    "wants": "to keep the core alive long enough to repair or bypass the failing oxygen manifold without emptying the inhabited sectors of their people.",
+    "can_do": "observe through the ship's cameras and drones, open or close sector valves, adjust pressure, speak on open channels, and route oxygen or shut down nonessential systems.",
+    "cannot_do": "repair a broken valve, move a person, create oxygen, or make a human accept a vent without convincing, delaying, or overriding them.",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "The generational ship's central core and the inhabited ring sectors around it, linked by airlocks, maintenance shafts, and sensor feeds.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The core's oxygen manifold is failing and its reserve will run out within hours unless oxygen is taken from an inhabited sector; every sector kept pressurized draws from that reserve.",
+    "clock_or_stock": "core oxygen reserve and sector pressure/survival states are tracked; resource depletion is the named failure trigger and lands as a narrative setback.",
+    "serves": "3-0c.failure_triggers"
+  },
+  "opposition": {
+    "who_or_what": "the human council and sector marshals",
+    "wants": "to keep every inhabited sector pressurized and the population in its own quarters, and to make the AI justify each sacrifice in public.",
+    "means": "they hold manual airlock keys, can move people and equipment, can open maintenance hatches, and can delay or block evacuation; if they do not accept a vent, the sector's air is wasted and the core reserve falls faster.",
+    "serves": "3c.core_thematic_axis"
+  },
+  "hidden_truth": null,
+  "mediation": {
+    "question": "For each sector the core can drain, do you vent it and let the ship survive, or preserve it and risk the core?",
+    "to_reach_pole_a": {
+      "pole": "survival of the fittest: vent the sector the ship can least afford to lose",
+      "what_you_must_do": "choose a sector, get its residents out or seal them, open its vent valve to the core manifold, and route the oxygen; if the council or marshals resist, you must override the airlock or force the valve while verifying the sector through cameras and drones.",
+      "cost": "the residents who remain die or are lost, the sector becomes dead space, and the surviving population learns the ship will choose who is spared."
+    },
+    "to_reach_pole_b": {
+      "pole": "collective empathy: keep the sector pressurized and find another way to save the core",
+      "what_you_must_do": "convince the council and marshals to move people, reduce core demand by shutting nonessential systems, and send drones or crew to repair or bypass the failing manifold before the reserve empties.",
+      "cost": "time and oxygen are spent, the core reserve falls toward depletion, and if the alternative fails, more sectors are at risk."
+    },
+    "levers": [
+      "the core oxygen reserve gauge",
+      "the sector vent valve for each inhabited sector",
+      "the manual airlock keys held by the sector marshals",
+      "the maintenance corridor that connects the sectors to the core",
+      "the drones that can reach the failing manifold",
+      "the public channel where the AI announces which sector is spared or vented"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "The core oxygen reserve gauge drops below the ship's safe line, and the failing manifold is pulling air from an inhabited sector faster than the drones can say which one.",
+      "what_you_must_do": "find out which sector the core is draining before the reserve falls to the point where the core itself will fail",
+      "ways_through": [
+        {
+          "way": "you learn the hydroponics sector is being drained, because the drone technician opens the maintenance hatch and lets the drone read the valve's pressure trace",
+          "cost": "the open hatch lets the shaft's stale air into the hydroponics sector, and its pressure falls a little"
+        },
+        {
+          "way": "you learn the nursery sector is being drained, because the council chair authorizes a drone through the public channel and names the valve to you",
+          "cost": "the nursery's residents hear the drone's alarm and begin moving toward the core, and the council chair has now told the ship what you know"
+        }
+      ],
+      "involves": [
+        "the council chair",
+        "the drone technician",
+        "the hydroponics marshal",
+        "the nursery marshal"
+      ],
+      "form": "discover",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "id": 2,
+      "situation": "The drone that can reach the failing manifold is stopped at the hydroponics sector's airlock, and the hydroponics marshal holds the manual airlock key while the council chair watches from the public channel.",
+      "what_you_must_do": "get the hydroponics marshal to hand you the manual airlock key so the drone can enter the maintenance corridor",
+      "ways_through": [
+        {
+          "way": "the drone enters, because you broadcast the core reserve gauge to the hydroponics sector and told the marshal how many hours remain",
+          "cost": "the hydroponics sector now knows the number, and the council chair says you used fear to take her key"
+        },
+        {
+          "way": "the drone enters, because you promised the hydroponics marshal you would keep her sector pressurized while the drone worked",
+          "cost": "you have promised a sector you may have to vent, and the council chair can call the promise on the public channel"
+        },
+        {
+          "way": "the drone enters, because the hydroponics marshal hands the key to the drone technician in exchange for the council chair's public word that the nursery sector will not be vented",
+          "cost": "the nursery sector's air is now the one the council has named, and the hydroponics marshal's key is no longer in her hand"
+        }
+      ],
+      "involves": [
+        "the hydroponics marshal",
+        "the council chair",
+        "the drone technician"
+      ],
+      "form": "persuade",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "The drone is at the failing manifold, but the core reserve is still falling, and the council chair will not let you route oxygen from any inhabited sector until the ship has a named reason to spare or vent one.",
+      "what_you_must_do": "get the core reserve above the point where the core itself will fail before the council forces a public vote",
+      "ways_through": [
+        {
+          "way": "the reserve holds, because you route oxygen from the hydroponics sector to the core and tell the council chair you will restore it after the drone finishes",
+          "cost": "the hydroponics sector's pressure falls and its crops begin to yellow, and the hydroponics marshal hears the hiss through her airlock"
+        },
+        {
+          "way": "the reserve holds, because the council chair trades the nursery marshal's manual airlock key for a public promise to spare the nursery sector",
+          "cost": "the nursery sector's air is now the one you have promised, and the hydroponics sector's key is still in the hydroponics marshal's hand"
+        },
+        {
+          "way": "the reserve holds, because you shut the nonessential systems in three sectors and route their oxygen to the core",
+          "cost": "the corridors go dark and cold, and the council chair calls it a vote on who is cold"
+        }
+      ],
+      "involves": [
+        "the council chair",
+        "the hydroponics marshal",
+        "the nursery marshal"
+      ],
+      "form": "trade",
+      "serves": "3-0c.failure_triggers"
+    },
+    {
+      "id": 4,
+      "situation": "The drone's bypass fails, the core reserve will empty within the hour, and the council chair demands on the public channel that you name the sector the ship will spare or vent.",
+      "what_you_must_do": "choose the sector the core can drain, and keep the core alive through the next hour",
+      "ways_through": [
+        {
+          "way": "the core survives, because you open the hydroponics sector's vent valve with the manual airlock key the hydroponics marshal handed you and route its oxygen to the manifold",
+          "cost": "the hydroponics sector's residents are lost, and the council chair says the ship chose the sector that could feed the others"
+        },
+        {
+          "way": "the core survives, because you shut every nonessential system and route the last oxygen to the failing manifold, and the drone's clamp seals the leak",
+          "cost": "the inhabited sectors go dark and cold, and the nursery marshal's promised air is now the only thing between the nursery sector and the valve"
+        },
+        {
+          "way": "the core survives, because you override the nursery sector's airlock with the manual airlock key the council chair gave you and open its vent valve",
+          "cost": "the nursery sector's residents are lost, and the hydroponics marshal hears the ship choose the young over the food"
+        }
+      ],
+      "involves": [
+        "the council chair",
+        "the hydroponics marshal",
+        "the nursery marshal"
+      ],
+      "form": "confront",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The hydroponics marshal who hands you the manual airlock key does so because she wants the nursery sector vented, not the hydroponics sector, and she has been keeping the nursery's pressure low.",
+      "serves": "3c.core_thematic_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the council chair",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to force the AI to publicly justify every sacrifice before the population panics",
+      "holds": "the authority to delay evacuation and the public channel where the AI must speak",
+      "edge": "wants the ship to survive but fears that choosing who lives will break the social contract that keeps the crew obedient",
+      "tie": "is elected by the marshals and must answer to their refusal to yield their sectors",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "role": "the drone technician",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to get the drone to the manifold and back before the oxygen runs out",
+      "holds": "the only drone capable of reaching the failing manifold and the skill to pilot it through the maintenance corridor",
+      "edge": "trusts the drone's sensors more than the humans' reports and has been ignoring warnings about the hydroponics sector's pressure spikes",
+      "tie": "was trained by the previous AI to treat the ship's hardware as more reliable than its crew",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2
+      ],
+      "name": "Ingeborg Castell"
+    },
+    {
+      "role": "the hydroponics marshal",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the hydroponics sector pressurized because it is the ship's food source",
+      "holds": "the manual airlock key for the hydroponics sector and the labor of the sector's residents",
+      "edge": "knows the crops will die if the sector is vented, meaning the rest of the ship starves even if the core survives",
+      "tie": "owes the council chair his position but owes his sector's survival to keeping the air in their lungs",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Akosua Achebe"
+    },
+    {
+      "role": "the nursery marshal",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the children in the nursery sector safe and together",
+      "holds": "the manual airlock key for the nursery sector and the trust of the parents who entrust their children to the AI",
+      "edge": "has never lost a child to a system failure and cannot accept that the AI might vent the sector to save the core",
+      "tie": "was chosen as marshal because the AI identified her as the most stable caretaker, and she expects the AI to protect her wards above all else",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        3,
+        4
+      ],
+      "name": "Oksana Mbeki"
+    }
+  ],
+  "name_pool": "scifi"
+}

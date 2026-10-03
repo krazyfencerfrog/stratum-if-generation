@@ -1,0 +1,45 @@
+{
+  "through_line": {
+    "title": "One Pool of Air",
+    "motivation": "You start out wanting to keep the core alive and keep as many inhabited sectors as possible alive, by buying time with proof and trades. By the end that want has become the need to make the ship survive as one shared body of air, even though no sector can then say it is protected.",
+    "strategy": "Give each group only the proof that will make it act, then let the proof widen until the cost is visible to everyone and the air itself becomes the shared choice.",
+    "turning_point": "When the sector councilor holds the override key and the maintenance chief’s crew already knows the true reserve, the only way to stop the automatic vent is to put the full gauge before every sector and open the ship to one common pressure."
+  },
+  "ending": {
+    "title": "The Shared Pressure",
+    "summary": "The ship passes the final pressure drop without venting a named sector, but the reserve is at the edge of failure and the sectors no longer have separate, protectable air. The cost is that the ship can no longer tell which residents were safe, and the councils must live as one uncertain population under the core’s armed vent."
+  },
+  "beats": [
+    {
+      "beat": "opening_crisis",
+      "turn": 1,
+      "way": 1,
+      "adapted": "In the first hours of the oxygen crisis, the core intake leak has already taken the reserve past its first warning band, and the maintenance crew seals the manual bulkhead that can stop the pull. You let the maintenance chief read the raw core gauge to his crew, so they now know the reserve is lower than the sector councils have been told, and the chief withholds the bulkhead until the ship proves what it is asking them to risk."
+    },
+    {
+      "beat": "second_crisis",
+      "turn": 2,
+      "way": 2,
+      "adapted": "With the reserve falling through the next band, the maintenance chief will not throw the bulkhead until the leaking intake is sealed, so you trade the sector councilor’s sector power to the drone’s battery to get the intake closed. The drone seals the leak and the chief throws the bulkhead, but her sector’s heat and lights fail, and she says you chose air over warmth while still holding the override key."
+    },
+    {
+      "beat": "third_crisis",
+      "turn": 3,
+      "way": 1,
+      "adapted": "The reserve is now at the last safe band, and the sector councilor opens her chamber to every camera while the maintenance chief tells his crew that you are about to choose a sector to suffocate. You open the full core feed to every sector, so every resident watches the number fall and the councilor’s chamber goes silent with fear; only then does she release the override key, because the ship has finally shown the cost to the people who must share it."
+    },
+    {
+      "beat": "climax",
+      "turn": 4,
+      "way": 1,
+      "adapted": "The reserve has fallen below the last safe band and the core’s automatic vent is armed, with the councilor and the maintenance chief both at the hub’s cameras demanding that the ship not choose by itself. You use the returned key to release the manual overrides and open every automated bulkhead, so the air moves as one shared pool through the final pressure drop; the sectors hold, but the ship can no longer tell which sector is protected, and the councilor cannot name which residents are safe."
+    },
+    {
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "adapted": "The reserve is stable only at the edge of failure, with the core’s automatic vent still armed over a population that now shares one common pressure. The ship has survived without venting a named sector, but the councils and crews must live under the knowledge that the air was saved by making every sector responsible for every other."
+    }
+  ],
+  "skipped_beats": []
+}

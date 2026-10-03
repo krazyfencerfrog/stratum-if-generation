@@ -1,0 +1,159 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "which secret, grudge, or inheritance claim to surface or keep in",
+      "description": "In each sibling's viewpoint, choose what to bring into the open and how directly to handle it—reveal a secret, press or soften a grudge, press or concede an inheritance claim—rather than choosing which sibling to inhabit.",
+      "binding": "constraint"
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint"
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint"
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "unspecified sibling",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": true,
+      "description": "the family secrets and inheritance truths not yet known to the starting sibling",
+      "design_status": "designed",
+      "binding": "constraint"
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "always_resolved",
+      "binding": "constraint"
+    },
+    "3-0c.failure_presence": {
+      "value": "none",
+      "binding": "constraint"
+    },
+    "3-0c.failure_triggers": {
+      "types": [],
+      "binding": "constraint"
+    },
+    "3-0c.failure_cost": {
+      "value": "not_applicable",
+      "binding": "constraint"
+    },
+    "3-0c.failure_scope": {
+      "value": "not_applicable",
+      "binding": "constraint"
+    },
+    "3b.primary_affect": {
+      "label": "family vulnerability",
+      "binding": "constraint"
+    },
+    "3b.primary_trajectory": {
+      "shape": "sustained",
+      "binding": "constraint"
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "gut-punch sadness"
+      ],
+      "binding": "constraint"
+    },
+    "3b.tone": {
+      "descriptors": [
+        "funny",
+        "wry"
+      ],
+      "binding": "constraint"
+    },
+    "3b.somatic_address": {
+      "level": 1,
+      "channels": [],
+      "binding": "constraint"
+    },
+    "3b.transgression": {
+      "ceiling": 2,
+      "floor": 1,
+      "binding": "constraint"
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "family loyalty",
+      "pole_b": "personal truth",
+      "binding": "default"
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "open confrontation",
+        "private reconciliation",
+        "strategic compromise"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "bittersweet reconciliation",
+      "worst_case": "shattered family, unresolved grief",
+      "binding": "constraint"
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "multi_hop",
+      "floor": "multi_hop",
+      "count_min": 3,
+      "count_max": 3,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "not_indicated",
+      "floor": "not_indicated",
+      "types": [],
+      "interactive": "not_applicable",
+      "binding": "default"
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "constraint"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "constraint"
+    },
+    "3f.setting_structure": {
+      "ceiling": "single",
+      "floor": "single",
+      "binding": "constraint"
+    },
+    "3f.setting_scale": {
+      "ceiling": "city_or_region",
+      "floor": "city_or_region",
+      "binding": "constraint"
+    },
+    "3g.target_ending_count": {
+      "min": 4,
+      "max": 6,
+      "binding": "default"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint"
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "who-knows-what tracking",
+        "relationship standing",
+        "inheritance/claim state"
+      ],
+      "binding": "constraint"
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "minimal"
+}

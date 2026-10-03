@@ -1,0 +1,97 @@
+The goal of this project is to generate story content for an interactive fiction engine (stratum-if, room-based: rooms, objects, characters with topics; not choose-your-own-adventure). A user gives a short idea (the kernel) and the pipeline expands it, with no further user involvement, into a full story. Today the pipeline ends at an OUTLINE: a story graph of nodes, lines (through-lines with endings), plain-language branch triggers, and rough character and location registers.
+
+This request is about ONE thing: the QUALITY of that outline. The machinery is solid and fast now. The stories are not yet good. We do not want the later stages (beat expansion, cast/world buildout, room build, prose) built in this pass; they will depend on the outline, so the outline has to be worth building on first.
+
+You get one pass at this. Do as much as you can in it: analysis, design, code, prompts, stub, tests, docs. We would rather you over-deliver in one prompt than ask follow-up questions. Where you are unsure, implement the option you believe in behind a flag and tell us how to A/B it.
+
+
+HARD CONSTRAINTS (unchanged)
+
+Production inference is local only: a Qwen3.8 27B thinking model through Ollama on one 16 GB RX 9070 XT (Ryzen 7700X, 32 GB RAM). You cannot run it. Nothing in the runtime path may assume a frontier model. What we have learned about it, all measured (details in docs/outline_design.md §7 and §10, generator/stats.py, docs/run_samples/):
+
+*) Model: hf.co/bartowski/orcarouter_Qwen3.8-27B-Uncensored-GGUF:IQ3_XS (3-bit, fully on GPU, about 25-30 tokens/s generation, prompt processing is fast). A Q5 of the same model ran at 8 tok/s partly on CPU; output quality was similar enough that speed won. An "OBLITERATED" abliteration looped in 6 of 6 probes and was dropped.
+*) It thinks long on every construction call: it runs to whatever limit it is given (40 KB on Q5 and IQ3_XS alike; 89 KB when unlimited) and the last part of a long trace re-checks details already settled. The 'build' class limit is now 25 KB of thinking (about 4-5 minutes), after which the client forces the answer from the partial trace ("budget forcing"); forced answers pass validation almost always. A 4a main line at 25 KB was as good as at 40 KB or unlimited (docs/run_samples/2026-10-03/limit_test/).
+*) Instructions about HOW to reason have no measurable effect. Trace size scales with what a call is given and asked to return. Treat cost as structure: inputs, outputs, number of rules, calls.
+*) Thinking-off calls ('classify' class, structured output with a rationale field first) take seconds. Use them for transcription, classification and selection.
+*) A full kernel now takes 85-115 minutes: step 2 under a minute, phase 3 about 30-50 min (nine blind extractions + cross-check), 3.5 premise about 14 min (plus about 5 min per audit and 5 per repair round), 3.8 seconds, step 4 about 35-50 min for 3-4 lines. Each extra thinking call costs about 5 minutes. A run up to about 2.5 hours per kernel is acceptable if the story gets clearly better; we run batches overnight.
+*) Loops: the client cuts reasoning that repeats itself and re-runs from a new seed (LoopDetector in ollama_client.py). Copies of a prompt's calibration example are caught by generator/example_guard.py.
+
+We kept a hard rule from the earlier passes: counts, lookups and structure are computed in Python; generation and verification never share a prompt; repair is a separate call that returns only what it changed. Everything else is on the table, including phase 3's binding policy, the test kernels, and adding new steps.
+
+
+READ FIRST
+
+CLAUDE.md, docs/outline_design.md (especially §10, the story-quality rules added on 2026-10-03), docs/fable_response_4.md (your last response; the outline loop is your design), docs/step3_consolidated_design_lessons.md, then prompts/ and generator/. git log shows what changed since your last pass and why; the commit messages are written to be read.
+
+Then docs/run_samples/2026-10-03/: real output of the pipeline, nine runs on six kernels, including before/after pairs (kernel31, kernel32, kernel1) for the story-quality changes. Each kernel directory holds the story outline (<id>_story.md, the thing to judge), the brief (<id>_s3_brief.json), the accepted premise (<id>_s3_5_premise_accepted.json), the premise audit/repair loop (<id>_s3_5_loop.json) and per-call statistics (<id>_run_stats.json). Some include a few raw thinking traces. README.md in that directory says which code version produced each and what we think of it. Read the outlines the way a player and a writer would, not only as data.
+
+
+WHERE WE ARE (our own assessment; challenge it)
+
+The outline is structurally sound on every kernel: graphs are valid, every beat filled, endings answer the story's question, the opposition acts, constraints from the kernel are honored, and nothing crashes or loops. As stories, the outlines produced by the code before 2026-10-03 (commit 403baa8) were flat. From kernel31 (an epic fantasy: hedge-witch, waking dragon, a party of knight, thief and scholar) and kernel32 (a comic dungeon crawl with a cursed talking sword) we found, and saw repeated on 17, 28 and 5:
+
+1. A danger-free world. Phase 3 inferred the failure model "relational collapse only"; 3.5a read "never add a way to lose" as "nothing in the world may be dangerous". kernel31's dragon never acted. kernel32's "dungeon crawl" was shrunk to one room because setting_structure was "single".
+2. Every turn the same choice. 3.5b tied each turn to the decision axis, so kernel32's four turns were all "keep the sword or put it back", and three of kernel31's four were "who carries the name".
+3. Coined abstractions: "the dragon's wake", "carry the wake through", "point the dry step". Nobody can picture them, and every later step repeats them.
+4. Cast seeds were a want and a possession, no more. No edges, no ties, no voice.
+5. No twists: phase 3 found kernel31's hidden motive (the scholar's reasons) and the premise had nowhere to say what it was, so the outline "exposed" a placeholder.
+6. Late branching: all lines shared most of the main line and forked at the climax (kernel31, kernel1). Ways through the early turns changed nothing downstream.
+7. Near-duplicate endings: the most common flaw (31, 28, 17, 5). Two lines that differ only in who pays a cost, with the same people standing at the end.
+8. Tone dropped: "funny" survived as one laugh. Summaries of events have no room for comedy unless the premise builds comic situations.
+
+Commit ed686c0 addressed these in prompts and checks (see §10 of outline_design.md): threat is not loss; "single" is one place with many rooms; turns have local goals and only the last one or two put the question at stake; everything named must be picturable; a hidden_truth field when phase 3 finds an epistemic gap; cast edges and ties; a reversal complication; audit checks E5 (picturable) and E6 (no repeated choice); 4c/4d prefer early divergences and accumulated triggers and no longer count a moved cost as a different ending; a late_forks note. Commit 8ad2d3a added cast names assigned in Python from genre pools (the model collapses onto the same few names when asked; the role stays the key).
+
+RESULTS OF THOSE CHANGES (details and our notes in docs/run_samples/2026-10-03/README.md): a clear step up on the same phase-3 inputs. kernel31's lines now leave at N01 and N02 with their own middles, the dragon acts, a concrete hidden truth is planted and paid off three different ways, and the four endings leave four different worlds. kernel32's dungeon has five places and turns with local goals. What did NOT improve much, and is where we most want your help:
+*) comedy and personality: the talking sword is still a function, not a character; "funny" is barely there;
+*) the brief's own wording leaks into summaries ("the sword's stated desire to be returned", repeated);
+*) companions' loyalties: only the opposition's loyalty moves; the thief's and knight's edges never pay off; "who is still with you at the end" varies around one person;
+*) residual abstraction where the story invents magic ("the road spent");
+*) later lines can retell earlier nodes (a repeated_node note now flags it; 4c is told to take a different way);
+*) branching depth is not reliable: kernel31's lines left early, kernel1's still all leave in the second half (the late_forks note fires) despite 4d being told to prefer early divergences;
+*) everything still reads like a summary of an outline rather than the pitch for a story someone would want to play. We do not know whether that is the node format, the premise, or the model's ceiling. Tell us what you think.
+
+
+WHAT WE WANT FROM YOU
+
+Make the outlines good. By good we mean, for an interactive story read as a whole:
+*) the plot is interesting: escalation, surprise, a middle that is not filler, an ending that lands;
+*) the people are interesting at outline level: wants that conflict, an edge, ties that make a betrayal or a loyalty cost something;
+*) there is room for reveals and reversals, planted and paid off;
+*) the player has macro agency: lines that part early enough to have their own middles, triggered by what the player did (including patterns over time), ending in different worlds, not different payers;
+*) it is specific and picturable, faithful to the kernel's genre, tone and explicit wishes, and gives the genre's audience what they came for (a dragon story has a dragon in it);
+*) it is right-sized for later stages (docs/kernel1_target_outline.md is the hand-written reference for size).
+
+Everything is on the table. Some directions we have thought about but not tried; evaluate them, add your own, and implement what you believe in:
+
+*) KERNEL AUGMENTATION before phase 3, or between phase 3 and 3.5: read a sparse kernel ("a dungeon crawl with a talking sword", "a mystery", "surprise me") for what its audience expects and would be disappointed not to get (the genre's promises, the player fantasy, the obligatory set pieces), and hand that forward. Keep it separate from the extraction so the user's explicit words still win.
+*) PHASE 3 BINDING: a field phase 3 inferred ("strong_inference") becomes a binding constraint (generator/brief.py, the 3h constraint map). On kernel31 an inferred "relational collapse only" removed the dragon's danger; on kernel32 an inferred "single" setting shrank the dungeon. Should inferred fields bind? Should some fields bind only in one direction (a floor, not a ceiling)? This was "do not weaken phase 3" last time; we are now asking you to judge it on the evidence.
+*) INVENTION STEPS: the model is asked to invent the engine, turns and cast in one shot each. Would a cheap divergent step help (several short candidate premises, hooks, twists or set pieces, generated with thinking off or small budgets, then a selection call against the brief)? A twist/reveal step? A "set piece" step that gives each line one memorable scene? Price every new call in minutes.
+*) STRUCTURE AND BRANCHING: is "main line, then one divergent line per iteration from 4d's seed" the right shape for agency? Should divergences be planned up front (a branch plan over the framework's beats before any line is built), so early forks and different endings are designed rather than discovered? Should lines be allowed to merge (a state carried, not a path)? Is --max-iterations 4 right when a kernel asks for "a dozen endings" (kernel17)?
+*) THE PREMISE: are the five engine fields plus turns the right primitives for a good story? What is missing (a world with its own history, a ticking event that happens whatever you do, an antagonist plan that advances on its own, a midpoint reversal, a cost the protagonist pays personally)?
+*) NODE CONTENT: is a 45-75 word summary plus where/who the right node content for judging quality? Would one line of "what the player sees/does here" or "the image this node leaves" help later stages without exploding cost?
+*) EVALUATION: we judge outlines by reading them. Could a cheap judge call or computed metrics (ending distinctness by world state and surviving cast, fork depth, turn-goal variety, abstraction density, genre-promise coverage) give a score we can compare across runs? An A/B harness that replays 3.5 onward from saved phase-3 outputs on a fixed set of kernels would make every future prompt change measurable. Build it if you agree.
+*) TEST KERNELS: tests/kernels/ has 32. Several are weak as tests or redundant. Rewrite, replace or add (we just added 31 and 32 for fantasy adventure, which will be a popular genre; there is a lot of sci-fi and adventure already). Propose a fixed evaluation set of 6-8 that covers the space, and say what each one tests.
+*) CALIBRATION EXAMPLES are the strongest lever we have (a copied example once became a premise). Several examples may teach the habits above: 3.5b's quartet example puts every turn on the decision axis (its kernel asks for that, but the model may generalize it); 4a's and 4c's examples are the same theatre story, so every main line and divergence the model sees has one shape; 3.5a, 3.5b and 3.5c all use the same newspaper engine. Rewrite the examples that teach the wrong thing; keep them domain-separated from the test kernels in judgment shape, not just nouns; never use kernel1.
+*) your own list. You will see things in the outputs we have not.
+
+
+WHAT NOT TO DO
+
+*) do not build stages A-D (docs/later_stages.md); this pass is about the outline;
+*) do not assume a frontier model anywhere in the runtime path, and do not rely on instructions about how to reason;
+*) do not add a call without saying what it costs (thinking bytes, minutes) and why it earns that; prefer thinking-off calls and Python where they can do the job;
+*) do not break resume-by-files, the stub, or the tests; keep generator/stub_client.py in sync with every schema change and add stub scenarios for new paths;
+*) do not touch generator/dynamic_config.py (local, gitignored).
+
+
+DELIVERABLES
+
+*) the improved generator, prompts, schemas, stub and tests (python tests/test_plumbing.py passes);
+*) flags for anything risky so we can A/B it against the current behavior on our machine;
+*) the A/B harness and evaluation set if you agree with them, with the exact commands to run;
+*) docs/fable_response_5.md: what you changed and why, where you disagree with our assessment, the cost of each new call, and a first-live-run checklist in priority order (what to run first, what to look for in the outputs and traces, what result would tell us a change failed);
+*) updated CLAUDE.md, README and docs/outline_design.md.
+
+We will run your changes overnight on the evaluation set and send nothing back unless we have to; make the response doc good enough that we can judge the results without you.
+
+Thank you. The last two passes turned a 31-hour run into a 90-minute one. This one is about making the 90 minutes worth reading.

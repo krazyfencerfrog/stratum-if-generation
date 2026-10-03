@@ -1,0 +1,233 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are a young hedge-witch from a border village, sent north to stop an old dragon that has woken in the mountains, with a small party whose loyalties are not yet yours.",
+    "wants": "to stop the awakened dragon before it reaches the border villages, and to do so without losing the companions who have walked with you",
+    "can_do": "travel the road, read the dragon's wake, use small hedge-witch wards and charms, talk to the companions and the people they meet, and choose which method of dealing with the dragon to pursue",
+    "cannot_do": "reach the dragon alone, know its old name, force the thief to open the old roads, make the knight accept an old oath, or compel the scholar to reveal why she must reach the dragon first",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "A border region from a hedged village to the northern mountains, crossed by a dark forest, a river city, ruined shrines, and a high pass.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The dragon's waking is moving south, and each stage of the road shows another sign that it is coming closer to the border villages.",
+    "clock_or_stock": "none tracked as a timer; the advance is told through the stages of travel and through who remains willing to walk with you, because 3-0c licenses only relational_collapse",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "the scholar from the capital, who has her own reasons for wanting to reach the dragon first",
+    "wants": "to arrive at the dragon before the border villagers do and to settle a personal obligation tied to her family's old claim on the dragon's name",
+    "means": "she can read the ruins, choose the route, withhold or reveal the dragon's old name, and at the pass make the dragon answer to her method instead of yours",
+    "serves": "3c.core_thematic_axis"
+  },
+  "mediation": {
+    "question": "How do you stop the awakened dragon, and which bond is spent to do it: the old duty of the quest, or the loyalty of the companions who have walked with you?",
+    "to_reach_pole_a": {
+      "pole": "bind the dragon to the old road",
+      "what_you_must_do": "gather the scholar's old name, the thief's knowledge of the roads, the knight's oath, and the river city's ward, then present the bound name to the dragon at the pass",
+      "cost": "the scholar's personal reason is exposed, and if her trust has collapsed she will withhold the name or let the dragon answer to the capital instead"
+    },
+    "to_reach_pole_b": {
+      "pole": "answer the dragon as a hedge-witch",
+      "what_you_must_do": "refuse the old name, carry your border charm into the pass, and let the dragon's wake pass through you and the companions who still stand with you",
+      "cost": "the companions' loyalty is tested, and the one you have least won over may not stand, leaving the dragon's wake unresolved"
+    },
+    "levers": [
+      "the scholar's capital letter and the old name she carries",
+      "the thief's map of the old roads",
+      "the knight's broken oath",
+      "the river city's ward-stone",
+      "the ruins' broken altar",
+      "your hedge-witch's border charm",
+      "the dragon's wake in the mountain pass"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "At a ruined shrine in the dark forest, the scholar finds the old name on the broken altar and says it can open the road to the pass, but the thief says the old roads will not open for a name spoken by a capital woman.",
+      "what_you_must_do": "find out what the old name will cost to use",
+      "ways_through": [
+        {
+          "way": "you learn the name opens the pass only for the person who carries the capital letter, because the scholar reads the altar aloud",
+          "cost": "she lets you see the letter, but not the reason her family claims it"
+        },
+        {
+          "way": "you learn the name can be carried by a hedge-witch's border charm, because the thief shows you the old road-mark in the altar",
+          "cost": "the thief keeps the road-mark for himself and asks to be paid at the river city"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the thief"
+      ],
+      "form": "discover",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "id": 2,
+      "situation": "The scholar chooses the river city route and says the old name must be carried with the city's ward-stone; the warden will not give the stone to a party that cannot say who will answer the dragon.",
+      "what_you_must_do": "get the river city's ward-stone",
+      "ways_through": [
+        {
+          "way": "the ward-stone is given, because you hand the scholar's capital letter to the river city warden",
+          "cost": "the warden reads the letter and the city learns the scholar's family claim before the pass"
+        },
+        {
+          "way": "the ward-stone is given, because the thief sells the warden his map of the old roads",
+          "cost": "the thief no longer trusts you to pay him, and the road-mark is now the city's to withhold"
+        },
+        {
+          "way": "the ward-stone is given, because the knight offers his broken oath to the city's shrine",
+          "cost": "the knight's disgrace is spoken in the market, and the scholar says the oath is not enough for the old name"
+        }
+      ],
+      "involves": [
+        "the river city warden",
+        "the scholar",
+        "the thief",
+        "the knight"
+      ],
+      "form": "trade",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "At the foot of the pass, the scholar says the old name will answer only if one of you carries her capital letter into the wake; the knight will not carry it unless his oath is mended, and the thief will not carry it unless his road is paid.",
+      "what_you_must_do": "choose who carries the old name into the wake",
+      "ways_through": [
+        {
+          "way": "the scholar carries the name, because you let her settle her family's claim in person",
+          "cost": "she may make the dragon answer to the capital instead of to your party"
+        },
+        {
+          "way": "the knight carries the name, because you gave him the broken oath to hold",
+          "cost": "the knight's disgrace is the price, and the scholar says a broken oath may not bind the dragon"
+        },
+        {
+          "way": "the thief carries the name, because you paid him with the border charm",
+          "cost": "your hedge-witch's charm is now in his keeping, and the party's road depends on his word"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the knight",
+        "the thief"
+      ],
+      "form": "choose_whom",
+      "serves": "3-0a.secondary_decision_axes"
+    },
+    {
+      "id": 4,
+      "situation": "At the pass, the dragon's wake rises before the border villages can hear it, and the scholar steps forward with the capital letter.",
+      "what_you_must_do": "make the dragon answer before it reaches the border villages",
+      "ways_through": [
+        {
+          "way": "the dragon is bound to the old road, because you presented the scholar's old name with the knight's oath and the river city's ward-stone",
+          "cost": "the scholar's personal reason is exposed, and the binding carries the capital's mark on the border road"
+        },
+        {
+          "way": "the dragon passes through the pass as a hedge-witch's wake, because you refused the old name and let your border charm carry it through the companions who still stand with you",
+          "cost": "the companion you have least won over does not stand, and the wake is left partly unresolved"
+        },
+        {
+          "way": "the dragon is left unresolved, because you let the scholar withhold the old name and the companions who doubted you turn away",
+          "cost": "relational_collapse: the wake passes over the border villages"
+        }
+      ],
+      "involves": [
+        "the scholar",
+        "the knight",
+        "the thief",
+        "the dragon"
+      ],
+      "form": "confront",
+      "serves": "3-0c.failure_triggers"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The scholar's capital letter names your border village as the first debtor in her family's old claim on the dragon's name.",
+      "serves": "3c.core_thematic_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the scholar",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to settle her family's old claim on the dragon's name before the border villagers arrive",
+      "holds": "the dragon's old name and the capital letter",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "role": "the thief",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "payment for opening the old roads",
+      "holds": "the map of the old roads",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "role": "the river city warden",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "the river city protected by the ward-stone",
+      "holds": "the river city's ward-stone",
+      "opposition": false,
+      "matters_to_turns": [
+        2
+      ]
+    },
+    {
+      "role": "the knight",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to have his broken oath mended",
+      "holds": "the knight's oath",
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "role": "the dragon",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to wake and reach the border villages",
+      "holds": "the dragon's wake in the mountain pass",
+      "opposition": false,
+      "matters_to_turns": [
+        4
+      ]
+    },
+    {
+      "role": "the protagonist",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to stop the awakened dragon without losing the companions",
+      "holds": "the hedge-witch's border charm",
+      "opposition": false,
+      "matters_to_turns": []
+    }
+  ]
+}
