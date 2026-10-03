@@ -98,7 +98,7 @@ hook table the next-line judge reads.
 `can_do`; fewer than 3 or more than 5 turns; an unknown or repeated form; a
 turn with fewer than two ways or a way without a cost; a `serves` tag that
 names no brief field (prefix match); complications over budget; a role a turn
-involves with no seed; a crowd with nobody who speaks for it.
+involves with no seed; a crowd with nobody who speaks for it; a way through written as a pick ("you choose to ...", `MENU_VERB`).
 
 *Asked* (`s3_5v_premise_check`, class `audit`: thinking on): three fixed
 lists and one search. One entry per numbered Kernel clause (`contradiction`),
@@ -125,7 +125,12 @@ scored 280; clean premises and outlines scored 0-3 (stock phrasing borrowed from
 and returns `{"repair_log", "revised"}` where `revised` holds only the
 top-level sections it changed. `merge_premise` carries everything else over
 untouched, so "do not touch what the findings do not name" is enforced by
-construction. Up to `--max-repairs` rounds; a finding that survives raises
+construction. The repair's validator runs the computed checks on the merged
+premise and re-asks at once (`SoftReject`) when the repair introduced a
+finding the premise did not have; on kernel1 a repair rewrote a turn under an
+unknown form with "you choose to" ways, which otherwise cost a whole audit
+and repair round. If the retry is still broken it is accepted and the next
+audit round reports it. Up to `--max-repairs` rounds; a finding that survives raises
 `PipelineHalt` (exit 2).
 
 Files: `s3_5a_engine.json`, `s3_5b_turns.json`, `s3_5c_cast.json`,

@@ -23,6 +23,10 @@ Scenario knobs (environment variables):
     STUB_PREMISE_HARD_ROUNDS=1   3.5b invents a score the engine lacks and
                                  3.5v reports it this many times (tests 3.5r)
     STUB_PREMISE_ALWAYS_HARD=1   3.5v never comes back clean (tests the halt)
+    STUB_REPAIR_BREAKS=1         3.5r's first answer also rewrites a turn as a
+                                 menu pick under an unknown form (tests the
+                                 repair validator); =2 its retry does too
+                                 (tests that the run goes on to the audit)
     STUB_BAD_CAST=1              3.5c's first answer leaves a crowd without a
                                  representative (tests the informed retry)
     STUB_BAD_PLAN=1              4a's first answer leaves a turn unplaced
@@ -73,6 +77,7 @@ class StubClient(LlmClient):
     def __init__(self):
         self.calls = []
         self.premise_verifies = 0
+        self.repair_breaks = 0
         self.last_call = {}
 
     def run_prompt(self, prompt, **kwargs):
@@ -396,8 +401,19 @@ class StubClient(LlmClient):
         }
 
     def p_s3_5r(self, p):
+        revised = {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}
+        breaks = env_int('STUB_REPAIR_BREAKS', 0)
+        if self.repair_breaks < breaks:
+            self.repair_breaks += 1
+            turns = self.p_s3_5b(p)['turns']
+            turns[2] = dict(turns[2], form='choose',
+                            ways_through=[{"way": "you choose to tell the sector first", "cost": "they barricade the valve"},
+                                          {"way": "nobody is told", "cost": "you become the council's instrument"}])
+            revised['turns'] = turns
+        elif 'written as a pick' in p.split(RETRY_MARKER)[0]:
+            revised['turns'] = self.p_s3_5b(p)['turns']     # the finding list names the broken turn: restore it
         return {"repair_log": [{"finding": self.VIOLATION, "change": "replaced the score with a rerouting complication", "disagreement": ""}],
-                "revised": {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}}
+                "revised": revised}
 
     # ------------------------------------------------------------------ 3.8
 

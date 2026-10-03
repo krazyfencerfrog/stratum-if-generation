@@ -111,6 +111,19 @@ STAMP_FILE = 'pipeline.json'
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 
+# A way through written as a menu pick: the question is not the verb.
+MENU_VERB = re.compile(r"\byou (?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\b|"
+                       r"\b(?:choose|decide|elect|opt) (?:to|whether|between)\b", re.I)
+
+
+class SoftReject(ValueError):
+    """A validator complaint worth one retry but not worth stopping the
+    run: if the retry is still rejected for it, the answer is accepted and
+    whatever is wrong is left to the checks downstream (for the premise
+    repair, the next audit round). A saved answer it would reject is never
+    reported as stale."""
+
+
 class PipelineHalt(RuntimeError):
     """Raised when a verify/repair loop exhausts its rounds with a hard
     finding still standing, or a story directory was written by an older
@@ -324,6 +337,8 @@ class StoryGenerator:
             if validator is not None and is_json:
                 try:
                     validator(parsed)
+                except SoftReject:
+                    pass
                 except (ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
                     raise ValueError(
                         f"{self.story_file_path(output_file_name)} no longer matches the schema this "
@@ -457,6 +472,16 @@ class StoryGenerator:
                     parsed = response
                     if not parsed.strip():
                         raise ValueError('the response was empty')
+            except SoftReject as e:
+                if attempts_left > 0:
+                    last_error = e
+                    rec['error'] = str(e)
+                    self.stats.record(**rec)
+                    print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
+                    feedback = self.retry_feedback(e, response)
+                    continue
+                rec['soft_problems'] = str(e)
+                print(f'  attempt {attempt} for {output_member_name} accepted with problems left to the next check: {e}')
             except (json.JSONDecodeError, ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
                 last_error = e
                 rec['error'] = str(e)
@@ -895,6 +920,10 @@ class StoryGenerator:
             for w in ways:
                 if not str(w.get('cost') or '').strip():
                     add(f"turns[{t.get('id')}].ways_through", 'a way through has no cost', str(w.get('way')))
+                if MENU_VERB.search(str(w.get('way') or '')):
+                    add(f"turns[{t.get('id')}].ways_through",
+                        'a way through is written as a pick ("you choose to ..."); say what you did and what it '
+                        'brought about, as the other ways do', str(w.get('way')))
         for key in ('protagonist', 'arena', 'pressure', 'opposition', 'mediation'):
             tag = (premise.get(key) or {}).get('serves')
             if tag and not valid_serves(tag, brief):
@@ -1042,6 +1071,14 @@ class StoryGenerator:
                 merged = self.merge_premise(current, parsed['revised'])
                 self.validate_engine(merged)
                 self.validate_turns({'turns': merged['turns'], 'complications': merged['complications']})
+                # what the repair broke that the computed checks can see: one
+                # retry now is cheaper than a whole audit and repair round
+                key = lambda f: (f['where'], f['problem'])
+                before = {key(f) for f in self.premise_computed_findings(current)}
+                broken = [f for f in self.premise_computed_findings(merged) if key(f) not in before]
+                if broken:
+                    raise SoftReject('the repair introduced new problems: ' + '; '.join(
+                        f"{f['where']}: {f['problem']}" + (f' ("{f["quote"]}")' if f['quote'] else '') for f in broken))
 
             repaired = self.run_prompt(f's3_5r{n}', 'premise_repair', {
                 '$$BRIEF_LINES$$': brief_table,

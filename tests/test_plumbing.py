@@ -158,6 +158,25 @@ def premise_repair_loop():
 
 
 @test
+def repair_breakage_is_caught_at_once():
+    run('repair_breaks', env={'STUB_PREMISE_HARD_ROUNDS': '1', 'STUB_REPAIR_BREAKS': '1'})
+    attempts = [c for c in calls('repair_breaks') if c['step'] == 's3_5r']
+    check(len(attempts) == 2 and not attempts[0]['ok'] and attempts[1]['ok'], f'expected a rejected repair and a clean retry: {attempts}')
+    check('you choose to' in attempts[0]['error'] and '"choose" is not one of the forms' in attempts[0]['error'],
+          f'the complaint should name both new problems: {attempts[0]["error"]}')
+    loop = load('repair_breaks', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 1 and not loop['still_failing'], 'the caught breakage should not cost another round')
+    # a retry that is still broken is accepted and left to the audit round, not fatal
+    run('repair_breaks_twice', env={'STUB_PREMISE_HARD_ROUNDS': '1', 'STUB_REPAIR_BREAKS': '2'})
+    attempts = [c for c in calls('repair_breaks_twice') if c['step'] == 's3_5r']
+    check(attempts[1]['ok'] and attempts[1].get('soft_problems'), f'the second broken repair should be accepted with its problems noted: {attempts}')
+    loop = load('repair_breaks_twice', 's3_5_loop.json')
+    check(any('you choose' in json.dumps(r.get('findings')) for r in loop['rounds']), 'the audit round should then report the menu pick')
+    check(not loop['still_failing'], 'the next repair round should clear it')
+    assert_story_ok('repair_breaks_twice')
+
+
+@test
 def premise_halt():
     _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '1'}, expect=2)
     check('PIPELINE HALTED' in out, 'no halt message')
