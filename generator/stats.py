@@ -84,10 +84,15 @@ CALL_CLASSES = {
         'num_predict': 8192, 'fallback': 'no_think', 'force_answer': True,
     },
     # construction: the premise pieces, the line plans, the node fill.
+    # Qwen3.8 27B runs every build call to any limit tried (40 KB on Q5 and
+    # IQ3_XS; 89 KB when unlimited), and the last part of a long trace is
+    # re-checking settled details. On kernel1 (2026-10-02) a 25 KB limit gave
+    # main lines as good as 40 KB or unlimited, and a full outline with more
+    # lines in less time; its forced answers passed or passed on retry.
     'build': {
         'think': None,
-        'target_thinking_bytes': 25000, 'target_seconds': 1500,
-        'limit_thinking_bytes': 40000, 'limit_seconds': 2700, 'limit_response_bytes': 24000,
+        'target_thinking_bytes': 20000, 'target_seconds': 900,
+        'limit_thinking_bytes': 25000, 'limit_seconds': 1800, 'limit_response_bytes': 24000,
         'num_predict': 14000, 'fallback': 'no_think', 'force_answer': True,
     },
 }

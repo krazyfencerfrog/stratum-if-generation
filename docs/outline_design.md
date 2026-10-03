@@ -320,7 +320,7 @@ thinks, what it should cost, and where it is cut off.
 | `classify` | s2 shape, 3.5c, 3.8 | off | 6 min | 45 min | stops the run, naming the partial trace |
 | `audit` | 3.5v | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 | `judge` | 4d | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
-| `build` | 3.5a, 3.5b, 3.5r, 3.75, 3.75r, 4a, 4b, 4c | on | 25 KB, 25 min | 40 KB, 45 min | answer forced from the partial thinking; if that fails, retried with thinking off |
+| `build` | 3.5a, 3.5b, 3.5r, 3.75, 3.75r, 4a, 4b, 4c | on | 20 KB, 15 min | 25 KB, 30 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 
 - **Breakers** are enforced by the client as the stream arrives
   (`max_thinking_bytes`, `max_response_bytes`, `max_seconds`); it closes the
