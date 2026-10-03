@@ -74,9 +74,16 @@ def gender_hint(role, texts):
     return 'n'
 
 
+def head_noun(role):
+    """The word a role is about: "the tower warden" -> warden, "the cursed
+    talking sword" -> sword, "the keeper of the bridge" -> keeper."""
+    words = re.sub(r"'s\b", '', str(role).lower()).split(' of ')[0].split()
+    return words[-1] if words else ''
+
+
 def wants_a_name(seed):
     return (isinstance(seed, dict) and seed.get('role') and seed.get('kind') != 'crowd'
-            and not NOT_A_PERSON.search(str(seed['role']))
+            and not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
             and re.sub(r'^(the|a|an)\s+', '', str(seed['role']).strip().lower()) not in ('protagonist', 'you', 'player'))
 
 
