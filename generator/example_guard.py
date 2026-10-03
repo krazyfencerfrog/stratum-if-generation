@@ -18,7 +18,7 @@ import os
 import re
 
 N = 4
-MIN_HITS = 4
+MIN_HITS = 8      # clean outputs score 0-3 (borrowed stock phrasing); a copied premise scored 280
 WORD = re.compile(r"[a-z0-9']+")
 PROMPT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'prompts')
 _cache = {}

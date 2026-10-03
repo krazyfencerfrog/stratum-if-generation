@@ -41,8 +41,8 @@ Clause 4: "Wry, dry tone." Premise: no field sets a tone.
 {"n": 4, "note": "Nothing in the premise sets a tone, and nothing in it is incompatible with a wry one.", "contradiction": false, "quote": ""}
 
 An absence constraint, satisfied.
-Constraint 6: "3-0b.epistemic_gap [constraint]: present false". Premise: describes no hidden truth.
-{"n": 6, "note": "The premise builds no concealed fact for the player to uncover, so there is nothing to quote.", "violated": false, "quote": ""}
+Constraint 6: "3-0b.epistemic_gap [constraint]: present false". Premise: one turn is a discover turn, "find out which of the two clerks signed the order", and nothing else is hidden.
+{"n": 6, "note": "An epistemic gap is a central truth about who you are or what is really happening that the story is built to keep from you; finding out a fact to get through one turn is not one, and the premise builds no such truth.", "violated": false, "quote": ""}
 
 A permitted clock beside a violation.
 Failure model: 3-0c.failure_triggers [constraint]: types time_pressure. Premise: pressure.clock_or_stock = "the tide, which covers the causeway twice a day"; complications include "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough".

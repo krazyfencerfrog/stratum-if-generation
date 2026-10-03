@@ -117,9 +117,9 @@ now thinks, on a small budget.
 distinctive 4-word phrases (two or more content words) of each prompt's
 CALIBRATION / ILLUSTRATION section, minus those in the prompt's instructions,
 that reappear in the output and are not explained by the Kernel, the brief
-or the premise. Four or more is a finding for the premise (`premise_computed_findings`)
+or the premise. Eight or more is a finding for the premise (`premise_computed_findings`)
 and a validator complaint for 4a, 4b, 4c and 4d. On kernel1 a copied premise
-scored 280; every clean premise and outline scored 0.
+scored 280; clean premises and outlines scored 0-3 (stock phrasing borrowed from an example, such as "the seed holds as given").
 
 **Repair** (`s3_5r<n>_premise_repair`) receives the normalized finding list
 and returns `{"repair_log", "revised"}` where `revised` holds only the
