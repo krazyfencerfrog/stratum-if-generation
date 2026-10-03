@@ -41,6 +41,9 @@ SAMPLER_NO_THINK = {'temperature': 0.7, 'top_p': 0.8, 'top_k': 20, 'repeat_penal
 #        started, the client first tries budget forcing (it closes the think
 #        block and asks for the answer from the thinking so far; see
 #        ollama_client.py). Only if that fails does `fallback` apply.
+# Every class with breakers on also cuts reasoning that loops (the client's
+#        detect_loops); a looped call is re-run once from a new seed, thinking
+#        still on, before `fallback` applies.
 # fallback: what to do when a breaker trips on a thinking call.
 CALL_CLASSES = {
     # phase 3 and the rating filter: untouched judgment prompts. Reported

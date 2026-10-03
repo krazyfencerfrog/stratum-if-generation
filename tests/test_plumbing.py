@@ -203,6 +203,26 @@ def breaker_falls_back_to_no_think():
 
 
 @test
+def loops_rerun_from_a_new_seed():
+    run('loop', env={'STUB_LOOP': 's4a'})
+    attempts = [c for c in calls('loop') if c['step'] == 's4a']
+    check(len(attempts) == 2, f'expected two s4a attempts, got {len(attempts)}')
+    check(attempts[0]['breaker'] == 'loop' and attempts[0].get('loop_line') and 'seed' not in attempts[0],
+          f'first attempt should be the looped one: {attempts[0]}')
+    check(attempts[1]['mode'] == 'think' and attempts[1]['ok'] and attempts[1].get('seed'),
+          f'the re-run should keep thinking, from a new seed: {attempts[1]}')
+    assert_story_ok('loop')
+    # a second loop goes to the class fallback, not to a third seed
+    run('loop_again', env={'STUB_LOOP': 's4a', 'STUB_LOOP_ALWAYS': '1'})
+    attempts = [c for c in calls('loop_again') if c['step'] == 's4a']
+    check([a['mode'] for a in attempts] == ['think', 'think', 'no_think'] and attempts[-1]['ok'],
+          f'loop, loop, then thinking off: {[(a["mode"], a["breaker"]) for a in attempts]}')
+    _, out = run('loop_off', env={'STUB_LOOP': 's4a'}, args=['--no-breakers'])
+    attempts = [c for c in calls('loop_off') if c['step'] == 's4a']
+    check(len(attempts) == 1 and attempts[0]['ok'], '--no-breakers should switch loop detection off too')
+
+
+@test
 def breaker_forces_the_answer_first():
     run('forced', env={'STUB_FORCE': 's4a'})
     attempts = [c for c in calls('forced') if c['step'] == 's4a']
@@ -725,6 +745,23 @@ def ollama_client_against_fake_server():
                                                limits={'max_thinking_bytes': 3000, 'force_answer': True})
         check(client.last_call.get('forced_answer') and response == '{"forced": true}' and thinking.startswith('We need'),
               f'implicit reasoning should count against the thinking limit and be forced: {client.last_call}')
+
+        loop = ['Let me reconsider the second turn.\n'] * 6
+        thinking, response = client.run_prompt(json.dumps({'raw_chunks': ['We have a premise.\n'] + loop * 50, 'delay': 0.002}),
+                                               limits={'detect_loops': True, 'max_thinking_bytes': 100000, 'force_answer': True})
+        info = client.last_call
+        check(info['aborted'] == 'loop' and info.get('loop_line') == 'Let me reconsider the second turn.'
+              and not info.get('forced_answer') and response == '' and thinking.count('reconsider') == 5,
+              f'a one-line loop should be cut at the fifth repeat, unforced: {info}')
+        cycle = ['OK, let me write the JSON now.\n', 'OK.\n', 'Actually, the second turn needs another way.\n',
+                 '"way": null,\n', 'Let me re-read the cannot_do once more.\n', 'So the cannot_do is a string, fine.\n']
+        client.run_prompt(json.dumps({'raw_chunks': ['Drafting.\n'] + cycle * 40, 'delay': 0.002}), limits={'detect_loops': True})
+        check(client.last_call['aborted'] == 'loop', f'a paragraph going round should be cut: {client.last_call}')
+        drafted = ['Turn 1, way 1: you open the vent.\n', 'Turn 1, way 2: you hold it.\n', 'Turn 2, way 1: the marshal folds.\n']
+        drafted += ['{ "beat": "climax", "turn": null, "way": null },\n', '"provenance": "invented",\n'] * 6
+        drafted += ['</think>\n\n{"a": 7}']
+        thinking, response = client.run_prompt(json.dumps({'raw_chunks': drafted}), limits={'detect_loops': True})
+        check(client.last_call['aborted'] is None and response == '{"a": 7}', f'ordinary reasoning was taken for a loop: {client.last_call}')
 
         before = FakeOllama.disconnects
         started = time.time()

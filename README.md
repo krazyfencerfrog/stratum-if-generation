@@ -77,7 +77,9 @@ dependants). `<id>_run_stats.json` records every call attempt.
 
 Each call has a budget. A call whose reasoning trace runs past its limit is
 cut off and made to answer from the thinking it has; if that fails, it is
-re-run once with thinking off. `report.py` shows which calls did.
+re-run once with thinking off. Reasoning that starts going round in a loop
+is cut as soon as it repeats itself and re-run once from a new seed, still
+thinking, before that fallback. `report.py` shows which calls did.
 `--no-force-answer` skips the forced answer; `--no-breakers` turns the
 limits off. `--craft-spine` adds the optional craft-spine step (3.75) after
 the premise.

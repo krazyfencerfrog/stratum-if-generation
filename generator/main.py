@@ -28,6 +28,7 @@ pipeline; CLAUDE.md the file naming and how to re-run a step.
 import os
 import sys
 import time
+import random
 import re
 import json
 import argparse
@@ -277,6 +278,7 @@ class StoryGenerator:
             'max_response_bytes': profile['limit_response_bytes'],
             'max_seconds': profile['limit_seconds'],
             'num_predict': profile['num_predict'],
+            'detect_loops': True,
         }
         if think is not False and self.force_answer and profile.get('force_answer'):
             limits['force_answer'] = True
@@ -347,6 +349,7 @@ class StoryGenerator:
         last_error = None
         feedback = ''
         fallback_used = False
+        loop_seed = None        # set after a loop: the retry samples from a new seed
         attempts_left = retries + 1
         attempt = 0
         while attempts_left > 0:
@@ -354,6 +357,8 @@ class StoryGenerator:
             attempt += 1
             mode = 'no_think' if think is False else 'think'
             kwargs = {'options': sampler_for(think), 'limits': self.limits_for(klass, think)}
+            if loop_seed is not None:
+                kwargs['options'] = dict(kwargs['options'], seed=loop_seed)
             if think is False:
                 kwargs['think'] = False
             if schema is not None and is_json:
@@ -362,6 +367,8 @@ class StoryGenerator:
             rec = {'prefix': prefix, 'name': name, 'step': step_of(prefix), 'klass': klass, 'mode': mode,
                    'attempt': attempt, 'prompt_file': prompt_file_name, 'prompt_chars': len(full_prompt),
                    'ok': False, 'breaker': None, 'error': None}
+            if loop_seed is not None:
+                rec['seed'] = loop_seed
             # what was actually sent, beside the trace it produced
             self.save_story_file(f'{prefix}_raw_input_prompt.txt', full_prompt)
             log_path = self.story_create_log(prefix)
@@ -405,12 +412,23 @@ class StoryGenerator:
             if breaker:
                 rec['breaker'] = breaker
                 rec['error'] = f'cut off by the {breaker} circuit breaker'
+                if info.get('loop_line'):
+                    rec['loop_line'] = info['loop_line'][:200]
                 self.stats.record(**rec)
                 cut_name = f'{prefix}_raw_output_thinking_cut_{stamp}.txt'
                 self.save_story_file(cut_name, thinking)
                 self.save_story_file(f'{prefix}_raw_output_response_cut_{stamp}.txt', response)
                 print(f'  attempt {attempt} for {output_member_name}: {rec["error"]} '
                       f'({rec["thinking_bytes"]} thinking bytes, {rec["seconds"]:.0f}s)')
+                if breaker == 'loop' and loop_seed is None:
+                    # a loop is the sampler's bad luck more than the prompt's:
+                    # the same call from another seed usually runs clean, and
+                    # keeps its thinking. A second loop falls through to the
+                    # class's fallback below.
+                    loop_seed = random.randrange(1, 2 ** 31)
+                    print(f'  re-running {output_member_name} from seed {loop_seed}')
+                    attempts_left += 1
+                    continue
                 if (breaker != 'max_duration' and think is not False
                         and profile.get('fallback') == 'no_think' and not fallback_used):
                     print(f'  re-running {output_member_name} with thinking off')

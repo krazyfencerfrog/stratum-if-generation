@@ -327,6 +327,15 @@ thinks, what it should cost, and where it is cut off.
   connection, which stops generation. `num_predict` is set as a backstop,
   and a `done_reason` of `length` is treated as a cut. `--no-breakers`
   disables them.
+- **Loops.** With breakers on, every call's reasoning is watched by the
+  client's `LoopDetector`: among the last 80 prose lines, one line five
+  times or three lines three times each (drafted-JSON and list lines are
+  not counted) cuts the call with breaker `loop`. Calibrated on kernel1:
+  7 of 7 looping traces caught 4-12 KB in, none of 75 healthy ones
+  flagged. A loop is not forced (there is nothing to answer from); the call
+  is re-run once from a new random `seed`, thinking still on, recorded in
+  the run stats. A second loop goes to the class's fallback like any other
+  breach (for `extract`, which has none, the run stops).
 - **Budget forcing.** When a `judge` or `build` call passes its thinking
   limit before any answer has started, the client does not throw the trace
   away: it sends one raw-mode continuation holding the prompt, the thinking

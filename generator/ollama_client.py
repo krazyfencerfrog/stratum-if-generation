@@ -7,8 +7,10 @@ returns (thinking, response) and leaves what happened in self.last_call:
   seconds, thinking_bytes, response_bytes
   aborted        None, or the circuit breaker that cut the call off:
                  'thinking_bytes' | 'response_bytes' | 'wall_clock' (the
-                 limits the caller passed) | 'max_duration' (this client's
-                 own cap, a last resort: 4 hours unless configured)
+                 limits the caller passed) | 'loop' (the reasoning is
+                 repeating itself; see detect_loops) | 'max_duration'
+                 (this client's own cap, a last resort: 4 hours unless
+                 configured)
   done_reason    the server's own reason ('stop', 'length', ...); 'length'
                  means num_predict or the context window ran out
   prompt_tokens, output_tokens, eval_seconds, load_seconds
@@ -51,10 +53,15 @@ limits:  {'max_thinking_bytes', 'max_response_bytes', 'max_seconds'}; any
          model's chat template (raw_template, Qwen's ChatML by default);
          probe_ollama.py checks it. If forcing fails, the call is reported
          as cut, exactly as without it.
+         With 'detect_loops': True, reasoning that repeats itself (see
+         LoopDetector) is cut at once with aborted 'loop', and last_call's
+         loop_line holds what repeated. Its answer is never forced: a
+         looping trace has nothing left to answer from.
 """
 
 from llm_client import LlmClient, LlmCallError
 import argparse
+import collections
 import json
 import os
 import socket
@@ -73,6 +80,44 @@ CHATML_TEMPLATE = ("<|im_start|>user\n{prompt}<|im_end|>\n"
 FORCE_CLOSE = ("\n\nI have deliberated enough. I will stop here and write the final answer "
                "now, exactly in the requested output format.")
 FORCED_ANSWER_TOKENS = 6144
+
+
+class LoopDetector:
+    """Watches reasoning as it streams and says when it has started going
+    round: among its last WINDOW prose lines, one seen five times, or three
+    different lines seen three times each. A looping trace cycles through
+    a paragraph with small variations ("OK." / "Let me write the JSON." /
+    the same doubt again), so its lines recur but rarely back to back.
+    Short lines and lines that start like drafted JSON or a list are not
+    counted: a drafted answer repeats its field lines legitimately.
+    Calibrated on kernel1 traces: 7 of 7 loops caught, 4-12 KB in; none of
+    75 healthy traces (up to 77 KB) flagged. A looping trace never
+    recovers; the thinking breaker would only catch it after the whole
+    budget is spent."""
+    WINDOW = 80
+    MIN_CHARS = 21
+
+    def __init__(self):
+        self.tail = ''
+        self.window = collections.deque()
+        self.counts = collections.Counter()
+
+    def feed(self, text):
+        """Takes the next fragment; returns the repeating line, or None."""
+        self.tail += text
+        *done, self.tail = self.tail.split('\n')
+        self.tail = self.tail[-4000:]
+        for line in done:
+            line = line.strip()
+            if len(line) < self.MIN_CHARS or line[0] in '{["}]|-':
+                continue
+            self.window.append(line)
+            self.counts[line] += 1
+            if len(self.window) > self.WINDOW:
+                self.counts[self.window.popleft()] -= 1
+            if self.counts[line] >= 5 or sum(1 for n in self.counts.values() if n >= 3) >= 3:
+                return line
+        return None
 
 
 def _ollama_url(host, path):
@@ -201,6 +246,8 @@ class OllamaClient(LlmClient):
         response_bytes = 0
         aborted = None
         final = None
+        loops = LoopDetector() if limits.get('detect_loops') else None
+        loop_line = None
         # Servers before 0.9 put the reasoning inside `response`, between
         # <think> tags. inline: None until the first non-blank response
         # text says which it is, then 'open' (inside the tags), 'closed'
@@ -259,6 +306,8 @@ class OllamaClient(LlmClient):
                         thinking_bytes += len(thought.encode("utf-8"))
                         if self.echo:
                             print(thought, end="", flush=True)
+                        if loops and not loop_line:
+                            loop_line = loops.feed(thought)
                     fragment = obj.get("response", "")
                     if fragment:
                         chunks.append(fragment)
@@ -277,6 +326,8 @@ class OllamaClient(LlmClient):
                         if inline == 'open' and '</think>' in "".join(chunks[-3:]):
                             inline = 'closed'
                             inline_closed_at = response_bytes
+                        elif inline == 'open' and loops and not loop_line:
+                            loop_line = loops.feed(fragment)
                     if obj.get("done"):
                         final = obj
                         if self.echo:
@@ -292,7 +343,9 @@ class OllamaClient(LlmClient):
                         answer_so_far = response_bytes - inline_closed_at
                     else:
                         thought_so_far, answer_so_far = thinking_bytes, response_bytes
-                    if max_thinking and thought_so_far > max_thinking:
+                    if loop_line:
+                        aborted = 'loop'
+                    elif max_thinking and thought_so_far > max_thinking:
                         aborted = 'thinking_bytes'
                     elif max_response and answer_so_far > max_response:
                         aborted = 'response_bytes'
@@ -341,8 +394,10 @@ class OllamaClient(LlmClient):
             if forced is not None:
                 return forced
         if aborted and self.echo:
-            print(f'\n[call cut off: {aborted}]')
+            print(f'\n[call cut off: {aborted}' + (f': {loop_line[:120]!r}' if loop_line else '') + ']')
         self.last_call = self._info(payload, start, thinking, text, aborted, final)
+        if loop_line:
+            self.last_call['loop_line'] = loop_line
         return (thinking, text)
 
     def _force(self, payload, thinking, limits, start):

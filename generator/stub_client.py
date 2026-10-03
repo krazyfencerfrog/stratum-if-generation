@@ -35,6 +35,10 @@ Scenario knobs (environment variables):
                                  failed (tests the no-think fallback); with
                                  STUB_ABORT_ALWAYS=1 its no-think call does
                                  too (tests the stop)
+    STUB_LOOP=s4a                that step's first thinking call reports looping
+                                 reasoning (tests the re-run from a new seed);
+                                 with STUB_LOOP_ALWAYS=1 every thinking call
+                                 of that step loops (tests the fallback after)
     STUB_SPINE_FLAGGED_ROUNDS=1  with --craft-spine, 3.75's first build cites by
                                  list index (a computed finding -> 3.75r)
     STUB_FORCE=s4a               that step's thinking call passes its thinking
@@ -80,6 +84,13 @@ class StubClient(LlmClient):
             self.last_call = {'aborted': 'thinking_bytes', 'done_reason': None, 'format_sent': False}
             print(f'[stub {kind}] (circuit breaker)')
             return (thinking, '')
+        seeded = 'seed' in (kwargs.get('options') or {})
+        if (os.environ.get('STUB_LOOP') == kind and not no_think and (kwargs.get('limits') or {}).get('detect_loops')
+                and (not seeded or env_int('STUB_LOOP_ALWAYS', 0))):
+            self.last_call = {'aborted': 'loop', 'loop_line': 'Wait, let me re-check the turns.',
+                              'done_reason': None, 'format_sent': False}
+            print(f'[stub {kind}] (loop)')
+            return ('Wait, let me re-check the turns.\n' * 5, '')
         handler = getattr(self, f'p_{kind}')
         answer = handler(prompt)
         text = answer if isinstance(answer, str) else json.dumps(answer, indent=2)
