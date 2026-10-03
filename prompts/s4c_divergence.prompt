@@ -71,7 +71,9 @@ entry has the same shape as on the main line:
    turn by a different way than other lines did.
  - way: the numbered way this line takes through that turn, or null if
    there is no turn or the line resolves it in a way not listed (then say
-   how in "adapted").
+   how in "adapted"). Where an existing line already plays the same turn at the same beat,
+   take a different way (unused_ways lists them); taking the same way
+   retells a node the story already has.
  - adapted: one or two sentences: what happens here on THIS line, who
    does what to whom, and what is different afterwards. Specific to this
    premise; a sentence that could be pasted into another story is not
@@ -157,7 +159,7 @@ Output:
     "motivation": "The cheque clears and for a day nobody is packing. You come to want the tour kept whole, and then to want nothing said that would stop the next cheque.",
     "strategy": "Give the backer what he asks for and keep the bill exactly as printed.",
     "turning_point": "The backer asks for more than a walk-on. Once you agree to that, the play is his.",
-    "differs_from": "T1 opens as the play the company can honestly give and pays with the money and a week of the tour. This line opens as advertised and fully paid; the price is the understudy's name and the old character man's place, and they pay it, not you."
+    "differs_from": "T1 answers the question with the play the company can honestly give: half a house, the understudy under her own name, the backer gone. This line answers it the other way and leaves a different company standing: the tour whole and paid, the backer's nephew in the cast, the old character man out of it and the understudy's name off the bill."
   },
   "divergence": {
     "diverges_at": "N04",

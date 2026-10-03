@@ -379,8 +379,26 @@ def check_story(story):
     late = late_forks(lines)
     if late:
         notes.append(_finding('late_forks', late))
+    for a, b in repeated_nodes(nodes):
+        notes.append(_finding('repeated_node', f'nodes {a} and {b} play the same turn the same way in the same beat '
+                                               f'on different lines; the second retells the first', nodes=[a, b]))
 
     return {'findings': findings, 'notes': notes}
+
+
+def repeated_nodes(nodes):
+    """Pairs of nodes on different lines that fill the same beat with the
+    same premise turn taken the same way: the later line retells what an
+    earlier one already built (it left a node too early)."""
+    seen, out = {}, []
+    for nid, n in nodes.items():
+        if n.get('turn') is None or not n.get('way'):
+            continue
+        key = (n.get('beat'), n.get('turn'), n.get('way'))
+        if key in seen and not set(as_list(n.get('lines'))) & set(as_list(nodes[seen[key]].get('lines'))):
+            out.append((seen[key], nid))
+        seen.setdefault(key, nid)
+    return out
 
 
 def late_forks(lines):

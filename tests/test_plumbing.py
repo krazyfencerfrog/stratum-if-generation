@@ -653,6 +653,10 @@ def late_forks_are_noted():
     check(checks.late_forks(late), 'lines that all leave in the second half should be noted')
     early = dict(late, T3={'divergence': {'diverges_at': 'N02'}})
     check(checks.late_forks(early) is None, 'a line that leaves in the first half clears the note')
+    nodes = {'N02': {'beat': 'b2', 'turn': 2, 'way': 1, 'lines': ['T1']},
+             'T2N01': {'beat': 'b2', 'turn': 2, 'way': 1, 'lines': ['T2']},
+             'T3N01': {'beat': 'b2', 'turn': 2, 'way': 2, 'lines': ['T3']}}
+    check(checks.repeated_nodes(nodes) == [('N02', 'T2N01')], f'repeated nodes: {checks.repeated_nodes(nodes)}')
 
 
 @test

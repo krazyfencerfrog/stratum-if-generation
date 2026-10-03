@@ -26,7 +26,8 @@ WHAT YOU WRITE FOR EACH NODE
    the thing is.
  - where: one to three places, by name.
    (People: a registered character with a "name" is called by that name
-   in the summary; "who" still lists them by their role label, exactly
+   in the summary, the full name the first time in a node and the first
+   name after that; "who" still lists them by their role label, exactly
    as registered.)
  - who: the people present, by label. "You" are always present and are
    not listed.
