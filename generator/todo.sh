@@ -36,3 +36,5 @@ python main.py --story-id=kernel27 < ../tests/kernels/kernel27.txt
 python main.py --story-id=kernel28 < ../tests/kernels/kernel28.txt
 python main.py --story-id=kernel29 < ../tests/kernels/kernel29.txt
 python main.py --story-id=kernel30 < ../tests/kernels/kernel30.txt
+python main.py --story-id=kernel31 < ../tests/kernels/kernel31.txt
+python main.py --story-id=kernel32 < ../tests/kernels/kernel32.txt

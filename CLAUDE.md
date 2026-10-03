@@ -31,7 +31,7 @@ python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt      # one kern
 python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt  # rating filter; stop after 2 | 3 | 3.5 | 3.75 | 3.8
 python main.py --story-id=kernel1 --max-iterations=2 < ...            # cap the outline's lines (default 4)
 python report.py kernel1 --baseline ../docs/baseline_kernel1_run_stats.json   # per-stage time and trace size against the archived run
-./todo.sh                                                             # all 30 test kernels
+./todo.sh                                                             # all 32 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt
 ```
 
@@ -72,7 +72,7 @@ Iteration workflow: run `tests/test_plumbing.py` → draft or edit the prompt �
 ## Other files
 
 - `tests/test_plumbing.py` — stub-driven tests: every stub scenario, the graph invariants, the Ollama client against a fake server. Keep `generator/stub_client.py` in sync with any schema change; the test fails if a prompt in `prompts/` is exercised by no scenario.
-- `tests/kernels/kernel1..30.txt` — the test kernel batch (input fixtures, not automated tests); 28–30 are adversarial kernels for 3.5 and the 3d retrofit; 17 is the linear-shape case.
+- `tests/kernels/kernel1..32.txt` — the test kernel batch (input fixtures, not automated tests); 28–30 are adversarial kernels for 3.5 and the 3d retrofit; 17 is the linear-shape case; 31 (epic quest with a party) and 32 (a terse comic dungeon crawl) are the fantasy-adventure cases.
 - `generator/report.py`, `generator/probe_ollama.py` — run statistics against a baseline; capability probe of the local server.
 - `stories/current_output.tar` — the archived kernel1 run on the 2026-09-29 pipeline (the one this outline loop replaced): through 3.5–3.7 and about two step-4 iterations of node builds, 31.7 hours, with full thinking traces. `docs/baseline_kernel1_run_stats.json` is its per-call timing, rebuilt from its log timestamps.
 - `prompts/later/`, `generator/later/` — parked later-stage material (craft spine, cast, world, node build, review). Not loaded or imported. See `prompts/later/README.md`.

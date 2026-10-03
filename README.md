@@ -65,7 +65,7 @@ python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt   # rating
 python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap the outline at two lines (default 4)
 python main.py --story-id=kernel1 --framework=seven_point < ...        # choose the story framework yourself
 python report.py kernel1 --baseline ../docs/baseline_kernel1_run_stats.json   # time and trace size per stage
-./todo.sh                                                              # all 30 test kernels
+./todo.sh                                                              # all 32 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt   # no model
 ```
 

@@ -599,7 +599,7 @@ def example_copies_are_caught():
 
 @test
 def helpers():
-    for i in range(1, 31):
+    for i in range(1, 33):
         text = open(os.path.join(KERNELS, f'kernel{i}.txt'), encoding='utf-8').read()
         clauses = brief.kernel_clauses(text)
         check(clauses and all(c.strip() for _, c in clauses), f'kernel{i}: no clauses')
