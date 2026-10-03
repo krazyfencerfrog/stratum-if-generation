@@ -127,8 +127,10 @@ def basic_run_and_resume():
     check(any(e['kind'] == 'branch' and e['trigger']['text'] for e in story['edges']), 'no branch edge carries a trigger')
     grid = story['grid']
     check(set(grid['rows']) == set(story['lines']), 'the grid does not have one row per line')
-    check(all(c['mode'] == 'no_think' for c in calls('basic') if c['step'] in ('s2', 's3_5c', 's3_5v', 's3_8')),
+    check(all(c['mode'] == 'no_think' for c in calls('basic') if c['step'] in ('s2', 's3_5c', 's3_8')),
           'a classify-class call ran with thinking on')
+    check(all(c['mode'] == 'think' and c['klass'] == 'audit' for c in calls('basic') if c['step'] == 's3_5v'),
+          'the premise audit should run with thinking on, in the audit class')
     check(all(c['mode'] == 'think' for c in calls('basic') if c['step'] in ('s3_5a', 's4a', 's4b', 's4c', 's4d')),
           'a build-class call ran with thinking off')
     n_calls = len(calls('basic'))
@@ -537,6 +539,24 @@ def malformed_premise_sections_are_rejected_early():
 
 
 # ---------------------------------------------------------------- pure helpers
+
+@test
+def example_copies_are_caught():
+    import example_guard, re as _re
+    pf = ['s3_5a_engine.prompt', 's3_5b_turns.prompt', 's3_5c_cast.prompt']
+    text = open(os.path.join(ROOT, 'prompts', 's3_5b_turns.prompt')).read()
+    _, examples = example_guard.split_prompt(text)
+    check(examples and 'CALIBRATION' in examples and '$$' not in examples, 'the examples section was not isolated')
+    first = _re.search(r'Output:\n(\{.*?\n\})\n', examples, _re.S)
+    copied = json.loads(first.group(1))
+    hits = example_guard.copied_phrases(copied, pf, ['a ship and its AI'])
+    check(len(hits) >= example_guard.MIN_HITS, f'a premise copied from the example went unflagged ({len(hits)} phrases)')
+    run('copyguard', args=['--stop-after=3.5'])
+    premise = load('copyguard', 's3_5_premise_accepted.json')
+    kernel = open(os.path.join(KERNELS, 'kernel1.txt')).read()
+    hits = example_guard.copied_phrases(premise, pf, [kernel])
+    check(len(hits) < example_guard.MIN_HITS, f'the stub premise was flagged as a copy: {hits[:5]}')
+
 
 @test
 def helpers():

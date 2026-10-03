@@ -42,6 +42,7 @@ import frameworks
 import schemas
 from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
+import example_guard
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -850,6 +851,12 @@ class StoryGenerator:
             add('protagonist.cannot_do', 'cannot_do names no limit; the obstacle has nowhere to live', cannot)
         elif cannot.lower() == str(prot.get('can_do') or '').strip().lower():
             add('protagonist.cannot_do', 'cannot_do restates can_do', cannot)
+        copied = example_guard.copied_phrases(
+            premise, ['s3_5a_engine.prompt', 's3_5b_turns.prompt', 's3_5c_cast.prompt'],
+            [self.kernel or '', json.dumps(brief or {})])
+        if len(copied) >= example_guard.MIN_HITS:
+            add('premise', f"the premise copies the prompts' calibration example ({len(copied)} of its phrases); "
+                           f"rebuild every section copied from it from this Kernel", '; '.join(copied[:6]))
         turns = [t for t in premise.get('turns') or [] if isinstance(t, dict)]
         if len(turns) < 3:
             add('turns', f'there are {len(turns)} turns; a story needs at least 3')
@@ -956,7 +963,7 @@ class StoryGenerator:
             '$$FAILURE_MODEL$$': brief_lines(brief, only=('3-0c',)),
             '$$PREMISE_JSON$$': self.to_json(premise),
             '$$KERNEL$$': self.kernel,
-        }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='classify',
+        }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='audit',
             schema=schemas.PREMISE_CHECK)
 
         findings = self.premise_computed_findings(premise)
@@ -1243,11 +1250,11 @@ if __name__ == "__main__":
                         help="use this story framework instead of letting 3.8 choose")
     parser.add_argument("--no-think-steps", default='',
                         help="comma-separated steps to run with the model's thinking off, in addition to the "
-                             "ones that already do (s2_shape, s3_5c, s3_5v, s3_8). A step is a prefix (s4a_i1), "
+                             "ones that already do (s2_shape, s3_5c, s3_8). A step is a prefix (s4a_i1), "
                              "a step id (s4a) or step_name (s2_shape).")
     parser.add_argument("--think-steps", default='',
                         help="comma-separated steps to run with thinking ON even though their class turns it "
-                             "off (e.g. s3_5v to compare the audit both ways)")
+                             "off (e.g. s3_8)")
     parser.add_argument("--no-force-answer", action="store_true",
                         help="when a thinking call passes its thinking limit, skip budget forcing and go "
                              "straight to the thinking-off re-run")

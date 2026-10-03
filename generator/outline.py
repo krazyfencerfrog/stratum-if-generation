@@ -47,6 +47,7 @@ import json
 from brief import brief_lite, shape_targets
 from stats import SCHEMA_VERSION
 import checks
+import example_guard
 import frameworks
 import schemas
 
@@ -410,6 +411,17 @@ class OutlineBuilder:
                              for p in c.get('setup_payoff_pairs') or [] if isinstance(p, dict)],
         })
 
+    def check_example_copy(self, parsed, prompt_file, problems):
+        """Reject an answer that reuses the prompt's illustration (see
+        example_guard.py). The kernel, the brief and the premise are the
+        context the answer may legitimately echo."""
+        hits = example_guard.copied_phrases(
+            parsed, [prompt_file],
+            [self.gen.kernel or '', json.dumps(self.gen.analysis.get('s3_brief') or {}), json.dumps(self.premise)])
+        if len(hits) >= example_guard.MIN_HITS:
+            problems.append(f"the answer copies the prompt's illustration ({len(hits)} of its phrases, e.g. "
+                            f"{'; '.join(hits[:4])}); write this story's own content")
+
     def main_line(self):
         required = frameworks.required_beats({'beats': self.framework.get('beats') or []})
 
@@ -431,6 +443,7 @@ class OutlineBuilder:
                 problems.append(f'premise turn(s) {unplaced} are not placed; the main line plays every turn once')
             if len(entries) > self.shape['nodes_max'] + 3:
                 problems.append(f"{len(entries)} entries; aim for {self.shape['nodes_min']} to {self.shape['nodes_max']}")
+            self.check_example_copy(parsed, 's4a_main_line.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
 
@@ -562,6 +575,7 @@ class OutlineBuilder:
             if seed.get('diverges_at') not in valid:
                 problems.append(f"seed.diverges_at \"{seed.get('diverges_at')}\" is not a node a line may leave from; "
                                 f"valid nodes are {valid}")
+            self.check_example_copy(parsed, 's4d_next_line.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
 
@@ -685,6 +699,7 @@ class OutlineBuilder:
                 if missing:
                     problems.append(f'required beat(s) {missing} are neither on this line\'s path nor listed in '
                                     f'skipped_beats with a reason')
+            self.check_example_copy(parsed, 's4c_divergence.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
 
@@ -843,6 +858,7 @@ class OutlineBuilder:
                 if unknown:
                     problems.append(f"node {x['id']}: who names {unknown}, who are neither in the character register nor in "
                                     f"new_characters; registered labels are {[c['label'] for c in self.characters.values()]}")
+            self.check_example_copy(parsed, 's4b_line_nodes.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
 

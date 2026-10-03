@@ -20,7 +20,7 @@ s3.5  premise: the dramatic engine
         3.5a engine   protagonist, arena, pressure, opposition, mediation          [think]
         3.5b turns    3-5 situations, each with ways through and a form            [think]
         3.5c cast     a rough sketch per role the turns name                       [no think]
-        computed checks + 3.5v audit                                               [no think]
+        computed checks + 3.5v audit                                               [think, small]
         3.5r repair (only if findings; returns only the changed sections)          [think]
 s3.8  story form: a framework chosen from a computed shortlist                     [no think]
 step 4, the outline loop, one line per iteration:
@@ -100,7 +100,7 @@ turn with fewer than two ways or a way without a cost; a `serves` tag that
 names no brief field (prefix match); complications over budget; a role a turn
 involves with no seed; a crowd with nobody who speaks for it.
 
-*Asked* (`s3_5v_premise_check`, thinking off, structured output): three fixed
+*Asked* (`s3_5v_premise_check`, class `audit`: thinking on): three fixed
 lists and one search. One entry per numbered Kernel clause (`contradiction`),
 per numbered constraint (`violated`), per engine check (`holds`: E1 the limit
 is real, E2 the opposition has its own want, E3/E4 each pole takes an action
@@ -108,7 +108,18 @@ with a cost, T<n> turn n is not the axis handed over as a pick), plus any
 mechanic the engine lacks. In each entry `note` precedes the verdict, so the
 deliberation is one visible sentence per item. The verdict is computed from
 the entries; there is no severity field to agonize over. Any failure is a
-finding.
+finding. The audit ran with thinking off until the kernel1 runs of
+2026-10-01, where it passed a turn that was the decision axis handed over as
+a bare pick and a premise copied from the prompts' calibration example; it
+now thinks, on a small budget.
+
+*Copied examples* are computed, not asked (`generator/example_guard.py`): the
+distinctive 4-word phrases (two or more content words) of each prompt's
+CALIBRATION / ILLUSTRATION section, minus those in the prompt's instructions,
+that reappear in the output and are not explained by the Kernel, the brief
+or the premise. Four or more is a finding for the premise (`premise_computed_findings`)
+and a validator complaint for 4a, 4b, 4c and 4d. On kernel1 a copied premise
+scored 280; every clean premise and outline scored 0.
 
 **Repair** (`s3_5r<n>_premise_repair`) receives the normalized finding list
 and returns `{"repair_log", "revised"}` where `revised` holds only the
@@ -300,13 +311,14 @@ grid, hooks, checks{findings, notes}, iterations[], stop_reason, warnings[]
 
 ## 7. How every call is run
 
-`generator/stats.py` defines four classes. A call's class decides whether it
+`generator/stats.py` defines five classes. A call's class decides whether it
 thinks, what it should cost, and where it is cut off.
 
 | class | calls | thinking | target | breaker | on a breach |
 |---|---|---|---|---|---|
 | `extract` | phase 3, rating filter | model default | 30 KB, 30 min | none | reported only |
-| `classify` | s2 shape, 3.5c, 3.5v, 3.8 | off | 6 min | 45 min | stops the run, naming the partial trace |
+| `classify` | s2 shape, 3.5c, 3.8 | off | 6 min | 45 min | stops the run, naming the partial trace |
+| `audit` | 3.5v | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 | `judge` | 4d | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 | `build` | 3.5a, 3.5b, 3.5r, 3.75, 3.75r, 4a, 4b, 4c | on | 25 KB, 25 min | 40 KB, 45 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 

@@ -62,6 +62,17 @@ CALL_CLASSES = {
         'limit_thinking_bytes': 40000, 'limit_seconds': 2700, 'limit_response_bytes': 16000,
         'num_predict': 14000, 'fallback': None,
     },
+    # the premise audit (3.5v): a fixed checklist over the premise, answered
+    # with thinking ON. With thinking off it passed a turn that was the
+    # decision axis as a two-way pick, and a premise copied from a
+    # calibration example (2026-10-02 kernel1 runs). Its answer runs 5-7 KB,
+    # so the response limit is the build class's, not the judge's.
+    'audit': {
+        'think': None,
+        'target_thinking_bytes': 12000, 'target_seconds': 720,
+        'limit_thinking_bytes': 24000, 'limit_seconds': 1500, 'limit_response_bytes': 24000,
+        'num_predict': 14000, 'fallback': 'no_think', 'force_answer': True,
+    },
     # a small judgment over a short digest (the next-line seed).
     'judge': {
         'think': None,
