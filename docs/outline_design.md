@@ -427,6 +427,16 @@ The causes were upstream, and each now has a rule:
   (`hidden_truth`); a computed finding reports it missing, or present when the
   brief rules one out. 3.5b plants a clue and a way to bring it out; 4a places
   where it is suspected and where it comes out.
+- **Names from Python.** The construction prompts still name people by role
+  (a local model asked for names collapses onto the same few). After 3.5c,
+  and after every repair, `generator/names.py` gives each individual who is a
+  person a name from a pool in `config/names.json`, chosen by genre words in
+  the kernel (weighted) and the premise, gendered by the pronouns near the role
+  (else neutral), unique within the story and deterministic per story id.
+  The role stays the key: `involves`, registers and 4b's `who` match on it,
+  and a node may also refer to someone by name. 4a, 4b and 4c call named
+  people by name; the story document shows "Name (role)". A later stage can
+  replace the names in the register.
 - **Cast edges and ties.** Each seed has an `edge` and a `tie`, shown in the
   story document and in the register 4b reads. At least one complication is a
   reversal.

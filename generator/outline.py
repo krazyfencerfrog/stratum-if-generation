@@ -43,6 +43,7 @@ iteration and is the one file the later stages read and annotate.
 """
 
 import json
+import names
 
 from brief import brief_lite, shape_targets
 from stats import SCHEMA_VERSION
@@ -148,6 +149,8 @@ class OutlineBuilder:
             'pressure': (p.get('pressure') or {}).get('description'),
             'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
             'hidden_truth': p.get('hidden_truth') or None,
+            'cast': [{'role': s.get('role'), 'name': s['name']} for s in as_list(p.get('cast_seeds'))
+                     if isinstance(s, dict) and s.get('name')],
             'question': med.get('question'),
             'pole_a': pick(med.get('to_reach_pole_a'), 'pole', 'what_you_must_do', 'cost'),
             'pole_b': pick(med.get('to_reach_pole_b'), 'pole', 'what_you_must_do', 'cost'),
@@ -207,7 +210,7 @@ class OutlineBuilder:
             if isinstance(seed, dict) and seed.get('role'):
                 self.add_character({'label': seed['role'], 'kind': seed.get('kind'), 'speaks_for': seed.get('speaks_for'),
                                     'wants': seed.get('wants'), 'holds': seed.get('holds'),
-                                    'edge': seed.get('edge'), 'tie': seed.get('tie'),
+                                    'edge': seed.get('edge'), 'tie': seed.get('tie'), 'name': seed.get('name'),
                                     'opposition': seed.get('opposition'), 'why': '',
                                     'matters_to_turns': seed.get('matters_to_turns') or []}, source='premise')
 
@@ -220,8 +223,9 @@ class OutlineBuilder:
             'edge': c.get('edge') or '', 'tie': c.get('tie') or '',
             'opposition': bool(c.get('opposition')), 'why': c.get('why') or '',
             'matters_to_turns': c.get('matters_to_turns') or [], 'source': source, 'nodes': [],
+            'name': c.get('name') or None,
             # filled by the character buildout (stage B)
-            'name': None, 'profile': None, 'packet': None,
+            'profile': None, 'packet': None,
         }
         return cid
 
@@ -251,6 +255,14 @@ class OutlineBuilder:
         for rid, r in table.items():
             if norm(r.get(key)) == want:
                 return rid
+        if key == 'label':
+            # a person may be referred to by the name the cast gave them, or by its first word
+            for rid, r in table.items():
+                if r.get('name') and norm(r['name']) == want:
+                    return rid
+            firsts = [rid for rid, r in table.items() if r.get('name') and norm(r['name']).split()[0] == want]
+            if len(firsts) == 1:
+                return firsts[0]
         if shortened:
             words = want.split()
             hits = []
@@ -268,7 +280,8 @@ class OutlineBuilder:
 
     def register_view(self):
         return {
-            'characters': [{'label': c['label'], 'kind': c['kind'], 'speaks_for': c['speaks_for'],
+            'characters': [{'label': c['label'], **({'name': c['name']} if c.get('name') else {}),
+                            'kind': c['kind'], 'speaks_for': c['speaks_for'],
                             'wants': c['wants'], 'holds': c['holds'],
                             **({'edge': c['edge']} if c.get('edge') else {}),
                             **({'tie': c['tie']} if c.get('tie') else {})} for c in self.characters.values()],
@@ -883,7 +896,13 @@ class OutlineBuilder:
             if norm(c.get('label')) in ('protagonist', 'the protagonist', 'you', 'yourself'):
                 continue        # "you" is not a character in the register
             if not self.match(c['label'], self.characters, 'label'):
-                self.add_character(c, source=line['id'])
+                cid = self.add_character(c, source=line['id'])
+                seed = {'role': c['label'], 'kind': self.characters[cid]['kind']}
+                if names.wants_a_name(seed):
+                    self.characters[cid]['name'] = names.pick(
+                        self.gen.story_id, c['label'], self.premise.get('name_pool') or 'modern',
+                        names.gender_hint(c['label'], [str(c.get('wants') or ''), str(c.get('why') or '')]),
+                        [x['name'] for x in self.characters.values() if x.get('name')])
         for x in fill['nodes']:
             node = self.nodes[x['id']]
             node['title'] = str(x.get('title')).strip()
@@ -967,6 +986,12 @@ class OutlineBuilder:
 
 # ---------------------------------------------------------------- markdown
 
+def who_text(c):
+    """A character as the story document shows it: the name the cast gave
+    them, with the role beside it."""
+    return f"{c['name']} ({c['label']})" if c.get('name') else c['label']
+
+
 def story_markdown(story):
     """The story graph as something a person can read top to bottom."""
     lines, nodes = story['lines'], story['nodes']
@@ -1046,7 +1071,7 @@ def story_markdown(story):
         out.append(f"### {nid}: {n.get('title') or '(unfilled)'} [{'; '.join(tags)}]")
         out.append(f"lines: {', '.join(n.get('lines') or [])}")
         out.append(f"where: {', '.join(locs[x]['name'] for x in n.get('where') or [] if x in locs) or '-'}")
-        out.append(f"who: {', '.join(chars[x]['label'] for x in n.get('who') or [] if x in chars) or '-'}")
+        out.append(f"who: {', '.join(who_text(chars[x]) for x in n.get('who') or [] if x in chars) or '-'}")
         out.append('')
         out.append(n.get('summary') or n.get('adapted') or '')
         for a in n.get('additions') or []:
@@ -1079,7 +1104,7 @@ def story_markdown(story):
             bits.append('opposition')
         if c.get('speaks_for'):
             bits.append(f"speaks for {c['speaks_for']}")
-        out.append(f"- **{c['label']}** ({', '.join(bits)}): wants {c.get('wants') or '?'}; holds {c.get('holds') or '?'}"
+        out.append(f"- **{who_text(c)}** ({', '.join(bits)}): wants {c.get('wants') or '?'}; holds {c.get('holds') or '?'}"
                    + (f"; edge: {c['edge']}" if c.get('edge') else '')
                    + (f"; tie: {c['tie']}" if c.get('tie') else '')
                    + (f"; {c['why']}" if c.get('why') else '')

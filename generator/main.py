@@ -44,6 +44,7 @@ import schemas
 from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
 import example_guard
+import names
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -881,7 +882,16 @@ class StoryGenerator:
             '$$ROLES$$': '\n'.join(f' - {r}' for r in roles) or ' (the turns name nobody)',
             '$$KERNEL$$': self.kernel,
         }, validator=self.cast_validator(turns['turns']), klass='classify', schema=schemas.CAST)
-        return self.assemble_premise(budget, engine, turns, cast)
+        return self.name_cast(self.assemble_premise(budget, engine, turns, cast))
+
+    def name_cast(self, premise):
+        """Names for the cast come from Python (generator/names.py), not the
+        model: the role stays the key, the name rides along. Keeps any name a
+        seed already has, so a repair that adds a seed names only that one."""
+        text = json.dumps({k: premise.get(k) for k in PREMISE_KEYS})
+        premise['name_pool'] = names.assign_names(premise.get('cast_seeds') or [], self.story_id,
+                                                  [self.kernel or '', text], premise.get('name_pool'))
+        return premise
 
     # ------------------------------------------------------------------ 3.5: verify
 
@@ -1106,7 +1116,7 @@ class StoryGenerator:
                 '$$KERNEL$$': self.kernel,
             }, prompt_file='s3_5r_premise_repair.prompt', validator=repair_validator, klass='build',
                 schema=schemas.PREMISE_REPAIR)
-            premise = self.merge_premise(premise, repaired['revised'])
+            premise = self.name_cast(self.merge_premise(premise, repaired['revised']))
             findings = self.verify_premise(premise, n)
             rounds.append({'round': n, 'source': f's3_5r{n}_premise_repair.json#revised',
                            'changed': sorted(repaired['revised'].keys()),

@@ -620,6 +620,32 @@ def example_copies_are_caught():
 
 
 @test
+def cast_names_come_from_python():
+    import names
+    premise = load('basic', 's3_5_premise_accepted.json')
+    seeds = premise['cast_seeds']
+    named = [s for s in seeds if s.get('name')]
+    check(named and all(s['kind'] == 'individual' for s in named), 'individuals should be named, crowds not')
+    check(all(not s.get('name') for s in seeds if s['kind'] == 'crowd'), 'a crowd was given a name')
+    check(len({s['name'].split()[0] for s in named}) == len(named), 'two people share a given name')
+    check(premise.get('name_pool') == 'scifi', f"kernel1 should draw from the scifi pool, got {premise.get('name_pool')}")
+    again = [dict(s, name=None) for s in seeds]
+    names.assign_names(again, f'{PREFIX}basic', ['x'], premise['name_pool'])
+    check([s.get('name') for s in again] == [s.get('name') for s in seeds], 'names are not deterministic for a story id')
+    check(not names.wants_a_name({'role': 'the dragon', 'kind': 'individual'})
+          and not names.wants_a_name({'role': 'the protagonist', 'kind': 'individual'}), 'a dragon or "you" was named')
+    check(names.pool_for(open(os.path.join(KERNELS, 'kernel31.txt')).read()) == 'fantasy'
+          and names.pool_for(open(os.path.join(KERNELS, 'kernel17.txt')).read()) == 'period', 'genre pools')
+    story = open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.md')).read()
+    check(f"{named[0]['name']} ({named[0]['role']})" in story, 'the story document should show name and role together')
+    # a node may refer to a person by name, full or first
+    from outline import OutlineBuilder
+    table = {'C01': {'label': 'the nursery warden', 'name': 'Adaora Prakash'}, 'C02': {'label': 'the speaker', 'name': None}}
+    check(OutlineBuilder.match('Adaora Prakash', table, 'label') == 'C01' and OutlineBuilder.match('Adaora', table, 'label') == 'C01',
+          'a name did not resolve to its role')
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}
