@@ -896,6 +896,9 @@ class StubClient(LlmClient):
         n = max(1, min(4, int(pk.get('rooms_wanted') or 1)))
         rooms = [{"name": f"{name}, part {i + 1}", "description": "stub: " + " ".join(["a particular corner of " + name] * 4)}
                  for i in range(n)]
+        built = pk.get('rooms_already_built') or []
+        if os.environ.get('STUB_DUP_ROOM') and built and 'another location or a room already built' not in p:
+            rooms[0]['name'] = built[0]  # the live failure: each part of one boat rebuilt the whole boat
         exits = [{"from": rooms[i]['name'], "to": rooms[i + 1]['name'], "label": "onward", "back_label": "back"} for i in range(n - 1)]
         objects = [{"name": f"{r['name']} thing {k + 1}", "room": r['name'], "description": "stub: worth a look",
                     "portable": k == 0, "story": k == 1} for r in rooms for k in range(4)]

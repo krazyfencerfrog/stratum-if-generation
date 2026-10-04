@@ -17,6 +17,11 @@ For each room:
    ("through the soundproof door"); the other location's rooms are joined
    later.
 
+Build only THIS location. other_locations are built separately and
+rooms_already_built exist: never make a room with one of those names. A
+location that is itself one room-sized space (a cabin, a wheelhouse, a
+booth) is one room, whatever rooms_wanted says.
+
 Objects: four to eight examinable things per room.
  - Every object the scenes' moments use must exist where the moments need
    it (read the node summaries: the kettle a scene uses, the bar someone

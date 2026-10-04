@@ -292,16 +292,21 @@ class WorldBuilder:
 
     def b2_place(self, lid):
         loc = self.locations[lid]
+        others = [l.get('name') for k, l in self.locations.items() if k != lid and l.get('name')]
+        built = [r['name'] for r in self.world['rooms'].values()]
         packet = {'location': {'name': loc.get('name'), 'kind': loc.get('kind'), 'why': loc.get('why')},
-                  'rooms_wanted': self.room_budget(lid), 'scenes': self.scenes_with(location=lid),
+                  'rooms_wanted': self.room_budget(lid), 'other_locations': others, 'rooms_already_built': built,
+                  'scenes': self.scenes_with(location=lid),
                   'people_here': sorted({self.who(c) for sc in self.plan['scenes'] if lid in sc['where']
                                          for c in sc['who'] if c in self.chars})}
         answer = self.gen.run_prompt(f's6b2_{lid}', 'place', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
-        }, prompt_file='s6b2_place.prompt', validator=self.b2_validator(), klass='build', schema=schemas.WORLD_PLACE)
+        }, prompt_file='s6b2_place.prompt', validator=self.b2_validator(others + built), klass='build', schema=schemas.WORLD_PLACE)
         self.add_place(lid, answer)
 
-    def b2_validator(self):
+    def b2_validator(self, elsewhere=()):
+        elsewhere = {norm(n) for n in elsewhere}
+
         def validate(parsed):
             problems, soft = [], []
             rooms = [r for r in as_list(parsed.get('rooms')) if isinstance(r, dict) and r.get('name')]
@@ -310,6 +315,10 @@ class WorldBuilder:
             names = [norm(r['name']) for r in rooms]
             if len(set(names)) != len(names):
                 problems.append('two rooms share a name')
+            clash = [r['name'] for r in rooms if norm(r['name']) in elsewhere]
+            if clash:
+                problems.append(f'rooms {clash} are another location or a room already built; build only this '
+                                f'location, and if it is one room-sized space, make it one room')
             for r in rooms:
                 if len(str(r.get('description') or '').split()) < 15:
                     problems.append(f"room {r['name']!r}: the description is too thin; give it specific details")
@@ -342,8 +351,12 @@ class WorldBuilder:
     def add_place(self, lid, answer, location_name=None):
         taken = set(self.world['rooms']) | set(self.world['objects']) | set(self.chars)
         by_name = {}
+        existing = {norm(v['name']): k for k, v in self.world['rooms'].items()}
         for r in as_list(answer.get('rooms')):
             if not isinstance(r, dict) or not r.get('name'):
+                continue
+            if norm(r['name']) in existing:  # never two rooms with one name: its things go to the one built
+                by_name[norm(r['name'])] = existing[norm(r['name'])]
                 continue
             rid = slug(r['name'], taken)
             taken.add(rid)
@@ -363,7 +376,7 @@ class WorldBuilder:
                 'name': o['name'], 'location': by_name.get(norm(o.get('room'))), 'portable': bool(o.get('portable')),
                 'listed': bool(o.get('portable')), 'description': [{'text': o.get('description')}],
                 'story': bool(o.get('story'))}
-        self.location_rooms[lid] = list(by_name.values())
+        self.location_rooms[lid] = list(dict.fromkeys(by_name.values()))
 
     def link(self, a, b, label=None, back=None):
         rooms = self.world['rooms']

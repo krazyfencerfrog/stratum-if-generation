@@ -560,9 +560,11 @@ def stage_b_builds_an_engine_world():
     world_stage.compile_variants([{'state': 'courage', 'direction': 'up', 'text': 'x'}], {'nerve'}, {}, problems, 'y')
     check(problems, 'an unknown state compiled')
 
-    run('stageb', args=['--stage-b'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1'})
+    run('stageb', args=['--stage-b'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STUB_DUP_ROOM': '1'})
     result = load('stageb', 'world.json')
     w = result['world']
+    names = [r['name'] for r in w['rooms'].values()]
+    check(len(set(names)) == len(names), f'two rooms share a name: {sorted(names)}')
     story = load('stageb', 'story.json')
     people = [c for c, ch in story['characters'].items() if ch.get('kind') != 'crowd']
     check(set(w['characters']) == set(people), f"people built: {sorted(w['characters'])} vs {people}")
