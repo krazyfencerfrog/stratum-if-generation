@@ -485,12 +485,11 @@ class OutlineBuilder:
         ending['changed'] = str(ending.get('changed') or '').strip()
         return ending
 
-    @staticmethod
-    def world_key(ending):
+    def world_key(self, ending):
         """Two endings leave the same world when they give the same answer
-        and the same people stand and are lost. Compared by role label."""
-        return (ending.get('answer'), frozenset(norm(x) for x in ending.get('standing') or []),
-                frozenset(norm(x) for x in ending.get('lost') or []))
+        and the same PEOPLE stand and are lost (things listed there are
+        ignored; see checks.people_only). Compared by role label."""
+        return checks.world_key(ending, [c for c in self.characters.values() if c.get('kind') != 'crowd'])
 
     def normalize_skips(self, parsed):
         skips = []

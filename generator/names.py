@@ -31,7 +31,7 @@ GENRE_WORDS = {
         'medieval': r'medieval|monaster\w*|abbey|plague|feudal|crusade|serfs?|barons?|pirates?|galleons?|'
                     r'royal navy|buccaneers?',
         'scifi': r'sci-fi|science fiction|starships?|spaceships?|generation(?:al)? ship|space station|planets?|colon(?:y|ies)|androids?|'
-                 r'robots?|ai|cyber\w*|orbit\w*|asteroids?|arcology|hull|airlocks?|reactors?|drones?|'
+                 r'robots?|ai|cyber\w*|orbit\w*|asteroids?|arcology|airlocks?|reactors?|drones?|'
                  r'terraform\w*|interstellar',
         'period': r'1[89][0-9]0s|steampunk|noir|cold war|victorian|edwardian|prohibition|wartime|detectives?',
     }.items()

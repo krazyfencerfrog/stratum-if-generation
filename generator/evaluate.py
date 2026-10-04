@@ -83,8 +83,8 @@ def metrics(story, promises=None):
     standing_by_role = {}
     for l in order:
         e = lines[l].get('ending') or {}
-        key = (e.get('answer'), frozenset(checks.norm(x) for x in e.get('standing') or []),
-               frozenset(checks.norm(x) for x in e.get('lost') or []))
+        cast = [c for c in (story.get('characters') or {}).values() if c.get('kind') != 'crowd']
+        key = checks.world_key(e, cast)
         worlds.append(key)
         answers.append(e.get('answer'))
         for x in e.get('standing') or []:

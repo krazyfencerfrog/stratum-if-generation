@@ -386,7 +386,7 @@ def check_story(story):
         notes.append(_finding('repeated_situation', f'nodes {a} and {b} play the same turn in the same beat on different '
                                                     f'lines and their summaries share most of their words; the situation '
                                                     f'should differ, not only the way', nodes=[a, b]))
-    for a, b, world in same_worlds(lines):
+    for a, b, world in same_worlds(lines, [c for c in chars.values() if c.get('kind') != 'crowd']):
         notes.append(_finding('same_world', f'lines {a} and {b} end in the same world ({world}): the same answer with the '
                                             f'same people standing and lost', lines=[a, b]))
     static = static_companions(story)
@@ -396,20 +396,43 @@ def check_story(story):
     return {'findings': findings, 'notes': notes}
 
 
-def world_key(ending):
+def people_only(values, cast):
+    """The entries of an ending's standing/lost list that are people in the
+    cast (by role label, name, or a label's words in order). The model also
+    lists things there ("the hedge-witch's home-tending"), and a thing in one
+    list made two same-world endings look different on kernel31."""
+    out = set()
+    for v in as_list(values):
+        n = norm(v)
+        for c in cast:
+            label, name = norm(c.get('label')), norm(c.get('name'))
+            words = iter(n.split())
+            if n and (n == label or (name and (n == name or n == name.split()[0]))
+                      or (label and all(w in words for w in label.split()))
+                      or (label and all(w in iter(label.split()) for w in n.split()))):
+                out.add(label)
+                break
+    return frozenset(out)
+
+
+def world_key(ending, cast=None):
+    """(answer, people standing, people lost). Without a cast every entry
+    counts, as before."""
     ending = ending or {}
+    if cast:
+        return (ending.get('answer'), people_only(ending.get('standing'), cast), people_only(ending.get('lost'), cast))
     return (ending.get('answer'), frozenset(norm(x) for x in as_list(ending.get('standing'))),
             frozenset(norm(x) for x in as_list(ending.get('lost'))))
 
 
-def same_worlds(lines):
+def same_worlds(lines, cast=None):
     """Pairs of lines whose endings leave the same world, with the world."""
     seen, out = {}, []
     for lid in list(lines):
         e = lines[lid].get('ending') or {}
         if not e.get('answer'):
             continue
-        key = world_key(e)
+        key = world_key(e, cast)
         if key in seen:
             desc = f"answer {key[0]}" + (f", standing {', '.join(sorted(key[1]))}" if key[1] else '') + (f", lost {', '.join(sorted(key[2]))}" if key[2] else '')
             out.append((seen[key], lid, desc))
