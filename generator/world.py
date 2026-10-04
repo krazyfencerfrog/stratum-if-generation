@@ -44,6 +44,7 @@ from errors import SoftReject
 norm = checks.norm
 
 VARIANT_SHARE = 0.6
+OWN_OBJECTS = 12             # object subjects one person is asked about, at most
 EXAMINABLE_PER_ROOM = (4, 8)
 ID_RE = re.compile(r'[^a-z0-9]+')
 
@@ -451,8 +452,32 @@ class WorldBuilder:
                 unique.append(s)
         return unique
 
+    def own_objects(self, cid, subjects):
+        """The object subjects this person has a tie to: named in what they
+        already say or are, or in the scenes they are in. Everyone commenting on
+        everything is filler; the rest of the world stays out of their mouth."""
+        ch = self.world['characters'][cid]
+        own = [ch.get('history'), self.chars[cid].get('holds'), self.chars[cid].get('wants')]
+        for t in ch['topics'].values():
+            own += [t.get('label')] + [v.get('text') for v in t.get('says') or []]
+        own += [v.get('text') for v in (ch.get('description') or []) + (ch.get('here') or [])]
+        scenes = [n.get('summary') for sc in self.scenes_with(cid=cid) for n in sc['nodes']]
+
+        def words(text):
+            return set(re.findall(r"[a-z]+", re.sub(r"'s\b", '', str(text or '').lower().replace('-', ' '))))
+        mine, theirs = words(' '.join(map(str, own))), words(' '.join(map(str, scenes)))
+
+        def named_in(name, pool):
+            core = [w for w in words(name) if len(w) > 2 and w not in ('the', 'and', 'old', 'his', 'her', 'its', 'your')]
+            return core and all(w in pool for w in core)
+        objects = [s for s in subjects if s['kind'] == 'object']
+        tied = [s for s in objects if named_in(s['subject'], mine)]
+        tied += [s for s in objects if s not in tied and named_in(s['subject'], theirs)]
+        return tied[:OWN_OBJECTS]
+
     def b1c_conversation(self, cid):
-        subjects = [s for s in self.subject_list() if s['subject'] not in (self.world['characters'][cid]['name'],)]
+        everyone = [s for s in self.subject_list() if s['subject'] not in (self.world['characters'][cid]['name'],)]
+        subjects = [s for s in everyone if s['kind'] != 'object'] + self.own_objects(cid, everyone)
         packet = {'who': self.who(cid), 'voice': self.chars[cid].get('voice'), 'tie': self.chars[cid].get('tie'),
                   'tier': self.tiers.get(cid), 'arc': self.arc_of(cid), 'states': sorted(self.states),
                   'already_topics': [t['label'] for t in self.world['characters'][cid]['topics'].values()],
@@ -466,9 +491,9 @@ class WorldBuilder:
                 if norm(x.get('subject')) not in names:
                     problems.append(f"subject {x.get('subject')!r} is not in the list")
                 compile_variants(x.get('says'), self.states, self.nodes, problems, f"subject {x.get('subject')!r}")
-            if len(lines) < max(1, len(subjects) // 2):
-                problems.append(f'{len(lines)} subjects answered of {len(subjects)}; say something about most of them '
-                                f'(a person who would not know says so, in character)')
+            if len(lines) < max(1, len(subjects) // 3):
+                problems.append(f'{len(lines)} subjects answered of {len(subjects)}; say something about at least a third '
+                                f'(the ones this person has something to say about)')
             if problems:
                 raise ValueError('; '.join(problems))
         answer = self.gen.run_prompt(f's6b1c_{cid}', 'conversation', {
@@ -480,7 +505,7 @@ class WorldBuilder:
             if not s:
                 continue
             tid = slug('about ' + s['subject'], topics)
-            topics[tid] = {'label': s['subject'], 'known_when': s['gate'],
+            topics[tid] = {'label': s['subject'], 'known_when': s['gate'], 'group': s['kind'],
                            'says': compile_variants(x.get('says'), self.states, self.nodes, [], tid)}
 
     # ------------------------------------------------------------ B3

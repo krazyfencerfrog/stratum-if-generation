@@ -8,11 +8,12 @@ what the story turns on. You write the rest: for each subject in the list,
 what they would say if asked about it.
 
  - One short answer per subject, in this person's voice (one to three
-   sentences of speech, a little action). It should tell the player
+   sentences of speech, a little action). It must tell the player
    something: about the subject, about the speaker, or about how the two are
-   tied. A person who would not know about a subject says so, in character
-   ("Never been up there. Heights."), or you leave the subject out; answer
-   most of them.
+   tied. Answer only the subjects this person has something real to say
+   about, and leave the rest out: a line that only says a thing is cold or
+   heavy or expensive is filler. A person who would not know a subject that
+   matters can say so, in character ("Never been up there. Heights.").
  - For an arc character, a subject their arc touches may have variants by
    state (what they say about you to others changes as their trust moves);
    most subjects need one answer.
