@@ -164,15 +164,12 @@ calibration examples (each with a reasoning paragraph and a full output);
 trimmed 3.5a (one example, or examples without their reasoning) as an A/B
 variant at the same budget.
 
-### Question for the user: relationship states at the premise level
-The premise audit (3.5v) reports "the crew's trust rises or falls with each
-favour, and they open the gate only if it is high enough" as a system the
-engine lacks; its own example says so. That rule predates the new engine,
-which has arc states and pattern conditions, and stage A builds exactly
-such states (perceived through tells, never as numbers). Should 3.5 be
-allowed to name a relationship that moves with the player's choices and
-gates something, leaving stage A to make it playable? Undecided; the audit
-still forbids it.
+### Relationship states at the premise level: DECIDED 2026-10-04
+"Whatever makes the better story": companions whose loyalty is earned or
+lost, and whose loyalty opens or closes doors, are the heart of interactive
+drama, and the new engine and stage A can carry them. 3.5a now names such a
+relationship as a primitive, and the audit permits it; it still reports a
+number the player is shown or must watch, and rule systems the engine lacks.
 
 ### Code health [solo]
 - Review `main.py` (about 1,500 lines) and `outline.py`: three authors in
