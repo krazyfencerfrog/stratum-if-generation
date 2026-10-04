@@ -836,6 +836,48 @@ def playtest_walks_outlines_and_patterns():
 
 
 @test
+def batch_runner_queues_resumes_and_locks():
+    import batch, tempfile, threading
+    tmp = tempfile.mkdtemp()
+    queue = os.path.join(tmp, 'q.json')
+    lock = os.path.join(tmp, 'gpu.lock')
+    env = {k: v for k, v in os.environ.items() if not k.startswith('STUB_')}
+    env['STRATUM_CLIENT'] = 'stub'
+    ids = [f'{PREFIX}batch_a', f'{PREFIX}batch_b', f'{PREFIX}batch_bad']
+    for sid in ids:
+        shutil.rmtree(story_dir(sid[len(PREFIX):]), ignore_errors=True)
+    batch.add(queue, [batch.make_job('kernel1', story_id=ids[0]), batch.make_job('kernel32', story_id=ids[1]),
+                      batch.make_job('no_such_kernel', story_id=ids[2])])
+    check(len(batch.add(queue, [batch.make_job('kernel1', story_id=ids[0])])) == 0, 'a job already queued was queued twice')
+    # a job a killed runner left "running" goes back to the queue
+    q = batch.load(queue); q['jobs'][1]['status'] = 'running'; batch.save(queue, q)
+    said = []
+    old = batch.GPU_LOCK
+    batch.GPU_LOCK = lock
+    try:
+        holder = open(lock, 'a+')
+        import fcntl
+        fcntl.flock(holder, fcntl.LOCK_EX)
+        threading.Timer(1.0, lambda: (fcntl.flock(holder, fcntl.LOCK_UN), holder.close())).start()
+        with batch.gpu(lock, say=said.append):
+            pass
+        check(any('waiting for the GPU' in m for m in said), f'a second runner did not wait for the GPU lock: {said}')
+        batch.run(queue, env=env, say=said.append)
+    finally:
+        batch.GPU_LOCK = old
+    st = {j['story_id']: j for j in batch.load(queue)['jobs']}
+    check(st[ids[0]]['status'] == 'done' and st[ids[1]]['status'] == 'done', f"jobs did not finish: {[(k, v['status'], v.get('error')) for k, v in st.items()]}")
+    check(st[ids[2]]['status'] == 'failed' and st[ids[2]]['exit'] not in (0, None), f"a bad job should fail: {st[ids[2]]}")
+    check(any('re-queued 1 interrupted' in m for m in said), 'the interrupted job was not re-queued')
+    check(os.path.isfile(os.path.join(story_dir('batch_a'), f'{PREFIX}batch_a_story.json')), 'no story from the batch job')
+    text, out = batch.report(queue)
+    check(ids[0] in text and 'done' in text and os.path.isfile(out), f'report: {text}')
+    for sid in ids:
+        shutil.rmtree(story_dir(sid[len(PREFIX):]), ignore_errors=True)
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}

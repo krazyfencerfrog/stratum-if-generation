@@ -112,8 +112,6 @@ more of a fixed budget for the story. Pairs with the budget investigation.
 - Merge the Fable 5 branch into main once it is proven; update docs.
 
 ### Tooling [solo]
-- A proper batch runner (queue file, resume, survives kills, a summary
-  report at the end) to replace the ad-hoc shell scripts.
 - `report.py` across many stories; a side-by-side view of two outlines of
   the same kernel for before/after reading.
 
@@ -125,6 +123,9 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   a kill.
 
 ## Done
+- 2026-10-04: batch runner (`generator/batch.py`): a queue file, a machine-wide GPU
+  lock so two runs never share the GPU (two runs had collided that day),
+  resume after kills, one retry for transient failures, a metrics report.
 - 2026-10-04: playtest simulator (`generator/playtest.py`). On the five Fable 5
   outlines: all valid, but every ending is reached with at most ONE decision
   per playthrough, the case for stage A in one number. Its random-play check
