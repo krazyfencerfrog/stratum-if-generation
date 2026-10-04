@@ -485,6 +485,12 @@ def stage_a_expands_arcs():
     th = arcs.shift_threshold([(0.5, 0.5)] * 4)
     check(th and th['random_rate'] < arcs.RANDOM_SHIFT_LIMIT and th['at_least'] >= 3, f'threshold: {th}')
     check(arcs.shift_threshold([(0.5, 0.5)] * 2) is None, 'two opportunities produced a pattern shift')
+    see = {'kind': 'opportunity', 'options': [{'moves': [{'state': 'a', 'direction': 'up'}, {'state': 'b', 'direction': 'down'}]},
+                                             {'moves': [{'state': 'a', 'direction': 'down'}, {'state': 'b', 'direction': 'up'}]}]}
+    check(arcs.is_seesaw(see), 'a pure trade was not recognized')
+    single = {'kind': 'opportunity', 'options': [{'moves': [{'state': 'a', 'direction': 'up'}]},
+                                                {'moves': [{'state': 'a', 'direction': 'down'}, {'state': 'b', 'direction': 'up'}]}]}
+    check(not arcs.is_seesaw(single), 'an option that moves one person was counted as a trade')
     seq = ['N01', 'N01a', 'N01b', 'N01c', 'N02']
     check(arcs.tell_in_reach(seq, 1, 4, lambda t: t.startswith('N') and len(t) == 3), 'the next major node is in reach')
     check(not arcs.tell_in_reach(seq, 1, 1, lambda t: True), 'a tell on its own node is in reach')
@@ -508,6 +514,8 @@ def stage_a_expands_arcs():
     for l, line in graph['lines'].items():
         check(line['path'][0] in graph['nodes'] and all(n in graph['nodes'] for n in line['path']), f'{l}: path broken')
     check(any(len(e['groups']) for e in result['endings'].values()), 'no ending variants were composed')
+    check(not any('no sequence of choices reaches' in f for f in result['checks']),
+          f"the stub's single-state options should reach every ending combination: {result['checks']}")
     check(load('stagea', 'arcs.md').startswith('# '), 'no markdown report')
     n = len(calls('stagea'))
     run('stagea', fresh=False, args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})

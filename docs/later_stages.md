@@ -64,6 +64,23 @@ Settled while building:
   the time; with four two-option opportunities that is all four (6%).
   Resolution and ending shifts become the first variant of the composed
   ending; line shifts become accumulated edges.
+- **First live run (kernel35_f5, 2026-10-04 evening, 28 minutes, every call
+  accepted first time):** tiers, states, moments on every major node, tells,
+  active attempts and composed endings all came out right, with good
+  physical detail ("the key is cold enough to sting your palm"). The flaw:
+  most choices were a SEESAW, one person's state up and the other's down
+  (6 of 14 opportunities in every option, 21 of 30 options overall, no
+  option good or bad for both), so the player answered "Lazlo or the
+  ghost?" again and again, and on T2 the ending with both at your side was
+  unreachable by any sequence of choices. Fixed with a rule in A2 (most
+  options move one person's state, at a cost in the world; at most a third
+  of a line's opportunities trade one person against another; a way to do
+  right or wrong by both), a soft check in A2's validator, and a final check
+  that enumerates every combination of choices along each line and reports
+  ending combinations nothing reaches. Also seen: the outline's paperwork
+  (ledger, receipts, as-is note) carried straight into the options; the A2
+  rule now says an option is done for a reason the player can feel, not a
+  document signed or priced.
 - **Resolution variants** use a weaker pattern (a majority of at least two
   moves, share 0.6), with the line's fixed resolution, or the last one, as
   the fallback.

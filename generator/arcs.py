@@ -124,6 +124,23 @@ def tell_in_reach(seq, own, target, is_major):
     return target == first_major
 
 
+def pattern_holds(up, down, direction, at_least, share):
+    """The engine's pattern(): moved at least `at_least` times, at least
+    `share` of the moves `direction` (engine/expressions.py)."""
+    moves = up + down
+    agree = down if direction == 'down' else up
+    return moves >= at_least and moves > 0 and agree / moves >= share
+
+
+def is_seesaw(node):
+    """Every option trades one state up against another down: the player is
+    asked "this person or that one" again (kernel35's first live run: 6 of 14
+    opportunities, and no option good for both)."""
+    sigs = [{(m['state'], m['direction']) for m in o.get('moves') or []} for o in node.get('options') or []]
+    sigs = [x for x in sigs if x]
+    return bool(sigs) and all(len({st for st, _ in x}) >= 2 and len({d for _, d in x}) == 2 for x in sigs)
+
+
 def expr(state, direction, at_least, share):
     return f"pattern('{state}','{direction}',{at_least},{share})"
 
@@ -554,6 +571,14 @@ class ArcBuilder:
                                 f"use a major node id or m<k> for the k-th minor node of this answer")
             existing = [self.minors[m] for m in self.expanded_path(line_id) if m in self.minors]
             all_opps = [x for x in existing if x['kind'] == 'opportunity'] + [x for _, x in opps]
+            if len(states) >= 2 and len(all_opps) >= 3:
+                seesaws = [x for x in all_opps if is_seesaw(x)]
+                if len(seesaws) > max(1, len(all_opps) // 3):
+                    soft.append(f'{len(seesaws)} of {len(all_opps)} opportunities on {line_id} trade one person against '
+                                f'another in every option (one up, the other down): the player is asked "this one or '
+                                f'that one" again and again, and cannot do right by both. At most a third may; most '
+                                f'options move ONE person\'s state, at a cost in the world (time, a thing, a risk), and '
+                                f'somewhere on the line there is a way to do right, or wrong, by both')
             if len(all_opps) >= 2:
                 active = sum(1 for x in all_opps if any(o.get('active') for o in x.get('options') or []))
                 if active == 0:
@@ -731,8 +756,58 @@ class ArcBuilder:
             order.extend(self.after.get(nid, []))
         return {'nodes': nodes, 'edges': edges, 'lines': lines, 'line_order': self.order, 'node_order': order}
 
+    def reachable_combinations(self, line_id, endings, limit=20000):
+        """Which of the composed ending's variant combinations some sequence of
+        option choices along the line can reach: every combination of
+        choices, the states counted as the engine would."""
+        end = endings.get(line_id) or {}
+        groups = end.get('groups') or []
+        if not groups:
+            return set(), set()
+        opps = [self.minors[m] for m in self.expanded_path(line_id)
+                if m in self.minors and self.minors[m]['kind'] == 'opportunity']
+        choices = [o.get('options') or [{}] for o in opps]
+        total = 1
+        for c in choices:
+            total *= len(c)
+        if total > limit:
+            return None, None
+        from itertools import product
+        possible = set(product(*[range(len(g['variants'])) for g in groups]))
+        reached = set()
+        for pick in product(*choices):
+            arcs_ = {}
+            for o in pick:
+                for mv in o.get('moves') or []:
+                    a = arcs_.setdefault(mv['state'], {'up': 0, 'down': 0})
+                    a[mv['direction']] += 1
+            combo = []
+            for g in groups:
+                for i, v in enumerate(g['variants']):
+                    m = re.match(r"pattern\('(\w+)','(\w+)',(\d+),([\d.]+)\)", v.get('when') or '')
+                    if not m:
+                        combo.append(i)
+                        break
+                    st, d, k, share = m.group(1), m.group(2), int(m.group(3)), float(m.group(4))
+                    a = arcs_.get(st, {'up': 0, 'down': 0})
+                    if pattern_holds(a['up'], a['down'], d, k, share):
+                        combo.append(i)
+                        break
+                else:
+                    combo.append(None)
+            reached.add(tuple(combo))
+        return possible, reached
+
     def final_checks(self, shifts, endings):
         findings = []
+        for l in self.order:
+            possible, reached = self.reachable_combinations(l, endings)
+            if possible is None:
+                continue
+            groups = (endings.get(l) or {}).get('groups') or []
+            for combo in sorted(possible - reached):
+                what = '; '.join(f"{g['who']}: {g['variants'][i]['when']}" for g, i in zip(groups, combo))
+                findings.append(f'on {l} no sequence of choices reaches the ending combination ({what})')
         for sh in shifts:
             if not sh.get('threshold'):
                 counts = {l: v['opportunities'] for l, v in sh['per_line'].items()}

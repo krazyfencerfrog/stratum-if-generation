@@ -35,6 +35,17 @@ rewind, so a surprise must show early.
 
 Rules:
  - A small choice moves a state; it never changes the line by itself.
+ - Do not make every choice a trade between two people. Most options move
+   ONE person's state, and their cost is in the world (time lost, a thing
+   given up, a risk taken, someone else watching), not automatically the
+   other person's state. At most a third of a line's opportunities may set
+   one person against another, and somewhere on the line there is a way to
+   do right by both, or wrong by both. A player must be able to win
+   everyone, or lose everyone, by how they play.
+ - An option is something done or said for a reason the player can feel
+   (to comfort, to defy, to protect, to mock, to help), not the order of
+   two errands, and not a document signed or priced unless the story is
+   about that document.
  - Every arc on this line gets opportunities on this line. Where how
    someone ends depends on their state, at least two opportunities on the
    line move it.
