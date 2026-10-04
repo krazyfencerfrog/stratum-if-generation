@@ -136,13 +136,18 @@ same level, with D's check being the engine validator plus playtest. Open for
 A: whether some outline forks should become pattern triggers; the "Python as
 planner, model as writer" variant of A2.
 
-### Premise A/B [GPU, queued]
-kernel35's batch run on this branch had smaller, more procedural turns than
-the Fable-branch run (plot 3 vs 4; lines of 5 nodes vs 7; one breaking point
-vs four). Queued: three 3.4-3.5 replays each on Fable's 4651810 and on HEAD
-(stratum-compare/ab_premise). If HEAD's premises are consistently weaker,
-suspect the 3.5a protagonist fields (history/need/ties/open) crowding the
-engine call.
+### Premise A/B: DONE 2026-10-04 (stratum-compare/ab_premise)
+Three 3.4-3.5 replays of kernel35 each on Fable's 4651810 and on b67f48a
+(this branch with the protagonist fields). No sign the branch weakened the
+premises: the same turn count, three set pieces each, the same shapes, and
+some of the best images on the branch; paperwork in every turn on both
+sides (the kernel's sale and debt invite it). One branch run halted after
+two repair rounds on the audit's "a deadline is a system the engine lacks"
+false alarm, fixed since in 97c7f3e. The one difference to watch: smaller
+casts on the branch (3, 2, 2 people against 4, 3, 3); 3.5c sketches only
+the roles the turns name, so the branch's turns lean on fewer people.
+Three samples; check it again in the next runs. kernel35_f5's strong
+premise was mostly a good draw.
 
 ### Protagonist fields on the model [GPU]
 The defined-but-steerable protagonist (history, need, ties, open, gender,
