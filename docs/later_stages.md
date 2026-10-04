@@ -283,128 +283,95 @@ call. Build the per-line version first and compare.
 has to be split), so 1-2 hours for a four-line story, plus any audit and
 repair.
 
-## 3. Stage B: character and setting buildout
+## 3. Stage B: the world (characters, rooms, objects)
 
-**Job.** Depth for the people and places the outline actually uses. This is
-where voice, stance, topics, fixtures and connections belong. Each entity
-gets a long form (for people and for later reference) and a packet form of
-150 words or fewer (what per-node calls receive), as the lessons doc's §6a
-requires.
+Revised 2026-10-04 to target the engine in `docs/engine_design.md`.
 
-**B1, characters (`s6c_<id>`, one call each, or two or three sketches per
-call).** Basis: `prompts/later/sB_cast.prompt`. Packet: the sketch (label,
-kind, wants, holds, speaks_for, opposition), the nodes the character is in
-(summary and the expansion events that name them), and how each line they
-are on ends for them.
+**Job.** Build the world the scenes will use: characters with topics and
+stances, rooms with exits, the objects that matter. Depth follows the arc
+tiers from A0: full profiles for `arc` characters, medium for `supporting`,
+a line or two for `functional`. Much of what this stage once had to invent
+now exists (voice, edge, tie, breaking point from 3.5c; arcs and states from
+A1); B's new work is what the engine needs.
 
-```json
-"profile": {
-  "name": "...", "voice": "...", "stance_at_open": "...", "moved_by": "...",
-  "arcs": {"T1": "where they end on this line", "T2": "..."},
-  "topics": [{"topic": "...", "knows": "...", "says_it_when": "plain words"}],
-  "ties": [{"to": "label", "what": "..."}]
-},
-"packet": "150 words or fewer: who they are, what they want, how they talk, what moves them"
-```
+**B1, characters (one call per arc or supporting character; functional
+characters in one batch call).** Input: the cast seed, the character's arc
+and light arc from A1, the scenes they are in (from A2), the states that
+concern them, the hidden truth if they know it. Output (engine §4.3):
+- `topics`: what you can talk to them about; for each, when it becomes known
+  (a flag a moment sets), what they say by state (stance), and any effect;
+- `description` variants by state (how they look and act as their arc moves);
+- for arc characters, a short history (what they bring into the story).
+Python checks: every topic's `known_when` names a flag some moment sets;
+every state a stance reads is declared; the hidden truth is only in the
+topics of those who know it.
 
-A naming pass may run first as one small no-think call for the whole cast,
-so names are chosen together. Crowds get a `who` line and no profile; the
-rule that a crowd has a representative is already enforced.
+**B2, rooms and objects (one call per location).** Input: the location
+sketch, the scenes that use it and their moments, the objects the moments
+name (levers, revelation objects, the kettle that bails). Output (engine
+§4.1-4.2): one to four rooms per location with permanent descriptions,
+exits between them, and the objects in them. A small classification call
+over the list of locations decides which locations adjoin (an exit between
+their nearest rooms); Python makes exits mutual and checks every room is
+reachable from every other within the scenes that open them.
 
-**B2, locations (`s6l_<id>`, one call each).** Basis:
-`prompts/later/sB_world.prompt`. Packet: the sketch, the nodes that use it
-with their expansion events located there, the protagonist's can/cannot, and
-the premise's levers.
-
-```json
-"rooms": [{"id": "L04.a", "name": "...", "purpose": "...", "fixtures": ["..."], "connects": ["L04.b"]}],
-"protagonist_can": "...",
-"levers_here": ["..."],
-"packet": "150 words or fewer"
-```
-
-One to three rooms per location. A final computed pass makes connections
-mutual and links locations to each other (`validate_world` in
-`generator/later/cast_world_craft.py` already does the first half); which
-locations adjoin is one small classification call over the list of names.
-
-**Cost estimate.** About 12 minutes per character and per location: a cast
-of six and seven locations is about 2.5 hours.
+**Cost.** Not the constraint (see the principles in §2). Roughly 5-10
+minutes per arc or supporting character and per location.
 
 ## 4. Stage C: reconciliation
 
-**Job.** Make sure the depth from B is reflected in the right paths and
-nothing is orphaned or contradicted. Mostly computed.
+**Job.** Make sure the world from B fits the scenes from A and nothing is
+orphaned or contradicted, before D compiles. Mostly computed:
+- every scene's rooms exist and are connected among themselves;
+- every object a moment names exists and can be where the moment needs it;
+- every topic is reachable (its `known_when` flag is set by some moment
+  before a scene where the character is present);
+- every character's stances cover the states their arc moves;
+- the playtest simulator walks the A2 graph with the B world attached and
+  reports unreachable scenes, endings and resolution variants.
 
-Computed (extending `generator/checks.py`):
+One model pass per line (thinking off, over packets): for each scene, does
+anything in it contradict the packet of anyone in it, or of a room it uses?
+yes/no with a quote. A finding re-runs the one B or A2 call it names, with
+the finding attached, and returns only what changed. After C the world is
+locked: D may not add characters, rooms or scenes.
 
-- every `events.who` and `events.where` resolves; every character with a
-  profile appears in a node, every room is used by an event or is flagged
-- every lever the premise names is placed in exactly one room or held by one
-  character
-- every character's `arcs` has an entry for each line they appear on
-- every topic's `says_it_when` names something an event provides
-- a character's `stance_at_open` is not contradicted by their first node
-  (keyword overlap warning only)
+## 5. Stage D: compile scenes
 
-One model pass per line (class: classify), over packets only: for each node
-on the line, "does this node's expansion contradict the packet of anyone in
-it, or of the place it is in? yes/no, one sentence, quote". Findings name a
-node or an entity; repair re-runs exactly that A1 or B call with the finding
-attached, as a third call, and returns only what changed.
+**Job.** Turn each scene into engine data (engine §4.4): which rooms it
+opens, where the cast is, its interactions (from its moments: opportunities
+with their arc-state effects, revelations setting knowledge flags, active
+attempts with their outcomes), its events (the outline's events that land
+here, tells that must appear soon after an opportunity), scene-specific
+room text (demonstrations, tells), and its exits (the outline's branch
+triggers as flag or pattern conditions; accumulated triggers as pattern
+conditions with the thresholds Python computed).
 
-Output: `story.reconciliation = {findings, repairs}` and `stage:
-"reconciled"`. After C the graph is locked: D may not add nodes, lines,
-characters or locations.
+One call per scene (the unit is small: one place-set, one stretch of time,
+a handful of moments). Python assembles the package, validates every
+condition and id, composes ending variants, and runs the playtest
+simulator on the result.
 
-## 5. Stage D: per-node room build
+Carry over from `generator/later/node_build.py` where it fits: the state
+registry, `mechanical_checks` (reachability, reads before writes, menu
+options that are moral labels rather than acts), node repair from a finding
+list. The open-exit problem the old node build had is gone by construction:
+scene exits come from the outline's edges.
 
-**Job.** What the old 4b did: per-room interactions with `requires` and
-`sets`, per-character agendas, structured exit conditions. It runs last
-because by then every input it needs is a packet.
+## 6. Prose
 
-Carry over, from `generator/later/node_build.py` and
-`prompts/later/sD_node_build.prompt`: `normalize_writes`, the node validator,
-the state registry (recomputed from every built node), `mechanical_checks`
-(exit reachability, reads before writes, menu interactions, missing rooms and
-characters), node repair from a finding list, and the review prompt
-`sD_review.prompt` for the judgment checks on node interiors.
+After D: the text the player reads, written into the package's text
+fields (room and character descriptions, what characters say, interaction
+text, scene openings, endings). D and B write short functional placeholders;
+the prose stage rewrites them in the story's voice, scene by scene, with
+the tone line and the cast's voices. Not designed further yet.
 
-What changes:
+## 7. What to build first
 
-- the packet comes from the story document: the node's summary and
-  expansion, the rooms of its locations, the packets of its characters, and
-  the state registry
-- exits are not invented: each outgoing edge already exists with a
-  plain-language trigger. D writes the condition that sentence becomes
-  (`edge.trigger.formal = [{variable, value}]`) and the default edge's
-  condition from `otherwise`. An `accumulated` trigger reads variables set
-  in earlier nodes; the registry says which exist.
-- `mechanical_checks` gains: every `expansion.enables` entry is reachable
-  through interactions that set the trigger's variables
-- the open-exit problem is gone by construction: there are no exits with
-  `leads_to: null`, so the review cannot flag one and repair cannot "fix"
-  one by rewording it
-
-```json
-"annotations": {"build": {
-  "arrival": "...",
-  "rooms": [{"room": "L04.a", "now": "...", "interactions": [{"target": "...", "action": "...", "requires": [], "result": "...", "sets": []}]}],
-  "characters": [{"label": "...", "in_room": "L04.a", "agenda": "...", "moved_by": "..."}],
-  "clock": null
-}}
-```
-
-**Cost estimate, honestly.** The archived run spent 65 to 150 minutes per
-node on this with a 60 to 124 KB trace. With packets instead of full
-definitions and exits given instead of invented it should be less, but this
-is the stage to split before running: one call per room of a node, with the
-node-level pieces (arrival, exits) in a small call of their own. Budget it as
-the most expensive stage and measure it on two nodes before running a story.
-
-## 6. What to build first
-
-A1 on the kernel1 outline's first three nodes, by hand-checking the packet
-size and the trace, before A0 or anything in B. The packet design is the
-risk in every later stage, and three nodes are enough to see whether it
-holds.
+1. Port the engine core (expression language, text variants, rewind) into
+   `engine/` and fix its three bugs; add the world, scene and interaction
+   model and the menu builder; hand-write a tiny package (two scenes of
+   kernel35) and play it in a terminal.
+2. The playtest simulator on the engine format.
+3. Stage A (A0-A2) on one kernel, then B, C, D, checked against the
+   hand-written package.
