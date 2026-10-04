@@ -180,8 +180,9 @@ state condition; minor-node summaries stay within size.
   that major node. Can move later if it fits better elsewhere.
 
 **Cost.** Not the constraint (see principles). Rough: A0 a minute, A1 about
-5-10 minutes, A2 about 5-10 minutes per major node, so about 2-3 hours for
-a 15-node story, plus any audit and repair.
+10 minutes, A2 one larger call per line (10-15 minutes, more if the packet
+has to be split), so 1-2 hours for a four-line story, plus any audit and
+repair.
 
 ## 3. Stage B: character and setting buildout
 
