@@ -1051,6 +1051,15 @@ def batch_runner_queues_resumes_and_locks():
     # a job a killed runner left "running" goes back to the queue
     q = batch.load(queue); q['jobs'][1]['status'] = 'running'; batch.save(queue, q)
     said = []
+    # a copy of the code nested in a comparison directory locks the outermost lock, not the one beside it
+    outer = os.path.join(tmp, 'outer')
+    nest = os.path.join(outer, 'compare', 'copy')
+    os.makedirs(nest, exist_ok=True)
+    for d in (outer, os.path.join(outer, 'compare')):
+        open(os.path.join(d, '.stratum_gpu.lock'), 'w').close()
+    got = batch.gpu_lock_path(nest)
+    check(outer.startswith(os.path.dirname(got)) and got != os.path.join(outer, 'compare', '.stratum_gpu.lock'),
+          f'a nested copy locks {got}, not the outermost lock')
     old = batch.GPU_LOCK
     batch.GPU_LOCK = lock
     try:

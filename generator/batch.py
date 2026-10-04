@@ -37,7 +37,25 @@ ROOT = os.path.dirname(THIS_DIR)
 STORIES = os.path.join(ROOT, 'stories')
 KERNELS = os.path.join(ROOT, 'tests', 'kernels')
 DEFAULT_QUEUE = os.path.join(STORIES, 'batch_queue.json')
-GPU_LOCK = os.environ.get('STRATUM_GPU_LOCK') or os.path.join(os.path.dirname(ROOT), '.stratum_gpu.lock')
+
+
+def gpu_lock_path(root=ROOT):
+    """The GPU lock every copy of the code shares: the outermost
+    .stratum_gpu.lock above the checkout, so a copy nested in a comparison
+    directory still locks the machine's one (not one beside itself); with
+    none yet, the checkout's parent."""
+    found, d = None, os.path.dirname(os.path.abspath(root))
+    while True:
+        if os.path.exists(os.path.join(d, '.stratum_gpu.lock')):
+            found = os.path.join(d, '.stratum_gpu.lock')
+        up = os.path.dirname(d)
+        if up == d:
+            break
+        d = up
+    return found or os.path.join(os.path.dirname(os.path.abspath(root)), '.stratum_gpu.lock')
+
+
+GPU_LOCK = os.environ.get('STRATUM_GPU_LOCK') or gpu_lock_path()
 TRANSIENT = ('idle timeout', 'could not reach ollama', 'failed mid-stream', 'ended before the call finished')
 RETRIES = 1
 
