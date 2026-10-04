@@ -151,7 +151,22 @@ kind:
 
 Each minor node: id, kind, the arc(s) it serves, a 30-50 word summary, one
 image, who, and for opportunities the options with their state effects in
-plain words. Minor nodes do not create lines; they hang off the major
+plain words.
+
+Rules for opportunities (decided 2026-10-04):
+- **Two or three options**, each something done or said, never a moral
+  label ("be kind").
+- **Sometimes an active attempt**: about one opportunity in three on a line
+  offers a physical try at changing the situation (fix it, take it, go
+  there) that can succeed, fail or be stopped; a failed attempt has its own
+  effect, it is never a dead end. Not every situation needs one.
+- **A tell, soon**: each opportunity names `tell`, how and where its effect
+  becomes perceptible, within the next one or two nodes on that line, in
+  the story's visibility mode (a ledger entry, a lamp, a change in how
+  someone stands or what they call you). The engine has a visual-novel style
+  rollback, so a player who gets an unexpected outcome must be able to see
+  it early, not rewind across half the story. `hidden` visibility hides what
+  an effect means, never that something happened. Minor nodes do not create lines; they hang off the major
 node's position on each line that passes through it, and a shared major
 node is expanded once, with every line through it in the packet.
 
@@ -162,8 +177,9 @@ edge may also be `accumulated`: a line shift triggered by a state pattern
 accumulated triggers finally come from. Big choices stay `act` triggers, as
 the outline wrote them.
 
-Computed checks after A2: every arc moment is played by some major or minor
-node; every state an arc resolution needs is moved by at least two
+Computed checks after A2: every opportunity has a tell placed within two
+nodes; about one in three opportunities on a line offers an active attempt;
+every arc moment is played by some major or minor node; every state an arc resolution needs is moved by at least two
 opportunities on the paths that reach it (aggregate, never single); every
 accumulated trigger's pattern is reachable; every resolution variant has a
 state condition; minor-node summaries stay within size.

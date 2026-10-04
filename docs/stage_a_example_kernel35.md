@@ -194,15 +194,18 @@ boat.
      "options": [
        {"do": "Ask him what a nuisance costs, and let him tell you", "effect": "lazlo_nerve up: his fear has a column now"},
        {"do": "Tell him the ghost does not take payment", "effect": "lazlo_nerve down: you laughed at the one thing keeping him calm"}
-     ]},
+     ],
+     "tell": "N02: when the line snaps, he either shouts the fuel price at you or at the ghost"},
 
     {"id": "N02a", "after": "N02", "kind": "opportunity", "serves": ["C02", "C03"],
      "summary": "The boat has stopped short of the gates. Pell Szeto shouts about the schedule from the lock-side while the captain waits at the wheel for your report, as if you were his crew.",
      "image": "the wheel still turning slowly with no hands on it", "who": ["Lake Kaur", "Pell Szeto"],
      "options": [
        {"do": "Report to the captain: 'Boat held, sir, stern to the lock'", "effect": "captain_regard up: you answered in his terms"},
-       {"do": "Shout back to Pell Szeto that the boat stopped itself", "effect": "captain_regard down: you made him a malfunction"}
-     ]},
+       {"do": "Shout back to Pell Szeto that the boat stopped itself", "effect": "captain_regard down: you made him a malfunction"},
+       {"do": "Jump to the bank with the bow line and try to tie off to a bollard yourself", "effect": "the rope burns through your hands and the wheel spins hard; the captain bellows 'Belay that!' and the boat stops short anyway. captain_regard down a little (you acted without orders) but Pell Szeto saw you try: his stance warms", "active": true}
+     ],
+     "tell": "N03: the wheelhouse lamp is lit for you when you come aboard, or it is out"},
 
     {"id": "N03a", "after": "N03", "kind": "demonstration", "serves": ["C01"],
      "summary": "Lazlo Brandt counts the fuel cash twice in the cabin and puts a note under the lamp: 'IOU: fear, one night.' He tears it up when he sees you looking.",
@@ -214,7 +217,8 @@ boat.
      "options": [
        {"do": "Admit you don't, and ask him", "effect": "Stellan's stance warms; he will name the salute later on lines that reach N06 or T2N04"},
        {"do": "Say it's superstition", "effect": "Stellan's stance cools; he steps back at N06 only after the salute is made"}
-     ]},
+     ],
+     "tell": "N04: he calls the warning to you by name from the bank, or he calls it to the boat"},
 
     {"id": "N04a", "after": "N04", "kind": "opportunity", "serves": ["C01", "C02"],
      "summary": "The crack is leaking into the cabin. The captain stands over it, waiting; Lazlo Brandt is in the doorway in his coat, ledger under his arm, asking what this is going to cost.",
@@ -222,8 +226,10 @@ boat.
      "options": [
        {"do": "Ask the captain how long the boat has been dying", "effect": "captain_regard up: you asked about his boat, not your sale"},
        {"do": "Tell Lazlo it's fine and steer him back to bed", "effect": "lazlo_nerve up, captain_regard down: you covered Lazlo's fear and dismissed the captain's warning"},
-       {"do": "Laugh, and tell Lazlo to put it in the ledger", "effect": "lazlo_nerve down: you made his fear the joke"}
-     ]},
+       {"do": "Laugh, and tell Lazlo to put it in the ledger", "effect": "lazlo_nerve down: you made his fear the joke"},
+       {"do": "Jam a cushion into the crack and start bailing with the kettle", "effect": "the water keeps coming until the captain's hand shows you where to press: 'Not like that. Here.' captain_regard up (you fought for the boat); lazlo_nerve down (his ledger is soaked in the doorway)", "active": true}
+     ],
+     "tell": "N05: whether Lazlo signs at the cabin table or out on the deck, as far from the water as he can get; whether the timbers groan at you or around you"},
 
     {"id": "N05a", "after": "N05", "kind": "demonstration", "serves": ["C02"],
      "summary": "As Lazlo Brandt signs the provisional note, every lamp aboard dims at once and the timbers groan along the length of the boat. The captain does not appear. He does not have to.",
@@ -235,7 +241,8 @@ boat.
      "options": [
        {"do": "Sit with him and say nothing for a while", "effect": "lazlo_nerve up: you saw the fear and did not price it"},
        {"do": "Tell him he signed it, he can live with it", "effect": "lazlo_nerve down"}
-     ]},
+     ],
+     "tell": "N06: he hands you the tea himself, or you have to take it from him"},
 
     {"id": "N06a", "after": "N06", "kind": "resolution", "serves": ["C03", "C04"],
      "summary": "The gates swing open. Pell Szeto writes 'weather' in the lock log and does not meet your eye; on the towpath Stellan Ilunga lowers his lantern to the water, the old salute returned.",
@@ -261,6 +268,12 @@ boat.
 ```
 
 ---
+
+Changes after review (2026-10-04): N02a and N04a gained an active attempt
+(tie off yourself; bail and plug the crack), each with its own effect when it
+fails or is stopped; every opportunity names a `tell`, where its effect shows
+within the next node or two (the engine has rollback, so an unexpected
+outcome must be visible early).
 
 ## What the real model would probably get wrong
 
