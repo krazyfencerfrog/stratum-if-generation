@@ -199,6 +199,57 @@ opportunities on the paths that reach it (aggregate, never single); every
 accumulated trigger's pattern is reachable; every resolution variant has a
 state condition; minor-node summaries stay within size.
 
+### What Python does and what the model does (decided 2026-10-04)
+
+The pipeline's rule holds here too: counts, lookups and structure are
+Python; judgment and invention are the model's. Stage A has a lot of
+structure, so roughly half of it is code.
+
+**Python owns:**
+- **Graph surgery.** The model describes minor nodes; Python assigns ids,
+  inserts them, wires edges, attaches them to every line through a shared
+  major node, and assembles each call's packet.
+- **The state registry.** A1 declares named states. Every option effect
+  carries a structured tag beside its plain-language text
+  (`{"state": "lazlo_nerve", "direction": "up"}`); a tag naming an
+  undeclared state is rejected.
+- **All threshold math.** The model never counts "three quarters of at
+  least three". It declares a pattern shift's state and direction; Python
+  counts the opportunities on each path, decides whether the threshold is
+  reachable and avoidable, and computes the condition.
+- **Every rule check:** a tell within two nodes; about one active attempt
+  in three opportunities; each state an outcome depends on moved by two or
+  more opportunities; arc moments spread, not piled into one node;
+  resolutions agree with the ending worlds; a warning placed before each
+  shift; the arc cast closed.
+- **Composing ending variants:** the table of combinations (Lazlo stays or
+  goes x the captain's regard) is generated, not written by the model.
+- **A playtest simulator.** Once the graph has states and effects, Python
+  walks it with different play styles (always conciliatory, always
+  dismissive, random, mixed) and reports which endings, variants and
+  pattern shifts each reaches. It tests the design rules directly: an
+  obvious pattern does shift the story; random play never does; every
+  ending and resolution is reachable. No prompt can check that.
+
+**The model owns:** what each arc is (what changes, why, at what cost); the
+minor nodes' scenes, the options' wording, what each tell and warning
+looks like; the judgment calls (visibility mode, supporting vs. functional,
+which pattern shifts make narrative sense).
+
+**Working pattern: the model proposes, Python checks, the model repairs
+from precise complaints.** This also keeps prompts small: instead of a
+prompt carrying every rule (on this model a long rule list mostly buys
+re-checking), Python finds exactly what is missing and asks for exactly
+that ("add one opportunity before N05 that moves lazlo_nerve"), as a small
+targeted call.
+
+**Option to try: Python as planner, the model as writer.** After A1, Python
+computes each line's task list (arc moments that need a node, states that
+need another opportunity, where each tell must land) and the model writes
+one item per small call. More calls, each with a tiny input; given that
+trace size follows input size, possibly better than one large per-line
+call. Build the per-line version first and compare.
+
 ### Decisions (2026-10-04)
 
 - **A2 works a line at a time**, not a node at a time: an arc's moments are
