@@ -22,20 +22,57 @@ AVOID = {'elara', 'kael', 'lyra', 'thorne', 'aria', 'seraphina', 'aldric', 'elia
          'mira', 'zara', 'finn', 'rowan blackwood', 'eldon', 'thalia', 'cassian', 'orin', 'vex', 'nova'}
 
 # keyword -> pool; whole words only. The kernel's own words count three
-# times; the premise's once. The pool with the most hits wins.
+# times; the premise's once. Era and culture pools score in full; the two
+# tone pools (romance, adventure) at half, so "a romance in Regency London"
+# lands in regency and "an epic fantasy adventure" in fantasy. Ties go to
+# the earlier pool in PRIORITY.
 GENRE_WORDS = {
     pool: r'\b(?:' + words + r')\b' for pool, words in {
-        'fantasy': r'fantasy|dragons?|witch(?:es)?|hedge-witch|wizards?|mages?|magic(?:al)?|swords?|elf|elves|dwarf|dwarves|'
-                   r'kingdoms?|quests?|dungeons?|sorcer\w*|fae|curse[sd]?|knights?|castles?|realms?|spells?|'
-                   r'enchant\w*|goblins?|trolls?|necromanc\w*|prophec\w*',
-        'medieval': r'medieval|monaster\w*|abbey|plague|feudal|crusade|serfs?|barons?|pirates?|galleons?|'
-                    r'royal navy|buccaneers?',
-        'scifi': r'sci-fi|science fiction|starships?|spaceships?|generation(?:al)? ship|space station|planets?|colon(?:y|ies)|androids?|'
-                 r'robots?|ai|cyber\w*|orbit\w*|asteroids?|arcology|airlocks?|reactors?|drones?|'
-                 r'terraform\w*|interstellar',
-        'period': r'1[89][0-9]0s|steampunk|noir|cold war|victorian|edwardian|prohibition|wartime|detectives?',
+        'japanese_historical': r'samurai|shogun\w*|ronin|edo|feudal japan|daimyo|ninjas?|katanas?|geishas?',
+        'chinese_historical': r'wuxia|jianghu|kung fu|martial sects?|imperial china|forbidden city|'
+                              r'(?:tang|song|ming|qing|han) dynasty',
+        'ancient_egyptian': r'egypt\w*|pharaohs?|nile|pyramids?|scarabs?|sphinx|mumm(?:y|ies)|anubis|osiris|hieroglyph\w*',
+        'ancient_roman': r'rome|roman|legions?|legionar\w*|centurions?|senat(?:e|or)s?|gladiators?|caesar|praetorians?|'
+                         r'pompeii|consuls?|colosseum',
+        'ancient_greek': r'ancient greece|greek|athens|athenian|spartans?|sparta|olympus|oracle|delphi|triremes?|'
+                         r'hoplites?|agora|minotaur|troy|trojans?',
+        'norse': r'vikings?|norse|fjords?|longships?|valhalla|jarls?|skalds?|odin|runes?|sagas?',
+        'regency': r'regency|ballrooms?|debutantes?|the ton|almack\w*|dukes?|duchess\w*|earls?|viscounts?|marquess\w*',
+        'victorian': r'victorian|edwardian|gaslight|hansom|steampunk|1[89][0-9]0s|nineteenth century',
+        'western': r'wild west|western|cowboys?|frontier|sheriffs?|outlaws?|saloons?|ranch\w*|gunslingers?|'
+                   r'stagecoach\w*|homestead\w*',
+        'age_of_sail': r'pirates?|galleons?|royal navy|buccaneers?|privateers?|frigates?|age of sail|corsairs?',
+        'medieval': r'medieval|monaster\w*|abbey|plague|feudal|crusades?|serfs?|barons?|child king|regents?|'
+                    r'courtiers?|court intrigue|thrones?|usurp\w*|coronation',
+        'scifi': r'sci-fi|science fiction|starships?|spaceships?|generation(?:al)? ship|space station|planets?|'
+                 r'colon(?:y|ies)|androids?|robots?|ai|cyber\w*|orbit\w*|asteroids?|arcology|airlocks?|reactors?|'
+                 r'drones?|terraform\w*|interstellar',
+        'fantasy': r'fantasy|dragons?|witch(?:es)?|hedge-witch|wizards?|mages?|magic(?:al)?|swords?|elf|elves|dwarf|'
+                   r'dwarves|kingdoms?|quests?|dungeons?|sorcer\w*|fae|curse[sd]?|knights?|castles?|realms?|spells?|'
+                   r'enchant\w*|goblins?|trolls?|orcs?|necromanc\w*|prophec\w*',
+        'period': r'19[0-6]0s|noir|cold war|prohibition|wartime|detectives?|gangsters?|speakeas\w*',
+        'romance': r'romance|romantic|love story|in love|lovers?|rom-?com|meet-cute|courtship|dating|'
+                   r'enemies to lovers|second chance',
+        'adventure': r'action|adventures?|treasure|heists?|jungle|expeditions?|mercenar\w*|explorers?|'
+                     r'archaeolog\w*|spies|spy|thriller|smugglers?|chase',
     }.items()
 }
+PRIORITY = list(GENRE_WORDS) + ['modern']
+TONE_POOLS = ('romance', 'adventure')
+
+# a character's own people, from words in the role: overrides the story's pool
+# for that one character ("the elven archer" in a human fantasy)
+RACE_WORDS = [('elven', re.compile(r'\b(elf|elves|elven|elvish)\b', re.I)),
+              ('dwarven', re.compile(r'\b(dwarf|dwarves|dwarven|dwarfish)\b', re.I)),
+              ('monstrous', re.compile(r'\b(orcs?|orcish|goblins?|trolls?|ogres?|kobolds?|hobgoblins?|gnolls?)\b', re.I))]
+
+
+def race_pool(role):
+    for pool, rx in RACE_WORDS:
+        if rx.search(str(role or '')):
+            return pool
+    return None
+
 
 # roles that are not people, or not one person: they keep their role
 NOT_A_PERSON = re.compile(r"\b(dragon|sword|blade|ai|ship|computer|machine|beast|creature|spirit|ghost|wolf|hound|"
@@ -44,11 +81,15 @@ NOT_A_PERSON = re.compile(r"\b(dragon|sword|blade|ai|ship|computer|machine|beast
                           r"system|core|voice|swarm|hive)\b", re.I)
 
 
+def pool_scores(kernel, *texts):
+    return {pool: (0.5 if pool in TONE_POOLS else 1) * (3 * len(re.findall(rx, (kernel or '').lower()))
+                                                        + sum(len(re.findall(rx, (t or '').lower())) for t in texts))
+            for pool, rx in GENRE_WORDS.items()}
+
+
 def pool_for(kernel, *texts):
-    scores = {pool: 3 * len(re.findall(rx, (kernel or '').lower()))
-              + sum(len(re.findall(rx, (t or '').lower())) for t in texts)
-              for pool, rx in GENRE_WORDS.items()}
-    best = max(scores, key=scores.get)
+    scores = pool_scores(kernel, *texts)
+    best = max(PRIORITY[:-1], key=lambda p: (scores[p], -PRIORITY.index(p)))
     if scores[best] == 0:
         return 'modern'
     if best == 'medieval' and scores['fantasy'] >= scores['medieval']:
@@ -127,25 +168,73 @@ def wants_a_name(seed):
             and re.sub(r'^(the|a|an)\s+', '', str(seed['role']).strip().lower()) not in ('protagonist', 'you', 'player'))
 
 
-def pick(story_id, role, pool_name, gender, taken):
-    """One name not yet taken in this story: given name and surname both
-    unused, drawn deterministically from the story id and the role."""
-    pool = POOLS.get(pool_name) or POOLS['modern']
-    rng = random.Random(f'{story_id}|{role.lower()}')
+GENDERS = {'f': 'f', 'female': 'f', 'woman': 'f', 'girl': 'f', 'm': 'm', 'male': 'm', 'man': 'm', 'boy': 'm',
+           'n': 'n', 'neutral': 'n', 'nonbinary': 'n', 'non-binary': 'n', 'unspecified': 'n', 'any': 'n'}
+
+
+def seed_gender(seed):
+    """The gender the cast step stated for this seed ('f', 'm', 'n'), or None."""
+    return GENDERS.get(str((seed or {}).get('gender') or '').strip().lower())
+
+
+def _feminine(word):
+    """Roman women take the feminine form of the family name: Julius -> Julia."""
+    return word[:-2] + 'a' if word.endswith('us') else word
+
+
+def compose(pool, gender, rng):
+    """One candidate name in the pool's style, and the parts that must be
+    unique within the story (a family name may repeat where the style is
+    patronymic or Roman: siblings and clans share it)."""
+    style = pool.get('style', 'given_surname')
+    if gender == 'n' and not pool.get('n') and style in ('roman', 'patronymic', 'patronymic_of'):
+        gender = rng.choice('fm')
+    if style == 'roman':
+        nomen, cognomen = rng.choice(pool['nomina']), rng.choice(pool['cognomina'])
+        if gender == 'f':
+            # a Roman woman is called by her family name, so it must be hers alone in the story
+            return f'{_feminine(nomen)} {_feminine(cognomen)}', [_feminine(nomen), _feminine(cognomen)]
+        return f"{rng.choice(pool['praenomina'])} {nomen} {cognomen}", [cognomen]
     if gender == 'n':
-        givens = (pool.get('n') or []) + pool['f'] + pool['m']
+        givens = (pool.get('n') or []) + pool.get('f', []) + pool.get('m', [])
     else:
         givens = (pool.get(gender) or []) + (pool.get('n') or [])
-    givens = [g for g in givens if g.lower() not in AVOID]
-    surnames = [s for s in pool.get('surnames') or [] if s.lower() not in AVOID]
+    givens = [g for g in givens if g.lower() not in AVOID] or pool.get('m') or ['Ash']
+    given = rng.choice(givens)
+    surnames = [x for x in pool.get('surnames') or [] if x.lower() not in AVOID]
+    if style == 'single':
+        epithets = pool.get('epithets') or []
+        if epithets and rng.random() < 0.4:
+            return f'{given} {rng.choice(epithets)}', [given]
+        return given, [given]
+    if style == 'origin':
+        return f"{given} of {rng.choice(pool['places'])}", [given]
+    if style == 'patronymic':
+        father = rng.choice(pool['m'])
+        stem = father if father.endswith('s') else father + 's'
+        return f"{given} {stem}{'dottir' if gender == 'f' else 'son'}", [given]
+    if style == 'patronymic_of':
+        father = rng.choice(pool['m'])
+        return f"{given} {'daughter' if gender == 'f' else 'son'} of {father}", [given]
+    surname = rng.choice(surnames) if surnames else ''
+    if style == 'family_first':
+        return f'{surname} {given}'.strip(), [given, surname]
+    return f'{given} {surname}'.strip(), [given] + ([surname.split()[-1]] if surname else [])
+
+
+def pick(story_id, role, pool_name, gender, taken):
+    """One name not yet taken in this story, drawn deterministically from the
+    story id and the role, in the style of the pool (or of the character's
+    own people, when the role names one)."""
+    pool = POOLS.get(race_pool(role) or pool_name) or POOLS['modern']
+    rng = random.Random(f'{story_id}|{role.lower()}')
     used = {part.lower() for name in taken for part in name.split()}
+    name = None
     for _ in range(200):
-        given = rng.choice(givens)
-        surname = rng.choice(surnames) if surnames else ''
-        if given.lower() in used or (surname and surname.split()[-1].lower() in used):
-            continue
-        return f'{given} {surname}'.strip()
-    return f'{rng.choice(givens)} {rng.choice(surnames) if surnames else ""}'.strip()
+        name, unique = compose(pool, gender, rng)
+        if not any(u.lower() in used for u in unique) and name not in taken:
+            return name
+    return name
 
 
 def assign_names(seeds, story_id, texts, pool_name=None):
@@ -157,6 +246,7 @@ def assign_names(seeds, story_id, texts, pool_name=None):
     for s in seeds:
         if wants_a_name(s) and not s.get('name'):
             own = [s.get(k) for k in SEED_OWN_FIELDS if s.get(k)]
-            s['name'] = pick(story_id, str(s['role']), pool_name, gender_hint(str(s['role']), texts, own), taken)
+            gender = seed_gender(s) or gender_hint(str(s['role']), texts, own)
+            s['name'] = pick(story_id, str(s['role']), pool_name, gender, taken)
             taken.append(s['name'])
     return pool_name

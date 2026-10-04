@@ -96,7 +96,7 @@ TURNS = obj(
 CAST = obj(
     notes=S,
     cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
-                       wants=S, holds=S, edge=STR_OR_NULL, tie=S, voice=STR_OR_NULL,
+                       gender=enum(['f', 'm', 'n']), wants=S, holds=S, edge=STR_OR_NULL, tie=S, voice=STR_OR_NULL,
                        breaking_point=STR_OR_NULL, opposition=B)),
 )
 
@@ -136,7 +136,7 @@ MAIN_LINE = obj(
 LINE_NODES = obj(
     nodes=arr(obj(id=S, title=S, summary=S, image=S, where=arr(S), who=arr(S))),
     new_locations=arr(obj(name=S, kind=S, why=S)),
-    new_characters=arr(obj(label=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
+    new_characters=arr(obj(label=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL, gender=enum(['f', 'm', 'n']),
                            wants=S, holds=S, why=S)),
 )
 

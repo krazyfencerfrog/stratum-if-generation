@@ -284,9 +284,12 @@ class OutlineBuilder:
             for rid, r in table.items():
                 if r.get('name') and norm(r['name']) == want:
                     return rid
-            firsts = [rid for rid, r in table.items() if r.get('name') and norm(r['name']).split()[0] == want]
-            if len(firsts) == 1:
-                return firsts[0]
+            # or by any one part of it that belongs to nobody else: "Toshiro" for
+            # "Maeda Toshiro", "Orla" for "Orla daughter of Borri"
+            parts = [rid for rid, r in table.items() if r.get('name')
+                     and want in set(norm(r['name']).split()) - NAME_LINKS]
+            if len(parts) == 1:
+                return parts[0]
         if shortened:
             words = want.split()
             hits = []
@@ -1126,7 +1129,7 @@ class OutlineBuilder:
                 if names.wants_a_name(seed):
                     self.characters[cid]['name'] = names.pick(
                         self.gen.story_id, c['label'], self.premise.get('name_pool') or 'modern',
-                        names.gender_hint(c['label'], [str(c.get('wants') or ''), str(c.get('why') or '')]),
+                        names.seed_gender(c) or names.gender_hint(c['label'], [str(c.get('wants') or ''), str(c.get('why') or '')]),
                         [x['name'] for x in self.characters.values() if x.get('name')])
         for x in fill['nodes']:
             node = self.nodes[x['id']]
@@ -1214,6 +1217,10 @@ class OutlineBuilder:
 
 
 # ---------------------------------------------------------------- markdown
+
+# connecting words inside names, never a reference on their own
+NAME_LINKS = {'of', 'son', 'daughter', 'the', 'child'}
+
 
 def who_text(c):
     """A character as the story document shows it: the name the cast gave

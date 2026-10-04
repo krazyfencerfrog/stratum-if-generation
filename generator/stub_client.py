@@ -431,7 +431,7 @@ class StubClient(LlmClient):
             seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds,
                           "edge": None if kind == "crowd" else f"stub edge of {r}", "tie": f"stub tie of {r}",
                           "voice": None if kind == "crowd" else f"stub voice of {r}: 'stub line'",
-                          "breaking_point": bp, "opposition": opp})
+                          "breaking_point": bp, "opposition": opp, "gender": "n" if kind == "crowd" else ("f" if "warden" in r else "m")})
         return {"notes": "stub", "cast_seeds": seeds}
 
     def p_s3_5v(self, p):
@@ -590,7 +590,7 @@ class StubClient(LlmClient):
                           "where": [place[0].upper() if sloppy else place[0]], "who": who})
         if extra and nodes:
             new_characters = [
-                {"label": "the drone technician", "kind": "individual", "speaks_for": "the dock crew", "wants": "her drones back", "holds": "the drone cradles", "why": "stub: someone has to launch the drone"},
+                {"label": "the drone technician", "kind": "individual", "speaks_for": "the dock crew", "gender": "f", "wants": "her drones back", "holds": "the drone cradles", "why": "stub: someone has to launch the drone"},
                 {"label": "the dock crew", "kind": "crowd", "speaks_for": None, "wants": "overtime", "holds": "the dock", "why": "stub"},
             ]
             new_locations.append({"name": "the drone dock", "kind": "a work deck", "why": "where drones are launched"})

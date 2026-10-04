@@ -754,6 +754,33 @@ def cast_names_come_from_python():
 
 
 @test
+def name_pools_styles_and_races():
+    import names
+    for kernel, pool in (('A romance in Regency London with a duke.', 'regency'), ('A gladiator in ancient Rome.', 'ancient_roman'),
+                         ('A tomb robber in the pyramids of Egypt.', 'ancient_egyptian'), ('A viking raid on a fjord.', 'norse'),
+                         ('A ronin in feudal Japan.', 'japanese_historical'), ('A gunslinger in a frontier town.', 'western'),
+                         ('An epic fantasy adventure with a dragon.', 'fantasy'), ('A cozy romance with a baker.', 'romance'),
+                         ('A 1940s noir detective story.', 'period'), ('Pirates chase a galleon.', 'age_of_sail')):
+        check(names.pool_for(kernel) == pool, f'{kernel!r} -> {names.pool_for(kernel)}, expected {pool}')
+    seeds = [{'role': 'the thief', 'kind': 'individual', 'gender': 'f'}, {'role': 'the elven archer', 'kind': 'individual', 'gender': 'm'},
+             {'role': 'the dwarf locksmith', 'kind': 'individual', 'gender': 'f'}, {'role': 'the goblin fence', 'kind': 'individual'},
+             {'role': 'the stone guardian', 'kind': 'individual'}]
+    names.assign_names(seeds, 'demo', ['A fantasy heist in a wizard tower.'])
+    got = {s['role']: s.get('name') for s in seeds}
+    check(got['the dwarf locksmith'] and ' daughter of ' in got['the dwarf locksmith'], f"dwarven patronymic: {got}")
+    check(got['the elven archer'] and got['the elven archer'].split()[0] in names.POOLS['elven']['m'], f"elven pool: {got}")
+    check(got['the goblin fence'] and len(got['the goblin fence'].split()) == 1, f"monstrous names are single: {got}")
+    check(got['the stone guardian'] is None, 'a stone guardian was named')
+    check(got['the thief'].split()[0] in names.POOLS['fantasy']['f'] + names.POOLS['fantasy']['n'], f"stated gender: {got}")
+    romans = [{'role': f'the daughter {i}', 'kind': 'individual', 'gender': 'f'} for i in range(6)]
+    names.assign_names(romans, 'demo', ['ancient Rome'], 'ancient_roman')
+    check(len({r['name'].split()[0] for r in romans}) == 6, f"Roman women share a family name: {[r['name'] for r in romans]}")
+    jp = [{'role': 'the ronin', 'kind': 'individual', 'gender': 'm'}]
+    names.assign_names(jp, 'demo', ['feudal Japan'], 'japanese_historical')
+    check(jp[0]['name'].split()[0] in names.POOLS['japanese_historical']['surnames'], f"family name first: {jp}")
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}
