@@ -39,6 +39,35 @@ Revised 2026-10-04 in conversation with the user. This replaces the earlier
 "beat expansion" sketch; its craft devices (setup/payoff pairs, irony) are
 kept as part of A1.
 
+**Built 2026-10-04** (`generator/arcs.py`, prompts `s5a0`-`s5a2`; `main.py
+--stage-a`, or `python arcs.py <story_id>` on an outline made by older code;
+output `<id>_arcs.json` and `<id>_arcs.md`). Not yet run on the live model.
+Settled while building:
+- **A0 tiers:** arc = the opposition, anyone whose standing differs between
+  endings, or a companion with a breaking point who is in at least half the
+  nodes. A breaking point alone is not enough: the cast step gives one to
+  every companion, which would have made kernel35's lock keeper and towpath
+  keeper arc characters. The call sorts the rest into supporting and
+  functional.
+- **Tells** must land by the next beat: within two nodes, or at the first
+  major node after the opportunity (minor nodes other lines hang after a
+  shared node can push the next beat further away). A minor node after a
+  shared major node is on every line through it, so its tell must land on
+  all of them; the packet lists each major node's lines, and the validator
+  checks every line (the stub found a T3-only tell on a node T1 and T4 also
+  pass through).
+- **Minor nodes hang after a major node only**; "before N05" is "after N04".
+  A branch leaves from the last minor node of its major node's group.
+- **Pattern-shift conditions** are computed exactly (dynamic programming over
+  each opportunity's option split): the least strict pattern with at least
+  three moves and a share of 0.75-1.0 that random play meets under 15% of
+  the time; with four two-option opportunities that is all four (6%).
+  Resolution and ending shifts become the first variant of the composed
+  ending; line shifts become accumulated edges.
+- **Resolution variants** use a weaker pattern (a majority of at least two
+  moves, share 0.6), with the line's fixed resolution, or the last one, as
+  the fallback.
+
 **The idea.** The outline's lines carry the PROTAGONIST's arc: each line is
 a different answer to what "you" want and how it resolves, and the player
 picks among them through big, informed choices. The other characters' arcs
@@ -399,5 +428,5 @@ the tone line and the cast's voices. Not designed further yet.
 2. ~~The playtest simulator on the engine format.~~ Done 2026-10-04
    (`python engine/playtest.py <package> --walkthroughs`; see §5 for how
    stage D uses it).
-3. Stage A (A0-A2) on one kernel, then B, C, D, checked against the
-   hand-written package.
+3. Stage A (A0-A2) on one kernel (built; first live run on kernel35_f5
+   queued), then B, C, D, checked against the hand-written package.

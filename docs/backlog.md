@@ -84,11 +84,21 @@ Plan:
 ## Next
 
 ### Later stages design [you, interactively]
-Stage A designed (2026-10-04): arcs and node expansion, the Python/model
-split, pattern shifts, tells, active attempts (`docs/later_stages.md` §2;
-worked example `docs/stage_a_example_kernel35.md`). Next: stages B, C and D
-at the same level. Small open items for A: composing resolution variants;
-whether some outline forks should become pattern triggers.
+Stage A designed and BUILT (2026-10-04, `generator/arcs.py`; first live run
+on kernel35_f5 queued after the premise A/B). The engine design and core,
+terminal player and playtest simulator are built (`engine/`). Next: read the
+live stage A output and fix the prompts; then design stages B, C and D at the
+same level, with D's check being the engine validator plus playtest. Open for
+A: whether some outline forks should become pattern triggers; the "Python as
+planner, model as writer" variant of A2.
+
+### Premise A/B [GPU, queued]
+kernel35's batch run on this branch had smaller, more procedural turns than
+the Fable-branch run (plot 3 vs 4; lines of 5 nodes vs 7; one breaking point
+vs four). Queued: three 3.4-3.5 replays each on Fable's 4651810 and on HEAD
+(stratum-compare/ab_premise). If HEAD's premises are consistently weaker,
+suspect the 3.5a protagonist fields (history/need/ties/open) crowding the
+engine call.
 
 ### Protagonist fields on the model [GPU]
 The defined-but-steerable protagonist (history, need, ties, open, gender,
@@ -147,3 +157,6 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   gender (commit 574e041 on fable-response-5).
 - 2026-10-04: ending worlds compare people only (d453412); free brief
   fields read as placeholders, fixing "surprise me" (557edce).
+- 2026-10-04: engine core, terminal player with history and rewind, playtest
+  simulator (engine/); modern names by culture with a home culture per story
+  (b67f48a); stage A built (6d0ae3e).
