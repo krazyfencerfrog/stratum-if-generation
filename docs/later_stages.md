@@ -368,10 +368,11 @@ the tone line and the cast's voices. Not designed further yet.
 
 ## 7. What to build first
 
-1. Port the engine core (expression language, text variants, rewind) into
+1. ~~Port the engine core (expression language, text variants, rewind) into
    `engine/` and fix its three bugs; add the world, scene and interaction
    model and the menu builder; hand-write a tiny package (two scenes of
-   kernel35) and play it in a terminal.
+   kernel35) and play it in a terminal.~~ Done 2026-10-04 (engine_design.md
+   §11; `python engine/cli.py engine/examples/kernel35_demo.json`).
 2. The playtest simulator on the engine format.
 3. Stage A (A0-A2) on one kernel, then B, C, D, checked against the
    hand-written package.

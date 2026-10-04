@@ -1,9 +1,11 @@
 # The stratum engine: design
 
-Status: design, 2026-10-04, agreed in conversation with the user; nothing
-here is built yet. The engine moves into this repository (`engine/`, beside
-`generator/`); the old `stratum-if` repository is mothballed. Its useful
-parts are ported (see §9).
+Status: agreed in conversation with the user, 2026-10-04; the core is built
+(`engine/`: expressions.py, state.py, story.py with the validator,
+runtime.py, cli.py; `engine/examples/kernel35_demo.json` is a hand-written
+two-scene package; `tests/test_engine.py`). The old `stratum-if` repository
+is mothballed. Its useful parts were ported (see §9). §11 lists what the
+build added or settled beyond this design.
 
 ## 1. What the engine is
 
@@ -94,7 +96,10 @@ like now: the permanent base (written by B2: what the place is, its
 fixtures), the current scene's layer (written by D: what is different now,
 "water is coming through the floor"), state fragments (small changes: the
 lamp lit or dark), then who and what is here. The engine composes them in
-that order. Exits are interactions under the verb
+that order. **Base text names only what never changes**: a line that
+snaps, a drawer that opens, a lamp that can go out belong in fragments or a
+scene's layer, or the base text contradicts the story once they change (the
+demo package hit this twice). Exits are interactions under the verb
 **Go**; an exit to a room the current scene does not open is not shown.
 
 ### 4.2 Objects
@@ -319,6 +324,9 @@ the current node instead of the target; the integration test asserted
 - the snapshot timeline for rewind, save and load (state_manager.py);
 - GameState's flags, stats, visits, turns and seed.
 
+In the event the code was rewritten rather than copied, so the three bugs
+did not come across; what survived is the design of each piece.
+
 The FrameNode/SubNode priority fall-through survives as the rule for
 choosing text variants and, inside a scene, room text; scenes and the world
 model replace frames as the unit of navigation. The old `generation/`
@@ -347,3 +355,43 @@ for reference.
   matters.
 - **The menu is always visible,** at its root (the verbs), drilling down on
   choice.
+
+## 11. Settled while building (2026-10-04)
+
+- **Arc states are two counts** (`state.arcs[name] = {up, down}`);
+  `stats.<name>_up` / `_down` read them, so both spellings in §5 work.
+  `moved(name)` gives the number of moves.
+- **Further helpers:** `here('character')` (in the player's room). Objects
+  may carry `when` (visible only while it holds: the logbook appears when the
+  drawer is opened), `listed` (named in "You can see ..."; defaults to
+  portable), and `take_text`. Characters carry `here` variants (how they
+  appear in the room text, by state: this is where tells live).
+- **Built-in actions** are generated (Look, Examine what is visible, Go
+  through open exits, Talk about known topics, Take portable things, Wait,
+  Inventory); an authored interaction with the same verb, object and detail
+  replaces one. Look and Inventory take no time and are not snapshotted.
+  An interaction is offered only when its object and detail are present
+  (in the room or carried); `"reach": "any"` lifts that.
+- **Free-text details:** a detail that is not an id (a line to say, an
+  answer to give) carries `detail_label`; a label in quotes reads "say '...'"
+  in the menu.
+- **Topics** may be `once` and carry effects; `known_when` discloses them.
+- **Nudges** are a scene's `nudges: [{id, after, text, effects, when?}]`,
+  fired once each, in order, when `after` actions have passed without
+  progress (a change to flags, stats, arcs, object locations or used
+  interactions; walking about is not progress).
+- **Events** default to `once: true`; one action runs events, then nudges,
+  then scene exits, repeated (up to 10 times) while a scene change lands.
+- **Effects** also include `room` (move the player) and `place` on a
+  character (move them within the scene).
+- **Endings** take `resolutions: [{about, variants}]` (one composed line per
+  group, the first variant whose `when` holds); a bare `variants` list is one
+  group.
+- **Validator** errors: unknown ids, expressions that do not parse or name
+  undeclared states, a flag a condition reads that nothing sets, scenes or
+  endings unreachable over scene exits, scenes without exits, duplicate
+  interaction ids, bad effects. Notes: story verbs used once or never,
+  things with nothing to say when examined, flags set but never read.
+- **Saves** hold the state and the whole rewind timeline, with the package
+  hash (`stratum-save/1`).
+
