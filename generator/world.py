@@ -424,29 +424,39 @@ class WorldBuilder:
     # ------------------------------------------------------------ B1c
 
     def subject_list(self):
+        """What anyone can be asked about: a short menu label, what it is, and when it is known."""
         out = []
         for s in self.plan['subjects']:
             if s['kind'] == 'person' and s.get('id') in self.world['characters']:
-                out.append({'subject': s['name'], 'kind': 'person', 'gate': f"seen('{s['id']}')"})
+                out.append({'subject': s['name'], 'kind': 'person', 'about': s.get('label'), 'gate': f"seen('{s['id']}')"})
             elif s['kind'] == 'place' and self.location_rooms.get(s.get('id')):
                 rooms = self.location_rooms[s['id']]
                 out.append({'subject': s['name'], 'kind': 'place',
                             'gate': ' or '.join(f"visited('{r}')" for r in rooms)})
             elif s['kind'] == 'event':
-                node = next((sc['major'] for sc in self.plan['scenes'] if sc['id'] == s.get('first_scene')), None)
-                if node:
-                    out.append({'subject': s['name'], 'kind': 'event', 'gate': f'flags.done_{node}'})
+                sc = next((sc for sc in self.plan['scenes'] if sc['id'] == s.get('first_scene')), None)
+                if sc:  # the menu gets the scene's title, not the premise's whole sentence
+                    label = str(sc.get('title') or '').strip() or ' '.join(str(s['name']).split()[:6])
+                    out.append({'subject': label, 'kind': 'event', 'about': s['name'], 'gate': f"flags.done_{sc['major']}"})
+        objects = {}
         for oid, o in self.world['objects'].items():
-            if o.get('story'):
-                out.append({'subject': o['name'], 'kind': 'object', 'gate': f"seen('{oid}')"})
-        return out
+            if o.get('story'):  # one subject per name, known once any of its namesakes is seen
+                objects.setdefault(norm(o['name']), {'subject': o['name'], 'kind': 'object', 'ids': []})['ids'].append(oid)
+        for o in objects.values():
+            out.append({'subject': o['subject'], 'kind': 'object', 'gate': ' or '.join(f"seen('{i}')" for i in o.pop('ids'))})
+        seen, unique = set(), []
+        for s in out:
+            if norm(s['subject']) not in seen:
+                seen.add(norm(s['subject']))
+                unique.append(s)
+        return unique
 
     def b1c_conversation(self, cid):
         subjects = [s for s in self.subject_list() if s['subject'] not in (self.world['characters'][cid]['name'],)]
         packet = {'who': self.who(cid), 'voice': self.chars[cid].get('voice'), 'tie': self.chars[cid].get('tie'),
                   'tier': self.tiers.get(cid), 'arc': self.arc_of(cid), 'states': sorted(self.states),
                   'already_topics': [t['label'] for t in self.world['characters'][cid]['topics'].values()],
-                  'subjects': [{'subject': s['subject'], 'kind': s['kind']} for s in subjects]}
+                  'subjects': [{k: s[k] for k in ('subject', 'kind', 'about') if s.get(k)} for s in subjects]}
         names = {norm(s['subject']): s for s in subjects}
 
         def validate(parsed):

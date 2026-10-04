@@ -573,6 +573,8 @@ def stage_b_builds_an_engine_world():
     check(len(result['protagonist']['think']) >= 3, 'fewer than three things to think about')
     gated = [t for c in w['characters'].values() for t in c['topics'].values() if "seen('" in (t.get('known_when') or '')]
     check(gated, 'no conversation about encountered subjects')
+    labels = [t['label'] for c in w['characters'].values() for t in c['topics'].values()]
+    check(all(len(str(l).split()) <= 8 for l in labels), f"a topic label is a sentence: {max(labels, key=len)!r}")
     # the world is valid engine data, wrapped in a one-scene package with the done flags declared
     rooms = list(w['rooms'])
     pkg = {'format': 'stratum-story/1', 'story_id': 'stageb', 'title': 'world check', 'protagonist': result['protagonist'],
