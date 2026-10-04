@@ -37,6 +37,8 @@ feel left to the player):
 
 ```json
 "protagonist": {
+  "name": "Teodor Fairweather",
+  "gender": "m",
   "who": "You are the new owner of a narrow canal boat, standing on its stern deck before dawn with your brother-in-law already counting the cost of every rope.",
   "history": "Your wife grew up on this boat with her grandfather, the captain; she died last winter and left it to you, and you have not been aboard since her funeral.",
   "wants": "to get the boat under way and sold before dawn",
@@ -50,6 +52,13 @@ feel left to the player):
   "cannot_do": "make the boat leave its mooring or enter a lock until the captain's condition on the water is met"
 }
 ```
+
+The name is assigned in Python from the story's pool (modern), before the
+cast, so nobody shares a part of it; "you" stays "you" in every summary, and
+"Teodor" is what Lazlo calls you when he is angry and what the captain
+refuses to call you until the end. Gender and history are decided by the
+pipeline: a defined person, not a blank (a different "you" is a different
+story).
 
 With that, the same events mean more: Lazlo's money is the funeral loan, so
 his ledger is grief and debt at once; the captain's test is a grandfather

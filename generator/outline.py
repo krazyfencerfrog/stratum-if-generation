@@ -166,7 +166,7 @@ class OutlineBuilder:
                     entry[key] = seed[key]
             cast.append(entry)
         return {
-            'protagonist': pick(p.get('protagonist'), 'who', 'history', 'wants', 'need', 'can_do', 'cannot_do', 'ties', 'open'),
+            'protagonist': pick(p.get('protagonist'), 'name', 'gender', 'who', 'history', 'wants', 'need', 'can_do', 'cannot_do', 'ties', 'open'),
             'pressure': (p.get('pressure') or {}).get('description'),
             'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
             'events': [f"{i}. ({e.get('when')}) {e.get('what')}" for i, e in enumerate(self.events, 1)],
@@ -1243,6 +1243,16 @@ def story_markdown(story):
     if fw.get('why'):
         out.append(f"Why this form: {fw['why']}")
     out.append('')
+    you = (story.get('premise') or {}).get('protagonist') or {}
+    if you.get('history') or you.get('name'):
+        out.append('## You' + (f": {you['name']}" if you.get('name') else ''))
+        for key, label in (('who', 'who'), ('history', 'history'), ('wants', 'wants'), ('need', 'need'), ('open', 'left to the player')):
+            if you.get(key):
+                out.append(f'- {label}: {you[key]}')
+        for t in you.get('ties') or []:
+            if isinstance(t, dict) and t.get('who'):
+                out.append(f"- tie, {t['who']}: {t.get('what')}")
+        out.append('')
     q = ((story.get('premise') or {}).get('mediation') or {}).get('question')
     if q:
         out.append(f'The question: {q}')

@@ -781,6 +781,22 @@ def name_pools_styles_and_races():
 
 
 @test
+def protagonist_is_named_first():
+    import names
+    you = {'who': 'You inherited a canal boat.', 'gender': 'm'}
+    cast = [{'role': 'your brother-in-law', 'kind': 'individual', 'gender': 'm'}, {'role': 'the lock keeper', 'kind': 'individual', 'gender': 'f'}]
+    name = names.name_protagonist(you, 'demo35', 'modern')
+    check(name and you['name'] == name and name.split()[0] in names.POOLS['modern']['m'] + names.POOLS['modern']['n'],
+          f'a human protagonist should get a name from the pool, gendered: {you}')
+    names.assign_names(cast, 'demo35', ['a canal boat'], 'modern', reserved=[name])
+    parts = set(name.lower().split())
+    check(all(not parts & set(c['name'].lower().split()) for c in cast), f'a cast member shares a name part with you: {name} / {cast}')
+    check(names.name_protagonist({'who': 'You are the ship AI.', 'gender': 'n'}, 'demo', 'scifi', human=False) is None,
+          'a non-human protagonist was named')
+    check(names.name_protagonist(you, 'demo35', 'modern') == name, 'naming is not stable for a protagonist that already has a name')
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}

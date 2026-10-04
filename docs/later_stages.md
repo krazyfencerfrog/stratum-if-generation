@@ -69,8 +69,12 @@ Character arcs drive the expansion; rooms come much later (stage D).
   protagonist a `history` (how you came to be here), a `need` under the want,
   `ties` (what each key person is to you, from your side; 3.5c's cast ties
   must agree), and `open` (what is left to the player: how you feel, which
-  way you grow). Never a name. Without this, the protagonist's arc describes
-  what you do, not who changes (found writing the kernel35 example).
+  way you grow). Without this, the protagonist's arc describes what you do,
+  not who changes (found writing the kernel35 example). The pipeline also
+  fixes `gender` (3.5a) and a name (Python, from the story's pool, before
+  the cast; human protagonists only): "you" stays "you" in the text, the
+  name is what others call you. A different "you" is a different story; the
+  story is not weakened to leave the protagonist undefined.
 - **Small nodes, separate in the graph.** Expansion adds minor beats as
   their own nodes, not as content inside the major ones: the graph grows,
   every node stays small (which later stages need), and the structure stays

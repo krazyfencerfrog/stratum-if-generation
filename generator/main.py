@@ -965,8 +965,13 @@ class StoryGenerator:
         """Names for the cast come from Python (generator/names.py), not the
         model: the role stays the key, the name rides along. Keeps any name a
         seed already has, so a repair that adds a seed names only that one."""
-        premise['name_pool'] = names.assign_names(premise.get('cast_seeds') or [], self.story_id,
-                                                  [self.kernel or ''] + names.premise_texts(premise), premise.get('name_pool'))
+        texts = [self.kernel or ''] + names.premise_texts(premise)
+        pool = premise.get('name_pool') or names.pool_for(*texts)
+        identity = ((self.analysis.get('s3_brief') or {}).get('fields') or {}).get('3-0b.protagonist_identity') or {}
+        human = str(identity.get('type') or 'human').lower() == 'human'
+        you = names.name_protagonist(premise.get('protagonist'), self.story_id, pool, human)
+        premise['name_pool'] = names.assign_names(premise.get('cast_seeds') or [], self.story_id, texts, pool,
+                                                  reserved=[you] if you else [])
         return premise
 
     def tone_line(self):

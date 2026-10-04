@@ -237,12 +237,26 @@ def pick(story_id, role, pool_name, gender, taken):
     return name
 
 
-def assign_names(seeds, story_id, texts, pool_name=None):
+def name_protagonist(protagonist, story_id, pool_name, human=True):
+    """The protagonist's name, from the same pool as the cast, drawn first so
+    no one in the cast shares a part of it. Only for a human protagonist
+    (an AI or a ship keeps its role); keeps a name it already has. "You" stays
+    "you" in the outline; the name is what other people call you."""
+    if not isinstance(protagonist, dict) or not human:
+        return None
+    if not protagonist.get('name'):
+        gender = seed_gender(protagonist) or 'n'
+        protagonist['name'] = pick(story_id, 'the protagonist', pool_name, gender, [])
+    return protagonist['name']
+
+
+def assign_names(seeds, story_id, texts, pool_name=None, reserved=()):
     """Gives every individual seed that is a person a 'name', keeping any it
     already has. texts: the kernel first, then premise text, for the genre
-    and for pronoun hints. Returns the pool used."""
+    and for pronoun hints. reserved: names already given (the protagonist's)
+    that no seed may share a part of. Returns the pool used."""
     pool_name = pool_name or pool_for(*texts)
-    taken = [s['name'] for s in seeds if isinstance(s, dict) and s.get('name')]
+    taken = [n for n in reserved if n] + [s['name'] for s in seeds if isinstance(s, dict) and s.get('name')]
     for s in seeds:
         if wants_a_name(s) and not s.get('name'):
             own = [s.get(k) for k in SEED_OWN_FIELDS if s.get(k)]
