@@ -488,6 +488,26 @@ class OutlineBuilder:
         ending['changed'] = str(ending.get('changed') or '').strip()
         return ending
 
+    def ending_strangers(self, ending):
+        """Entries of an ending's standing and lost lists that are not people
+        in the cast: a phrase from a way ("the different senator", kernel39)
+        or a thing ("the caldarium's testimony"). The world comparison
+        ignores them, but the outline shows them, and the judge reads a
+        placeholder as a missing character."""
+        cast = list(self.characters.values())
+        out = []
+        for key in ('standing', 'lost'):
+            for v in ending.get(key) or []:
+                if norm(v) in ('you', 'yourself') or checks.people_only([v], cast):
+                    continue
+                out.append(f'{key} "{v}"')
+        return out
+
+    @staticmethod
+    def strangers_complaint(where, strangers):
+        return (f"{where} standing and lost name only people of the cast, by role or name; these are not: "
+                f"{', '.join(strangers)}. A thing kept or destroyed goes in changed; a person goes in only if the cast has them")
+
     def world_key(self, ending):
         """Two endings leave the same world when they give the same answer
         and the same PEOPLE stand and are lost (things listed there are
@@ -556,10 +576,16 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4a_main_line.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
+            soft = []
             if self.events and not any(e.get('event') is not None for e in entries):
-                raise SoftReject(f"none of the engine's {len(self.events)} events is placed (event: null everywhere); "
-                                 f"the world has to act on this line: put at least one event in the entry where it "
-                                 f"lands, and say what it does there")
+                soft.append(f"none of the engine's {len(self.events)} events is placed (event: null everywhere); "
+                            f"the world has to act on this line: put at least one event in the entry where it "
+                            f"lands, and say what it does there")
+            strangers = self.ending_strangers(parsed.get('ending') or {})
+            if strangers:
+                soft.append(self.strangers_complaint("the ending's", strangers))
+            if soft:
+                raise SoftReject('; '.join(soft))
 
         return self.gen.run_prompt('s4a_i1', 'main_line', {
             '$$KERNEL$$': self.gen.kernel,
@@ -781,6 +807,9 @@ class OutlineBuilder:
                     problems.append(f'seed {i}: ending needs a summary and its world (answer, standing, lost)')
                     continue
                 self.normalize_ending(ending, problems)
+                strangers = self.ending_strangers(ending)
+                if strangers:
+                    soft.append(self.strangers_complaint(f"seed {i}'s ending:", strangers))
                 wk = self.world_key(ending)
                 if wk in worlds:
                     soft.append(f'seed {i} ends in the same world as {worlds[wk]} (answer {wk[0]}, the same people '
@@ -947,6 +976,9 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4c_divergence.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
+            strangers = self.ending_strangers(parsed.get('ending') or {}) if isinstance(parsed.get('ending'), dict) else []
+            if strangers:
+                soft.append(self.strangers_complaint("the ending's", strangers))
             if soft:
                 raise SoftReject('; '.join(soft))
 

@@ -108,8 +108,9 @@ Plan:
   kernel32): DONE 2026-10-04 for phrases (4 of 265 saved summaries, e.g.
   "in quick practical fragments"), folded into 4b's soft check; single words
   like "commuter" are not caught;
-- `ending.lost` lists things as well as people (now ignored when comparing
-  worlds, but the field drifts);
+- `ending.lost` lists things as well as people: DONE 2026-10-04, soft-rejected
+  at 4a, 4c and 4p (8 of 78 saved endings; kernel39's "the different
+  senator", a phrase from a way, was the judge's worst thing);
 - no accumulated triggers in any run yet;
 - invented magic stays vague (kernel31: "the old bond", "the smoke of your
   village");
