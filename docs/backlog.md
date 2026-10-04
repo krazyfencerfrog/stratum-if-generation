@@ -58,8 +58,9 @@ Plan:
    the answer may be "40 KB for 3.5a/b and 4c, 25 KB for 4b".
 
 ### Review of the Fable 5 outlines [solo]
-- Read 31, 32, 8, 35 (done in conversation 2026-10-04), 34 and 33 as a
-  player; keep a quality ledger in `docs/run_samples/<date>/README.md`.
+- Read 31, 32, 8, 35, 34 (done in conversation 2026-10-04); 33 when it
+  lands. Write the quality ledger into `docs/run_samples/<date>/README.md`
+  with the outputs, as for the 2026-10-03 samples.
 - Retry and repair forensics: which soft retries and audit findings fire,
   how often, whether the fix took. A rule that fires on every kernel is a
   rule the model cannot follow as written.
@@ -74,14 +75,31 @@ Plan:
 - no accumulated triggers in any run yet;
 - invented magic stays vague (kernel31: "the old bond", "the smoke of your
   village");
-- premise repair rounds: kernel31 needed two.
+- premise repair rounds: kernel31 needed two;
+- endings phrased as permutations of one sentence ("the child is safe, X is
+  lost, Y stands"; kernel34) and repeated motifs ("folded" list, oath, copy);
+- procedure standing in for drama (kernel34's stakes run through seating
+  charts and oath wording).
 
 ## Next
 
 ### Later stages design [you, interactively]
-In progress: stage A redesigned as arcs and node expansion
-(`docs/later_stages.md` §2, 2026-10-04), with open questions listed there.
-The user has ideas; talk them through before building anything. Starting
+Stage A designed (2026-10-04): arcs and node expansion, the Python/model
+split, pattern shifts, tells, active attempts (`docs/later_stages.md` §2;
+worked example `docs/stage_a_example_kernel35.md`). Next: stages B, C and D
+at the same level. Small open items for A: composing resolution variants;
+whether some outline forks should become pattern triggers.
+
+### Playtest simulator [solo]
+Python that walks a story graph with play styles (always conciliatory,
+always dismissive, random, mixed) and reports which endings, variants and
+shifts each reaches. Designed for stage A, but useful now: on today's
+outlines it checks that every line and ending is reachable from its
+triggers.
+
+### Protagonist fields on the model [GPU]
+The defined-but-steerable protagonist (history, need, ties, open, gender,
+a Python name; commits 8b46995, 3769dd9) has not run on the model yet. Starting
 point: `docs/later_stages.md` (A beat expansion, B cast and world buildout,
 C reconciliation, D the per-node room build). Questions: what each stage
 consumes and produces, what the outline must carry for them (the node
@@ -124,6 +142,8 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   a kill.
 
 ## Done
+- 2026-10-04: stage A design (later_stages.md §2), worked example for
+  kernel35, protagonist fields and naming.
 - 2026-10-04: name generator, 20 pools, per-culture styles, races, stated
   gender (commit 574e041 on fable-response-5).
 - 2026-10-04: ending worlds compare people only (d453412); free brief
