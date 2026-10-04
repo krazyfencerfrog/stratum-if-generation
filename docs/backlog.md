@@ -123,6 +123,12 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   a kill.
 
 ## Done
+- 2026-10-04: code review of main.py/outline.py and fixes: a finished premise loop
+  replays as saved (no model calls from new checks); rejected attempts' outputs kept;
+  the run summary prints on a crash; line ids count lines (no gap after a dropped
+  seed); the plan validator trims seeds first; "you" ignored in a node's who; one
+  TURN_FORMS; dead helpers removed. Left as is: long run_prompt/story_markdown, the
+  per-attempt .log files.
 - 2026-10-04: batch runner (`generator/batch.py`): a queue file, a machine-wide GPU
   lock so two runs never share the GPU (two runs had collided that day),
   resume after kills, one retry for transient failures, a metrics report.

@@ -615,6 +615,11 @@ class OutlineBuilder:
     # ------------------------------------------------------------------ digests
 
     def line_containing(self, node_id):
+        """The first line (in build order) whose path passes the node: the
+        line a new line diverging there is attached to. A node a later line
+        reaches by rejoining has its canonical path on the earlier line, and
+        both the divergence validator and apply_divergence use this same
+        choice, so the turns counted as played and the parent agree."""
         for lid in self.line_order:
             if node_id in self.lines[lid]['path']:
                 return self.lines[lid]
@@ -747,7 +752,7 @@ class OutlineBuilder:
             seeds = parsed.get('seeds')
             if not isinstance(seeds, list):
                 raise ValueError('seeds must be a list (empty when no further line is worth building)')
-            seeds = [x for x in seeds if isinstance(x, dict)]
+            seeds = [x for x in seeds if isinstance(x, dict)][:room]     # seeds past the room are never built
             problems, soft = [], []
             taken = set()
             worlds = {main_world: 'the main line'}
@@ -786,7 +791,7 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4p_branch_plan.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
-            parsed['seeds'] = seeds[:room]
+            parsed['seeds'] = seeds
             if not linear and len(path) >= 4 and len(seeds) >= 2:
                 half = [sd for sd in seeds if sd.get('diverges_at') in path and path.index(sd['diverges_at']) + 1 <= len(path) / 2]
                 if not half:
@@ -961,7 +966,9 @@ class OutlineBuilder:
         }, prompt_file='s4c_divergence.prompt', validator=validate, klass='build', schema=schemas.DIVERGENCE)
 
     def apply_divergence(self, n, p):
-        line_id = f'T{n}'
+        # lines are numbered by how many there are, not by iteration: a planned
+        # seed 4c drops still uses an iteration, and must not leave a gap (T1, T3)
+        line_id = f'T{len(self.lines) + 1}'
         dv = p['divergence']
         at = dv['diverges_at']
         parent = self.line_containing(at)
@@ -1094,7 +1101,8 @@ class OutlineBuilder:
                         problems.append(f"node {x['id']}: {k} is empty" + (
                             ' (one concrete sight, sound or object the player keeps from this node)' if k == 'image' else ''))
                 x['where'] = [str(w).strip() for w in as_list(x.get('where')) if str(w).strip()]
-                x['who'] = [str(w).strip() for w in as_list(x.get('who')) if str(w).strip()]
+                x['who'] = [str(w).strip() for w in as_list(x.get('who'))
+                            if str(w).strip() and norm(w) not in ('you', 'yourself', 'protagonist', 'the protagonist')]
                 if not x['where']:
                     problems.append(f"node {x['id']}: where is empty; every node happens somewhere")
                 if len(x['where']) > 3:

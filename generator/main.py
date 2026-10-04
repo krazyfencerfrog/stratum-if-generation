@@ -103,8 +103,7 @@ SHAPE_TIERS = {
     'length': ('short', 'medium', 'long', 'unstated'),
 }
 
-TURN_FORMS = ('discover', 'persuade', 'trade', 'confront', 'conceal_or_reveal', 'sabotage',
-              'endure', 'choose_whom', 'rescue', 'escape')
+TURN_FORMS = tuple(schemas.TURN_FORMS)      # one list, in schemas.py
 # A complication is craft, not invention against the Kernel: even a tightly
 # specified Kernel gets two (one of them a reversal).
 COMPLICATION_BUDGET = {'minimal': 2, 'moderate': 3, 'generous': 4}
@@ -258,12 +257,6 @@ class StoryGenerator:
         cleaned = cleaned.replace("‘", "'").replace("’", "'")
         cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
         return json.loads(cleaned)
-
-    def analysis_json(self, member_name, indent=2):
-        value = self.analysis.get(member_name)
-        if value is None:
-            return 'none'
-        return json.dumps(value, indent=indent, ensure_ascii=False)
 
     @staticmethod
     def to_json(value, indent=2):
@@ -479,6 +472,7 @@ class StoryGenerator:
                 if attempts_left > 0:
                     last_error = e
                     rec['error'] = str(e)
+                    self.keep_rejected(prefix, attempt, thinking, response)
                     self.stats.record(**rec)
                     print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
                     feedback = self.retry_feedback(e, response)
@@ -488,6 +482,7 @@ class StoryGenerator:
             except (json.JSONDecodeError, ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
                 last_error = e
                 rec['error'] = str(e)
+                self.keep_rejected(prefix, attempt, thinking, response)
                 self.stats.record(**rec)
                 print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
                 feedback = self.retry_feedback(e, response)
@@ -506,6 +501,13 @@ class StoryGenerator:
             f"{attempt} attempts (last error: {last_error}); see "
             f"{self.story_file_path(prefix + '_raw_output_response.txt')}"
         )
+
+    def keep_rejected(self, prefix, attempt, thinking, response):
+        """A rejected attempt's output is kept beside the accepted one (the
+        retry overwrites the plain raw_output files), so a retry can be
+        examined afterwards: what the model wrote, and what the check said."""
+        self.save_story_file(f'{prefix}_raw_output_thinking_rejected_{attempt}.txt', thinking)
+        self.save_story_file(f'{prefix}_raw_output_response_rejected_{attempt}.txt', response)
 
     @staticmethod
     def retry_feedback(error, response):
@@ -672,16 +674,6 @@ class StoryGenerator:
         return str((self.analysis.get('s3_brief') or {}).get('enrichment_budget') or 'moderate')
 
     # ------------------------------------------------------------------ validators
-
-    @staticmethod
-    def require_keys(*keys):
-        def validate(parsed):
-            if not isinstance(parsed, dict):
-                raise ValueError('expected a JSON object')
-            missing = [k for k in keys if k not in parsed]
-            if missing:
-                raise ValueError(f'missing keys {missing}')
-        return validate
 
     @staticmethod
     def validate_engine(parsed):
@@ -866,14 +858,14 @@ class StoryGenerator:
         self.run_prompt('s3d', 'viewpoint', replace_kernel_only)
         self.run_prompt('s3e', 'timeline', replace_kernel_only)
         self.run_prompt('s3f', 'setting', {
-            '$$VIEWPOINT_EXCURSIONS_JSON$$': self.analysis_json('s3d_viewpoint'),
+            '$$VIEWPOINT_EXCURSIONS_JSON$$': self.to_json(self.analysis.get('s3d_viewpoint')),
             '$$KERNEL$$': self.kernel
         })
         # 3g is chained, not blind: branching density and tracked state aren't
         #  well-defined without the decision (3-0a) and the failure model (3-0c).
         self.run_prompt('s3g', 'complexity', {
-            '$$INTERACTIVE_QUESTION_JSON$$': self.analysis_json('s3_0a_interactive_question'),
-            '$$FAILURE_MODEL_JSON$$': self.analysis_json('s3_0c_consequence_failure_model'),
+            '$$INTERACTIVE_QUESTION_JSON$$': self.to_json(self.analysis.get('s3_0a_interactive_question')),
+            '$$FAILURE_MODEL_JSON$$': self.to_json(self.analysis.get('s3_0c_consequence_failure_model')),
             '$$KERNEL$$': self.kernel
         })
         # 3h: the phase's own cross-check. Classification only; fixes nothing.
@@ -1182,7 +1174,24 @@ class StoryGenerator:
           s3_5r<n>_premise_repair      {"repair_log", "revised": changed sections}
           s3_5_premise_accepted.json   what downstream reads
           s3_5_loop.json               the rounds and their findings
-        Halts (PipelineHalt) if the last round still has findings."""
+        Halts (PipelineHalt) if the last round still has findings.
+
+        A finished loop (s3_5_loop.json and the accepted premise on disk) is
+        replayed as it was: the accepted premise is loaded, not re-verified.
+        Re-verifying would run TODAY's computed checks over it, and a check
+        added since the run could raise a finding and start a repair round,
+        a model call in what should be a free replay."""
+        loop_record = self.load_story_file('s3_5_loop.json')
+        accepted = self.load_story_file('s3_5_premise_accepted.json')
+        if loop_record and accepted:
+            record = json.loads(loop_record)
+            if record.get('still_failing'):
+                raise PipelineHalt(
+                    f"s3_5 premise: the saved loop ended with findings still standing; inspect "
+                    f"{self.story_file_path('s3_5_loop.json')}, then delete the s3_5* files to re-run the loop.")
+            premise = json.loads(accepted)
+            self.analysis['s3_5_premise'] = premise
+            return premise
         premise = self.build_premise()
         self.save_story_json('s3_5_premise.json', premise)
         brief_table = brief_lines(self.analysis.get('s3_brief'))
@@ -1562,4 +1571,9 @@ if __name__ == "__main__":
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)
+    except Exception:
+        # print what ran before the error, then fail with the traceback
+        for line in gen.stats.summary_lines():
+            print(line)
+        raise
     finish()

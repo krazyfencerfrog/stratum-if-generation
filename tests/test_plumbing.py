@@ -878,6 +878,28 @@ def batch_runner_queues_resumes_and_locks():
 
 
 @test
+def replays_are_stable_and_rejections_kept():
+    # a finished premise loop replays as it was, even when today's checks would object to it
+    run('drift')
+    acc_path = os.path.join(story_dir('drift'), f'{PREFIX}drift_s3_5_premise_accepted.json')
+    premise = json.load(open(acc_path))
+    premise['turns'][0]['ways_through'][0]['way'] = 'you choose to trace the ducts'   # today's menu-verb check would flag this
+    json.dump(premise, open(acc_path, 'w'))
+    before = len(calls('drift'))
+    run('drift', fresh=False)
+    check(len(calls('drift')) == before, f'a replay made {len(calls("drift")) - before} model call(s)')
+    # a rejected attempt keeps its output beside the accepted one
+    run('kept', env={'STUB_BAD_PLAN': '1'})
+    check(os.path.isfile(os.path.join(story_dir('kept'), f'{PREFIX}kept_s4a_i1_raw_output_response_rejected_1.txt')),
+          'the rejected 4a answer was not kept')
+    # a seed 4c drops leaves no gap in the line numbering
+    run('nogap', args=['--max-iterations=4'], env={'STUB_NOTHING_ON': '2'})
+    story = load('nogap', 'story.json')
+    ids = sorted(story['lines'])
+    check(ids == [f'T{i}' for i in range(1, len(ids) + 1)], f'line ids have a gap: {ids}')
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}

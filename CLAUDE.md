@@ -67,7 +67,7 @@ Order: `s1 → s2 (rating filter, shape split) → run_phase3()` (`s3_0a, s3_0b,
 
 **4e evaluation** (`generator/evaluate.py`): computed metrics over the finished outline (fork positions, distinct ending worlds, companions whose standing varies, events placed, set-piece turns, promise coverage, repeated phrases, retold situations, summary size) plus one thinking-off call, `s4e_outline_judge`, scoring six axes out of 5 with the best and worst thing named. Written to `<id>_eval.json`; the judge is the same local model grading itself, a weak signal kept because it is cheap and comparable. `generator/ab.py` replays 3.4 onward from a story directory's saved phase 3 into `stories/<kernel>_<variant>/` and tabulates variants side by side; `tests/kernels/EVAL_SET.txt` is the fixed evaluation set.
 
-**Re-running a step**: delete its saved output file(s). For the 3.5 loop, delete every `s3_5*` file. Downstream outputs are not invalidated automatically — delete them too when an input changed. Each story directory carries `<id>_pipeline.json` (schema version 5); a directory from an older schema stops the run and prints what to delete (phase-3 outputs may be kept).
+**Re-running a step**: delete its saved output file(s). For the 3.5 loop, delete every `s3_5*` file (a finished loop replays its accepted premise as saved, without re-running today's checks over it). A rejected attempt's output is kept as `<prefix>_raw_output_*_rejected_<n>.txt`. Downstream outputs are not invalidated automatically — delete them too when an input changed. Each story directory carries `<id>_pipeline.json` (schema version 5); a directory from an older schema stops the run and prints what to delete (phase-3 outputs may be kept).
 
 ## Prompts
 
