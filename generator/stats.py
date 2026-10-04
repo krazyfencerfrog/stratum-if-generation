@@ -99,7 +99,17 @@ CALL_CLASSES = {
 
 
 def call_profile(klass):
-    return dict(CALL_CLASSES.get(klass) or CALL_CLASSES['extract'])
+    """A call class's budget. STRATUM_THINKING_LIMIT overrides the thinking
+    limit per class for experiments ("build=40000,judge=30000"); the target
+    moves with it (80% of the limit)."""
+    profile = dict(CALL_CLASSES.get(klass) or CALL_CLASSES['extract'])
+    for item in os.environ.get('STRATUM_THINKING_LIMIT', '').split(','):
+        name, _, value = item.partition('=')
+        if name.strip() == klass and value.strip().isdigit():
+            profile['limit_thinking_bytes'] = int(value)
+            profile['target_thinking_bytes'] = int(int(value) * 0.8)
+            profile['limit_seconds'] = max(profile.get('limit_seconds') or 0, int(int(value) / 25000 * 1800))
+    return profile
 
 
 def sampler_for(think):

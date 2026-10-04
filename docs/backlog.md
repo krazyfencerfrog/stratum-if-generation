@@ -38,8 +38,36 @@ What we know (runs of 2026-10-03/04, Fable 5 branch):
   16 full-attention layers grow it), but that has to be checked with
   `ollama ps` after a load.
 
+**Step 1 done (2026-10-04, `generator/trace_analysis.py`, 233 traced calls in
+12 runs: the Fable 5 branch runs plus batch3's kernel35/38).** Sentence by
+sentence, each trace is sorted into restating the prompt, deliberating
+(questions, could/maybe/either/whether), checking, planning notes and
+drafting (phrases that reach the answer), per tenth of the trace:
+- Phase-3 extractions, which finish on their own, SETTLE: deliberation falls
+  from about 0.34 to 0.27 in the last fifth, checking rises to 0.06 and
+  drafting to 0.20.
+- Construction calls cut at 25 KB (3.5a/b, 4a, 4b, 4c, 4p: 131 of them)
+  never settle: deliberation stays at 0.30-0.34 to the last tenth, checking
+  at 0.02-0.03; drafting climbs to 0.20. They are cut in the drafting-while-
+  still-deciding phase, before the settle-and-check phase.
+- Only 22-31% of the 4a, 4c and 4p answers' distinctive content (content-word
+  trigrams not in the prompt) appears anywhere in their traces (3.5a 49%,
+  4b 64%), against 72-98% for phase 3: most of a forced construction answer
+  is composed after the cut.
+- First attempts rejected by their validator: forced 7/135 (5%), finished
+  build calls 0/14 (too few to mean much).
+So a larger budget would buy finished decisions, not re-checking; the
+earlier "25 KB is as good as unlimited" (4a only, smaller prompts) does not
+describe today's prompts. Whether finished decisions make better stories is
+step 3's question. `STRATUM_THINKING_LIMIT=build=40000` (any class) and
+`STRATUM_NUM_CTX` now set the budget per run for that experiment, in any
+copy of the code. Proposed first matrix (cheapest, fits num_ctx 32k even at
+60 KB: 3.5a's prompt is about 7k tokens): the premise (ab.py ...
+--stop-after=3.5) on kernels 31, 32, 35 at 25 / 40 / 60 KB, one seed each,
+about 4 hours; then 4a/4c if the premises improve.
+
 Plan:
-1. [solo] Trace analysis on the saved traces: where in each forced trace
+1. [solo, DONE] Trace analysis on the saved traces: where in each forced trace
    the decisions are settled (when the model starts drafting the final
    answer), what the rest is spent on (re-checks, rule lists, restating
    the input), and whether forced answers miss rules that a validator,

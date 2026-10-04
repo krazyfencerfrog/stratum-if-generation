@@ -173,6 +173,8 @@ class OllamaClient(LlmClient):
         if limits.get('num_predict') and 'num_predict' not in opts:
             opts['num_predict'] = int(limits['num_predict'])
         opts.update(self.options)
+        if os.environ.get('STRATUM_NUM_CTX', '').isdigit():
+            opts['num_ctx'] = int(os.environ['STRATUM_NUM_CTX'])     # for budget experiments; reloads the model
         payload = {
             "model": self.model,
             "prompt": prompt,
