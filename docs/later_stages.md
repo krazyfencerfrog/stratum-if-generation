@@ -6,7 +6,7 @@ is already in the repository to build it from. The outline loop's schema was
 shaped to leave these hooks; they are listed in section 1 so a change to the
 loop does not quietly remove one.
 
-Order: **A** beat expansion, **B** character and setting buildout, **C**
+Order: **A** arcs and node expansion, **B** character and setting buildout, **C**
 reconciliation, **D** per-node room build. Prose comes after D.
 
 All four annotate one evolving document, `<id>_story.json`. Per-call files
@@ -18,11 +18,11 @@ the document is the assembled view every stage reads and rewrites.
 
 | in the story document | written by the loop as | filled by |
 |---|---|---|
-| `nodes[id].annotations` | `{}` | A writes `expansion`; D writes `build` |
+| `nodes[id].annotations` | `{}` | A2 writes `expansion` (the minor nodes it added); D writes `build` |
 | `nodes[id].additions` | what a later line needs this node to contain for its trigger to be possible | A must honor each one |
 | `edges[].trigger` | `{text, kind: act or accumulated, formal: null}` | D writes `formal`: the condition over state variables |
 | `edges[].otherwise` | the other side of each fork, in plain words | D, when it writes the default exit |
-| `characters[id].name, profile, packet` | `null` | B |
+| `characters[id].name, profile, packet` | name from Python, the rest `null` | B (A0 adds `arc_tier`, A1 adds `arc`) |
 | `locations[id].rooms, packet` | `null` | B |
 | `lines[id].ending` | title and summary; for a rejoining line, how the shared ending reads on that line | A (ending variants), D (variant conditions) |
 | `hooks` | ways through a turn no line took | A may mention them as roads not taken; D may make them visible dead ends |
@@ -33,76 +33,142 @@ Prefixes continue the numbering: `s5*` stage A, `s6*` stage B, `s7*` stage C,
 `s8*` stage D. Each call gets a class from `generator/stats.py` before its
 prompt is written; the class is its budget.
 
-## 2. Stage A: beat expansion
+## 2. Stage A: arcs and node expansion
 
-**Job.** For each node, work out what needs to happen in it: what serves each
-present character's arc, what makes each outgoing trigger possible, and one
-or two things that make it interesting. Still an outline: ordered events, not
-rooms.
+Revised 2026-10-04 in conversation with the user. This replaces the earlier
+"beat expansion" sketch; its craft devices (setup/payoff pairs, irony) are
+kept as part of A1.
 
-**A0, the craft pass (one call per story, plus one small call per extra
-line).** This is the old 3.75, moved here because its devices are about how
-beats play. Changes from `prompts/later/sA_craft_spine.prompt`:
+**The idea.** The outline's lines carry the PROTAGONIST's arc: each line is
+a different answer to what "you" want and how it resolves, and the player
+picks among them through big, informed choices. The other characters' arcs
+live inside and across those lines, and stage A makes them playable: it maps
+every arc onto the node graph, then expands the graph with small nodes that
+give the player chances to influence, understand and complete those arcs.
+Character arcs drive the expansion; rooms come much later (stage D).
 
-- `want_need_tension` becomes one entry per line. Each line has its own
-  motivation; a single story-wide need fought that.
-- `escalation_shape` is dropped. The framework is the escalation shape, and
-  matching a pattern to `3b.primary_trajectory` is now part of the computed
-  shortlist.
-- `setup_payoff_pairs` cite node ids, and a pair is valid only if the setup
-  node precedes the payoff node on at least one line (computed).
-- `irony_mode` stays; its type against `3-0b.epistemic_gap.present` is a
-  lookup and is computed.
+### Principles (from the user)
+
+- **Arcs may vary by line but are not forced to.** A character's arc is
+  shared wherever nothing pushes it apart, and forks only where a line, or
+  the player's accumulated choices, actually change it.
+- **No blind switches.** A single minor choice never throws the whole line.
+  A line shift comes either from a big choice whose consequences the player
+  can broadly foresee, or from the AGGREGATE of many minor choices: a
+  pattern that shows a preference or a play style. A "do you answer the
+  phone" choice, with no information about what it will cause, never
+  decides an outcome on its own.
+- **The player perceives arcs through whatever the story affords:** what
+  characters say, what they do, where they are, what the player discovers.
+  The means vary by story; the stage does not fix one.
+- **The protagonist has an arc** in most stories: the general direction of
+  their path. Lines change it significantly; they are how the player shows
+  how they WANT it to resolve.
+- **Small nodes, separate in the graph.** Expansion adds minor beats as
+  their own nodes, not as content inside the major ones: the graph grows,
+  every node stays small (which later stages need), and the structure stays
+  checkable.
+- **Cost is not the constraint.** This is the stage that makes the story;
+  every call should earn its place, but none is cut to save time.
+
+### A0. Arc cast (computed, plus one small classify call)
+
+Every character gets an `arc` tier:
+- `arc`: companions and the opposition, whose standing can differ between
+  endings (computed from `opposition`, `breaking_point`, and whether their
+  standing varies across the ending worlds);
+- `supporting`: recurring, with a stance that shifts but no ending of their
+  own (a thinking-off call decides between supporting and functional for
+  the rest, with a reason first);
+- `functional`: a role in one or two nodes.
+
+Typically two to four `arc` characters; it depends on the story. **The arc
+cast is closed here.** Later stages may add only functional characters (a
+role, one line of purpose, where they are); a new character who needs an
+arc means the outline is missing something and goes back through it.
+
+### A1. Arc plan (one call per story, judge or build class)
+
+Input: the line digests (motivation, strategy, turning point, path, ending
+world), the arc and supporting cast (wants, edge, tie, voice, breaking
+point), the premise's turns, events and hidden truth, the node list with
+summaries.
+
+Output, per arc character (and the protagonist, whose arc is written from
+each line's motivation and turning point in the same form so the whole set
+can be checked together):
 
 ```json
-"craft": {
-  "arcs": {"T1": {"want": "...", "need": "...", "tension": "..."}},
-  "irony": {"type": "situational | dramatic", "device": "..."},
-  "setup_payoff": [{"setup_node": "N02", "payoff_node": "N04", "what": "...", "lines": ["T1"]}],
-  "motif": null
-}
-```
-
-Verify and repair as 3.5 does now: computed checks first (node ids exist,
-order on a shared path, irony type), then a no-think audit with one entry per
-Kernel clause and per device ("does this create a second decision axis?"),
-then a repair that returns only the changed sections. Class: build for A0,
-classify for the audit.
-
-**A1, per node (`s5b_<node>`).** Packet, and nothing else:
-
-- the node: beat job, `adapted`, `summary`, `where` and `who` as sketches
-- for each line through it: motivation and strategy, and the summaries of
-  the node before and the node after on that line
-- `must_enable`: each outgoing edge's trigger text and `otherwise` text
-- `additions`
-- the craft devices that name this node
-- the node's premise turn, with the way each line through it takes
-
-```json
-"annotations": {"expansion": {
-  "arrives_with": ["what is true when play reaches this node, in plain words"],
-  "events": [{"what": "...", "who": ["label"], "where": "location name"}],
-  "arc_beats": [{"character": "label", "change": "what shifts for them here"}],
-  "enables": [{"edge": "N03->T2N01", "by": "what the player can do here that the trigger sentence describes"}],
-  "interest": [{"kind": "reversal | reveal | plant | payoff | cost_shown", "what": "..."}],
-  "leaves_with": ["what is true when play leaves, per outgoing edge where it differs"]
+"arcs": {"C02": {
+  "starts": "what they want, believe and feel about you at the opening",
+  "moments": [{"node": "N04", "lines": ["T1", "T2"], "change": "what shifts and why",
+               "kind": "turn | reveal | test | demonstration"}],
+  "forks": [{"after": "N04", "by": "line | state", "how": "what makes the arc split here"}],
+  "resolutions": [{"lines": ["T1"], "state": "what they have become, and whether they stand with you",
+                   "needs": "the pattern of play that leads here (for state forks), or null"}],
+  "state": {"name": "lazlo_trust", "meaning": "how far he believes you will sell", "moves": "up when you ..., down when you ..."}
 }}
 ```
 
-Three to six events. Class: build, but the packet is small; if traces run
-long, split `events` from the rest. A shared node is expanded once, with
-every line through it in the packet.
+Also carried from the old craft pass: setup/payoff pairs citing node ids
+(computed: the setup precedes the payoff on at least one line), and the
+irony device (its type is a lookup against the epistemic gap).
 
-**Computed checks after A.** Every outgoing branch has an `enables` entry;
-every `additions` text is covered by an event; everyone in `events.who` is
-in the node's `who` (or is reported for the register); every setup/payoff
-pair lands in an event of each named node; `leaves_with` of a node is
-consistent with `arrives_with` of its successors (a string-overlap warning,
-not a judgment).
+Computed checks: every arc character has at least one moment on every line
+they appear in; their resolutions match the ending worlds (who stands, who is
+lost); a state fork names a state that some minor choice moves; no arc
+resolves on a single minor choice. Audit and repair as 3.5 does, if the
+checks are not enough.
 
-**Cost estimate.** A0 about 20 minutes; A1 about 10 minutes a node. A
-four-line story of 18 nodes: about 3.5 hours.
+### A2. Node expansion (one call per major node, build class)
+
+For each major node, add minor nodes before, inside or after it, each of one
+kind:
+
+- **opportunity**: a small choice that moves an arc's state ("help him hide
+  the stain" / "show the lock keeper"). Its effect is on state, never on
+  the line by itself; what each option means is something the player can
+  read from the situation.
+- **revelation**: something learned that explains a character or the
+  hidden truth (a logbook, an overheard call, an object).
+- **demonstration**: a character acting from where their arc currently is,
+  so the change is seen, not told.
+- **resolution**: where an arc lands, usually near an ending; may come in
+  variants keyed to state.
+
+Each minor node: id, kind, the arc(s) it serves, a 30-50 word summary, one
+image, who, and for opportunities the options with their state effects in
+plain words. Minor nodes do not create lines; they hang off the major
+node's position on each line that passes through it, and a shared major
+node is expanded once, with every line through it in the packet.
+
+**Arc state and line shifts.** Opportunities move named states. A line's
+ending may come in variants keyed to state (a companion stays or goes). An
+edge may also be `accumulated`: a line shift triggered by a state pattern
+("you sided with the ghost at every chance"), which is where the outline's
+accumulated triggers finally come from. Big choices stay `act` triggers, as
+the outline wrote them.
+
+Computed checks after A2: every arc moment is played by some major or minor
+node; every state an arc resolution needs is moved by at least two
+opportunities on the paths that reach it (aggregate, never single); every
+accumulated trigger's pattern is reachable; every resolution variant has a
+state condition; minor-node summaries stay within size.
+
+### Open questions (to settle before building)
+
+- The packet for A2: a whole line at a time, or one major node with its
+  neighbours? (Per node is smaller; per line keeps arc pacing coherent.)
+- How visible arc state should be to the player (signposted outcomes vs.
+  discovered ones), which affects how opportunities are written.
+- Whether supporting characters get light arcs (a stance that shifts) or
+  none.
+- Where the old `additions` (what a later line needs a node to contain)
+  are honored: in A2, as part of the major node's expansion.
+
+**Cost.** Not the constraint (see principles). Rough: A0 a minute, A1 about
+5-10 minutes, A2 about 5-10 minutes per major node, so about 2-3 hours for
+a 15-node story, plus any audit and repair.
 
 ## 3. Stage B: character and setting buildout
 

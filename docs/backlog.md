@@ -13,6 +13,10 @@ overnight batch.
 ## Active
 
 ### Thinking budget investigation [solo, then GPU]
+First look (2026-10-04): kernel35's forced 4a trace was still choosing its
+crisis beat at the 25 KB cut, not re-checking settled decisions; the traces
+are telegraphic deliberation ("Need ...", "Could ...", "But maybe ..."), so
+the old "drafting starts at X%" heuristic finds nothing. Worth measuring.
 The question: would a larger thinking budget for construction calls give
 clearly better outlines, and is it affordable? The user is open to longer
 runs if the outlines get significantly better.
@@ -75,6 +79,8 @@ Plan:
 ## Next
 
 ### Later stages design [you, interactively]
+In progress: stage A redesigned as arcs and node expansion
+(`docs/later_stages.md` §2, 2026-10-04), with open questions listed there.
 The user has ideas; talk them through before building anything. Starting
 point: `docs/later_stages.md` (A beat expansion, B cast and world buildout,
 C reconciliation, D the per-node room build). Questions: what each stage
