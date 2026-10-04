@@ -420,7 +420,18 @@ for reference.
   character whom neither the intro nor a scene opening (this scene or an
   earlier one) has introduced; events fire wherever the player is, so an
   unintroduced name is a stranger shouting (playtest feedback, 2026-10-04).
-- **Planned with stage B (2026-10-04, not built yet):** a `seen` state
+- **Built for stages B and D (2026-10-04):** `seen` (people present in the
+  player's room and objects visible there are recorded after every action;
+  `seen('x')`), the THINK verb and examine yourself from the package's
+  `protagonist` block (`description`, `think` topics), moments (a scene's
+  `moments: [{id, options, required, neutral, lapse}]`; `answered('id')`),
+  computed time (`turns` advance only for actions that change something,
+  move you, or wait; `takes_time` overrides; `actions` counts everything),
+  and `weight: "major"` passed to menu leaves (the terminal player marks it
+  ◆). The playtest explorer drops what cannot matter from a state (other
+  scenes' interactions and events, flags read only by text, seen-subjects no
+  condition asks about), which keeps the demo at 27k states.
+- **Planned with stage B (2026-10-04, superseded by the entry above):** a `seen` state
   (people present in rooms the player enters, objects seen or examined;
   `seen('x')` in conditions) so conversations about anything encountered
   need no per-subject flags; `think` as a core verb with the protagonist's

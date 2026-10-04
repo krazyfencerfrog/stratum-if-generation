@@ -491,6 +491,12 @@ combination) go into the run's report for a human to read.
   conversation: a chore to help with, a drink to share, the dog; flavour,
   sometimes with a small effect. They make a place lived in, and they mask
   which actions matter.
+- **Text that fires anywhere must not assume a place.** Events, nudges and
+  lapses fire wherever the player is; the demo's nudge said "Lazlo's voice
+  comes up from the cabin" to a player standing in the cabin. Give such text
+  room variants (`at('cabin')`) or write it placeless. A check for D: an
+  event or nudge naming a room the player can be in, without a variant for
+  that room.
 - **Story verbs:** prefer the core verbs; add a story verb where a genre
   action deserves its own word, especially one the story repeats (Bail,
   Climb, Salute). Action stories lean on them more. A one-use story verb is

@@ -22,9 +22,12 @@ class GameState:
         self.visited = set()          # rooms and scenes entered
         self.used = set()             # interaction ids of `once` interactions already used
         self.fired = set()            # event and nudge ids already fired
-        self.turns = 0
+        self.seen = set()             # characters and objects the player has encountered
+        self.moments = {}             # moment id -> actions since its options were first offered
+        self.turns = 0                # time that has passed (actions that changed something, moves, waits)
         self.turns_in_scene = 0
         self.idle = 0                 # actions in this scene since one last changed anything
+        self.actions = 0              # every action taken, timed or not
         self.seed = random.random()
 
     # ------------------------------------------------------------ reads
@@ -60,22 +63,24 @@ class GameState:
         c.__dict__.update(self.__dict__)
         for key in ('flags', 'stats', 'locations', 'placements'):
             setattr(c, key, dict(getattr(self, key)))
-        for key in ('visited', 'used', 'fired'):
+        for key in ('visited', 'used', 'fired', 'seen'):
             setattr(c, key, set(getattr(self, key)))
         c.arcs = {k: dict(v) for k, v in self.arcs.items()}
+        c.moments = dict(self.moments)
         return c
 
     def to_dict(self):
         return {'scene': self.scene, 'room': self.room, 'ending': self.ending, 'flags': dict(self.flags),
                 'stats': dict(self.stats), 'arcs': copy.deepcopy(self.arcs), 'locations': dict(self.locations),
                 'placements': dict(self.placements), 'visited': sorted(self.visited), 'used': sorted(self.used),
-                'fired': sorted(self.fired), 'turns': self.turns, 'turns_in_scene': self.turns_in_scene,
-                'idle': self.idle, 'seed': self.seed}
+                'fired': sorted(self.fired), 'seen': sorted(self.seen), 'moments': dict(self.moments),
+                'turns': self.turns, 'turns_in_scene': self.turns_in_scene,
+                'idle': self.idle, 'actions': self.actions, 'seed': self.seed}
 
     @staticmethod
     def from_dict(data):
         s = GameState()
-        for key in ('scene', 'room', 'ending', 'turns', 'turns_in_scene', 'idle', 'seed'):
+        for key in ('scene', 'room', 'ending', 'turns', 'turns_in_scene', 'idle', 'actions', 'seed'):
             setattr(s, key, data.get(key, getattr(s, key)))
         s.flags = dict(data.get('flags') or {})
         s.stats = dict(data.get('stats') or {})
@@ -85,4 +90,6 @@ class GameState:
         s.visited = set(data.get('visited') or [])
         s.used = set(data.get('used') or [])
         s.fired = set(data.get('fired') or [])
+        s.seen = set(data.get('seen') or [])
+        s.moments = dict(data.get('moments') or {})
         return s

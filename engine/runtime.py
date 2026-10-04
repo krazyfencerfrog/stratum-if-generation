@@ -64,6 +64,7 @@ class Engine:
             self.queue.append(pick_text(intro, st))
         self._enter_scene(s.start['scene'], room=s.start.get('room'))
         self._settle()
+        self._note_seen()
         self.timeline = [st.clone()]
         view = self.view()
         self.history = [{'label': '(the beginning)', 'text': view['text'], 'turn': 0}]
@@ -110,11 +111,11 @@ class Engine:
         s, st = self.story, self.state
         built, authored = [], []
 
-        def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None):
+        def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None):
             into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail,
                          'object_label': obj_label or (s.name_of(obj) if obj else None),
                          'detail_label': detail_label or (s.name_of(detail) if detail else None),
-                         'source': source})
+                         'source': source, 'weight': weight})
 
         add(built, 'look', 'look')
         for oid in self.visible_objects():
@@ -122,6 +123,12 @@ class Engine:
             obj = s.objects[oid]
             if obj.get('portable') and st.locations.get(oid) == st.room:
                 add(built, f'take:{oid}', 'take', oid)
+        you = s.protagonist
+        if you.get('description'):
+            add(built, 'examine:you', 'examine', 'you', obj_label='yourself', source=('self',))
+        for tid, topic in (you.get('think') or {}).items():
+            if f'think:{tid}' not in st.used and evaluate(topic.get('known_when', 'true'), st):
+                add(built, f'think:{tid}', 'think', tid, obj_label=topic.get('label') or tid, source=('think', tid))
         for cid in self.present():
             add(built, f'examine:{cid}', 'examine', cid)
             for tid, topic in (s.characters[cid].get('topics') or {}).items():
@@ -140,21 +147,40 @@ class Engine:
             add(built, 'inventory', 'inventory')
 
         for it in self.scene().get('interactions') or []:
-            if it.get('room') not in (None, st.room) or it['id'] in st.used:
-                continue
-            if it.get('reach') != 'any' and not (self._reachable(it.get('object')) and self._reachable(it.get('detail'))):
-                continue
-            if not evaluate(it.get('when', 'true'), st):
+            if not self._available(it):
                 continue
             detail_label = it.get('detail_label')
             if detail_label is None and it.get('object') in s.characters and it.get('detail'):
                 topic = (s.characters[it['object']].get('topics') or {}).get(it['detail'])
                 detail_label = (topic or {}).get('label')
             add(authored, it['id'], it['verb'], it.get('object'), it.get('detail'), it.get('object_label'),
-                detail_label, source=('interaction', it))
+                detail_label, source=('interaction', it), weight=it.get('weight'))
 
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
         return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken] + authored
+
+    def _available(self, it):
+        """An authored interaction can be offered now: in this room (or
+        anywhere in the scene), not used up, its moment not yet answered, its
+        object and detail at hand, its condition true."""
+        st = self.state
+        if it.get('room') not in (None, st.room) or it['id'] in st.used:
+            return False
+        moment = self.moment_of(it['id'])
+        if moment and moment['id'] in st.used:
+            return False
+        if it.get('reach') != 'any' and not (self._reachable(it.get('object')) and self._reachable(it.get('detail'))):
+            return False
+        return bool(evaluate(it.get('when', 'true'), st))
+
+    def moments(self):
+        return self.scene().get('moments') or []
+
+    def moment_of(self, interaction_id):
+        for m in self.moments():
+            if interaction_id in (m.get('options') or []):
+                return m
+        return None
 
     def menu(self, collapse=None):
         """The options as a tree: verbs, then objects, then details. Leaves
@@ -177,14 +203,15 @@ class Engine:
             for obj, opts in objects.items():
                 if obj is None:
                     for o in opts:
-                        vnode['children'].append({'label': None, 'id': o['id']})
+                        vnode['children'].append(dict({'label': None, 'id': o['id']},
+                                                      **({'weight': o['weight']} if o.get('weight') else {})))
                     continue
                 onode = {'label': opts[0]['object_label'], 'children': []}
                 for o in opts:
-                    if o['detail'] is None:
-                        onode['children'].append({'label': None, 'id': o['id']})
-                    else:
-                        onode['children'].append({'label': detail_text(verb, o['detail_label']), 'id': o['id']})
+                    leaf = {'label': None if o['detail'] is None else detail_text(verb, o['detail_label']), 'id': o['id']}
+                    if o.get('weight'):
+                        leaf['weight'] = o['weight']
+                    onode['children'].append(leaf)
                 vnode['children'].append(onode)
             root['children'].append(vnode)
         root['children'] = [_collapse(c, collapse or self.collapse) for c in root['children']]
@@ -219,7 +246,9 @@ class Engine:
         if reseed:
             st.new_seed()
         before = _signature(st)
+        changes_before = _changes(st)
         moved_room = False
+        takes_time = None
         src = opt['source']
         if src and src[0] == 'interaction':
             it = src[1]
@@ -227,6 +256,20 @@ class Engine:
             self._apply(it.get('effects'))
             if it.get('once'):
                 st.used.add(it['id'])
+            moment = self.moment_of(it['id'])
+            if moment:                       # one answer closes the moment
+                st.used.add(moment['id'])
+                st.moments.pop(moment['id'], None)
+            if 'takes_time' in it:
+                takes_time = bool(it['takes_time'])
+        elif src and src[0] == 'self':
+            self.queue.append(pick_text(s.protagonist.get('description'), st, 'you'))
+        elif src and src[0] == 'think':
+            topic = s.protagonist['think'][src[1]]
+            self.queue.append(pick_text(topic.get('says'), st, f'think.{src[1]}'))
+            self._apply(topic.get('effects'))
+            if topic.get('once'):
+                st.used.add(f'think:{src[1]}')
         elif src and src[0] == 'topic':
             _, cid, tid = src
             topic = s.characters[cid]['topics'][tid]
@@ -252,8 +295,12 @@ class Engine:
             self.queue.append(pick_text(obj.get('take_text'), st) or f"You take {obj.get('name', opt['object'])}.")
         elif opt['verb'] == 'wait':
             self.queue.append(pick_text(self.scene().get('wait_text'), st) or 'Time passes.')
-        st.turns += 1
-        st.turns_in_scene += 1
+        if takes_time is None:     # computed: time passes when something changed, you moved, or you waited
+            takes_time = moved_room or opt['verb'] == 'wait' or _changes(st) != changes_before
+        if takes_time:
+            st.turns += 1
+            st.turns_in_scene += 1
+        st.actions = getattr(st, 'actions', 0) + 1
         scene_before = st.scene
         self._settle(progress_since=before)
         return moved_room, scene_before
@@ -327,13 +374,17 @@ class Engine:
                     st.idle += 1
                     self._nudge()
                 progress_since = None
+                self._tick_moments()
+            self._note_seen()
             target = self._exit_due()
             if target is None:
                 return
+            self._lapse_all()
             if target in self.story.endings:
                 self._end(target)
                 return
             self._enter_scene(target)
+            self._note_seen()
 
     def _nudge(self):
         st = self.state
@@ -347,7 +398,54 @@ class Engine:
             self._apply(n.get('effects'))
             return
 
+    def _note_seen(self):
+        """Who and what the player has now encountered: the people in the room
+        and every object visible there."""
+        st = self.state
+        if st.ending or st.room is None:
+            return
+        st.seen.update(self.present())
+        st.seen.update(self.visible_objects())
+
+    def _offered(self, moment):
+        by_id = {it['id']: it for it in self.scene().get('interactions') or []}
+        return any(self._available(by_id[i]) for i in moment.get('options') or [] if i in by_id)
+
+    def _tick_moments(self):
+        """Count the actions since each open moment was first offered; an
+        optional one lapses after its `after`."""
+        st = self.state
+        for m in self.moments():
+            if m['id'] in st.used:
+                continue
+            if m['id'] in st.moments:
+                st.moments[m['id']] += 1
+            elif self._offered(m):
+                st.moments[m['id']] = 0
+            lapse = m.get('lapse')
+            if not m.get('required') and lapse and st.moments.get(m['id'], -1) >= lapse.get('after', 4):
+                self._lapse(m)
+
+    def _lapse(self, m):
+        st = self.state
+        st.used.add(m['id'])
+        st.moments.pop(m['id'], None)
+        lapse = m.get('lapse') or {}
+        if lapse.get('text'):
+            self.queue.append(pick_text(lapse['text'], st, m['id']))
+        self._apply(lapse.get('effects'))
+
+    def _lapse_all(self):
+        """Leaving a scene: every optional moment that was offered and never
+        answered lapses."""
+        for m in self.moments():
+            if not m.get('required') and m['id'] not in self.state.used and m['id'] in self.state.moments:
+                self._lapse(m)
+
     def _exit_due(self):
+        st = self.state
+        if any(m.get('required') and m['id'] not in st.used for m in self.moments()):
+            return None          # a required moment holds the scene until it is answered
         for ex in self.scene().get('exits') or []:
             if evaluate(ex.get('when', 'true'), self.state):
                 return ex['to']
@@ -465,6 +563,14 @@ class Engine:
         self.history = history[:len(self.timeline)]
         self.queue = []
         return self.view()
+
+
+def _changes(st):
+    """What makes an action take time: a change to facts, counts, arcs or where
+    things are (walking and waiting are counted separately)."""
+    return (tuple(sorted(st.flags.items())), tuple(sorted(st.stats.items())),
+            tuple(sorted((k, v['up'], v['down']) for k, v in st.arcs.items())),
+            tuple(sorted((k, str(v)) for k, v in st.locations.items())))
 
 
 def _signature(st):

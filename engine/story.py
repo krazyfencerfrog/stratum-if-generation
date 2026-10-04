@@ -17,9 +17,9 @@ FORMAT = 'stratum-story/1'
 
 CORE_VERBS = {
     'look': 'Look', 'examine': 'Examine', 'go': 'Go', 'talk': 'Talk', 'take': 'Take', 'give': 'Give',
-    'show': 'Show', 'use': 'Use', 'wait': 'Wait', 'inventory': 'Inventory',
+    'show': 'Show', 'use': 'Use', 'think': 'Think', 'wait': 'Wait', 'inventory': 'Inventory',
 }
-VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'wait', 'inventory')
+VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room')
 
 
@@ -75,6 +75,8 @@ class Story:
             return Story(json.load(f))
 
     def name_of(self, thing):
+        if thing == 'you':
+            return 'yourself'
         for table in (self.objects, self.characters, self.rooms):
             if thing in table:
                 return table[thing].get('name') or thing
@@ -97,6 +99,8 @@ def validate(story):
     errors, notes = [], []
     s = story
     flags_set, flags_read = set(), set()
+    moment_ids = set()           # (moment id, where) read by answered()
+    declared_moments = set()
     verb_uses = {}
 
     def check_expr(where, text):
@@ -120,6 +124,10 @@ def validate(story):
         for x in refs['visited']:
             if x not in s.rooms and x not in s.scenes:
                 errors.append(f'{where}: visited() names neither a room nor a scene: {x!r}')
+        for x in refs['seen']:
+            if x not in s.characters and x not in s.objects:
+                errors.append(f'{where}: seen() names neither a character nor an object: {x!r}')
+        moment_ids.update((x, where) for x in refs['moments'])
 
     def check_variants(where, variants):
         if isinstance(variants, str):
@@ -159,6 +167,18 @@ def validate(story):
         errors.append(f"start scene {s.start.get('scene')!r} does not exist")
     if s.start.get('room') and s.start['room'] not in s.rooms:
         errors.append(f"start room {s.start.get('room')!r} does not exist")
+
+    # you
+    you = s.protagonist
+    check_variants('protagonist description', you.get('description'))
+    for tid, topic in (you.get('think') or {}).items():
+        check_expr(f'think {tid}', topic.get('known_when', 'true'))
+        check_variants(f'think {tid} says', topic.get('says'))
+        check_effects(f'think {tid}', topic.get('effects'))
+        if not topic.get('says'):
+            errors.append(f'think {tid}: says nothing')
+    if 'you' in s.objects or 'you' in s.characters:
+        errors.append('"you" is reserved for the player; no object or character may use it as an id')
 
     for name, st in s.states.items():
         if not isinstance(st, dict) or not st.get('meaning'):
@@ -250,6 +270,10 @@ def validate(story):
                 errors.append(f'{iw}: a detail without an object')
             check_expr(iw, it.get('when', 'true'))
             check_effects(iw, it.get('effects'))
+            if it.get('weight') not in (None, 'major'):
+                errors.append(f"{iw}: weight must be 'major' or absent, not {it.get('weight')!r}")
+            if 'takes_time' in it and not isinstance(it['takes_time'], bool):
+                errors.append(f'{iw}: takes_time must be true or false')
             if not it.get('text'):
                 errors.append(f'{iw}: no text')
         for ev in list(sc.get('events') or []) + list(sc.get('nudges') or []):
@@ -264,6 +288,39 @@ def validate(story):
             elif 'after' not in ev:
                 errors.append(f'{ew}: needs when (an event) or after (a nudge)')
             check_effects(ew, ev.get('effects'))
+        own = {it.get('id') for it in sc.get('interactions') or []}
+        in_moment = {}
+        for m in sc.get('moments') or []:
+            mw = f"{where} moment {m.get('id')}"
+            if not m.get('id'):
+                errors.append(f'{where}: a moment has no id')
+                continue
+            if m['id'] in ids:
+                errors.append(f'{mw}: duplicate id')
+            ids.add(m['id'])
+            declared_moments.add(m['id'])
+            options = m.get('options') or []
+            if len(options) < 2:
+                errors.append(f'{mw}: a moment offers at least two options')
+            for o in options:
+                if o not in own:
+                    errors.append(f'{mw}: option {o!r} is not an interaction of this scene')
+                if o in in_moment:
+                    errors.append(f'{mw}: option {o!r} is already in moment {in_moment[o]}')
+                in_moment[o] = m['id']
+            if m.get('required'):
+                if m.get('neutral') not in options:
+                    errors.append(f'{mw}: a required moment names a neutral option among its options, so the choice '
+                                  f'is offered and never forced one way')
+                if m.get('lapse'):
+                    errors.append(f'{mw}: a required moment cannot lapse')
+            else:
+                lapse = m.get('lapse')
+                if not isinstance(lapse, dict) or not isinstance(lapse.get('after', 4), int):
+                    errors.append(f'{mw}: an optional moment needs a lapse ({{after, text, effects}}): walking away '
+                                  f'is its own answer')
+                else:
+                    check_effects(f'{mw} lapse', lapse.get('effects'))
         exits = sc.get('exits') or []
         graph[sid] = []
         for ex in exits:
@@ -282,6 +339,10 @@ def validate(story):
             check_variants(f'ending {eid} resolution {gi}', group.get('variants'))
         if not end.get('text'):
             errors.append(f'ending {eid}: no text')
+
+    for m, where in sorted(moment_ids):
+        if m not in declared_moments:
+            errors.append(f'{where}: answered() names unknown moment {m!r}')
 
     # every flag read is set somewhere
     for flag, where in sorted(flags_read):

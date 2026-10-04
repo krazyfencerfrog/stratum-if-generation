@@ -5,7 +5,63 @@
   "protagonist": {
     "name": "Teodor Fairweather",
     "pronoun": "you",
-    "gender": "m"
+    "gender": "m",
+    "description": [
+      {
+        "text": "Wet to the knees and rope-burned across both palms. Mira would have laughed, and then fetched the first-aid tin.",
+        "when": "in_scene('S02')"
+      },
+      {
+        "text": "A man in his good coat on a boat that has never seen a good coat, Mira's ring on a cord round your neck where you can feel it."
+      }
+    ],
+    "think": {
+      "mira": {
+        "label": "Mira",
+        "says": [
+          {
+            "text": "She would have known how to talk to him. She called the boat 'the old man' and patted the wheel when she passed it, and you thought it was a joke.",
+            "when": "not seen('lake_kaur')"
+          },
+          {
+            "text": "Her grandfather. She told you about him twice, both times laughing, and both times she stopped laughing before she finished. Now you know why."
+          }
+        ]
+      },
+      "lazlo": {
+        "label": "Lazlo",
+        "says": [
+          {
+            "text": "He paid for the funeral without being asked, and he has not let you forget it for a single day. Both of those are true. Mira loved him anyway.",
+            "when": "not pattern('lazlo_nerve','up',1,1.0) and not pattern('lazlo_nerve','down',1,1.0)"
+          },
+          {
+            "text": "He is frightened, and the ledger is how he holds it. You gave him a number to hold. It helped more than you expected.",
+            "when": "pattern('lazlo_nerve','up',1,1.0)"
+          },
+          {
+            "text": "You laughed at the one thing keeping him steady. He has not looked at you straight since."
+          }
+        ]
+      },
+      "the_captain": {
+        "label": "the captain",
+        "known_when": "seen('lake_kaur')",
+        "says": [
+          {
+            "text": "He is dead, and he is standing at the wheel of your boat, and the strangest part is that he looks exactly like the photograph on Mira's mantelpiece."
+          }
+        ]
+      },
+      "the_sale": {
+        "label": "selling the boat",
+        "says": [
+          {
+            "text": "Noon. Four miles. Lazlo gets his money, you get whatever is left, and the boat goes to a man who wants it for a floating café. You tell yourself that is what she would have wanted, and you are not sure you believe it."
+          }
+        ]
+      }
+    }
   },
   "intro": [
     {
@@ -276,6 +332,16 @@
             "text": "Black oak and iron, closed, and coming closer."
           }
         ]
+      },
+      "miras_ring": {
+        "name": "Mira's ring",
+        "location": "player",
+        "portable": true,
+        "description": [
+          {
+            "text": "A plain silver band, worn thin on one side from her habit of turning it. It is too small for any of your fingers, so it hangs on a cord."
+          }
+        ]
       }
     },
     "characters": {
@@ -347,6 +413,14 @@
         "arc_tier": "arc",
         "description": [
           {
+            "text": "He has his cup of tea in both hands and, for once, no pencil.",
+            "when": "flags.shared_tea"
+          },
+          {
+            "text": "He has washed his own cup and left yours on the side, full and cold.",
+            "when": "flags.refused_tea and in_scene('S01')"
+          },
+          {
             "text": "Mira's brother: a tidy man in a coat too good for a boat, with her eyes and none of her patience."
           },
           {
@@ -393,6 +467,15 @@
             "says": [
               {
                 "text": "'Noon,' he says. 'He pays on the dock, I take what Mira's funeral cost me, you keep the rest. Simple.' He says 'simple' the way other people knock on wood."
+              }
+            ]
+          },
+          "the_logbook": {
+            "label": "the logbook",
+            "known_when": "seen('logbook')",
+            "says": [
+              {
+                "text": "'A dead man's diary,' he says. 'Does it say anything about money? No? Then it's furniture.' He does not look at it."
               }
             ]
           }
@@ -585,6 +668,51 @@
             }
           ],
           "when": "flags.answered_ledger"
+        },
+        {
+          "id": "S01.tea_yes",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "tea_yes",
+          "detail_label": "'Thanks. Sit down a minute.'",
+          "room": "cabin",
+          "when": "flags.tea_made",
+          "text": "He sits. The two of you drink in silence while the boat creaks around you, and for a minute it is just two people who miss the same woman.",
+          "effects": [
+            {
+              "set": "shared_tea"
+            }
+          ]
+        },
+        {
+          "id": "S01.tea_no",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "tea_no",
+          "detail_label": "'Not now, Lazlo.'",
+          "room": "cabin",
+          "when": "flags.tea_made",
+          "text": "He nods as if he expected it and pours yours back into the pot, which is somehow worse.",
+          "effects": [
+            {
+              "set": "refused_tea"
+            }
+          ]
+        },
+        {
+          "id": "S01.kettle_on",
+          "verb": "use",
+          "object": "kettle",
+          "object_label": "the kettle",
+          "room": "cabin",
+          "when": "not flags.tea_made",
+          "once": true,
+          "text": "You light the spirit stove and set the kettle on it. Lazlo watches you do it, then gets up without a word and finds two cups.",
+          "effects": [
+            {
+              "set": "tea_made"
+            }
+          ]
         }
       ],
       "events": [
@@ -598,7 +726,15 @@
         {
           "id": "S01.nudge_lazlo",
           "after": 4,
-          "text": "Lazlo's voice comes up from the cabin: 'Are we selling this boat or haunting it? The line, Teodor.'"
+          "text": [
+            {
+              "text": "Lazlo looks up from the ledger. 'Are we selling this boat or haunting it? The line, Teodor.'",
+              "when": "at('cabin')"
+            },
+            {
+              "text": "Lazlo's voice comes up from the cabin: 'Are we selling this boat or haunting it? The line, Teodor.'"
+            }
+          ]
         },
         {
           "id": "S01.nudge_dawn",
@@ -612,6 +748,35 @@
           "when": "flags.cast_off",
           "kind": "default",
           "trigger": "you cast off"
+        }
+      ],
+      "moments": [
+        {
+          "id": "S01.ledger",
+          "options": [
+            "S01.price_fear",
+            "S01.mock_fear",
+            "S01.put_off"
+          ],
+          "required": true,
+          "neutral": "S01.put_off"
+        },
+        {
+          "id": "S01.tea",
+          "options": [
+            "S01.tea_yes",
+            "S01.tea_no"
+          ],
+          "required": false,
+          "lapse": {
+            "after": 3,
+            "text": "Lazlo drinks both cups of tea himself, slowly, watching the hatch.",
+            "effects": [
+              {
+                "set": "refused_tea"
+              }
+            ]
+          }
         }
       ]
     },
@@ -713,6 +878,20 @@
               "dir": "down"
             }
           ]
+        },
+        {
+          "id": "S02.hold_on",
+          "verb": "talk",
+          "object": "lake_kaur",
+          "detail": "nothing",
+          "detail_label": "nothing: you just hold on",
+          "when": "not flags.reported",
+          "text": "You open your mouth, find nothing in it, and hold on to the doorframe instead. The captain watches the gates come at you without a word. The boat bumps the lock wall, scrapes, and stops a yard short, as if it had meant to all along.",
+          "effects": [
+            {
+              "set": "reported"
+            }
+          ]
         }
       ],
       "events": [
@@ -734,6 +913,19 @@
           "to": "END_DEMO",
           "when": "flags.reported",
           "kind": "default"
+        }
+      ],
+      "moments": [
+        {
+          "id": "S02.what_you_say",
+          "options": [
+            "S02.report",
+            "S02.blame_boat",
+            "S02.jump",
+            "S02.hold_on"
+          ],
+          "required": true,
+          "neutral": "S02.hold_on"
         }
       ]
     }

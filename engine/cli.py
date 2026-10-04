@@ -44,7 +44,8 @@ def show_level(node, path, out):
         print('  ' + ' › '.join(path), file=out)
     for i, child in enumerate(node['children'], 1):
         more = '' if 'id' in child else ' …'
-        print(f'  {i}. {child["label"]}{more}', file=out)
+        mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
+        print(f'  {i}. {child["label"]}{more}{mark}', file=out)
 
 
 def history(engine, ask, out):

@@ -19,6 +19,8 @@ before anyone plays it.
     here('lazlo')                        that character is in the player's room
     in_scene('S04')                      the current scene
     visited('wheelhouse')                the room (or scene) has been entered before
+    seen('logbook')                      the player has encountered that person or thing
+    answered('S01.ledger')               that moment has been answered (or has lapsed)
     turns, turns_in_scene                actions taken, in total and in this scene
     d(20), chance(0.3)                   deterministic randomness (seeded per step)
 """
@@ -32,7 +34,7 @@ COMPARE = {ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.Gt: operator.gt, ast
 BINARY = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv,
           ast.FloorDiv: operator.floordiv, ast.Mod: operator.mod}
 NAMES = ('turns', 'turns_in_scene', 'True', 'False', 'true', 'false')
-FUNCTIONS = ('pattern', 'moved', 'has', 'at', 'here', 'in_scene', 'visited', 'd', 'chance')
+FUNCTIONS = ('pattern', 'moved', 'has', 'at', 'here', 'in_scene', 'visited', 'seen', 'answered', 'd', 'chance')
 NAMESPACES = ('flags', 'stats')
 
 
@@ -131,6 +133,10 @@ def _call(name, args, state, rng, text):
             return state.scene == args[0]
         if name == 'visited':
             return args[0] in state.visited
+        if name == 'seen':
+            return args[0] in state.seen
+        if name == 'answered':
+            return args[0] in state.used
         if name in ('d', 'chance'):
             rng = random.Random(f'{state.seed}|{text}')     # made only when asked: most conditions roll nothing
             return rng.randint(1, int(args[0])) if name == 'd' else rng.random() < float(args[0])
@@ -144,7 +150,8 @@ def references(text):
     'stats': set, 'states': set, 'objects': set, 'rooms': set, 'chars': set,
     'scenes': set}. Raises ExpressionError on anything the evaluator would
     refuse."""
-    refs = {k: set() for k in ('flags', 'stats', 'states', 'objects', 'rooms', 'chars', 'scenes', 'visited')}
+    refs = {k: set() for k in ('flags', 'stats', 'states', 'objects', 'rooms', 'chars', 'scenes', 'visited', 'seen',
+                               'moments')}
     tree = parse(text)
 
     def walk(node):
@@ -162,7 +169,7 @@ def references(text):
                 raise ExpressionError(f'unknown function in {text!r}')
             first = node.args[0].value if node.args and isinstance(node.args[0], ast.Constant) else None
             target = {'pattern': 'states', 'moved': 'states', 'has': 'objects', 'at': 'rooms', 'here': 'chars',
-                      'in_scene': 'scenes', 'visited': 'visited'}.get(node.func.id)
+                      'in_scene': 'scenes', 'visited': 'visited', 'seen': 'seen', 'answered': 'moments'}.get(node.func.id)
             if target and first is not None:
                 refs[target].add(first)
             if node.func.id == 'pattern':

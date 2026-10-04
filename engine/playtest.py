@@ -64,16 +64,51 @@ def expressions_in(data):
     return out
 
 
+def behavioural_flags(story):
+    """Flags read by conditions that change what can happen (what is offered,
+    what fires, where exits lead, what is visible, which ending variant
+    holds), as opposed to flags read only by text variants (a description
+    that changes, a fragment that appears). Only these need to be part of an
+    explored state."""
+    texts = []
+    for sc in story.scenes.values():
+        for key in ('interactions', 'events', 'nudges', 'exits'):
+            texts += [x.get('when', 'true') for x in sc.get(key) or []]
+    for ch in story.characters.values():
+        texts += [t.get('known_when', 'true') for t in (ch.get('topics') or {}).values()]
+    texts += [t.get('known_when', 'true') for t in (story.protagonist.get('think') or {}).values()]
+    for room in story.rooms.values():
+        texts += [x.get('when', 'true') for x in room.get('exits') or []]
+    texts += [o.get('when', 'true') for o in story.objects.values()]
+    for end in story.endings.values():
+        for group in ending_groups(end):
+            texts += [v.get('when', 'true') for v in group.get('variants') or [] if isinstance(v, dict)]
+    flags = set()
+    for t in texts:
+        for node in ast.walk(parse(t)):
+            if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id == 'flags':
+                flags.add(node.attr)
+    return flags
+
+
 def counter_caps(story):
     """For each counter, a value past which no condition can tell two values
     apart: one more than the largest constant it is compared with."""
     caps = {'turns': 0, 'turns_in_scene': 0}
     uses_visited = False
+    seen_subjects = set()
+    answered = set()
     for text in expressions_in(story.data):
         tree = parse(text)
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and getattr(node.func, 'id', None) == 'visited':
                 uses_visited = True
+            if isinstance(node, ast.Call) and getattr(node.func, 'id', None) == 'seen' and node.args \
+                    and isinstance(node.args[0], ast.Constant):
+                seen_subjects.add(node.args[0].value)
+            if isinstance(node, ast.Call) and getattr(node.func, 'id', None) == 'answered' and node.args \
+                    and isinstance(node.args[0], ast.Constant):
+                answered.add(node.args[0].value)
             if isinstance(node, ast.Compare):
                 sides = [node.left] + list(node.comparators)
                 names = [n.id for n in sides if isinstance(n, ast.Name) and n.id in caps]
@@ -83,13 +118,23 @@ def counter_caps(story):
                         caps[name] = max(caps[name], int(num) + 1)
     idle = {sid: max([n.get('after', 3) for n in sc.get('nudges') or []] or [0])
             for sid, sc in story.scenes.items()}
-    return caps, idle, uses_visited
+    lapses = {m['id']: (m.get('lapse') or {}).get('after', 4) if not m.get('required') else 0
+              for sc in story.scenes.values() for m in sc.get('moments') or []}
+    scoped = {}                     # scene -> ids that live and die with it (interactions, moments, events, nudges)
+    for sid, sc in story.scenes.items():
+        ids = {it['id'] for it in sc.get('interactions') or []}
+        ids |= {m['id'] for m in sc.get('moments') or []}
+        ids |= {e['id'] for e in list(sc.get('events') or []) + list(sc.get('nudges') or [])}
+        scoped[sid] = ids - answered
+    return caps, idle, uses_visited, seen_subjects, lapses, scoped
 
 
 class Normalizer:
     def __init__(self, story):
         self.story = story
-        self.caps, self.idle, self.uses_visited = counter_caps(story)
+        self.caps, self.idle, self.uses_visited, self.seen_subjects, self.lapses, self.scoped = counter_caps(story)
+        self.all_scoped = set().union(*self.scoped.values()) if self.scoped else set()
+        self.live_flags = behavioural_flags(story)
 
     def __call__(self, st):
         st.turns = min(st.turns, self.caps['turns'])
@@ -100,8 +145,16 @@ class Normalizer:
         else:
             st.idle = min(st.idle, self.idle.get(st.scene, 0))
         st.seed = SEED
+        st.actions = 0                        # nothing reads the action count
         if not self.uses_visited:
             st.visited = set()
+        st.seen = st.seen & self.seen_subjects     # only what some condition asks about
+        st.flags = {k: v for k, v in st.flags.items() if k in self.live_flags}
+        # another scene's interactions, moments and events can never be offered or fire again
+        stale = self.all_scoped - self.scoped.get(st.scene, set())
+        st.used -= stale
+        st.fired -= stale
+        st.moments = {m: min(n, self.lapses.get(m, 0)) for m, n in st.moments.items()}
         return st
 
     @staticmethod
@@ -151,6 +204,7 @@ def explore(story, max_states=50000):
     offered, taken, fired, scenes, exits_taken = set(), set(), set(), set(), set()
     endings = {}                               # ending -> {combo: state index}
     truncated = False
+    clipped = set()                            # states that lost a successor to the limit
     queue = deque([0])
     while queue:
         i = queue.popleft()
@@ -175,6 +229,7 @@ def explore(story, max_states=50000):
             if j is None:
                 if len(states) >= max_states:
                     truncated = True
+                    clipped.add(i)
                     continue
                 j = len(states)
                 index[k] = j
@@ -185,8 +240,8 @@ def explore(story, max_states=50000):
             out[i].append(j)
     # which states can still reach an ending (frontier states count as able, when truncated)
     can = set(i for i, st in enumerate(states) if st.ending)
-    if truncated:
-        can |= {i for i in range(len(states)) if not out[i] and not states[i].ending}
+    if truncated:     # unexplored or clipped: unknown, so never reported as stuck
+        can |= {i for i in range(len(states)) if (not out[i] and not states[i].ending) or i in clipped}
     back = [[] for _ in states]
     for i, js in enumerate(out):
         for j in js:
@@ -294,11 +349,14 @@ def chooser(story, style):
 
 
 def opportunities(story):
-    """Option ids that move an arc state: the choices the story is built on."""
+    """Option ids that move an arc state: the choices the story is built on.
+    Options grouped in a moment are measured by the moment (offered when any
+    of its options is), not one by one."""
     out = []
     for sc in story.scenes.values():
+        grouped = {o for m in sc.get('moments') or [] for o in m.get('options') or []}
         for it in sc.get('interactions') or []:
-            if any('move' in e for e in it.get('effects') or []):
+            if any('move' in e for e in it.get('effects') or []) and it['id'] not in grouped:
                 out.append(it['id'])
     for cid, ch in story.characters.items():
         for tid, topic in (ch.get('topics') or {}).items():
@@ -308,8 +366,11 @@ def opportunities(story):
 
 
 def optional_ids(story):
-    """Opportunities marked `optional`: discoveries a player may miss by design."""
+    """Opportunities a player may miss by design: marked `optional`, or in a
+    moment that lapses."""
     out = {it['id'] for sc in story.scenes.values() for it in sc.get('interactions') or [] if it.get('optional')}
+    out |= {o for sc in story.scenes.values() for m in sc.get('moments') or [] if not m.get('required')
+            for o in m.get('options') or []}
     out |= {f'talk:{cid}:{tid}' for cid, ch in story.characters.items()
             for tid, topic in (ch.get('topics') or {}).items() if topic.get('optional')}
     return out

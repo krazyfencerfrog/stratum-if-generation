@@ -343,7 +343,8 @@ def playtest_explores_the_demo():
     i = next(iter(result['endings']['END_DEMO'].values()))
     check(playtest.path_to(result, i), 'no walkthrough')
     curious = playtest.play(story, 'up', runs=40)
-    check(curious['opportunities_seen']['S01.price_fear'] == 1.0, f"the gated choice is missable: {curious['opportunities_seen']}")
+    check(set(curious['opportunities_seen']) == {'talk:lake_kaur:the_logbook'} and not curious['unfinished'],
+          f"choices in moments are measured by the moment, the rest one by one: {curious['opportunities_seen']}")
 
 
 @test
@@ -359,8 +360,9 @@ def playtest_finds_stuck_states_and_missed_choices():
     story = Story(data)
     errors, _ = playtest.explore_findings(story, playtest.explore(story))
     check(any(e.startswith('STUCK') and 'S02' in e and 'jump for it' in e for e in errors), f'stuck state missed: {errors}')
-    # an ungated way forward makes the ledger choice missable
+    # an ungated way forward makes the ledger choice missable (with its moment removed, nothing holds the scene)
     data = demo_data()
+    data['scenes']['S01']['moments'] = [m for m in data['scenes']['S01']['moments'] if m['id'] != 'S01.ledger']
     s1 = data['scenes']['S01']['interactions']
     next(i for i in s1 if i['id'] == 'S01.cast_off')['when'] = 'true'
     for it in s1:
@@ -388,12 +390,124 @@ def playtest_measures_pattern_shifts():
           f"styles: {[p['shift_rates'] for p in plays]}")
 
 
+# ---------------------------------------------------------------- moments, time, seen, think, weight
+
+@test
+def moments_gate_and_lapse():
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    play(eng, ['S01.try_untie', 'S01.untie_blocked'])
+    check(eng.state.scene == 'S01' and 'S01.ledger' in eng.state.moments, 'the required moment was not opened')
+    eng.state.flags['cast_off'] = True          # even with the exit's own condition true...
+    eng.act('look')
+    eng.act('examine:stern_line')
+    check(eng.state.scene == 'S01', 'a required moment did not hold the scene')
+    eng.state.flags['cast_off'] = False
+    eng.act('S01.put_off')
+    check('S01.price_fear' not in ids(eng) and 'S01.ledger' in eng.state.used, 'answering did not close the moment')
+    view = eng.act('S01.cast_off')
+    check(eng.state.scene == 'S02', 'the scene did not move on once the moment was answered')
+    # an optional moment lapses after its count, with its own effect
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    play(eng, ['go:cabin', 'S01.kettle_on'])
+    texts = []
+    for a in ['examine:kettle', 'examine:lazlo', 'examine:you']:
+        texts += eng.act(a)['text']
+    check(any('drinks both cups' in t for t in texts) and eng.state.flags.get('refused_tea'), f'no lapse: {texts}')
+    check('S01.tea_yes' not in ids(eng), 'a lapsed moment is still offered')
+    # an offered, unanswered optional moment lapses when the scene ends
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    play(eng, ['go:cabin', 'S01.kettle_on', 'talk:lazlo:the_ledger', 'S01.price_fear', 'go:stern_deck'])
+    view = eng.act('S01.cast_off')
+    check(eng.state.scene == 'S02' and 'S01.tea' in eng.state.used and eng.state.flags.get('refused_tea'),
+          'leaving the scene did not lapse the open tea moment')
+
+
+@test
+def time_passes_only_when_something_changes():
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    for a in ['examine:you', 'think:mira', 'examine:stern_line']:
+        eng.act(a)
+    check(eng.state.turns == 0 and eng.state.actions == 3, f'free actions took time: {eng.state.turns}')
+    eng.act('go:cabin')
+    check(eng.state.turns == 1, 'moving took no time')
+    eng.act('S01.kettle_on')
+    check(eng.state.turns == 2, 'an action that changed something took no time')
+    eng.act('wait')
+    check(eng.state.turns == 3, 'waiting took no time')
+    data = demo_data()
+    next(i for i in data['scenes']['S01']['interactions'] if i['id'] == 'S01.read_ledger')['takes_time'] = True
+    eng = Engine(Story(data))
+    eng.start(seed=1)
+    play(eng, ['go:cabin', 'talk:lazlo:the_ledger'])
+    before = eng.state.turns
+    eng.act('S01.read_ledger')
+    check(eng.state.turns == before + 1, 'takes_time did not override the computed rule')
+
+
+@test
+def seen_think_and_weight():
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    check('lazlo' not in eng.state.seen and 'think:the_captain' not in ids(eng), 'seen before met')
+    eng.act('go:wheelhouse')
+    check('lake_kaur' in eng.state.seen and 'think:the_captain' in ids(eng), 'meeting the captain did not unlock the thought')
+    check('logbook' not in eng.state.seen, 'a hidden object was seen')
+    eng.act('S01.open_drawer')
+    check('logbook' in eng.state.seen, 'an object that appeared was not seen')
+    play(eng, ['go:stern_deck', 'go:cabin'])
+    check('talk:lazlo:the_logbook' in ids(eng), 'a seen-gated conversation did not open')
+    check('wet to the knees' not in eng.act('examine:you')['text'][0].lower(), 'the wrong self-description')
+    data = demo_data()
+    next(i for i in data['scenes']['S01']['interactions'] if i['id'] == 'S01.cast_off')['weight'] = 'major'
+    eng = Engine(Story(data))
+    eng.start(seed=1)
+    play(eng, ['S01.try_untie', 'S01.put_off'])
+    leaf = [l for l in leaves_with(eng.menu()) if l.get('id') == 'S01.cast_off']
+    check(leaf and leaf[0].get('weight') == 'major', f'weight did not reach the menu: {leaf}')
+    out = io.StringIO()
+    cli.show_level(eng.menu(), [], out)
+    check('◆' not in out.getvalue(), 'the marker showed at the root for a nested choice')
+    untie = next(c for c in eng.menu()['children'] if c['label'] == 'Untie')
+    out = io.StringIO()
+    cli.show_level(untie, ['Untie'], out)
+    check('◆' in out.getvalue(), f'the terminal player did not mark the major choice:\n{out.getvalue()}')
+
+
+def leaves_with(tree):
+    if 'id' in tree:
+        yield tree
+        return
+    for c in tree['children']:
+        yield from leaves_with(c)
+
+
+@test
+def validator_checks_moments_and_the_rest():
+    def broken(mutate, expect):
+        data = demo_data()
+        mutate(data)
+        errors, _ = validate(Story(data))
+        check(any(expect in e for e in errors), f'expected an error containing {expect!r}, got {errors}')
+    broken(lambda d: d['scenes']['S01']['moments'][0].update(neutral='S01.cast_off'), 'neutral option')
+    broken(lambda d: d['scenes']['S01']['moments'][0]['options'].append('S01.nope'), "option 'S01.nope'")
+    broken(lambda d: d['scenes']['S01']['moments'][1].pop('lapse'), 'needs a lapse')
+    broken(lambda d: d['scenes']['S01']['moments'][0].update(lapse={'after': 3}), 'cannot lapse')
+    broken(lambda d: d['scenes']['S01']['interactions'][0].update(when="seen('ghost_ship')"), "seen() names")
+    broken(lambda d: d['scenes']['S01']['interactions'][0].update(when="answered('S09.x')"), 'unknown moment')
+    broken(lambda d: d['scenes']['S01']['interactions'][0].update(weight='huge'), 'weight must be')
+    broken(lambda d: d['protagonist']['think']['mira'].update(says=[]), 'think mira: says nothing')
+
+
 @test
 def terminal_player_runs_a_script():
     out = io.StringIO()
     eng = Engine(Story(demo_data()))
-    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Untie (-> 1 the stern line), 5 Wait
-    cli.play(eng, ['4', '1', 'q'], out=out)
+    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Think, 5 Untie (-> 1 the stern line), 6 Wait, 7 Inventory
+    cli.play(eng, ['5', '1', 'q'], out=out)
     text = out.getvalue()
     check('Before you do' in text and eng.state.placements['lazlo'] == 'stern_deck',
           f'scripted play failed:\n{text}')
