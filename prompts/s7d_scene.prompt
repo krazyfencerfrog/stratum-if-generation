@@ -16,7 +16,8 @@ What you write, naming rooms, people and things exactly as the packet does:
  - room_text: for any room that is different in this scene (water on the
    floor, a light left on), its text for this scene, as variants: by state
    (the tells due here: show the effect of the player's earlier choice in
-   what a person does or where they stand), or after a node, with a default.
+   what a person does or where they stand; give the direction, up or down,
+   since the two read differently), or after a node, with a default.
  - moments: one per OPPORTUNITY node. For each of its options, in the
    SAME ORDER, one engine action: a verb, an object, a detail, a menu
    label, the room (or null), and the text of what happens (two to four
@@ -43,7 +44,9 @@ What you write, naming rooms, people and things exactly as the packet does:
    player is, so it must not assume a room ("Dana's voice over the talkback"
    works anywhere in the station; "Dana looks up from the board" does not).
  - props: any small thing an action needs that the rooms do not list (a
-   cushion to jam into a crack), with its room.
+   cushion to jam into a crack), with its room. Something that is not a
+   thing at all (the water, the course, the dark) can be an action's object
+   as it is: the menu shows its words.
 
 Rules:
  - Verbs: prefer the core verbs (talk, use, give, show, take); add a story

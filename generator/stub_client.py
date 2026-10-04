@@ -954,7 +954,8 @@ class StubClient(LlmClient):
                 opts.append(dict(act(f"{n['id']}.n", 'no side'), neutral=True))
             moments.append({"node": n['id'], "options": opts, "lapse": {"after": 4, "text": "stub: the moment passes"}})
         actions = [act(f"rev.{n['id']}", 'find it out', reveals=[n['id']]) for n in pk.get('nodes') or [] if n.get('kind') == 'revelation']
-        actions += [act('chore', 'help with a chore'), act('drink', 'share a drink')]
+        actions += [act('chore', 'help with a chore'),
+                    act('salute', 'salute the water', verb='salute', object='the water', detail=None, label='the water')]
         actions += [act(f"go.{e['to']}", f"go on to {e['to']}", leads_to=e['to']) for e in pk.get('leaving') or []]
         return {"notes": "stub", "opening": f"stub: the scene {sid} begins", "start_room": rooms[0]['name'],
                 "placement": [{"who": x, "room": rooms[0]['name']} for x in people], "room_text": [],

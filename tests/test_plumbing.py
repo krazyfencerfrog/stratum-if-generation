@@ -559,6 +559,10 @@ def stage_b_builds_an_engine_world():
           f'compiled variants: {got} {problems}')
     world_stage.compile_variants([{'state': 'courage', 'direction': 'up', 'text': 'x'}], {'nerve'}, {}, problems, 'y')
     check(problems, 'an unknown state compiled')
+    got = world_stage.compile_variants([{'state': 'nerve', 'text': 'stirred'}, {'state': 'nerve', 'direction': 'down', 'text': 'shy'},
+                                        {'text': 'plain'}], {'nerve'}, {}, [], 'z')
+    check([v.get('when') for v in got] == ["pattern('nerve','down',1,0.6)", "moved('nerve')", None],
+          f'a variant with no direction: {got}')
 
     run('stageb', args=['--stage-b'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STUB_DUP_ROOM': '1'})
     result = load('stageb', 'world.json')
@@ -605,6 +609,8 @@ def stages_c_and_d_compile_a_playable_package():
     moments = [m for sc in package['scenes'].values() for m in sc.get('moments') or []]
     check(moments and all(m['options'] for m in moments), 'no moments compiled')
     check(any(m['required'] and m.get('neutral') for m in moments), 'no required moment with a neutral option')
+    free = [it for sc in package['scenes'].values() for it in sc['interactions'] if it.get('object_label') == 'the water']
+    check(free, 'an action on something that is not a thing (the water) did not compile as free text')
     moves = [e for sc in package['scenes'].values() for it in sc['interactions'] for e in it.get('effects') or [] if 'move' in e]
     check(moves, 'no option carries stage A\'s state moves')
     # it plays: a walk that takes the way on in every scene reaches an ending

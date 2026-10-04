@@ -70,8 +70,9 @@ def slug(text, taken=()):
 def compile_variants(variants, states, nodes, problems, where):
     """[{state, direction, after, text}] -> engine text variants, conditional
     ones first, the unconditional last. Unknown states or nodes are
-    problems."""
-    out, always = [], []
+    problems. A state with no direction means the state has moved at all
+    (moved()), after the variants that say which way."""
+    out, loose, always = [], [], []
     for v in as_list(variants):
         if not isinstance(v, dict) or not str(v.get('text') or '').strip():
             continue
@@ -83,10 +84,7 @@ def compile_variants(variants, states, nodes, problems, where):
             if st not in states:
                 problems.append(f'{where}: state {st!r} is not one of {sorted(states)}')
                 continue
-            if d not in ('up', 'down'):
-                problems.append(f'{where}: a variant on {st} needs direction up or down')
-                continue
-            parts.append(f"pattern('{st}','{d}',1,{VARIANT_SHARE})")
+            parts.append(f"pattern('{st}','{d}',1,{VARIANT_SHARE})" if d in ('up', 'down') else f"moved('{st}')")
         if after not in (None, '', 'null'):
             if after not in nodes:
                 problems.append(f'{where}: after {after!r} is not a node of the story')
@@ -95,10 +93,10 @@ def compile_variants(variants, states, nodes, problems, where):
         entry = {'text': str(v['text']).strip()}
         if parts:
             entry['when'] = ' and '.join(parts)
-            out.append(entry)
+            (loose if 'moved(' in entry['when'] else out).append(entry)
         else:
             always.append(entry)
-    return out + always[:1]
+    return out + loose + always[:1]
 
 
 def done_flags(world):

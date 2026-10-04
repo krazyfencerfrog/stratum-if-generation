@@ -269,16 +269,18 @@ class SceneCompiler:
                 problems.append(f'{where}: verb {a.get("verb")!r} is not a verb')
                 return None
             obj = self.resolve(a.get('object'), names, open_, props) if a.get('object') else None
-            if a.get('object') and not obj:
-                problems.append(f"{where}: object {a.get('object')!r} is not a person, room or thing in this world "
-                                f"(add it under props if it is a small thing the scene needs)")
-                return None
+            free = None
+            if a.get('object') and not obj:      # not a thing in the world ("salute the water"): the menu shows its words
+                free = str(a['object']).strip()
+                obj = slug(free) or 'it'
             room = open_names.get(norm(a.get('room'))) if a.get('room') else None
             if a.get('room') and not room:
                 problems.append(f"{where}: room {a.get('room')!r} is not open in this scene")
             it = {'id': iid, 'verb': verb, 'text': str(a.get('text') or '').strip()}
             if obj:
                 it['object'] = obj
+            if free:
+                it['object_label'] = free
             detail = a.get('detail')
             if detail:
                 d = self.resolve(detail, names, open_, props)
