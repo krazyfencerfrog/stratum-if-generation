@@ -512,8 +512,8 @@ def terminal_player_runs_a_script():
     check('Before you do' in text and eng.state.placements['lazlo'] == 'stern_deck',
           f'scripted play failed:\n{text}')
     out = io.StringIO()
-    cli.play(Engine(Story(demo_data())), ['3', 'b', 'x', 'r', 'q'], out=out)
-    check('pick a number' in out.getvalue() and 'nothing to rewind' in out.getvalue(), out.getvalue())
+    cli.play(Engine(Story(demo_data())), ['3', 'b', 'x', 'u', 'q'], out=out)
+    check("pick an option's key" in out.getvalue() and 'nothing to rewind' in out.getvalue(), out.getvalue())
     # history: go to the cabin (3 Go -> 2 cabin), ask about the ledger, then h and back to point 1
     out = io.StringIO()
     eng = Engine(Story(demo_data()))

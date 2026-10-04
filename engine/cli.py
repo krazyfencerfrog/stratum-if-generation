@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Play a story package in the terminal.
 
-The menu stands in for the radial UI: the root shows the verbs; pick a
-number to drill down to objects and details. Other keys: b back a level,
-r rewind one action, h history (what you did, and a way back to any point),
-s save, l load, q quit.
+The menu stands in for the radial UI: the root shows the verbs; one key
+press (1-9, then letters) drills down to objects and details. Keys that are
+always there: u unwind one action, h history (what you did, and a way back
+to any point), s save, l load, q quit; b (or backspace, esc) goes back a
+level. At a real terminal a key acts at once; piped input reads lines.
 
     python cli.py examples/kernel35_demo.json
     python cli.py story.json --check              # validate only
@@ -14,6 +15,7 @@ s save, l load, q quit.
 
 import argparse
 import os
+import select
 import sys
 import textwrap
 
@@ -21,6 +23,31 @@ from runtime import Engine, EngineError, SaveMismatch
 from story import Story, validate
 
 WIDTH = 78
+RESERVED = 'bhlqsu'
+KEYS = '123456789' + ''.join(c for c in 'abcdefghijklmnopqrstuvwxyz' if c not in RESERVED)
+BACK_KEYS = ('b', '\x7f', '\x08', '\x1b')
+
+
+def read_key(prompt, out):
+    """One key press from a terminal, without enter. Arrow keys and other
+    escape sequences are swallowed whole; a lone esc is esc."""
+    import termios
+    import tty
+    print(prompt, end='', flush=True, file=out)
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        key = os.read(fd, 1).decode(errors='ignore')
+        if key == '\x1b':
+            while select.select([fd], [], [], 0.03)[0]:
+                os.read(fd, 8)
+                key = ''                                    # an arrow or function key: no choice at all
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    shown = {'\x1b': 'esc', '\x7f': 'back', '\x08': 'back', '\n': '', '\r': ''}.get(key, key)
+    print(shown, file=out)
+    return key
 
 
 def wrap(text):
@@ -42,29 +69,34 @@ def show(view, out):
 def show_level(node, path, out):
     if path:
         print('  ' + ' › '.join(path), file=out)
-    for i, child in enumerate(node['children'], 1):
+    for key, child in zip(KEYS, node['children']):
         more = '' if 'id' in child else ' …'
         mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
-        print(f'  {i}. {child["label"]}{more}{mark}', file=out)
+        print(f'  {key}. {child["label"]}{more}{mark}', file=out)
+    print('  ' + ('[b] back  ' if path else '') + '[u] unwind  [h] history  [s] save  [l] load  [q] quit', file=out)
 
 
 def history(engine, ask, out):
     """List what has happened; offer to go back to any earlier point.
     Returns the new view if the player went back, else None."""
     entries = engine.history
+    keys = '0' + KEYS
+    start = max(0, len(entries) - len(keys))               # the most recent points, if there are more than keys
     print('\n  History:', file=out)
-    for i, h in enumerate(entries):
+    for key, i in zip(keys, range(start, len(entries))):
+        h = entries[i]
         first = next((t for t in h['text'] if t), '')
         gist = (first[:60] + '…') if len(first) > 60 else first
         here = '  <- you are here' if i == len(entries) - 1 else ''
-        print(f"  {i:>3}. {h['label']}{here}", file=out)
+        print(f"  {key}. {h['label']}{here}", file=out)
         if gist:
             print(f'       {gist}', file=out)
     if len(entries) < 2:
         return None
-    choice = ask('  go back to which point? (number, or enter to stay) ').strip()
-    if not choice.isdigit() or not 0 <= int(choice) < len(entries) - 1:
+    choice = ask('  go back to which point? (its key, or anything else to stay) ').strip().lower()
+    if not choice or choice not in keys or start + keys.index(choice) >= len(entries) - 1:
         return None
+    choice = str(start + keys.index(choice))
     index = int(choice)
     view = engine.rewind_to(index)
     print(f"\n(back to {index}: {entries[index]['label'] if index < len(entries) else ''})\n", file=out)
@@ -74,9 +106,12 @@ def history(engine, ask, out):
     return view
 
 
-def play(engine, picks=None, out=sys.stdout, save_path='stratum.save'):
-    """Run the loop. `picks` (a list of strings) replaces input when given."""
+def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None):
+    """Run the loop. `picks` (a list of strings) replaces input when given.
+    `keys`: one press per choice; by default, when stdin is a terminal."""
     feed = iter(picks) if picks is not None else None
+    if keys is None:
+        keys = feed is None and sys.stdin.isatty()
 
     def ask(prompt):
         if feed is not None:
@@ -87,8 +122,8 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save'):
             print(f'{prompt}{choice}', file=out)
             return choice
         try:
-            return input(prompt)
-        except EOFError:
+            return read_key(prompt, out) if keys else input(prompt)
+        except (EOFError, KeyboardInterrupt):
             return 'q'
 
     view = engine.start()
@@ -98,17 +133,18 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save'):
         while True:
             node, path = stack[-1]
             show_level(node, path, out)
-            choice = ask('> ').strip().lower()
+            raw = ask('> ')
+            choice = raw if raw in BACK_KEYS else raw.strip().lower()
             if choice == 'q':
                 return view
-            if choice == 'b':
+            if choice in BACK_KEYS:
                 if len(stack) > 1:
                     stack.pop()
                 continue
-            if choice == 'r':
+            if choice == 'u':
                 try:
                     view = engine.rewind()
-                    print('(rewound)\n', file=out)
+                    print('(unwound)\n', file=out)
                     show(view, out)
                 except EngineError as e:
                     print(f'({e})', file=out)
@@ -131,10 +167,12 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save'):
                 except (OSError, SaveMismatch) as e:
                     print(f'({e})', file=out)
                 break
-            if not choice.isdigit() or not 1 <= int(choice) <= len(node['children']):
-                print('  (pick a number, or b, r, h, s, l, q)', file=out)
+            if not choice:
                 continue
-            child = node['children'][int(choice) - 1]
+            if choice not in KEYS[:len(node['children'])]:
+                print('  (pick an option\'s key, or b, u, h, s, l, q)', file=out)
+                continue
+            child = node['children'][KEYS.index(choice)]
             if 'id' in child:
                 print(file=out)
                 view = engine.act(child['id'])
