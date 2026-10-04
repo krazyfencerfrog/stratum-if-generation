@@ -111,16 +111,13 @@ ground. Framework: Fichtean curve.
 Main line T1 "The Hill's Own": N01 opening_crisis (turn 1, way 1: the
 foreman's mother tells you his grandfather dug here for the last sponsor);
 N02 second_crisis (event 1; turn 2, way 1: the men dig the nephew out by
-hand, the student's arm is broken); N03 third_crisis (turn 3, way 1: the
-council gets the first viewing in writing; the agent stops the men's pay
-and the student signs his certificate anyway); N04 climax (event 2; turn 4,
+hand, the student's arm is broken); N03 third_crisis (turn 3, way 1: you walk the council up the hill to see the find in the ground; the agent stops the men's pay and the student goes to the station with him anyway); N04 climax (event 2; turn 4,
 way 1: the men lift the crate off the platform); N05 aftermath, the
 ending: the find in the village church, the sponsor gone for good, the
 student gone with him, the foreman beside you. World: answer pole_b;
 standing: the foreman; lost: the student. first_half: N01, N02.
 unused_ways: N02 turn 2 way 2 (the agent's crane, which cracks the lid);
-N03 turn 3 way 2 (the student certifies, the agent's crew lifts it, the
-foreman's men walk off), way 3 (you show them both the day book; it comes
+N03 turn 3 way 2 (the student leads the agent's crew down the trench and they lift it, the foreman's men walk off), way 3 (you show them both the day book; it comes
 up whole and the agent wires the sponsor that you are the thief); N04 turn
 4 way 2 (it goes on the train and the student rides with it).
 seeds_wanted: 3.
@@ -132,14 +129,14 @@ Output:
       "motivation": "The crane gets the nephew out in a minute and the agent has his photograph of the cracked lid. You come to want the dig finished at any price, because the find is already half his and the rain is not waiting.",
       "strategy": "Take the agent's money and his crew, keep the foreman's men on by paying them out of it, and get the find to the station before the council can organize.",
       "diverges_at": "N02", "trigger": "you let the agent swing his crane over the trench to get the nephew out", "trigger_kind": "act", "way": 2,
-      "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it to put her name on the catalogue. The foreman stays on the hill with his men paid and his nephew alive, and does not come to the station.", "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's, damaged; the village has seen nothing" },
+      "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come to the station.", "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's, damaged; the village has seen nothing" },
       "why_different": "T1 keeps the find and loses the student; this line loses the find and the student both and keeps the foreman only by his nephew's debt: the other answer, with the dig run by the agent from the second crisis on."
     },
     {
       "motivation": "You come to want the student's name on the record more than the village's claim, because she broke her arm in the trench for a find the foreman had been hiding from everyone, you included.",
-      "strategy": "Let her certify the find for export, let the agent's crew lift it, and answer the council at the station with the day book that shows what the foreman knew.",
-      "diverges_at": "N03", "trigger": "you let the student certify the find for export and the agent's crew lift it", "trigger_kind": "act", "way": 2,
-      "ending": { "title": "The Catalogue Entry", "summary": "The find goes on the train with the student's name on its certificate and yours beside it. The foreman and his men have walked off the hill, the council turns its back on you at the station, and the second burial is left open to the rain.", "answer": "pole_a", "standing": ["the student"], "lost": ["the foreman", "the foreman's mother"], "changed": "the upper burial is destroyed by the rain; the village will not have you back" },
+      "strategy": "Let her lead the agent's crew down the trench to lift it, and answer the council at the station with the day book that shows what the foreman knew.",
+      "diverges_at": "N03", "trigger": "you let the student lead the agent's crew down the trench to lift it", "trigger_kind": "act", "way": 2,
+      "ending": { "title": "Her Name on the Case", "summary": "The find goes on the train with the student beside it in the goods van, her name to go on its case. The foreman and his men have walked off the hill, the council turns its back on you at the station, and the second burial is left open to the rain.", "answer": "pole_a", "standing": ["the student"], "lost": ["the foreman", "the foreman's mother"], "changed": "the upper burial is destroyed by the rain; the village will not have you back" },
       "why_different": "Seed 1 loses the student and keeps the foreman; this line is the reverse, and the village is lost with him. T1 keeps the find; this does not."
     },
     {

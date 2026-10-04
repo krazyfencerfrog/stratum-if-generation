@@ -82,32 +82,32 @@ after. "reading" comes first.
 CALIBRATION EXAMPLES (shape and discipline; do not reuse their content)
 
 Example A: a nearly empty Kernel.
-Kernel: "I want a western."
-Brief (trimmed): 3b.tone [default]: laconic, dusty; 3-0c.failure_presence
+Kernel: "I want a samurai story."
+Brief (trimmed): 3b.tone [default]: restrained, severe; 3-0c.failure_presence
 [default]: soft, triggers incapacitation_or_death; 3f.setting_structure
 [default]: clustered, city_or_region.
 Output:
 {
-  "reading": "Someone asking for a western in three words wants the genre whole: a town that is barely a town, a stranger with a past, the law thin on the ground, and a reckoning in the open street. They want to feel outnumbered and unhurried at once.",
-  "genre": "western",
-  "player_fantasy": "To be the one person in a frightened town who will not look away, and to find out what that costs when the guns come out.",
+  "reading": "Someone asking for a samurai story in four words wants the genre whole: a masterless swordsman, a code that has outlived the world it was made for, people who need a sword they cannot pay for, and a duel decided in one stroke. They want long stillness that breaks all at once.",
+  "genre": "samurai drama",
+  "player_fantasy": "To be the one sword between the weak and the strong, and to find out whether the code you carry is worth what it asks of you.",
   "promises": [
-    {"what": "a town with one street, one saloon and one jail, where everyone knows who you are by the second day", "why": "the western's whole pressure is that there is nowhere else to go", "in_kernel": false},
-    {"what": "a man who owns the water or the cattle and therefore the town, and who does his own talking", "why": "the genre needs power with a face", "in_kernel": false},
-    {"what": "a horse, a long ride, and country that can kill you by itself", "why": "the land is a character; without it this is a bar fight", "in_kernel": false},
-    {"what": "a confrontation in the open street with the town watching from doorways", "why": "the reckoning the audience has waited the whole story for", "in_kernel": false},
-    {"what": "someone young who has decided to be like you, which you do not want", "why": "the genre's quiet cost: what the gun teaches", "in_kernel": false}
+    {"what": "a masterless swordsman with a past he will not speak of, and a sword he would rather not draw", "why": "the genre's hero is defined by what he refuses", "in_kernel": false},
+    {"what": "a lord's house that has the law on its side and nothing else, and a retainer who carries out its orders in person", "why": "the genre needs power with a face, and a code that power hides behind", "in_kernel": false},
+    {"what": "a village that cannot pay for protection and asks anyway", "why": "the obligation is the story", "in_kernel": false},
+    {"what": "rain, mud and one road through the mountains", "why": "the weather and the ground fight in every fight", "in_kernel": false},
+    {"what": "a duel decided in a single stroke after a long stillness", "why": "the reckoning the audience waits for; everything before it is the drawing of breath", "in_kernel": false}
   ],
   "set_pieces": [
-    {"scene": "a stagecoach stopped on a dry riverbed by men who already know your name", "where": "open country a day out of town"},
-    {"scene": "the saloon going silent, glass by glass, as the owner's men come in and sit down without ordering", "where": "the saloon"},
-    {"scene": "a cattle herd driven through the main street at night so that nobody can see who is being taken out of the jail", "where": "the town's one street"},
-    {"scene": "the street at noon: doors shutting one by one down both sides", "where": "the town's one street"}
+    {"scene": "a fight in the rain in a narrow street, the mud deciding as much as the swords", "where": "the post town's main street"},
+    {"scene": "a tea house going quiet as a stranger lays his swords on the floor beside him", "where": "the tea house"},
+    {"scene": "the lord's riders crossing the rice fields at dawn in a single line, banners up", "where": "the fields below the village"},
+    {"scene": "two swordsmen standing still in long grass until the wind drops", "where": "a hillside above the road"}
   ],
-  "tone_engine": "Laconic: people say less than they mean and the player learns to read the pause. Dusty: everything is thirsty, including the town's loyalty.",
+  "tone_engine": "Restrained: people bow and say little, and the player learns to read what a bow costs. Severe: every drawn sword ends something, and nobody draws one lightly.",
   "obligatory_cast": [
-    "a sheriff who has already decided whose side the badge is on",
-    "a saloon keeper who hears everything and sells it in both directions"
+    "a swordsman of the lord's house who was once your friend",
+    "an innkeeper who has outlived three lords and pours tea for all of them"
   ],
   "must_not": []
 }

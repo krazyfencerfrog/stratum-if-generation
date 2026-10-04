@@ -169,18 +169,12 @@ Framework: Fichtean curve. Nodes: N01 opening_crisis (turn 1, way 1: the
 foreman's mother tells you his grandfather dug here for the last sponsor);
 N02 second_crisis (event 1; turn 2, way 1: the men dig the nephew out by
 hand while you hold the lamp; the student's arm is broken); N03
-third_crisis (turn 3, way 1: the council gets the first viewing in
-writing; the agent stops the men's pay and the student signs his
-certificate anyway); N04 climax (event 2; turn 4, way 1: the men lift the
+third_crisis (turn 3, way 1: you walk the council up the hill to see the find in the ground; the agent stops the men's pay and the student goes to the station with him anyway); N04 climax (event 2; turn 4, way 1: the men lift the
 crate off the platform); N05 aftermath, the ending: the find in the
 village church, the student gone with the sponsor, the foreman beside you
 (answer pole_b; standing: the foreman; lost: the student). Turn 2's way 2
 is "the agent's crane gets the nephew out; its foot cracks the find's
-lid and the agent has his photograph". Turn 3's way 2 is "the student
-certifies the find for export and the agent's crew lifts it; the
-foreman's men walk off the hill and he goes with them". Turn 4's way 2 is
-"it goes on the train, because you sign the export form and the student
-rides with it".
+lid and the agent has his photograph". Turn 3's way 2 is "the student leads the agent's hired crew down the trench and they lift it; the foreman's men walk off the hill and he goes with them". Turn 4's way 2 is "it goes on the train, because you help the agent's crew nail down the crate's lid and the student rides with it".
 Seed: motivation "the find is already half his and the rain is not
 waiting; you come to want the dig finished at any price"; strategy "take
 the agent's money and his crew, keep the men on by paying them out of it,
@@ -208,12 +202,12 @@ Output:
     "opportunity": null,
     "shift": "The nephew is out alive in a minute, by the agent's machine, and the foreman's men have seen whose hand it was. The crane's foot has cracked the find's lid, the agent has his photograph, and from here the dig runs on his pay book."
   },
-  "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it to put her name on the catalogue. The foreman stays on the hill with his men paid and his nephew alive, and does not come down to the station.",
+  "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come down to the station.",
               "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's and damaged; the village never saw it" },
   "beats": [
-    { "beat": "third_crisis", "turn": 3, "way": 2, "event": null, "adapted": "The agent's hired crew is on the hill by morning and the foreman's men stand back from the trench until you tell them the agent's money is their pay. You let the student certify the find for export, in the arm sling, with the agent's pen; the men go down for the agent's wages, and the foreman watches you give the order and says nothing." },
-    { "beat": "climax", "turn": 4, "way": 2, "event": 2, "adapted": "The sponsor's crate is on the platform before the find is clean, and the council is on the road with the foreman's mother at the front. You sign the export form on the crate's lid and the student climbs into the goods van beside it; the foreman has not come down from the hill, and his mother turns back when she sees your name on the form." },
-    { "beat": "aftermath", "turn": null, "way": null, "event": null, "adapted": "The train is gone with the find and the student, and the agent's photograph of the cracked lid will be in the sponsor's catalogue before your report. The foreman's men are paid to the day; the village church has an empty table where the council meant to put the find, and nobody on the hill asks when you are leaving." }
+    { "beat": "third_crisis", "turn": 3, "way": 2, "event": null, "adapted": "The agent's hired crew is on the hill by morning and the foreman's men stand back from the trench until you tell them the agent's money is their pay. You let the student lead the agent's crew down the trench, her arm in its sling; the men go down for the agent's wages, and the foreman watches you give the order and says nothing." },
+    { "beat": "climax", "turn": 4, "way": 2, "event": 2, "adapted": "The sponsor's crate is on the platform before the find is clean, and the council is on the road with the foreman's mother at the front. You help the agent's crew nail down the crate's lid and the student climbs into the goods van beside it; the foreman has not come down from the hill, and his mother turns back when she sees your hands on the crate." },
+    { "beat": "aftermath", "turn": null, "way": null, "event": null, "adapted": "The train is gone with the find and the student, and the agent's photograph of the cracked lid will be on the sponsor's desk before you are. The foreman's men are paid to the day; the village church has an empty table where the council meant to put the find, and nobody on the hill asks when you are leaving." }
   ],
   "skipped_beats": [],
   "rejoins_at": null
