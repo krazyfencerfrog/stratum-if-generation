@@ -73,7 +73,7 @@ def show_level(node, path, out):
         more = '' if 'id' in child else ' …'
         mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
         print(f'  {key}. {child["label"]}{more}{mark}', file=out)
-    print('  ' + ('[b] back  ' if path else '') + '[u] unwind  [h] history  [s] save  [l] load  [q] quit', file=out)
+    print('  ' + ('[b] prev menu  ' if path else '') + '[u] unwind  [h] history  [s] save  [l] load  [q] quit', file=out)
 
 
 def history(engine, ask, out):
