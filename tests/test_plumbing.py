@@ -452,6 +452,20 @@ def stale_directories_fail_loudly():
 
 
 @test
+def verbal_tics_count_along_a_path():
+    import example_guard as eg
+    path = [('N01', 'The boat slips into the current while the lamps gutter.'),
+            ('N02', 'At dawn the boat slips into the current again, past the lock.'),
+            ('N03', 'You watch as the boat slips into the current a third time.'),
+            ('N04', 'The black name stone glows; the black name stone hums; Orla Dunmore watches the gate.')]
+    tics = eg.repeated_tics(path, ['N03'], exempt_texts=['the black name stone'], name_words=['Orla', 'Dunmore'])
+    check(any('slips into' in p and ids == ['N01', 'N02', 'N03'] for p, ids in tics), f'tics: {tics}')
+    check(not eg.repeated_tics(path, ['N04'], exempt_texts=['the black name stone'], name_words=['Orla', 'Dunmore']),
+          'a phrase not in a new node, or the story\'s own noun, counted')
+    check(not eg.repeated_tics(path[:2], ['N02']), 'two nodes made a tic')
+
+
+@test
 def stage_a_expands_arcs():
     import arcs
     # the threshold math: "3 of 4, three quarters" is met by random play 31% of the time (the design note)

@@ -1114,6 +1114,18 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4b_line_nodes.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
+            # verbal tics: a phrase in three or more summaries along this line, the path one player reads
+            new = {x['id']: x.get('summary') or '' for x in got}
+            path = [(nid, new.get(nid) or (self.nodes.get(nid) or {}).get('summary') or '') for nid in line['path']]
+            exempt = [self.gen.kernel or '', json.dumps(self.premise)] + [
+                f"{c.get('name') or ''} {c.get('label') or ''}" for c in self.characters.values()]
+            name_words = [w for c in self.characters.values() for k in ('name', 'label')
+                          for w in str(c.get(k) or '').split()]
+            tics = example_guard.repeated_tics(path, new_ids, exempt, name_words=name_words)
+            if tics:
+                raise SoftReject('these phrases would appear in three or more node summaries on this line, a verbal '
+                                 'tic the player notices: ' + '; '.join(f'"{p}" ({", ".join(ids)})' for p, ids in tics[:5])
+                                 + '. In the new nodes, show the moment in its own words, or something new happening')
 
         prefix = f's4b_i{n}' + (f'_p{part}' if part > 1 else '')
         return self.gen.run_prompt(prefix, 'line_nodes', {

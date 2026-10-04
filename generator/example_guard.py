@@ -138,3 +138,33 @@ def brief_echoes(output, brief, n=BRIEF_N):
             else:
                 i += 1
     return sorted(set(hits), key=lambda h: (-len(h), h))
+
+
+
+def repeated_tics(path_texts, new_ids, exempt_texts=(), min_nodes=3, name_words=()):
+    """Verbal tics along one path a player reads: phrases in at least
+    `min_nodes` of its node summaries, at least one of them new ("the boat
+    slips into the current" three times). path_texts is [(node id, summary)]
+    in path order. Phrases that occur in exempt_texts (the kernel, the
+    premise, the cast's names and labels: the story's own nouns, like "the
+    black name stone") do not count; nor does repetition across lines, which
+    no single player reads; nor do phrases with fewer than two content words
+    outside people's names ("Euphemia Thackeray watches the"). Returns
+    [(phrase, [node ids])], most repeated first."""
+    names = {w.lower().replace("'s", '') for w in name_words}
+    exempt = set()
+    for t in exempt_texts:
+        exempt |= ngrams(t)
+    where = {}
+    for nid, text in path_texts:
+        for g in ngrams(text.replace("'s ", ' ')):
+            where.setdefault(g, []).append(nid)
+    out = []
+    for g, ids in where.items():
+        ids = sorted(set(ids))
+        if sum(1 for w in g if content(w) and w not in names) < 2:
+            continue
+        if len(ids) >= min_nodes and set(ids) & set(new_ids) and g not in exempt:
+            out.append((' '.join(g), ids))
+    out.sort(key=lambda x: -len(x[1]))
+    return out

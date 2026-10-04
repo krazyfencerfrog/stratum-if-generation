@@ -597,7 +597,7 @@ class StubClient(LlmClient):
                 who = [labels[(i + it) % len(labels)]]
             if sloppy:
                 who = [re.sub(r'^the ', '', w) for w in who]
-            nodes.append({"id": n['id'], "title": f"stub {n['id']}", "summary": f"stub summary: {n.get('plan', '')}",
+            nodes.append({"id": n['id'], "title": f"stub {n['id']}", "summary": f"{n['id']}: " + str(n.get('plan', '')).replace('stub: ', '').replace(' in this story', ''),
                           "image": f"stub image for {n['id']}: a gauge needle resting on red",
                           "where": [place[0].upper() if sloppy else place[0]], "who": who})
         if extra and nodes:
