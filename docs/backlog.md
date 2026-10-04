@@ -106,16 +106,6 @@ consumes and produces, what the outline must carry for them (the node
 `image` and cast `voice` are early hooks), how it maps onto the stratum-if
 engine (rooms, objects, characters with topics).
 
-### Kernel audit [solo + you]
-- Which of the 35 kernels are weak or redundant as tests (Fable named 9,
-  21, 22, 23, 24 as weak outline tests).
-- Gaps: horror with real danger, a heist with a crew, a mystery with a
-  real crime, slice of life, settings that use the new name pools (Rome,
-  feudal Japan, the frontier, Regency).
-- Settle the evaluation set (`tests/kernels/EVAL_SET.txt`) and a baseline.
-- Hand-written target outlines for a few kernels, like
-  `docs/kernel1_target_outline.md`, as the reference for "great".
-
 ### Prompt size [solo, then GPU]
 3.5a, 3.5b, 4a and 4c carry 26-40 KB. Find text that changes nothing
 (redundant rules, oversized examples) and cut it: a smaller input leaves
@@ -142,6 +132,10 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   a kill.
 
 ## Done
+- 2026-10-04: kernel audit: retired 9, 18, 23 (duplicates); added 36 horror with a
+  group, 37 crew heist, 38 Victorian murder, 39 ancient Rome, 40 frontier West;
+  evaluation split into EVAL_SET (9, two nights) and EVAL_QUICK (4, one night).
+  Still open from the audit: hand-written target outlines for a few kernels.
 - 2026-10-04: stage A design (later_stages.md §2), worked example for
   kernel35, protagonist fields and naming.
 - 2026-10-04: name generator, 20 pools, per-culture styles, races, stated

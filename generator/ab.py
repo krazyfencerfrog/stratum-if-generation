@@ -59,6 +59,9 @@ def eval_set():
 def kernel_list(spec):
     if spec in ('eval', 'EVAL_SET'):
         return eval_set()
+    if spec in ('quick', 'EVAL_QUICK'):
+        with open(os.path.join(KERNELS, 'EVAL_QUICK.txt'), encoding='utf-8') as f:
+            return f.read().split()
     return [k.strip() for k in spec.split(',') if k.strip()]
 
 
@@ -177,7 +180,7 @@ def main():
     for name in ('prepare', 'run'):
         p = sub.add_parser(name)
         p.add_argument('--variant', required=True, help='a short name; the story id becomes <kernel>_<variant>')
-        p.add_argument('--kernels', required=True, help='comma-separated kernel ids, or "eval" for tests/kernels/EVAL_SET.txt')
+        p.add_argument('--kernels', required=True, help='comma-separated kernel ids, "eval" (tests/kernels/EVAL_SET.txt, the full set) or "quick" (EVAL_QUICK.txt)')
         p.add_argument('--source-dir', default='', help='take phase 3 from this directory instead of stories/<kernel>')
         p.add_argument('--fresh', action='store_true', help='delete an existing variant directory first')
         p.add_argument('flags', nargs=argparse.REMAINDER, help='after --: flags for main.py')

@@ -40,7 +40,8 @@ GENRE_WORDS = {
         'regency': r'regency|ballrooms?|debutantes?|the ton|almack\w*|dukes?|duchess\w*|earls?|viscounts?|marquess\w*',
         'victorian': r'victorian|edwardian|gaslight|hansom|steampunk|1[89][0-9]0s|nineteenth century',
         'western': r'wild west|western|cowboys?|frontier|sheriffs?|outlaws?|saloons?|ranch\w*|gunslingers?|'
-                   r'stagecoach\w*|homestead\w*',
+                   r'stagecoach\w*|homestead\w*|cattle\w*|railroads?|wyoming|montana|dakota|texas|arizona|nevada|'
+                   r'ranchers?|rustl\w*|posse',
         'age_of_sail': r'pirates?|galleons?|royal navy|buccaneers?|privateers?|frigates?|age of sail|corsairs?',
         'medieval': r'medieval|monaster\w*|abbey|plague|feudal|crusades?|serfs?|barons?|child king|regents?|'
                     r'courtiers?|court intrigue|thrones?|usurp\w*|coronation',
@@ -54,7 +55,7 @@ GENRE_WORDS = {
         'romance': r'romance|romantic|love story|in love|lovers?|rom-?com|meet-cute|courtship|dating|'
                    r'enemies to lovers|second chance',
         'adventure': r'action|adventures?|treasure|heists?|jungle|expeditions?|mercenar\w*|explorers?|'
-                     r'archaeolog\w*|spies|spy|thriller|smugglers?|chase',
+                     r'archaeolog\w*|spies|spy|thriller|smugglers?|chase|casinos?|vaults?|safecrack\w*',
     }.items()
 }
 PRIORITY = list(GENRE_WORDS) + ['modern']
