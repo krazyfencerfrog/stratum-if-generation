@@ -168,3 +168,31 @@ def repeated_tics(path_texts, new_ids, exempt_texts=(), min_nodes=3, name_words=
             out.append((' '.join(g), ids))
     out.sort(key=lambda x: -len(x[1]))
     return out
+
+
+def described_voices(summaries, cast):
+    """Node summaries that narrate a person with their cast sketch's own
+    description of how they talk or what their edge is ("Ivo begins a bargain
+    in quick practical fragments"): the sketch is direction for the writer,
+    not text for the story. The quoted sample line is left out (a person may
+    say their line). summaries maps node id to text. Returns
+    [(node id, person, phrase)]."""
+    import re
+    quoted = re.compile("['\"\u2018\u2019\u201c\u201d][^'\"\u2018\u2019\u201c\u201d]{8,}['\"\u2018\u2019\u201c\u201d]")
+    sketches = []
+    for c in cast:
+        who = c.get('name') or c.get('label') or ''
+        for k in ('voice', 'edge'):
+            grams = ngrams(quoted.sub(' ', str(c.get(k) or '')))
+            if grams:
+                sketches.append((who, grams))
+    out = []
+    for nid, text in summaries.items():
+        g = ngrams(text)
+        for who, grams in sketches:
+            common = g & grams
+            if common:
+                out.append((nid, who, ' '.join(sorted(common)[0])))
+                break
+    return out
+

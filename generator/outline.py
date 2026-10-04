@@ -1122,10 +1122,19 @@ class OutlineBuilder:
             name_words = [w for c in self.characters.values() for k in ('name', 'label')
                           for w in str(c.get(k) or '').split()]
             tics = example_guard.repeated_tics(path, new_ids, exempt, name_words=name_words)
+            voices = example_guard.described_voices(new, self.characters.values())
+            complaints = []
             if tics:
-                raise SoftReject('these phrases would appear in three or more node summaries on this line, a verbal '
-                                 'tic the player notices: ' + '; '.join(f'"{p}" ({", ".join(ids)})' for p, ids in tics[:5])
-                                 + '. In the new nodes, show the moment in its own words, or something new happening')
+                complaints.append('these phrases would appear in three or more node summaries on this line, a verbal '
+                                  'tic the player notices: ' + '; '.join(f'"{p}" ({", ".join(ids)})' for p, ids in tics[:5])
+                                  + '. In the new nodes, show the moment in its own words, or something new happening')
+            if voices:
+                complaints.append('these summaries narrate a person with their cast sketch\'s description, which is '
+                                  'direction for the writer, not story text: ' + '; '.join(
+                                      f'{nid}: {who}, "{p}"' for nid, who, p in voices[:5])
+                                  + '. Show it in what they say or do')
+            if complaints:
+                raise SoftReject(' Also, '.join(complaints))
 
         prefix = f's4b_i{n}' + (f'_p{part}' if part > 1 else '')
         return self.gen.run_prompt(prefix, 'line_nodes', {

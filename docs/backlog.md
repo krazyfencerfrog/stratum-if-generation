@@ -105,7 +105,9 @@ Plan:
 ### Known weak spots from the runs [solo, then GPU]
 - node summaries run long: 76-99 words against the 45-75 target;
 - a cast member's voice description leaks into summaries ("commuter" in
-  kernel32): the brief-echo treatment could cover voices;
+  kernel32): DONE 2026-10-04 for phrases (4 of 265 saved summaries, e.g.
+  "in quick practical fragments"), folded into 4b's soft check; single words
+  like "commuter" are not caught;
 - `ending.lost` lists things as well as people (now ignored when comparing
   worlds, but the field drifts);
 - no accumulated triggers in any run yet;

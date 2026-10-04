@@ -471,6 +471,10 @@ def verbal_tics_count_along_a_path():
     check(not eg.repeated_tics(path, ['N04'], exempt_texts=['the black name stone'], name_words=['Orla', 'Dunmore']),
           'a phrase not in a new node, or the story\'s own noun, counted')
     check(not eg.repeated_tics(path[:2], ['N02']), 'two nodes made a tic')
+    cast = [{'name': 'Ivo Gutierrez', 'voice': "talks in quick, practical fragments: 'The line is frayed and I am cold.'"}]
+    leaks = eg.described_voices({'N04': 'Ivo begins a bargain in quick practical fragments.',
+                                 'N05': 'Ivo says the line is frayed and he is cold.'}, cast)
+    check([x[0] for x in leaks] == ['N04'], f'voice leaks: {leaks}')
 
 
 @test
