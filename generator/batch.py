@@ -11,6 +11,7 @@ saved files (the pipeline replays what is on disk).
 
     cd generator
     python batch.py add  kernel38                      # stories/kernel38 from tests/kernels/kernel38.txt
+    python batch.py add  reference/ref_canterville     # stories/ref_canterville from tests/kernels/reference/
     python batch.py add  kernel35 --variant b3 -- --branching=judge   # replay 3.4 on from stories/kernel35's phase 3
     python batch.py add  --set quick --variant plan                   # every kernel in EVAL_QUICK.txt
     python batch.py run                                # until the queue is empty (--wait: keep polling)
@@ -91,7 +92,8 @@ def make_job(kernel, variant=None, flags=(), story_id=None):
     """A job runs the pipeline for one story. With a variant it replays 3.4 on
     from stories/<kernel>'s phase-3 files into stories/<kernel>_<variant>
     (the same as ab.py run); without, it runs the whole pipeline."""
-    sid = story_id or (f'{kernel}_{variant}' if variant else kernel)
+    base = os.path.basename(kernel)      # 'reference/ref_canterville' -> ref_canterville
+    sid = story_id or (f'{base}_{variant}' if variant else base)
     return {'story_id': sid, 'kernel': kernel, 'variant': variant, 'flags': list(flags),
             'status': 'queued', 'attempts': 0, 'added': time.strftime('%Y-%m-%d %H:%M'),
             'started': None, 'ended': None, 'minutes': None, 'exit': None, 'error': None}

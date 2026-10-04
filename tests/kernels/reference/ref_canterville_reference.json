@@ -1,0 +1,182 @@
+{
+ "story_id": "ref_canterville",
+ "stage": "reference",
+ "source": "human, public domain",
+ "kernel": "A comic ghost story. Your family, brash and modern and from the New World, buys an old English country house that comes with a ghost who has been haunting it for three hundred years and takes the job very seriously. Your family refuses to be frightened. I want it to be very funny, and then, at the end, genuinely moving.",
+ "premise": {
+  "mediation": {
+   "question": "Can a family that refuses to be frightened give a ghost what he actually needs?"
+  }
+ },
+ "line_order": [
+  "T1"
+ ],
+ "lines": {
+  "T1": {
+   "id": "T1",
+   "title": "Love Is Stronger Than Death",
+   "motivation": "You start out amused by the ghost like everyone else in your family; you end up the only one who asks what he wants, and you go where nobody living has gone to give it to him.",
+   "ending": {
+    "title": "The Almond Blossoms",
+    "summary": "Sir Simon is buried at last under the almond tree that bloomed when you prayed for him; the house is quiet, his jewels are yours, and you keep what you learned in the Garden of Death to yourself.",
+    "standing": [
+     "Sir Simon de Canterville",
+     "the Duke of Cheshire"
+    ],
+    "lost": [],
+    "changed": "the ghost sleeps; the house is still; you have seen what death signifies",
+    "node": "N08"
+   },
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08"
+   ]
+  }
+ },
+ "node_order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08"
+ ],
+ "nodes": {
+  "N01": {
+   "id": "N01",
+   "beat": "setup",
+   "title": "The Stain by the Fireplace",
+   "summary": "Your father buys Canterville Chase ghost and all, laughing at the warnings. In the library the housekeeper shows you the blood of Lady Eleanore, murdered in 1575; your brother scrubs it away with Pinkerton's Champion Stain Remover while thunder shakes the windows and the housekeeper faints.",
+   "image": "a bottle of Pinkerton's stain remover on the hearth, thunder over the park",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N02": {
+   "id": "N02",
+   "beat": "inciting_incident",
+   "title": "Oil Your Chains",
+   "summary": "At one in the morning the ghost clanks down the corridor in rusty fetters, eyes like burning coals. Your father, in slippers, asks him to oil his chains and leaves him a bottle of Tammany Rising Sun Lubricator; the twins pelt him with pillows. Three centuries of terror, and nobody screams.",
+   "image": "a small bottle of lubricator on the landing in the moonlight",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N03": {
+   "id": "N03",
+   "beat": "rising",
+   "title": "The Stain Comes Back",
+   "summary": "Every morning the stain is back, and every morning a new colour: dull red, then vermilion, then emerald green. Your family bets on the colour at breakfast. Only you will not join in; it upsets you, and on the morning it turns green you nearly cry.",
+   "image": "an emerald-green bloodstain on the library floor",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N04": {
+   "id": "N04",
+   "beat": "rising",
+   "title": "Ye Otis Ghoste",
+   "summary": "The ghost plans his greatest night. Turning a corner he meets a horror with a glowing turnip head and a placard, and flees shaking. By daylight he finds a bed-curtain, a broom and a hollow turnip, the twins' work: YE OTIS GHOSTE, Beware of Ye Imitationes.",
+   "image": "a hollow turnip with a candle inside, a placard pinned to a bed-curtain",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N05": {
+   "id": "N05",
+   "beat": "midpoint",
+   "title": "Boo",
+   "summary": "Butter slides, trip-wires and water jugs over doors: the twins hunt him nightly until he dares only his duty walks. Dressed as Jonas the Graveless he is ambushed with a shout of BOO and escapes up the chimney, broken. The family decides he has gone, and the young Duke of Cheshire comes to stay.",
+   "image": "soot falling from a cold chimney",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N06": {
+   "id": "N06",
+   "beat": "crisis",
+   "title": "Poor, Poor Ghost",
+   "summary": "Coming in with your riding habit torn, you find the ghost alone at a window of the Tapestry Chamber. You scold him for the stain and for the paints he stole from your box, and then you ask why he cannot sleep. Three hundred years awake, he says, and a garden where he could rest.",
+   "image": "the ghost at the window, your torn riding habit",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N07": {
+   "id": "N07",
+   "beat": "climax",
+   "title": "The Golden Girl",
+   "summary": "He shows you the old verse on the library window: when a golden girl can win prayer from the lips of sin, and the barren almond bears, peace will come to Canterville. You must weep for his sins, pray for his soul, and face what waits in the dark. You give him your hand, and the wall opens.",
+   "image": "the prophecy in old letters on the library window; a wall fading like mist",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N08": {
+   "id": "N08",
+   "beat": "resolution",
+   "title": "The Almond Blossoms",
+   "summary": "At midnight you come back down the stairs with a casket of jewels and lead your frightened family to a hidden room: a skeleton chained to the wall, reaching for an empty trencher. You kneel and pray. Through the window the twins see the old almond tree in blossom under the moon.",
+   "image": "a withered almond tree in blossom under the moon",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": true
+  }
+ },
+ "characters": {
+  "C01": {
+   "label": "the Canterville ghost",
+   "name": "Sir Simon de Canterville",
+   "opposition": true,
+   "wants": "to terrify the new owners as he has everyone for three centuries; underneath, to sleep",
+   "edge": "a vain old actor who rehearses his roles and is wounded by bad reviews",
+   "voice": "archaic and grandiloquent, wounded pride in every line",
+   "breaking_point": "gives up haunting when the twins make him a joke",
+   "id": "C01",
+   "kind": "individual"
+  },
+  "C02": {
+   "label": "your father, the American Minister",
+   "name": "Hiram B. Otis",
+   "wants": "a fine house and no nonsense",
+   "edge": "meets every supernatural terror with a practical product",
+   "voice": "courteous, commercial, unshakeable: \"I really must insist on your oiling those chains\"",
+   "id": "C02",
+   "kind": "individual"
+  },
+  "C03": {
+   "label": "the twins",
+   "name": "the Stars and Stripes",
+   "wants": "fun",
+   "edge": "relentless pranksters, the ghost's real opposition",
+   "voice": "a shout of BOO from the dark",
+   "id": "C03",
+   "kind": "individual"
+  },
+  "C04": {
+   "label": "the young Duke of Cheshire",
+   "name": "Cecil",
+   "wants": "to marry you",
+   "edge": "a boy in love, honest and patient",
+   "voice": "shy and earnest",
+   "id": "C04",
+   "kind": "individual"
+  }
+ }
+}
