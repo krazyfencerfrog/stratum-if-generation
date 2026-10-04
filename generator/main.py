@@ -752,6 +752,11 @@ class StoryGenerator:
             parsed['complications'] = []
         if problems:
             raise ValueError('; '.join(problems))
+        plotty = sorted({r for t in turns for r in t['involves'] if FUNCTION_ROLE.search(r)})
+        if plotty:
+            raise SoftReject(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
+                             f'Name each by what a reader would see or be told: an occupation, a relation, a '
+                             f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
 
     def with_echo_check(self, validator, keys):
         """Wraps a construction validator with the brief-echo check: a
@@ -796,6 +801,11 @@ class StoryGenerator:
                         problems.append(f'crowd "{s["role"]}" has no individual seed whose speaks_for names it')
             if problems:
                 raise ValueError('; '.join(problems))
+            plotty = [s['role'] for s in seeds if norm(s['role']) not in wanted and FUNCTION_ROLE.search(str(s['role']))]
+            if plotty:
+                raise SoftReject(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
+                                 f'Name each by what a reader would see or be told: an occupation, a relation, a '
+                                 f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
         return validate
 
     @staticmethod
@@ -1469,6 +1479,10 @@ class StoryGenerator:
         for f in found:
             print(f'  - {f}')
         return result
+
+
+# a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
+FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
 
 
 def as_bool(value, default=False):

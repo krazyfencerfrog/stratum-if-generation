@@ -108,6 +108,12 @@ Plan:
   lost, Y stands"; kernel34) and repeated motifs ("folded" list, oath, copy);
 - procedure standing in for drama (kernel34's stakes run through seating
   charts and oath wording).
+- DONE 2026-10-04: verbal tics along one line soft-rejected at 4b (d79e9aa;
+  repetition across alternative lines is left alone, since no player reads
+  them together, though the outline judge does and complains: kernel38's
+  "spreads the signed debt on the table" sits two to a line); roles written
+  as plot functions ("the guest whose secret is easiest to hear", invented
+  by 3.5c from 3.5a's pole text) soft-rejected at 3.5b and 3.5c.
 
 ## Next
 
