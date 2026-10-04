@@ -577,6 +577,42 @@ def stage_b_builds_an_engine_world():
 
 
 @test
+def stages_c_and_d_compile_a_playable_package():
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    from runtime import Engine
+    run('staged', args=['--stage-d'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
+    package = load('staged', 'package.json')
+    story = EngineStory(package)
+    errors, _ = engine_validate(story)
+    check(not errors, f'the compiled package does not validate: {errors[:5]}')
+    outline = load('staged', 'story.json')
+    check(len(package['scenes']) == len(outline['nodes']), 'a scene per major node')
+    check(set(package['endings']) == {f"E_{outline['lines'][l]['path'][-1]}" for l in outline['line_order']},
+          f"endings: {sorted(package['endings'])}")
+    moments = [m for sc in package['scenes'].values() for m in sc.get('moments') or []]
+    check(moments and all(m['options'] for m in moments), 'no moments compiled')
+    check(any(m['required'] and m.get('neutral') for m in moments), 'no required moment with a neutral option')
+    moves = [e for sc in package['scenes'].values() for it in sc['interactions'] for e in it.get('effects') or [] if 'move' in e]
+    check(moves, 'no option carries stage A\'s state moves')
+    # it plays: a walk that takes the way on in every scene reaches an ending
+    eng = Engine(story)
+    eng.start(seed=1)
+    for _ in range(300):
+        if eng.state.ending:
+            break
+        opts = eng.options()
+        pick = next((o for o in opts if o['source'] and o['source'][0] == 'interaction' and any(
+            m.get('required') and o['id'] in m['options'] for m in eng.moments())), None)
+        pick = pick or next((o for o in opts if o['source'] and o['source'][0] == 'interaction'
+                             and any('go_' in str(e) for e in o['source'][1].get('effects') or [])), None)
+        pick = pick or next(o for o in opts if o['verb'] == 'wait')
+        eng.act(pick['id'])
+    check(eng.state.ending, f'the package did not play to an ending (stuck in {eng.state.scene})')
+    check(load('staged', 'package.md').startswith('# '), 'no package report')
+
+
+@test
 def every_prompt_is_exercised():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt'))}
     unused = have - used_prompts

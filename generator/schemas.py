@@ -234,11 +234,27 @@ WORLD_YOU = obj(
     think=arr(obj(label=S, known_after=STR_OR_NULL, says=arr(VARIANT))),
 )
 
+# ---------------------------------------------------------------- stage D (compile_scenes.py)
+
+SCENE_ACTION = obj(required=['verb', 'object', 'detail', 'label', 'room', 'text'],
+                   verb=S, object=STR_OR_NULL, detail=STR_OR_NULL, label=S, room=STR_OR_NULL, text=S,
+                   neutral=B, reveals=arr(S), leads_to=STR_OR_NULL, once=B)
+SCENE = obj(
+    notes=S, opening=S, start_room=S,
+    placement=arr(obj(who=S, room=S)),
+    room_text=arr(obj(room=S, variants=arr(VARIANT))),
+    moments=arr(obj(required=['node', 'options'], node=S, options=arr(SCENE_ACTION), lapse=obj(after=I, text=S))),
+    actions=arr(SCENE_ACTION),
+    events=arr(obj(required=['text'], text=S, after_turns=INT_OR_NULL, after=STR_OR_NULL)),
+    nudges=arr(obj(after=I, text=S)),
+    props=arr(obj(name=S, room=S, description=S, portable=B)),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
     'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
     'OUTLINE_JUDGE': OUTLINE_JUDGE, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
-    'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU,
+    'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
 }

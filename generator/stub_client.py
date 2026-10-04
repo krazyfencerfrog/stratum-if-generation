@@ -176,6 +176,7 @@ class StubClient(LlmClient):
             ('You are step 6b2m of', 's6b2m'),
             ('You are step 6b2 of', 's6b2'),
             ('You are step 6b3 of', 's6b3'),
+            ('You are step 7d of', 's7d'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -924,4 +925,37 @@ class StubClient(LlmClient):
                 "carrying": [{"name": "a keepsake", "description": "stub: it was hers"}],
                 "think": [{"label": label, "known_after": None, "says": [self.v(f"stub: what you think about {label}")]}
                           for label in ("your history", "the person you owe", "what you need")]}
+
+    # ------------------------------------------------------------------ stage D
+
+    def p_s7d(self, p):
+        pk = self.section(p, 'THIS SCENE (') or {}
+        rooms = pk.get('rooms') or [{'name': 'nowhere', 'objects': []}]
+        things = [o for r in rooms for o in r.get('objects') or []]
+        people = [x['name'] for x in pk.get('people') or []]
+        sid = (pk.get('scene') or {}).get('id', 'S')
+
+        def act(k, text, **extra):
+            base = ({"verb": "talk", "object": people[0]} if people else {"verb": "use", "object": things[0] if things else None})
+            line = f"'{text} ({sid} {k})'"
+            out = dict(base, detail=line, label=line, room=None, text=f"stub: {text}", neutral=False, reveals=[],
+                       leads_to=None, once=False)
+            out.update(extra)
+            return out
+        moments = []
+        for n in pk.get('nodes') or []:
+            if n.get('kind') != 'opportunity':
+                continue
+            opts = [act(f"{n['id']}.{o['n']}", f"option {o['n']}") for o in n.get('options') or []]
+            if n.get('required'):
+                opts.append(dict(act(f"{n['id']}.n", 'no side'), neutral=True))
+            moments.append({"node": n['id'], "options": opts, "lapse": {"after": 4, "text": "stub: the moment passes"}})
+        actions = [act(f"rev.{n['id']}", 'find it out', reveals=[n['id']]) for n in pk.get('nodes') or [] if n.get('kind') == 'revelation']
+        actions += [act('chore', 'help with a chore'), act('drink', 'share a drink')]
+        actions += [act(f"go.{e['to']}", f"go on to {e['to']}", leads_to=e['to']) for e in pk.get('leaving') or []]
+        return {"notes": "stub", "opening": f"stub: the scene {sid} begins", "start_room": rooms[0]['name'],
+                "placement": [{"who": x, "room": rooms[0]['name']} for x in people], "room_text": [],
+                "moments": moments, "actions": actions,
+                "events": [{"text": "stub: something happens on its own", "after_turns": 2, "after": None}],
+                "nudges": [{"after": 4, "text": "stub: a voice from somewhere asks what you are waiting for"}], "props": []}
 

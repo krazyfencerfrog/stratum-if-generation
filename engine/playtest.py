@@ -270,12 +270,16 @@ def explore_findings(story, result):
     errors, notes = [], []
     if result['truncated']:
         notes.append(f"exploration stopped at {len(result['states'])} states: findings below cover only those")
+    # a truncated search has not tried every sequence: what it did not reach is unknown, not unreachable
+    unreached = notes if result['truncated'] else errors
     for sid in story.scenes:
         if sid not in result['scenes']:
-            errors.append(f'scene {sid} is never reached by any sequence of actions')
+            unreached.append(f'scene {sid} is never reached by any sequence of actions'
+                             + (' within the explored states' if result['truncated'] else ''))
     for eid in story.endings:
         if eid not in result['endings']:
-            errors.append(f'ending {eid} is never reached by any sequence of actions')
+            unreached.append(f'ending {eid} is never reached by any sequence of actions'
+                             + (' within the explored states' if result['truncated'] else ''))
     by_scene = {}
     for i in result['stuck']:
         by_scene.setdefault(result['states'][i].scene, []).append(i)
@@ -460,10 +464,11 @@ def styles_for(story):
     return out
 
 
-def run(story, runs=500, max_states=50000, walkthroughs=False, out=sys.stdout):
+def run(story, runs=500, max_states=50000, walkthroughs=False, out=sys.stdout, styled_runs=None):
     result = explore(story, max_states=max_states)
     errors, notes = explore_findings(story, result)
-    plays = [play(story, style, runs=runs if style == 'random' else max(50, runs // 5)) for style in styles_for(story)]
+    styled_runs = styled_runs or max(50, runs // 5)
+    plays = [play(story, style, runs=runs if style == 'random' else styled_runs) for style in styles_for(story)]
     e2, n2 = play_findings(story, plays)
     errors += e2
     notes += n2

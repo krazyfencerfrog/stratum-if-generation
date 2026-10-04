@@ -431,6 +431,13 @@ would be fifteen to twenty calls, two to three hours.
 
 ## 4. Stage C: reconciliation
 
+**Built 2026-10-04 as the first pass of stage D** (`generator/compile_scenes.py`):
+every scene's rooms joined among themselves, every scene leading somewhere,
+every name the scene compiler writes resolving to a room, person or thing
+(a hard retry of that scene's call), every done flag the world reads set by
+something (unset ones are set on entering the scene that holds the node).
+The per-line contradiction pass below is not built.
+
 **Job.** Make sure the world from B fits the scenes from A and nothing is
 orphaned or contradicted, before D compiles. Mostly computed:
 - every scene's rooms exist and are connected among themselves;
@@ -448,6 +455,23 @@ the finding attached, and returns only what changed. After C the world is
 locked: D may not add characters, rooms or scenes.
 
 ## 5. Stage D: compile scenes
+
+**Built 2026-10-04** (`generator/compile_scenes.py`, prompt `s7d_scene`;
+`main.py --stage-d`, or `python compile_scenes.py <id>` on a directory with
+stages A and B): one call per scene writes the scene by name (opening,
+placement, room text, a moment per opportunity with one action per stage A
+option in order, revelations, incidental actions, the action taking each
+outgoing edge, events, placeless nudges, props); Python copies stage A's
+state moves onto the options by position, decides required moments (a state
+some ending variant or pattern shift reads) and demands their neutral
+option, sets the done flags, builds exits as flags the leading actions set
+(pattern shifts first, then branches, then the default), assembles
+`<id>_package.json` and checks it with the engine's validator and playtest
+(`<id>_package.md`). On the stub, kernel to playable package end to end. Not
+yet built: the repair call fed by the playtest's findings; exploring a whole
+story exhaustively does not scale (the stub stops at the state limit in its
+first scene), so per-scene exploration from each scene's entry states is
+the next step for the check.
 
 **Job.** Turn each scene into engine data (engine §4.4): which rooms it
 opens, where the cast is, its interactions (from its moments: opportunities

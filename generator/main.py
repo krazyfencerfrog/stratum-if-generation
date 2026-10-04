@@ -51,6 +51,7 @@ import evaluate
 import arcs
 import scenes
 import world as world_stage
+import compile_scenes
 import example_guard
 import names
 
@@ -1521,6 +1522,30 @@ class StoryGenerator:
             print(f'  - {f}')
         return result
 
+    # ------------------------------------------------------------------ stages C and D: the package
+
+    def run_package(self, story=None, arcs_result=None, world_result=None):
+        """Stages C and D (generator/compile_scenes.py): reconcile, compile
+        every scene, assemble the engine package, and check it with the
+        engine's validator and playtest. Writes <id>_package.json and .md."""
+        load = lambda suffix: json.loads(Path(self.story_file_path(suffix)).read_text(encoding='utf-8'))
+        story = story or self.analysis.get('story') or load('story.json')
+        arcs_result = arcs_result or load('arcs.json')
+        world_result = world_result or load('world.json')
+        plan = scenes.plan(story, arcs_result, self.analysis.get('s3_brief'), self.analysis.get('s3_4_promises'))
+        comp = compile_scenes.SceneCompiler(self, story, arcs_result, plan, world_result)
+        package = comp.run()
+        self.save_story_json('package.json', package)
+        report = comp.check(package)
+        self.save_story_file('package.md', compile_scenes.report_markdown(self.story_id, comp.findings, report))
+        play = report.get('playtest') or {}
+        print(f"package: {len(package['scenes'])} scenes; {len(comp.findings)} reconciliation finding(s); validator "
+              f"{len(report['errors'])} error(s); playtest {len(play.get('errors') or [])} error(s), "
+              f"{len(play.get('notes') or [])} note(s)")
+        for e in comp.findings + report['errors'] + (play.get('errors') or []):
+            print(f'  - {e}')
+        return package, report
+
 
 # a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
 FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
@@ -1592,6 +1617,9 @@ if __name__ == "__main__":
     parser.add_argument("--stage-b", action="store_true",
                         help="after stage A, run stage B (the world: characters, places, conversation, you; "
                              "<id>_world.json, <id>_world.md); implies --stage-a")
+    parser.add_argument("--stage-d", action="store_true",
+                        help="after stage B, run stages C and D (compile the scenes into an engine package: "
+                             "<id>_package.json, playable with engine/cli.py); implies --stage-a and --stage-b")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
@@ -1656,10 +1684,12 @@ if __name__ == "__main__":
         gen.run_outline(max_iterations=args.max_iterations)
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
         gen.run_outline_judge()
-        if args.stage_a or args.stage_b:
+        if args.stage_a or args.stage_b or args.stage_d:
             arcs_result = gen.run_arcs()
-            if args.stage_b:
-                gen.run_world(arcs_result=arcs_result)
+            if args.stage_b or args.stage_d:
+                world_result = gen.run_world(arcs_result=arcs_result)
+                if args.stage_d:
+                    gen.run_package(arcs_result=arcs_result, world_result=world_result)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)
