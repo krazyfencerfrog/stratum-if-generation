@@ -314,38 +314,101 @@ repair.
 
 ## 3. Stage B: the world (characters, rooms, objects)
 
-Revised 2026-10-04 to target the engine in `docs/engine_design.md`.
+Revised 2026-10-04 to target the engine in `docs/engine_design.md`, then
+designed in conversation with the user the same evening (decisions below).
 
 **Job.** Build the world the scenes will use: characters with topics and
-stances, rooms with exits, the objects that matter. Depth follows the arc
-tiers from A0: full profiles for `arc` characters, medium for `supporting`,
-a line or two for `functional`. Much of what this stage once had to invent
-now exists (voice, edge, tie, breaking point from 3.5c; arcs and states from
-A1); B's new work is what the engine needs.
+stances, rooms with exits, the objects in them, and "you". Depth follows the
+arc tiers from A0: full profiles for `arc` characters, medium for
+`supporting`, a line or two for `functional`. Much of what this stage once
+had to invent now exists (voice, edge, tie, breaking point from 3.5c; arcs
+and states from A1; minor nodes from A2); B's new work is what the engine
+needs, and a world worth wandering in.
+
+### Decisions (2026-10-04)
+
+- **Scale is story-dependent, never small.** The floor is the middle ground
+  (kernel35: the boat's five rooms, the towpath, the lock, the boatyard;
+  about ten rooms, most scenes opening three to six). Exploration and
+  adventure stories span more (twenty to forty). B0 computes a target from
+  the brief (setting scale and structure, the genre promises) and B2 builds
+  to it.
+- **Talk to anyone about anything you know, within reason.** Curated topics
+  carry the story; on top of them every character has something to say
+  about every person, notable object, place and event the player has
+  encountered, in their own voice (short lines; for arc characters the
+  subjects that matter vary by their state). It costs more writing and
+  gives better play: it is where characters live, and it masks which
+  conversations matter.
+- **Examine everything, within reason:** four to eight examinable things
+  per room, two or three of them story-relevant, most of the rest saying
+  something about a person or the place's history rather than pure scenery.
+- **"You" is part of the world:** a self-description that changes with the
+  story (examine yourself), what you start out carrying (Mira's ring), and
+  a THINK verb: topics about your history, your ties and your need, what you
+  think shifting as the story moves. This is where the defined-but-steerable
+  protagonist (later_stages §2 principles) shows up in play.
+- **Connective places are added fairly freely, never as skeletons:** the
+  stairs, the yard, the corridor exist where the geography wants them, and
+  each must contribute to the story's feel: specific details and at least
+  one thing worth examining.
+
+### Engine additions these need
+
+- `seen` state: characters present in a room the player enters and objects
+  the player sees or examines are recorded automatically; `seen('x')` in
+  conditions. Conversations about encountered subjects use it, so B writes
+  no flag per subject.
+- `think` as a core verb, with the protagonist's topics; `examine` of the
+  player; the player's starting inventory (objects with location
+  `player`, already supported).
+
+### Steps
+
+**B0 (Python): scenes and subjects.** Group each line's expanded path
+(major and minor nodes, from A2) into scenes: consecutive nodes in the same
+places with no time jump (the engine's unit; engine_design §2). The model
+reviews only the borderline joins, if any. Collect the subject list: every
+person, notable object (levers, revelation objects, what the moments name),
+place and event, with where each first appears. Compute the target room
+count.
 
 **B1, characters (one call per arc or supporting character; functional
-characters in one batch call).** Input: the cast seed, the character's arc
-and light arc from A1, the scenes they are in (from A2), the states that
-concern them, the hidden truth if they know it. Output (engine §4.3):
-- `topics`: what you can talk to them about; for each, when it becomes known
-  (a flag a moment sets), what they say by state (stance), and any effect;
-- `description` variants by state (how they look and act as their arc moves);
-- for arc characters, a short history (what they bring into the story).
-Python checks: every topic's `known_when` names a flag some moment sets;
-every state a stance reads is declared; the hidden truth is only in the
-topics of those who know it.
+characters in one batch).** Input: the cast seed, the arc or light arc, the
+scenes they are in, the states that concern them, the hidden truth if they
+know it. Output (engine §4.3): curated `topics` (when each becomes known,
+what they say by state, effects); `description` and `here` variants by
+state (the tells live here); for arc characters a short history. Python
+checks: every `known_when` names a flag some moment sets or a `seen()`;
+every state a stance reads is declared; the hidden truth appears only in
+the topics of those who know it.
 
-**B2, rooms and objects (one call per location).** Input: the location
+**B1c, conversation (one call per character; functional characters in
+batches).** Input: the character's packet and voice, the subject list with
+where each first appears, the character's tie to each subject. Output: one
+line per subject they would plausibly have something to say about, in
+voice, gated by `seen(subject)`; for arc characters, variants by state on
+the subjects their arc touches. A subject a character would not know about
+gets a line that says so in character, or nothing.
+
+**B2, places (one call per location) and the map.** Input: the location
 sketch, the scenes that use it and their moments, the objects the moments
-name (levers, revelation objects, the kettle that bails). Output (engine
-§4.1-4.2): one to four rooms per location with permanent descriptions,
-exits between them, and the objects in them. A small classification call
-over the list of locations decides which locations adjoin (an exit between
-their nearest rooms); Python makes exits mutual and checks every room is
-reachable from every other within the scenes that open them.
+need, the room target. Output (engine §4.1-4.2): rooms with permanent base
+descriptions (base text names only what never changes; engine §4.1),
+exits, story objects where the moments need them and four to eight
+examinable things per room. One map call over all locations decides which
+adjoin and adds connective places; Python makes exits mutual and checks
+every scene's rooms are connected among themselves.
+
+**B3, you (one call).** Input: the protagonist (who, history, need, ties,
+open, gender, name), the lines and the protagonist's arc per line from A1.
+Output: self-description variants, starting inventory, THINK topics (your
+history, each tie, your need, the open question) with what you think by
+state or line.
 
 **Cost.** Not the constraint (see the principles in §2). Roughly 5-10
-minutes per arc or supporting character and per location.
+minutes per character, per conversation, per location and for you; kernel35
+would be fifteen to twenty calls, two to three hours.
 
 ## 4. Stage C: reconciliation
 

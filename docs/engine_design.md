@@ -420,4 +420,9 @@ for reference.
   character whom neither the intro nor a scene opening (this scene or an
   earlier one) has introduced; events fire wherever the player is, so an
   unintroduced name is a stranger shouting (playtest feedback, 2026-10-04).
+- **Planned with stage B (2026-10-04, not built yet):** a `seen` state
+  (people present in rooms the player enters, objects seen or examined;
+  `seen('x')` in conditions) so conversations about anything encountered
+  need no per-subject flags; `think` as a core verb with the protagonist's
+  topics; examine yourself. See later_stages.md §3.
 
