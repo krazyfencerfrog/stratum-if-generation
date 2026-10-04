@@ -166,7 +166,7 @@ class OutlineBuilder:
                     entry[key] = seed[key]
             cast.append(entry)
         return {
-            'protagonist': pick(p.get('protagonist'), 'who', 'wants', 'can_do', 'cannot_do'),
+            'protagonist': pick(p.get('protagonist'), 'who', 'history', 'wants', 'need', 'can_do', 'cannot_do', 'ties', 'open'),
             'pressure': (p.get('pressure') or {}).get('description'),
             'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
             'events': [f"{i}. ({e.get('when')}) {e.get('what')}" for i, e in enumerate(self.events, 1)],

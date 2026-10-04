@@ -374,6 +374,10 @@ class StubClient(LlmClient):
     def p_s3_5a(self, p):
         return {
             "protagonist": {"who": "You are the ship's AI, present through cameras and drones.", "wants": "keep the core alive and the sectors breathing",
+                            "history": "You were woken from maintenance mode an hour ago by the first pressure alarm in forty years.",
+                            "need": "to learn whether the crew still sees you as the ship or as one more system that failed them",
+                            "ties": [{"who": "the sector council", "what": "the people who voted to keep you running last year, by one vote"}],
+                            "open": "whether you obey the council or the core",
                             "can_do": "watch every sector, route air, open valves that have a drone at them",
                             "cannot_do": "vent a sector without the sector council's override code, or move a person",
                             "serves": "3-0b.protagonist_identity"},

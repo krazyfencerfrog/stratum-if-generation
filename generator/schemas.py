@@ -78,7 +78,7 @@ PROMISES = obj(
 POLE = obj(pole=S, what_you_must_do=S, cost=S)
 
 ENGINE = obj(
-    protagonist=obj(who=S, wants=S, can_do=S, cannot_do=S, serves=S),
+    protagonist=obj(who=S, history=S, wants=S, need=S, can_do=S, cannot_do=S, ties=arr(obj(who=S, what=S)), open=S, serves=S),
     arena=obj(description=S, serves=S),
     pressure=obj(description=S, clock_or_stock=S, serves=S),
     opposition=obj(who_or_what=S, wants=S, means=S, serves=S),

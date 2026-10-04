@@ -64,6 +64,13 @@ Character arcs drive the expansion; rooms come much later (stage D).
 - **The protagonist has an arc** in most stories: the general direction of
   their path. Lines change it significantly; they are how the player shows
   how they WANT it to resolve.
+- **"You" is defined, but steerable** (decided 2026-10-04): between a blank
+  player insert and a fixed character. The premise (3.5a) gives the
+  protagonist a `history` (how you came to be here), a `need` under the want,
+  `ties` (what each key person is to you, from your side; 3.5c's cast ties
+  must agree), and `open` (what is left to the player: how you feel, which
+  way you grow). Never a name. Without this, the protagonist's arc describes
+  what you do, not who changes (found writing the kernel35 example).
 - **Small nodes, separate in the graph.** Expansion adds minor beats as
   their own nodes, not as content inside the major ones: the graph grows,
   every node stays small (which later stages need), and the structure stays
