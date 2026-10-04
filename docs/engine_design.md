@@ -425,4 +425,10 @@ for reference.
   `seen('x')` in conditions) so conversations about anything encountered
   need no per-subject flags; `think` as a core verb with the protagonist's
   topics; examine yourself. See later_stages.md §3.
+- **Planned with stage D (2026-10-04, not built yet):** moments (grouped,
+  mutually exclusive options; required ones gate the scene's exits with a
+  neutral option, optional ones lapse with an effect), computed time
+  (actions that change nothing are free; `takes_time` overrides), and
+  `weight: "major"` on line-changing interactions for the front end to show
+  or not. See later_stages.md §5.
 

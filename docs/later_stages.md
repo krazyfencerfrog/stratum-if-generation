@@ -467,6 +467,48 @@ changed. What they catch that a reader of the JSON would not:
 The walkthroughs (the shortest route to each ending and resolution
 combination) go into the run's report for a human to read.
 
+### Decisions (2026-10-04, with the user)
+
+- **Ignored opportunities: a mix.** An opportunity whose state feeds an
+  ending variant or a pattern shift on a line through the scene is
+  REQUIRED (Python decides, from A1's resolutions and shifts): it gates the
+  scene's exits, and always offers a neutral option, so the choice is
+  offered, never forced one way. Every other opportunity LAPSES: after a
+  while, or when you leave, the moment passes, and walking away is itself
+  the answer, with its own small effect ("Lazlo writes 'ignored' in the
+  ledger").
+- **Big, line-changing choices are signposted in the fiction** (people say
+  what is at stake; the text weighs it), always. The interaction also
+  carries `weight: "major"`, which the front end may show on the radial (a
+  distinct ring or icon) as a player option.
+- **Time is computed.** An action takes time if it changes something (a
+  flag, an arc state, where an object is), moves you to another room, or
+  is Wait; an action that changes nothing is free (examining, incidental
+  talk, thinking). D may override per interaction where the fiction says
+  otherwise ("search the whole hold"). Turn-timed events count time; nudges
+  count every action, so endless examining still gets a prod.
+- **Two to four incidental activities per scene** beyond examining and
+  conversation: a chore to help with, a drink to share, the dog; flavour,
+  sometimes with a small effect. They make a place lived in, and they mask
+  which actions matter.
+- **Story verbs:** prefer the core verbs; add a story verb where a genre
+  action deserves its own word, especially one the story repeats (Bail,
+  Climb, Salute). Action stories lean on them more. A one-use story verb is
+  a validator note.
+
+### Engine additions these need
+
+- **Moments** in a scene: `{id, options: [interaction ids], required,
+  neutral: interaction id, lapse: {after, text, effects}}`. Taking an option
+  closes the rest; a required moment holds the scene's exits until
+  answered; an optional one lapses after `after` actions, or on leaving its
+  room, firing its lapse. The playtest's missed-opportunity check reads
+  `required` instead of the hand-marked `optional`.
+- **Computed time:** each action reports whether time passed (the rule
+  above, with an interaction's `takes_time` overriding); `turns` and
+  `turns_in_scene` advance only then.
+- **`weight`** on interactions, passed through to the menu tree.
+
 Carry over from `generator/later/node_build.py` where it fits: the state
 registry, `mechanical_checks` (reachability, reads before writes, menu
 options that are moral labels rather than acts), node repair from a finding
