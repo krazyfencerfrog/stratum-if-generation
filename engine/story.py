@@ -307,6 +307,9 @@ def validate(story):
         if eid not in seen:
             errors.append(f'ending {eid}: not reachable from the start')
 
+    # people named by the world's own text before anything has introduced them
+    notes.extend(unintroduced(s))
+
     # story verbs used once point at the solution
     for verb, uses in verb_uses.items():
         if verb not in CORE_VERBS and len(uses) == 1:
@@ -315,6 +318,59 @@ def validate(story):
         if vid not in CORE_VERBS and vid not in verb_uses:
             notes.append(f'story verb {vid!r} is declared but never used')
     return errors, notes
+
+
+TITLES = {'Captain', 'Doctor', 'Lady', 'Lord', 'Master', 'Mister', 'Miss', 'Sister', 'Brother', 'Father', 'Mother'}
+
+
+def texts_of(variants):
+    if isinstance(variants, str):
+        return [variants]
+    out = []
+    for v in variants or []:
+        t = v if isinstance(v, str) else v.get('text', '')
+        out.extend(t if isinstance(t, list) else [t])
+    return out
+
+
+def unintroduced(s):
+    """Notes for event and nudge text that names a character no earlier text
+    has introduced: the intro, or the opening of this scene or of a scene
+    before it (breadth-first from the start). An event fires wherever the
+    player is, so 'Pell's shouting grows louder' means nothing to a player
+    who has not been told who Pell is."""
+    import re
+    parts = {}
+    for cid, ch in s.characters.items():
+        words = [w for w in re.findall(r"[A-Z][a-z']+", ch.get('name', '')) if w not in TITLES and len(w) > 2]
+        parts[cid] = set(words)
+
+    def named(text):
+        found = set(re.findall(r"[A-Z][a-z']+", text))
+        return {cid for cid, ws in parts.items() if ws & found}
+
+    known = set()
+    for t in texts_of(s.data.get('intro')):
+        known |= named(t)
+    order, seen, todo = [], set(), [s.start.get('scene')]
+    while todo:
+        x = todo.pop(0)
+        if x in seen or x not in s.scenes:
+            continue
+        seen.add(x)
+        order.append(x)
+        todo.extend(ex.get('to') for ex in s.scenes[x].get('exits') or [])
+    notes = []
+    for sid in order:
+        sc = s.scenes[sid]
+        for t in texts_of(sc.get('opening')):
+            known |= named(t)
+        for ev in list(sc.get('events') or []) + list(sc.get('nudges') or []):
+            for t in texts_of(ev.get('text')):
+                for cid in sorted(named(t) - known):
+                    notes.append(f"scene {sid} event {ev.get('id')}: names {s.characters[cid].get('name', cid)}, "
+                                 f'whom nothing has introduced yet (the intro or a scene opening should)')
+    return notes
 
 
 def ending_groups(end):

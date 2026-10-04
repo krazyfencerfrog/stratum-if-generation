@@ -98,6 +98,15 @@ def demo_package_validates():
     errors, notes = validate(Story(demo_data()))
     check(not errors, f'demo has errors: {errors}')
     check(any("'untie'" in n for n in notes), f'one-use story verb not noted: {notes}')
+    check(not any('introduced' in n for n in notes), f'demo names someone unintroduced: {notes}')
+
+
+@test
+def validator_notes_unintroduced_characters():
+    data = demo_data()
+    data['scenes']['S02']['opening'] = [{'text': 'The line snaps and the boat drifts toward the gates.'}]
+    _, notes = validate(Story(data))
+    check(any('S02.closer' in n and 'Pell Szeto' in n for n in notes), f'unintroduced Pell not noted: {notes}')
 
 
 @test
@@ -133,11 +142,19 @@ def menu_collapses_and_has_no_dead_options():
     labels = [c['label'] for c in root['children']]
     check(labels[0] == 'Look' and 'Wait' in labels, f'root verbs: {labels}')
     check('Talk' not in labels, 'Talk shown with nobody on the stern deck')
-    check('Untie › the stern line' in labels, f'single-object verb did not collapse: {labels}')
+    untie = next(c for c in root['children'] if c['label'] == 'Untie')
+    check([c['label'] for c in untie['children']] == ['the stern line'] and 'id' in untie['children'][0],
+          f'trivial collapse should keep Untie -> the stern line as a level: {untie}')
+    wait = next(c for c in root['children'] if c['label'] == 'Wait')
+    check('id' in wait, f'Wait (nothing to choose) did not collapse: {wait}')
+    labels_all = [c['label'] for c in eng.menu(collapse='all')['children']]
+    check('Untie › the stern line' in labels_all, f"collapse='all' did not merge the single option: {labels_all}")
     eng.act('go:cabin')
-    talk = next(c for c in eng.menu()['children'] if c['label'].startswith('Talk'))
-    check('children' in talk and talk['label'] == 'Talk › Lazlo Brandt',
-          f'one person, two topics should give "Talk › Lazlo Brandt" with children: {talk}')
+    talk = next(c for c in eng.menu()['children'] if c['label'] == 'Talk')
+    check([c['label'] for c in talk['children']] == ['Lazlo Brandt'] and len(talk['children'][0]['children']) == 2,
+          f'one person, two topics should give Talk -> Lazlo Brandt -> two topics: {talk}')
+    talk_all = next(c for c in eng.menu(collapse='all')['children'] if c['label'].startswith('Talk'))
+    check(talk_all['label'] == 'Talk › Lazlo Brandt', f"collapse='all': {talk_all['label']}")
     eng.act('talk:lazlo:the_ledger')
     check('talk:lazlo:the_ledger' not in ids(eng), 'a once topic is still offered')
     check({'S01.price_fear', 'S01.mock_fear'} <= set(ids(eng)), 'the ledger options did not appear')
@@ -259,16 +276,55 @@ def rewind_save_and_load():
 
 
 @test
+def history_records_and_rewinds_to_any_point():
+    eng = Engine(Story(demo_data()))
+    eng.start(seed=1)
+    check(len(eng.history) == 1 and any('Mira died' in t for t in eng.history[0]['text']), 'no starting entry')
+    play(eng, ['go:cabin', 'talk:lazlo:the_ledger', 'S01.price_fear', 'look', 'go:stern_deck'])
+    labels = [h['label'] for h in eng.history]
+    check(labels == ['(the beginning)', 'Go › down the cabin steps', 'Talk › Lazlo Brandt › about the ledger',
+                     'Talk › Lazlo Brandt › about what a nuisance costs', 'Go › up the steps to the stern deck'],
+          f'history labels (look takes no time and is not recorded): {labels}')
+    check(len(eng.history) == len(eng.timeline), 'history and timeline out of step')
+    check('shoulders come down' in ' '.join(eng.history[3]['text']), 'history lost the text of a step')
+    eng.rewind_to(2)
+    check(len(eng.history) == 3 and eng.state.arc('lazlo_nerve') == (0, 0) and 'S01.mock_fear' in ids(eng),
+          'rewind_to did not restore the state after entry 2')
+    for bad in (2, 9, -1):
+        try:
+            eng.rewind_to(bad)
+            raise AssertionError(f'rewind_to({bad}) was accepted')
+        except EngineError:
+            pass
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, 'h.save')
+        eng.save(path)
+        other = Engine(Story(demo_data()))
+        other.start()
+        other.load(path)
+        check(other.history == eng.history, 'history did not survive a save')
+
+
+@test
 def terminal_player_runs_a_script():
     out = io.StringIO()
     eng = Engine(Story(demo_data()))
-    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Untie, 5 Wait; then in S02 quit
-    cli.play(eng, ['4', 'q'], out=out)
+    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Untie (-> 1 the stern line), 5 Wait; then in S02 quit
+    cli.play(eng, ['4', '1', 'q'], out=out)
     text = out.getvalue()
-    check('crack like a pistol shot' in text and eng.state.scene == 'S02', f'scripted play failed:\n{text}')
+    check('pistol' in text and eng.state.scene == 'S02', f'scripted play failed:\n{text}')
     out = io.StringIO()
     cli.play(Engine(Story(demo_data())), ['3', 'b', 'x', 'r', 'q'], out=out)
     check('pick a number' in out.getvalue() and 'nothing to rewind' in out.getvalue(), out.getvalue())
+    # history: go to the cabin (3 Go -> 2 cabin), ask about the ledger, then h and back to point 1
+    out = io.StringIO()
+    eng = Engine(Story(demo_data()))
+    cli.play(eng, ['3', '2', '4', '1', '1', 'h', '1', 'q'], out=out)
+    text = out.getvalue()
+    check('History:' in text and 'Go › down the cabin steps' in text and 'Talk › Lazlo Brandt › about the ledger' in text,
+          f'history listing wrong:\n{text}')
+    check('(back to 1' in text and len(eng.history) == 2 and eng.state.room == 'cabin'
+          and 'talk:lazlo:the_ledger' in ids(eng), f'going back through history failed:\n{text}')
 
 
 def main():

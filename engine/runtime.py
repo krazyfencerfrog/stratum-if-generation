@@ -24,6 +24,7 @@ DETAIL_WORD = {'talk': 'about', 'give': 'to', 'show': 'to', 'use': 'on'}
 FREE = ('look', 'inventory')          # meta actions: no turn passes, nothing fires
 CHAIN_LIMIT = 10                      # scene changes or event rounds in one action
 SAVE_FORMAT = 'stratum-save/1'
+COLLAPSE_MODES = ('trivial', 'all')
 
 
 class EngineError(ValueError):
@@ -35,10 +36,14 @@ class SaveMismatch(EngineError):
 
 
 class Engine:
-    def __init__(self, story):
+    def __init__(self, story, collapse='trivial'):
         self.story = story if isinstance(story, Story) else Story(story)
+        if collapse not in COLLAPSE_MODES:
+            raise EngineError(f'collapse must be one of {COLLAPSE_MODES}')
+        self.collapse = collapse
         self.state = None
-        self.timeline = []
+        self.timeline = []                # a snapshot after every action (rewind)
+        self.history = []                 # beside each snapshot: what was chosen and what it said
         self.queue = []
 
     # ------------------------------------------------------------ setup
@@ -60,7 +65,9 @@ class Engine:
         self._enter_scene(s.start['scene'], room=s.start.get('room'))
         self._settle()
         self.timeline = [st.clone()]
-        return self.view()
+        view = self.view()
+        self.history = [{'label': '(the beginning)', 'text': view['text'], 'turn': 0}]
+        return view
 
     # ------------------------------------------------------------ what can be done
 
@@ -147,9 +154,14 @@ class Engine:
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
         return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken] + authored
 
-    def menu(self):
-        """The options as a tree: verbs, then objects, then details. A level
-        with one option merges into its parent. Leaves carry `id`."""
+    def menu(self, collapse=None):
+        """The options as a tree: verbs, then objects, then details. Leaves
+        carry `id`. `collapse` (default: the engine's) decides which levels
+        with a single option merge into their parent: 'trivial' merges only
+        where there is nothing to choose (Wait, Look, an object with one way
+        to act on it), so the menu keeps its shape and does not point at what
+        matters; 'all' merges every single option ("Untie › the stern line"
+        at the root)."""
         s = self.story
         verbs = {}
         for o in self.options():
@@ -170,14 +182,10 @@ class Engine:
                     if o['detail'] is None:
                         onode['children'].append({'label': None, 'id': o['id']})
                     else:
-                        label = o['detail_label']
-                        word = 'say' if label[:1] in '\'"‘“' else DETAIL_WORD.get(verb)
-                        if word and not label.startswith(word + ' '):
-                            label = f'{word} {label}'
-                        onode['children'].append({'label': label, 'id': o['id']})
+                        onode['children'].append({'label': detail_text(verb, o['detail_label']), 'id': o['id']})
                 vnode['children'].append(onode)
             root['children'].append(vnode)
-        root['children'] = [_collapse(c) for c in root['children']]
+        root['children'] = [_collapse(c, collapse or self.collapse) for c in root['children']]
         return root
 
     # ------------------------------------------------------------ acting
@@ -233,7 +241,19 @@ class Engine:
         scene_before = st.scene
         self._settle(progress_since=before)
         self.timeline.append(st.clone())
-        return self.view(show_room=moved_room or st.scene != scene_before)
+        view = self.view(show_room=moved_room or st.scene != scene_before)
+        text = view['text'] or ([f"You are in {view['room']['name']}."] if view.get('room') else [])
+        self.history.append({'label': self.label_of(opt), 'text': text, 'turn': st.turns})
+        return view
+
+    def label_of(self, opt):
+        """An option as the menu path that names it: 'Talk › Lazlo Brandt › about the ledger'."""
+        parts = [self.story.verbs.get(opt['verb'], opt['verb'])]
+        if opt['object_label']:
+            parts.append(opt['object_label'])
+        if opt['detail_label']:
+            parts.append(detail_text(opt['verb'], opt['detail_label']))
+        return ' › '.join(parts)
 
     def _free_text(self, opt):
         if opt['verb'] == 'look':
@@ -395,13 +415,24 @@ class Engine:
             raise EngineError('nothing to rewind')
         steps = min(steps, len(self.timeline) - 1)
         del self.timeline[len(self.timeline) - steps:]
+        del self.history[len(self.timeline):]
         self.state = self.timeline[-1].clone()
         self.queue = []
         return self.view()
 
+    def rewind_to(self, index):
+        """Back to history entry `index` (0 is the beginning): the state as
+        it was right after that action."""
+        if not 0 <= index < len(self.timeline):
+            raise EngineError(f'no history entry {index}')
+        if index == len(self.timeline) - 1:
+            raise EngineError('that is where you are')
+        return self.rewind(len(self.timeline) - 1 - index)
+
     def save(self, path):
         data = {'format': SAVE_FORMAT, 'story_id': self.story.id, 'package_hash': self.story.hash,
-                'state': self.state.to_dict(), 'timeline': [t.to_dict() for t in self.timeline]}
+                'state': self.state.to_dict(), 'timeline': [t.to_dict() for t in self.timeline],
+                'history': self.history}
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f)
 
@@ -417,6 +448,9 @@ class Engine:
                                'the save cannot be loaded into the new version')
         self.state = GameState.from_dict(data['state'])
         self.timeline = [GameState.from_dict(t) for t in data.get('timeline') or [data['state']]]
+        history = list(data.get('history') or [])
+        history += [{'label': '(not recorded)', 'text': [], 'turn': None}] * (len(self.timeline) - len(history))
+        self.history = history[:len(self.timeline)]
         self.queue = []
         return self.view()
 
@@ -429,11 +463,22 @@ def _signature(st):
             tuple(sorted((k, str(v)) for k, v in st.locations.items())), tuple(sorted(st.used)), st.scene)
 
 
-def _collapse(node):
+def detail_text(verb, label):
+    """A detail as the menu shows it: 'about the ledger', 'on the crack',
+    "say 'Boat held, sir'"."""
+    word = 'say' if label[:1] in '\'"‘“' else DETAIL_WORD.get(verb)
+    if word and not label.startswith(word + ' '):
+        return f'{word} {label}'
+    return label
+
+
+def _collapse(node, mode):
     if 'children' not in node:
         return node
-    node = dict(node, children=[_collapse(c) for c in node['children']])
-    if len(node['children']) == 1:
+    node = dict(node, children=[_collapse(c, mode) for c in node['children']])
+    # an unlabelled child is no choice at all (Wait, or an object with one way
+    # to act on it): it always merges; a labelled only child merges under 'all'
+    if len(node['children']) == 1 and (node['children'][0]['label'] is None or mode == 'all'):
         child = node['children'][0]
         label = node['label'] if not child['label'] else f"{node['label']} › {child['label']}"
         merged = dict(child, label=label)

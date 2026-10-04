@@ -392,6 +392,21 @@ for reference.
   endings unreachable over scene exits, scenes without exits, duplicate
   interaction ids, bad effects. Notes: story verbs used once or never,
   things with nothing to say when examined, flags set but never read.
-- **Saves** hold the state and the whole rewind timeline, with the package
-  hash (`stratum-save/1`).
+- **Saves** hold the state, the whole rewind timeline and the history, with
+  the package hash (`stratum-save/1`).
+- **History:** beside each snapshot the engine keeps what was chosen (the
+  menu path, "Talk › Lazlo Brandt › about the ledger") and what it said;
+  `rewind_to(n)` returns to any entry (the visual-novel backlog; the
+  terminal player's `h`). Walkthroughs from the playtest simulator can use
+  the same record.
+- **Collapse is a front-end choice:** the engine builds the full tree and
+  merges levels by mode. `trivial` (default) merges only where there is
+  nothing to choose (Wait, Look, an object with one way to act on it), so
+  the menu keeps one shape (verb, then object) and a lone option never
+  jumps to the root and points at the solution; `all` merges every single
+  option ("Untie › the stern line").
+- **Introductions:** the validator notes event or nudge text naming a
+  character whom neither the intro nor a scene opening (this scene or an
+  earlier one) has introduced; events fire wherever the player is, so an
+  unintroduced name is a stranger shouting (playtest feedback, 2026-10-04).
 
