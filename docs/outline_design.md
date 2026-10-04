@@ -16,20 +16,24 @@ s1  kernel (as written)
 s2  rating filter (if --rating)  ->  shape split: content kernel + shape prefs     [no think]
 phase 3   nine blind extractions over the content kernel, 3h cross-check           [unchanged]
           constraint map + STORY BRIEF (computed)
+s3.4  genre promises: what the audience expects and the Kernel left open           [no think]
 s3.5  premise: the dramatic engine
-        3.5a engine   protagonist, arena, pressure, opposition, mediation          [think]
-        3.5b turns    3-5 situations, each with ways through and a form            [think]
-        3.5c cast     a rough sketch per role the turns name                       [no think]
+        3.5a engine   protagonist, arena, pressure, opposition, events, mediation  [think]
+        3.5b turns    3-5 situations, each with ways through, a form, a set piece  [think]
+        3.5c cast     a sketch per role: wants, holds, edge, tie, voice, breaking point [no think]
         computed checks + 3.5v audit                                               [think, small]
         3.5r repair (only if findings; returns only the changed sections)          [think]
 s3.8  story form: a framework chosen from a computed shortlist                     [no think]
 step 4, the outline loop, one line per iteration:
-        4a main line plan (iteration 1)  |  4c divergence plan (iteration n)       [think]
-        4b line nodes: summary, where, who; registers grow as needed; <=4 per call [think]
-        computed checks (graph, beats, turns, branches, registers)
-        4d next line: is another line worth building, and its seed                 [think, small]
+        4a main line plan (iteration 1), with its ending world                     [think]
+        4p branch plan (after the main line): every seed and ending world at once  [think, small]
+        4c divergence plan (iteration n) from the next planned seed                [think]
+        4b line nodes: summary, image, where, who; registers grow; <=4 per call    [think]
+        computed checks (graph, beats, turns, branches, registers, worlds)
+        (4d next line, under --branching=judge: one seed per iteration)            [think, small]
+s4e   computed metrics + one scoring call over the finished outline                [no think]
 story document: <id>_story.json, <id>_story.md (rewritten every iteration)
-run statistics: <id>_run_stats.json (appended every call attempt)
+evaluation: <id>_eval.json; run statistics: <id>_run_stats.json
 ```
 
 Standing rules, enforced in code:
@@ -77,9 +81,9 @@ calls in the order the old prompt asked the model to think in.
 
 | call | builds | output |
 |---|---|---|
-| `s3_5a_engine` | protagonist (with `cannot_do`), arena, pressure, opposition, `hidden_truth` (when the brief has an epistemic gap: what it is, who knows, what it changes; else null), mediation | about 2.5 KB |
-| `s3_5b_turns` | 3 to 5 turns (situation, task, `ways_through` with costs, `involves`, `form`), complications by budget | about 3 KB |
-| `s3_5c_cast` | one sketch per role the turns name: kind, speaks_for, wants, holds, `edge` (a contradiction, flaw or secret), `tie` (to you or another seed), opposition | about 2 KB |
+| `s3_5a_engine` | protagonist (with `cannot_do`), arena, pressure, opposition, `events` (two or three things the world brings about on its own, with `when`), `hidden_truth` (when the brief has an epistemic gap: what it is, who knows, what it changes; else null), mediation | about 3 KB |
+| `s3_5b_turns` | 3 to 5 turns (situation, task, `ways_through` with costs, `involves`, `form`, `set_piece` or null), complications by budget (at least two, one a reversal) | about 3.5 KB |
+| `s3_5c_cast` | one sketch per role the turns name: kind, speaks_for, wants, holds, `edge` (a contradiction, flaw or secret), `tie` (to you or another seed), `voice` (how they talk, one sample line), `breaking_point` (companions: what would make them leave or turn), opposition | about 3 KB |
 
 `assemble_premise` puts them side by side as `s3_5_premise.json` and looks up
 each seed's `matters_to_turns` from the turns. Dropped from the old single
@@ -283,10 +287,12 @@ stage C.
 | call | file |
 |---|---|
 | main line plan | `s4a_i1_main_line.json` |
+| branch plan | `s4p_i1_branch_plan.json` |
 | divergence plan | `s4c_i<n>_divergence.json` |
 | node fill | `s4b_i<n>_line_nodes.json`, then `s4b_i<n>_p2_line_nodes.json` ... for a line with more than four new nodes |
-| next-line judge | `s4d_i<n>_next_line.json` |
+| next-line judge | `s4d_i<n>_next_line.json` (branching `judge`) |
 | story document | `story.json`, `story.md` |
+| evaluation | `s4e_outline_judge.json`, `eval.json` |
 
 Every call also saves `<prefix>_raw_input_prompt.txt` (exactly what was
 sent), `<prefix>_raw_output_thinking.txt` and `<prefix>_raw_output_response.txt`.
@@ -303,15 +309,17 @@ unstamped directory holding only phase-3 outputs is adopted.
 
 ```
 schema_version, story_id, stage ("outline"), kernel, shape, premise, framework
-lines{id: title, motivation, strategy, turning_point, differs_from, ending{title, summary, node},
+lines{id: title, motivation, strategy, turning_point, differs_from,
+          ending{title, summary, node, answer, standing[], lost[], changed},
           path[], new_nodes[], parent, divergence{diverges_at, trigger, trigger_kind, way,
           instead_of, opportunity, shift}, rejoins_at, skipped_beats[]}
-nodes{id: line, iteration, beat, turn, way, adapted, title, summary, where[], who[],
+nodes{id: line, iteration, beat, turn, way, event, adapted, title, summary, image, where[], who[],
           is_ending, lines[], additions[], annotations{}}
 edges[{from, to, lines[], kind, trigger{text, kind, formal}, otherwise[]}]
-characters{id: label, kind, speaks_for, wants, holds, opposition, why, source, nodes[],
-          name, profile, packet}            (last three null until stage B)
+characters{id: label, kind, speaks_for, wants, holds, edge, tie, voice, breaking_point, opposition,
+          why, source, nodes[], name, profile, packet}            (last two null until stage B)
 locations{id: name, kind, why, source, nodes[], rooms, packet}   (last two null until stage B)
+branching, plan{assessment, seeds[]}, promises,
 grid, hooks, checks{findings, notes}, iterations[], stop_reason, warnings[]
 ```
 
@@ -323,9 +331,9 @@ thinks, what it should cost, and where it is cut off.
 | class | calls | thinking | target | breaker | on a breach |
 |---|---|---|---|---|---|
 | `extract` | phase 3, rating filter | model default | 30 KB, 30 min | none | reported only |
-| `classify` | s2 shape, 3.5c, 3.8 | off | 6 min | 45 min | stops the run, naming the partial trace |
+| `classify` | s2 shape, 3.4, 3.5c, 3.8, 4e | off | 6 min | 45 min | stops the run, naming the partial trace |
 | `audit` | 3.5v | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
-| `judge` | 4d | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
+| `judge` | 4p, 4d | on | 12 KB, 12 min | 24 KB, 25 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 | `build` | 3.5a, 3.5b, 3.5r, 3.75, 3.75r, 4a, 4b, 4c | on | 20 KB, 15 min | 25 KB, 30 min | answer forced from the partial thinking; if that fails, retried with thinking off |
 
 - **Breakers** are enforced by the client as the stream arrives
@@ -391,12 +399,14 @@ the connection stops generation, speed, optionally a smaller `num_ctx`).
 python tests/test_plumbing.py
 ```
 
-Eighteen tests, about six seconds: every stub scenario (repair loop, halt,
+Thirty tests, about eight seconds: every stub scenario (repair loop, halt,
 informed retries, sloppy answers, breaker fallback and a cut with no
-fallback, rejoin, new cast, nothing-worth-building, linear shape, overrides,
-stale directories), the loop's validators driven directly with answers that
-must be rejected, the computed checks against deliberately broken graphs,
-the Ollama client against a fake server, the helpers, the probe and the
+fallback, loops, forced answers, rejoin, new cast, nothing-worth-building,
+linear shape, overrides, stale directories, the branch plan's soft rules,
+missing events and set pieces, the brief-echo check, judge mode, the A/B
+harness), the loop's validators driven directly with answers that must be
+rejected, the computed checks against deliberately broken graphs, the
+Ollama client against a fake server, the helpers, the probe and the
 report. It also fails
 if a prompt in `prompts/` is exercised by no scenario or mentions kernel1.
 
@@ -405,8 +415,8 @@ are listed at the top of `generator/stub_client.py`.
 
 ## 9. Not yet run against a live model
 
-Everything after phase 3. `docs/fable_response_4.md` section 9 is the
-checklist, in priority order.
+Everything added on 2026-10-04 (section 11). `docs/fable_response_5.md`
+section 8 is the checklist, in priority order.
 
 ## 10. Story-quality rules (2026-10-03)
 
@@ -445,3 +455,102 @@ The causes were upstream, and each now has a rule:
   lines. A computed note (`late_forks`) flags a story whose lines all leave
   in the main line's second half. Moving a price onto a different payer, with
   the same people standing at the end, no longer counts as a different ending.
+
+## 11. The quality pass (2026-10-04)
+
+`docs/fable_response_5.md` gives the reasons. What runs now, over and above
+section 10:
+
+- **Genre promises (3.4).** One thinking-off call reads the content Kernel
+  and the brief's tone, affect, failure, setting and decision lines, and
+  writes what a reader who asked for this kind of story expects and the
+  Kernel left unsaid: `promises` (each marked `in_kernel`), `set_pieces`,
+  `tone_engine` (how the tone is produced), `obligatory_cast` (at most
+  three), `must_not` (what the Kernel rules out). `brief.promises_lines()`
+  renders it into 3.5a, 3.5b, 4a and 4c under the rule that a promise is a
+  default one rank below a brief default. Nothing audits against it; the
+  3.5v audit's clause and constraint lists keep the Kernel on top.
+  `--no-promises` gives the prompts `none`.
+- **Inferred constraints are marked.** A brief field whose binding rests on
+  `strong_inference` is rendered `[constraint, inferred]`. It still may not
+  be contradicted (the audit's constraint list includes it); the construction
+  prompts are told it is a floor the Kernel's details forced, not a ceiling
+  on what the genre may add. The complications budget no longer falls to one
+  on a tightly specified Kernel (minimal 2, moderate 3, generous 4).
+- **The engine has events.** 3.5a writes two or three `events`: things the
+  opposition or the pressure brings about on their own schedule, each with
+  `when` (early, middle, late). A missing or empty list is a computed finding.
+  4a places at least one (`event` on a beat entry; a soft rule), shows what
+  it does, and 4c may land the rest or land them differently.
+- **Turns carry a set piece and companion stakes.** 3.5b names, on at least
+  one turn, the `set_piece` it delivers (a computed finding when the promises
+  offered one and no turn names any); when the cast has companions, one
+  turn's ways differ in who is won, lost or turned. Example B is the dig
+  (companions whose loyalty is at stake), replacing the quartet whose every
+  turn sat on the decision axis.
+- **The cast has voices and breaking points.** 3.5c writes `voice` (how the
+  person talks, with one sample line) for every individual and
+  `breaking_point` (what "you" could do that would make them leave, turn or
+  act alone) for companions. Both ride in the register 4b reads; 4p and 4d
+  read the breaking points as the table of worlds a line can end in.
+- **The story's own words.** `example_guard.brief_echoes` finds five-word
+  phrases of the brief's analytic text copied into the engine's levers,
+  pressure, events or the turns' ways; 3.5a and 3.5b soft-reject on it (one
+  informed retry). `evaluate.metrics` counts the phrases that survive into
+  node summaries.
+- **Ending worlds.** Every line's ending states `answer` (pole_a, pole_b,
+  mixed, neither), `standing`, `lost` and `changed`. Two endings are the
+  same world when answer, standing and lost agree; `checks` notes it
+  (`same_world`), the branch plan refuses it once, and `evaluate` counts
+  distinct worlds.
+- **The branch plan (4p).** Under `--branching=plan` (default), one judge
+  call after the main line designs every further seed at once (motivation,
+  strategy, `diverges_at`, trigger and kind, way, ending world,
+  why_different), reading the companions' breaking points, the events, the
+  unused ways and the main line's ending world. The validator rejects an
+  invalid node, a repeated (node, way) pair, or a missing ending world, and
+  soft-rejects a set with no seed in the main line's first half or two seeds
+  in one world. The seeds are consumed in order; a seed 4c returns
+  `nothing_worth_building` on is dropped and the next is tried; the loop
+  stops when the plan is spent or at `--max-iterations`, which now defaults
+  to the Kernel's ending tier (one 1, few 2, several 4, many 6, unstated 3;
+  a linear shape gets two more, its extra lines being one node each).
+  `--branching=judge` is the previous behaviour: 4d after every line.
+- **Retold nodes are refused.** A 4c entry that plays a turn an existing
+  line plays at the same beat by the same way is soft-rejected; what gets
+  through is noted (`repeated_node`), and `repeated_situation` notes two
+  such nodes whose summaries share most of their phrases even when the way
+  differs.
+- **Images.** 4b writes `image` per node: one concrete sight, sound or
+  object the player keeps (a dozen words). It is the picturability test and
+  stage D's first fixture. The story document shows it under each node.
+- **Evaluation (4e).** `evaluate.metrics` over the finished document: fork
+  positions and the first-half count, distinct ending worlds and the
+  answers given, companions whose standing varies, events placed, set-piece
+  turns and nodes, promise coverage (a promise counts as covered when a
+  node summary or image shares two content words with it: crude, but
+  computed), repeated phrases across nodes, brief echoes, retold situations,
+  summary size against the 45-75 word target, opposition presence,
+  registers. Then one thinking-off call, `s4e_outline_judge`, scores plot,
+  people, reveals, agency, specificity and genre out of 5 with a note each,
+  names the best and worst thing, and says whether it would play. Both go
+  to `<id>_eval.json` and print at the end of the run.
+- **The A/B harness.** `ab.py run --variant <name> --kernels eval -- <flags>`
+  copies a kernel's step-2 and phase-3 files into
+  `stories/<kernel>_<name>/`, stamps it, and runs `main.py` with the flags
+  from 3.4 on; `ab.py compare` prints the metrics, judge totals and minutes
+  of each variant side by side per kernel and as means.
+  `tests/kernels/EVAL_SET.txt` is the fixed set: 1, 4, 5, 8, 17, 28, 31, 32.
+
+Costs (projected; measure them): 3.4 about one minute; 3.5c about thirty
+seconds longer; 4p one judge call of about five minutes, in place of the
+per-iteration 4d calls (about four minutes each), so a four-line story is
+about eight minutes cheaper; 4e about one minute; `image` and `event` a few
+hundred bytes of output. The prompts grew: 3.5a and 3.5b render at about
+25 KB on the stub (the promises block and the longer examples), 4a at 19 KB,
+4c at 24 KB, 4p at 15 KB.
+
+The story document gained `branching`, `plan`, `promises`, `events` in the
+premise, `voice` and `breaking_point` on cast seeds and characters, `image`
+and `event` on nodes, and `answer`, `standing`, `lost`, `changed` on every
+line's ending. Schema version 5.

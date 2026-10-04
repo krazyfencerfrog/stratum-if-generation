@@ -9,22 +9,32 @@ played.
 The story so far is a main line and possibly others. Each line is a
 through-line (what drives the protagonist, how they go about it, the
 ending it earns) laid over the beats of one framework. A previous step
-judged that another line is worth building and gave its SEED: a different
-motivation and strategy, the node where it leaves the existing story, and
-the trigger. Your job is to grow that seed into a line.
+judged that this line is worth building and gave its SEED: a different
+motivation and strategy, the node where it leaves the existing story, the
+trigger, and (when the seed came from the branch plan) the WORLD its
+ending should leave: which answer, who stands, who is lost. Your job is
+to grow that seed into a line.
 
 THE MODEL FOR THIS STEP
 
 Think of a film whose hero starts out wanting escape and adventure and
 ends up driven by duty after losing their family. That is a main line. A
-second line does not merely vary one of its choices; it finds another thing the
-hero could come to want (to join the enemy who claims to be their parent;
-to go home; to win at any price), and then asks where in the existing
-story that could take hold and what would have to be there for it to be
-believable. The new line grows from that point, has its own beats, and
-reaches its own ending, or rejoins the story later, changed. A line is
-worth building when it changes what the story is ABOUT for the player,
-not when it flips one outcome.
+second line does not merely vary one of its choices; it finds another
+thing the hero could come to want (to join the enemy who claims to be
+their parent; to go home; to win at any price), and then asks where in
+the existing story that could take hold and what would have to be there
+for it to be believable. The new line grows from that point, has its own
+beats, and reaches its own ending, or rejoins the story later, changed. A
+line is worth building when it changes what the story is ABOUT for the
+player, not when it flips one outcome.
+
+A line that leaves early has a MIDDLE OF ITS OWN. Its turns are the same
+premise turns, but the situation each one opens on is different: a
+different event has landed, a different companion is beside you or gone,
+the opposition is further ahead. A new entry that plays a turn an
+existing line plays at the same beat, by the same way, retells a node the
+story already has; take a different way, or resolve the turn in a way of
+this line's own, and change what the situation is made of.
 
 WHAT YOU PRODUCE
 
@@ -40,9 +50,9 @@ divergence:
  - diverges_at: the id of the last node this line shares with the
    existing story. Use the seed's node. It must be one of: $$VALID_NODES$$
  - trigger: what the player DID or brought about in that node that sends
-   the story this way: plain words, second person, past tense ("you
-   closed the gate on him with the deputy beside you"). Never "you
-   chose". A later stage turns this sentence into a condition.
+   the story this way: plain words, second person, past tense ("you let
+   the agent swing his crane over the trench"). Never "you chose". A later
+   stage turns this sentence into a condition.
  - trigger_kind: "act" when the trigger is something done in that node;
    "accumulated" when it is the pattern of what the player did across
    the earlier nodes. When the seed is about a relationship (a companion
@@ -71,23 +81,28 @@ entry has the same shape as on the main line:
    turn by a different way than other lines did.
  - way: the numbered way this line takes through that turn, or null if
    there is no turn or the line resolves it in a way not listed (then say
-   how in "adapted"). Where an existing line already plays the same turn at the same beat,
-   take a different way (unused_ways lists them); taking the same way
-   retells a node the story already has.
+   how in "adapted"). Where an existing line already plays the same turn
+   at the same beat, take a different way (unused_ways lists them).
+ - event: the engine's event that lands in this entry, or null. An event
+   the shared part of the path has already placed stays placed; one it
+   has not is this line's to land, and to land differently.
  - adapted: one or two sentences: what happens here on THIS line, who
    does what to whom, and what is different afterwards. Specific to this
    premise; a sentence that could be pasted into another story is not
    adapted.
 
 ending and rejoins_at: the line ENDS. Normally its last new entry is its
-own ending (rejoins_at null; "ending" gives its title and summary). It
-may instead rejoin an existing node further on (rejoins_at is that node's
-id) and play out from there exactly as the existing story does. Rejoin
-only when what this line did still shows in the shared ending; "ending"
-then says how that ending reads for someone who came this way. A line
-whose difference disappears at the rejoin is not a line. A rejoining line
-plays every node from the rejoin on, so none of those nodes may carry a
-turn this line has already played.
+own ending (rejoins_at null; "ending" gives its title, summary, and its
+world: answer, standing, lost, changed, in the same form as the main
+line's). When the seed carries an ending world, land in it; where the
+line, worked out, cannot, say in "why" where it moved and why. It may
+instead rejoin an existing node further on (rejoins_at is that node's id)
+and play out from there exactly as the existing story does. Rejoin only
+when what this line did still shows in the shared ending; "ending" then
+says how that ending reads for someone who came this way. A line whose
+difference disappears at the rejoin is not a line. A rejoining line plays
+every node from the rejoin on, so none of those nodes may carry a turn
+this line has already played.
 
 skipped_beats: every REQUIRED beat of the framework that is nowhere on
 this line's path (not shared before the divergence, not filled after it,
@@ -107,11 +122,16 @@ RULES
  4. The opposition still acts on this line: it does something in at
     least one new entry.
  5. The ending is an answer to the story's question, and its price is
-    stated.
+    stated; its world (standing, lost) is paid for by what happened on
+    this line, with a companion's breaking point crossed or kept in an
+    entry when their standing differs from the main line's.
  6. Stay inside the brief and the engine: no new systems, no way to lose
     the brief's failure model does not name.
  7. People listed in the engine's "cast" with a name are called by that
-    name; others by their role.
+    name; others by their role. Say what physically happens.
+ 8. The promises are the audience's: a set piece the main line played
+    may go the other way here; one it did not play is this line's to
+    play. Under a comic tone, say what is funny in at least one entry.
 
 $$SHAPE_NOTE$$
 
@@ -125,8 +145,8 @@ after:
   "why": "...",
   "through_line": { "title": "...", "motivation": "...", "strategy": "...", "turning_point": "...", "differs_from": "..." },
   "divergence": { "diverges_at": "node id", "trigger": "...", "trigger_kind": "act | accumulated", "way": null, "instead_of": "...", "opportunity": null, "shift": "..." },
-  "ending": { "title": "...", "summary": "..." },
-  "beats": [ { "beat": "beat id", "turn": null, "way": null, "adapted": "..." } ],
+  "ending": { "title": "...", "summary": "...", "answer": "pole_a | pole_b | mixed | neither", "standing": ["role label"], "lost": ["role label"], "changed": "..." },
+  "beats": [ { "beat": "beat id", "turn": null, "way": null, "event": null, "adapted": "..." } ],
   "skipped_beats": [ { "beat": "beat id", "reason": "..." } ],
   "rejoins_at": null
 }
@@ -136,53 +156,75 @@ ending are null, beats and skipped_beats are empty, rejoins_at is null.
 
 ILLUSTRATION (a different story; shows the grain, nothing else)
 
-Story so far: T1 "The Honest House": the stage manager of a touring
-company whose leading actress has walked out mends each gap honestly and
-opens to half a house, a week and a backer poorer. The question: does the
-company open as the play it advertised, or as the play it can honestly
-give? Framework: three-act. Nodes: N01 setup; N02 inciting_incident
-(turn 1, way 1); N03 commitment (turn 2, way 1); N04 midpoint (turn 3,
-way 2: the backer's nephew is refused and the backer is told why); N05
-crisis; N06 climax (turn 4, way 1: the audience is told before the
-curtain); N07 resolution, the ending. Turn 3's way 1 is "he gets his part
-and the backer's cheque clears"; turn 4's way 2 is "the playbill stands
-and the understudy plays under the star's name".
-Seed: motivation "keep the company in work"; strategy "give the backer
-what he asks for and keep the bill as printed"; diverges_at N04; trigger
-"you gave the backer's nephew his part".
+Story so far: T1 "The Hill's Own": you direct a dig above a village in
+the last days before the rains, with the foreman (whose family farms the
+hill; breaking point: turns the day the find is crated without the village
+seeing it), the student (breaking point: leaves the day you hold her name
+off the record) and the sponsor's agent, the opposition, who wants the
+find on the train. The question: does the find leave the hill, or stay
+with the people it was buried for? pole_a: it leaves; pole_b: it stays.
+Events: 1 (middle) the rain comes a week early; 2 (late) the sponsor's
+crate arrives at the station before the find is out of the ground.
+Framework: Fichtean curve. Nodes: N01 opening_crisis (turn 1, way 1: the
+foreman's mother tells you his grandfather dug here for the last sponsor);
+N02 second_crisis (event 1; turn 2, way 1: the men dig the nephew out by
+hand while you hold the lamp; the student's arm is broken); N03
+third_crisis (turn 3, way 1: the council gets the first viewing in
+writing; the agent stops the men's pay and the student signs his
+certificate anyway); N04 climax (event 2; turn 4, way 1: the men lift the
+crate off the platform); N05 aftermath, the ending: the find in the
+village church, the student gone with the sponsor, the foreman beside you
+(answer pole_b; standing: the foreman; lost: the student). Turn 2's way 2
+is "the agent's crane gets the nephew out; its foot cracks the find's
+lid and the agent has his photograph". Turn 3's way 2 is "the student
+certifies the find for export and the agent's crew lifts it; the
+foreman's men walk off the hill and he goes with them". Turn 4's way 2 is
+"it goes on the train, because you sign the export form and the student
+rides with it".
+Seed: motivation "the find is already half his and the rain is not
+waiting; you come to want the dig finished at any price"; strategy "take
+the agent's money and his crew, keep the men on by paying them out of it,
+get the find to the station before the council can organize";
+diverges_at N02; trigger "you let the agent swing his crane over the
+trench to get the nephew out"; way 2; ending world: answer pole_a,
+standing the foreman, lost the student.
 Output:
 {
   "status": "proposed",
-  "why": "The seed holds as given: giving the nephew a part is already a way through turn 3 with its price attached, and a company that has taken the backer's money that way cannot afford to tell the house the truth.",
+  "why": "The seed holds as given: the crane is turn 2's second way with its price attached, and a dig whose find is already photographed and cracked is the agent's dig from that minute on. The seed's ending world holds: the foreman stays for his nephew's sake, the student goes with the find.",
   "through_line": {
-    "title": "The Backer's Company",
-    "motivation": "The cheque clears and for a day nobody is packing. You come to want the tour kept whole, and then to want nothing said that would stop the next cheque.",
-    "strategy": "Give the backer what he asks for and keep the bill exactly as printed.",
-    "turning_point": "The backer asks for more than a walk-on. Once you agree to that, the play is his.",
-    "differs_from": "T1 answers the question with the play the company can honestly give: half a house, the understudy under her own name, the backer gone. This line answers it the other way and leaves a different company standing: the tour whole and paid, the backer's nephew in the cast, the old character man out of it and the understudy's name off the bill."
+    "title": "The Sponsor's Hill",
+    "motivation": "The crane has the nephew out in a minute and the agent has his photograph of the cracked lid. You come to want the dig finished at any price, because the find is already half his and the rain is not waiting; by the end you want only to be the one who signed, so that the foreman's men were paid for it.",
+    "strategy": "Take the agent's money and his crew, keep the foreman's men on by paying them from it, and get the find to the station before the council can organize.",
+    "turning_point": "The agent's pay book. Once the foreman's men are drawing his wages through your hand, every order you give at the trench is his, and you give them anyway.",
+    "differs_from": "T1 keeps the find on the hill and pays with the student; this line gives the other answer: the find leaves cracked in the sponsor's crate, the student with it, and the foreman stays only because his nephew is alive and his men were paid, in a dig that stopped being yours at the second crisis."
   },
   "divergence": {
-    "diverges_at": "N04",
-    "trigger": "you gave the backer's nephew his part",
+    "diverges_at": "N02",
+    "trigger": "you let the agent swing his crane over the trench to get the nephew out",
     "trigger_kind": "act",
-    "way": 1,
-    "instead_of": "you refused the nephew and told the backer why",
+    "way": 2,
+    "instead_of": "the foreman's men dug the nephew out by hand while you held the lamp",
     "opportunity": null,
-    "shift": "The cheque clearing is the first good news the company has had all week, and it came from the one thing you did that you would not say out loud. The manager starts speaking to you as a partner."
+    "shift": "The nephew is out alive in a minute, by the agent's machine, and the foreman's men have seen whose hand it was. The crane's foot has cracked the find's lid, the agent has his photograph, and from here the dig runs on his pay book."
   },
-  "ending": { "title": "As Billed", "summary": "The tour goes on, whole and paid, under a star who is not in it. The understudy gave the performance and cannot put her name to it, the old character man has no scene, and you are the one who knows what the bill is worth." },
+  "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it to put her name on the catalogue. The foreman stays on the hill with his men paid and his nephew alive, and does not come down to the station.",
+              "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's and damaged; the village never saw it" },
   "beats": [
-    { "beat": "crisis", "turn": null, "way": null, "adapted": "The backer, pleased, wants his nephew in the second lead by the next town, and the manager agrees before you are asked. You are the one who tells the old character man that his only scene now belongs to a boy who cannot be heard past the footlights." },
-    { "beat": "climax", "turn": 4, "way": 2, "adapted": "The house fills to see the star. You let the playbill stand and send the understudy on under another woman's name, and the applause at the call is for someone who is not in the building." },
-    { "beat": "resolution", "turn": null, "way": null, "adapted": "The second week is confirmed and the bills for the next town are printed the same as the last. You lock the prompt book away with what the dresser told you, which nobody has asked you about." }
+    { "beat": "third_crisis", "turn": 3, "way": 2, "event": null, "adapted": "The agent's hired crew is on the hill by morning and the foreman's men stand back from the trench until you tell them the agent's money is their pay. You let the student certify the find for export, in the arm sling, with the agent's pen; the men go down for the agent's wages, and the foreman watches you give the order and says nothing." },
+    { "beat": "climax", "turn": 4, "way": 2, "event": 2, "adapted": "The sponsor's crate is on the platform before the find is clean, and the council is on the road with the foreman's mother at the front. You sign the export form on the crate's lid and the student climbs into the goods van beside it; the foreman has not come down from the hill, and his mother turns back when she sees your name on the form." },
+    { "beat": "aftermath", "turn": null, "way": null, "event": null, "adapted": "The train is gone with the find and the student, and the agent's photograph of the cracked lid will be in the sponsor's catalogue before your report. The foreman's men are paid to the day; the village church has an empty table where the council meant to put the find, and nobody on the hill asks when you are leaving." }
   ],
   "skipped_beats": [],
   "rejoins_at": null
 }
 (Three new entries, starting at the beat after the divergence node's;
-turn 4 played once, by the way T1 did not take; the manager acts in the
-crisis; the ending answers the question with "as advertised" and says who
-pays. Every required beat is on the path, so skipped_beats is empty.)
+turns 3 and 4 played once each, by ways T1 did not take, so no node is
+retold; event 2 lands here as it did on T1 but goes the other way; the
+agent acts in the third crisis with his crew and his pay book; the ending
+answers the question with pole_a and names who stands and who is lost,
+and the foreman's standing is paid for in the third crisis. Every
+required beat is on the path, so skipped_beats is empty.)
 
 USER INPUT FOLLOWS BELOW
 
@@ -192,8 +234,11 @@ $$KERNEL$$
 - the brief (decision, theme, affect, failure)
 $$BRIEF_LITE_JSON$$
 
-- the engine: protagonist, pressure, opposition, question and poles, levers, turns (ways numbered), complications
+- the engine: protagonist, pressure, opposition, events (numbered), cast (with voices and breaking points), question and poles, levers, turns (ways numbered), complications
 $$PREMISE_JSON$$
+
+- the promises (defaults; the Kernel and the brief beat them)
+$$PROMISES$$
 
 - the framework and its beats
 $$FRAMEWORK_JSON$$

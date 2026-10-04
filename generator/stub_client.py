@@ -57,7 +57,21 @@ Scenario knobs (environment variables):
                                  main line's ending node
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
                                  iteration
-    STUB_STOP_AFTER=3            4d says stop after this iteration
+    STUB_STOP_AFTER=3            4d says stop after this iteration (--branching=judge)
+    STUB_NO_EVENTS=1             3.5a names no events (a computed finding the
+                                 repair must fill)
+    STUB_NO_SET_PIECE=1          no turn names a set piece (a computed finding)
+    STUB_NO_EVENT_PLACED=1       4a's first answer places no event (a soft
+                                 rejection; the retry places one)
+    STUB_PLAN_LATE=1             4p's first answer has every seed leaving in
+                                 the second half (a soft rejection)
+    STUB_PLAN_DUP=1              4p's first answer has two seeds in the same
+                                 ending world (a soft rejection); =2 the retry
+                                 does too (accepted, noted)
+    STUB_PLAN_SEEDS=2            how many seeds 4p plans (default: seeds_wanted);
+                                 0 plans none, so the loop stops after the main line
+    STUB_ECHO=1                  3.5a's first answer copies a phrase of the
+                                 brief's analytic wording into a lever (soft)
 """
 
 import json
@@ -138,10 +152,13 @@ class StubClient(LlmClient):
             ('craft-spine construction step', 's3_75'),
             ('repair step for the craft spine', 's3_75r'),
             ('You are the story-form step', 's3_8'),
+            ('You are the genre-promises step', 's3_4'),
             ('You are step 4a', 's4a'),
             ('You are step 4b', 's4b'),
             ('You are step 4c', 's4c'),
             ('You are step 4d', 's4d'),
+            ('You are step 4p', 's4p'),
+            ('You are step 4e', 's4e'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -330,9 +347,28 @@ class StubClient(LlmClient):
         return {"checks": checks, "primary_branch_source": {"source": "interactive_question", "rationale": "stub"},
                 "unresolved_for_next_phase": []}
 
+    # ------------------------------------------------------------------ 3.4
+
+    def p_s3_4(self, p):
+        return {
+            "reading": "stub: a confined-vessel survival story; the reader wants to feel the air getting thin.",
+            "genre": "hard science fiction, ship in crisis",
+            "player_fantasy": "to be the one mind that sees every gauge and still has to choose.",
+            "promises": [{"what": "a corridor sealing with someone on the wrong side of the hatch", "why": "the genre's image of the cost", "in_kernel": True},
+                         {"what": "the hum of the scrubbers stopping", "why": "silence as the warning", "in_kernel": False}],
+            "set_pieces": [{"scene": "a drone's camera feed from inside a venting sector", "where": "an inhabited sector"},
+                           {"scene": "the council chamber lit by emergency strips while the AI speaks", "where": "the council chamber"}],
+            "tone_engine": "Tense: every scene has a number falling in the corner of it.",
+            "obligatory_cast": ["an engineer who trusts the machines more than the AI"],
+            "must_not": [],
+        }
+
     # ------------------------------------------------------------------ 3.5
 
     VIOLATION = "a crew-trust score that rises with each favor and gates the manual override"
+    EVENTS = [{"what": "The scrubbers in the outer ring stop, and the hum everyone grew up with is gone.", "when": "early", "serves": "3b.primary_affect"},
+              {"what": "The council calls an open session and puts the AI's gauges on the chamber wall.", "when": "late", "serves": "3c.core_thematic_axis"}]
+    ECHO = "which sector to vent or spare at each core breakdown"
     FIXED = "The council's warden quietly reroutes air to her own sector."
 
     def p_s3_5a(self, p):
@@ -346,11 +382,13 @@ class StubClient(LlmClient):
                          "clock_or_stock": "core margin (stock), licensed by 3-0c resource_depletion", "serves": "3-0c.failure_triggers"},
             "opposition": {"who_or_what": "the sector council", "wants": "no sector vented, whatever the core costs",
                            "means": "it holds the override codes and can lock the AI out of the valves", "serves": "3c.core_thematic_axis"},
+            "events": [] if env_int('STUB_NO_EVENTS', 0) else list(self.EVENTS),
             "mediation": {
                 "question": "Is the ship its people or its core?",
                 "to_reach_pole_a": {"pole": "fittest: vent", "what_you_must_do": "obtain a council override or a foreman's manual valve", "cost": "the council learns what you asked for"},
                 "to_reach_pole_b": {"pole": "collective: spare", "what_you_must_do": "find and reroute air the sectors are hiding", "cost": "the core margin falls faster"},
-                "levers": ["the council override codes", "the hydroponics scrubber feed", "the warden's private reroute"],
+                "levers": ["the council override codes", "the hydroponics scrubber feed", "the warden's private reroute"]
+                          + ([self.ECHO] if env_int('STUB_ECHO', 0) and RETRY_MARKER not in p else []),
                 "serves": "3-0a.primary_decision_axis"},
             # STUB_GAP=1: the brief has an epistemic gap; =2 the engine forgets to state it (a computed finding)
             "hidden_truth": self.HIDDEN if env_int('STUB_GAP', 0) == 1 else None,
@@ -358,19 +396,21 @@ class StubClient(LlmClient):
 
     def p_s3_5b(self, p):
         hard = env_int('STUB_PREMISE_HARD_ROUNDS', 0) > 0
+        sp = None if env_int('STUB_NO_SET_PIECE', 0) else "the drone's camera feed from inside the venting ring, frost forming on the lens"
         return {
             "turns": [
                 {"id": 1, "situation": "The nursery's air is short and the council will not say why.", "what_you_must_do": "find where the air is going",
                  "ways_through": [{"way": "a drone traces the ducts", "cost": "the drone is lost to the cold"}, {"way": "the warden tells you", "cost": "she learns you suspect her"}],
-                 "involves": ["the nursery warden", "the nursery families"], "form": "discover", "serves": "3-0a.primary_decision_axis"},
+                 "involves": ["the nursery warden", "the nursery families"], "form": "discover", "set_piece": None, "serves": "3-0a.primary_decision_axis"},
                 {"id": 2, "situation": "Hydroponics can feed the medical bay or itself, not both.", "what_you_must_do": "get the foreman to open the feed",
                  "ways_through": [{"way": "he opens it on your promise that his sector is never vented", "cost": "a promise you may break"}, {"way": "he opens it after seeing the medical bay", "cost": "hours of margin"}],
-                 "involves": ["the hydroponics foreman"], "form": "persuade", "serves": "3c.core_thematic_axis"},
+                 "involves": ["the hydroponics foreman"], "form": "persuade", "set_piece": sp, "serves": "3c.core_thematic_axis"},
                 {"id": 3, "situation": "The council offers the override for one sector of your choosing.", "what_you_must_do": "decide whom to tell",
                  "ways_through": [{"way": "the sector hears first", "cost": "they barricade the valve"}, {"way": "nobody is told", "cost": "you become the council's instrument"}],
-                 "involves": ["the council speaker", "the nursery warden"], "form": "conceal_or_reveal", "serves": "3c.core_thematic_axis"},
+                 "involves": ["the council speaker", "the nursery warden"], "form": "conceal_or_reveal", "set_piece": None, "serves": "3c.core_thematic_axis"},
             ],
-            "complications": [{"description": self.VIOLATION if hard else self.FIXED, "serves": "3c.core_thematic_axis"}],
+            "complications": [{"description": self.VIOLATION if hard else self.FIXED, "serves": "3c.core_thematic_axis"},
+                              {"description": "The foreman's manual feed valve was welded half shut by the previous AI.", "serves": "3-0c.failure_triggers"}],
         }
 
     def p_s3_5c(self, p):
@@ -378,16 +418,20 @@ class StubClient(LlmClient):
         roles = [m.group(1).strip() for m in re.finditer(r'^\s*- (.+)$', listed, re.M)]
         bad = env_int('STUB_BAD_CAST', 0) and RETRY_MARKER not in p
         known = {
-            "the nursery warden": ("individual", None if bad else "the nursery families", "her sector spared", "a private reroute", False),
-            "the nursery families": ("crowd", None, "air", "the ship's sympathy", False),
-            "the hydroponics foreman": ("individual", None, "his scrubbers running", "the manual feed valve", False),
-            "the council speaker": ("individual", "the sector council", "the AI dependent on the council", "the override codes", True),
+            "the nursery warden": ("individual", None if bad else "the nursery families", "her sector spared", "a private reroute", False,
+                                   "turns the day the nursery is named on the public channel"),
+            "the nursery families": ("crowd", None, "air", "the ship's sympathy", False, None),
+            "the hydroponics foreman": ("individual", None, "his scrubbers running", "the manual feed valve", False,
+                                        "walks off the feed valve if his sector is bled twice"),
+            "the council speaker": ("individual", "the sector council", "the AI dependent on the council", "the override codes", True, None),
         }
         seeds = []
         for r in roles:
-            kind, speaks, wants, holds, opp = known.get(r, ("individual", None, "stub want", "stub holding", False))
+            kind, speaks, wants, holds, opp, bp = known.get(r, ("individual", None, "stub want", "stub holding", False, None))
             seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds,
-                          "edge": None if kind == "crowd" else f"stub edge of {r}", "tie": f"stub tie of {r}", "opposition": opp})
+                          "edge": None if kind == "crowd" else f"stub edge of {r}", "tie": f"stub tie of {r}",
+                          "voice": None if kind == "crowd" else f"stub voice of {r}: 'stub line'",
+                          "breaking_point": bp, "opposition": opp})
         return {"notes": "stub", "cast_seeds": seeds}
 
     def p_s3_5v(self, p):
@@ -426,6 +470,12 @@ class StubClient(LlmClient):
             revised['turns'] = self.p_s3_5b(p)['turns']     # the finding list names the broken turn: restore it
         if 'states no hidden truth' in p.split(RETRY_MARKER)[0]:
             revised['hidden_truth'] = self.HIDDEN
+        if 'names no event' in p.split(RETRY_MARKER)[0]:
+            revised['events'] = list(self.EVENTS)
+        if 'no turn names the set piece' in p.split(RETRY_MARKER)[0]:
+            turns = revised.get('turns') or self.p_s3_5b(p)['turns']
+            turns[1]['set_piece'] = "the drone's camera feed from inside the venting ring"
+            revised['turns'] = turns
         return {"repair_log": [{"finding": self.VIOLATION, "change": "replaced the score with a rerouting complication", "disagreement": ""}],
                 "revised": revised}
 
@@ -479,16 +529,20 @@ class StubClient(LlmClient):
         entries = []
         middle = beats[1:-1] if len(beats) > 2 else beats
         queue = list(turns)
+        n_events = len(premise.get('events') or [])
+        place_events = n_events and not (env_int('STUB_NO_EVENT_PLACED', 0) and RETRY_MARKER not in p)
         for i, b in enumerate(beats):
             turn = None
             if b in middle and queue:
                 turn = queue.pop(0)
-            entries.append({"beat": b['id'], "turn": turn, "way": 1 if turn is not None else None,
-                            "adapted": f"stub: {b['id']} in this story" + (f", playing turn {turn}" if turn is not None else '')})
+            event = 1 if (place_events and i == 0) else (2 if (place_events and n_events > 1 and i == len(beats) - 2) else None)
+            entries.append({"beat": b['id'], "turn": turn, "way": 1 if turn is not None else None, "event": event,
+                            "adapted": f"stub: {b['id']} in this story" + (f", playing turn {turn}" if turn is not None else '')
+                            + (f", event {event} lands" if event else '')})
             if b is middle[-1]:
                 while queue:      # more turns than middle beats: double up on the last one
                     turn = queue.pop(0)
-                    entries.append({"beat": b['id'], "turn": turn, "way": 1, "adapted": f"stub: {b['id']} again, playing turn {turn}"})
+                    entries.append({"beat": b['id'], "turn": turn, "way": 1, "event": None, "adapted": f"stub: {b['id']} again, playing turn {turn}"})
         if sloppy and entries:
             name = {'opening_crisis': 'Opening crisis', 'setup': 'Setup'}.get(entries[0]['beat'])
             if name:
@@ -500,7 +554,9 @@ class StubClient(LlmClient):
                     e['way'] = 'null'
         return {"through_line": {"title": "the keeper", "motivation": "keep everyone breathing, then keep the core",
                                  "strategy": "reroute rather than vent", "turning_point": "the council's offer"},
-                "ending": {"title": "the strained collective", "summary": "everyone breathes, barely"},
+                "ending": {"title": "the strained collective", "summary": "everyone breathes, barely",
+                           "answer": "pole_b", "standing": ["the nursery warden", "the hydroponics foreman"], "lost": [],
+                           "changed": "the ship is cold and lit by strips"},
                 "beats": entries, "skipped_beats": []}
 
     PLACES = [("the core status bay", "a control space", "where the margin is read"),
@@ -530,6 +586,7 @@ class StubClient(LlmClient):
             if sloppy:
                 who = [re.sub(r'^the ', '', w) for w in who]
             nodes.append({"id": n['id'], "title": f"stub {n['id']}", "summary": f"stub summary: {n.get('plan', '')}",
+                          "image": f"stub image for {n['id']}: a gauge needle resting on red",
                           "where": [place[0].upper() if sloppy else place[0]], "who": who})
         if extra and nodes:
             new_characters = [
@@ -598,17 +655,74 @@ class StubClient(LlmClient):
         if rejoin:
             covered.add(nodes[rejoin]['beat'])
         skipped = [{"beat": b, "reason": "stub: the line does not pass through it"} for b in required if b not in covered]
-        hook = next((h for h in hooks if h['node'] == at), None)
+        hook = next((h for h in hooks if h['node'] == at and h['way'] == seed.get('way')), None) \
+            or next((h for h in hooks if h['node'] == at), None)
+        seed_ending = seed.get('ending') if isinstance(seed.get('ending'), dict) else {}
+        ending = {"title": seed_ending.get('title') or f"stub ending {it}", "summary": seed_ending.get('summary') or f"stub: line {it} ends differently",
+                  "answer": seed_ending.get('answer') or ("pole_a" if it % 2 == 0 else "mixed"),
+                  "standing": seed_ending.get('standing') or (["the nursery warden"] if it % 2 == 0 else ["the hydroponics foreman"]),
+                  "lost": seed_ending.get('lost') or (["the hydroponics foreman"] if it % 2 == 0 else ["the nursery warden"]),
+                  "changed": seed_ending.get('changed') or "stub: a sector is dark"}
+        for e in entries:
+            e.setdefault("event", None)
         return {
             "status": "proposed", "why": "stub: the seed holds",
             "through_line": {"title": f"line {it}", "motivation": seed.get('motivation', 'stub'), "strategy": seed.get('strategy', 'stub'),
                              "turning_point": "stub", "differs_from": "stub: a different answer at a different price"},
             "divergence": {"diverges_at": at, "trigger": seed.get('trigger', 'you told the sector first'),
-                           "trigger_kind": "accumulated" if linear else "act",
+                           "trigger_kind": seed.get('trigger_kind') or ("accumulated" if linear else "act"),
                            "way": hook['way'] if hook else None,
                            "instead_of": "you told no one",
                            "opportunity": None if hook else "the speaker makes a private offer",
                            "shift": "stub: what you learn there changes what you want"},
-            "ending": {"title": f"stub ending {it}", "summary": f"stub: line {it} ends differently"},
+            "ending": ending,
             "beats": entries, "skipped_beats": skipped, "rejoins_at": rejoin,
         }
+
+    # ------------------------------------------------------------------ 4p / 4e
+
+    def p_s4p(self, p):
+        counts = self.section(p, '- counts and where a line may leave') or {}
+        hooks = (self.section(p, '- ways through a turn that no line has taken') or {}).get('unused_ways') or []
+        digest = self.section(p, '- the story so far (one entry per node') or {}
+        valid = counts.get('valid_divergence_nodes') or []
+        first_half = counts.get('first_half') or valid[:1]
+        wanted = env_int('STUB_PLAN_SEEDS', counts.get('seeds_wanted', 2))
+        wanted = min(wanted, counts.get('seeds_at_most', wanted))
+        retry = RETRY_MARKER in p
+        linear = 'LINEAR SHAPE' in self.body(p)
+        late_only = env_int('STUB_PLAN_LATE', 0) and not retry
+        dup = env_int('STUB_PLAN_DUP', 0)
+        dup_now = dup >= 2 or (dup == 1 and not retry)
+        main = (digest.get('lines') or [{}])[0]
+        taken = set()
+        seeds = []
+        for i in range(wanted):
+            if linear:
+                at = valid[0]
+            elif late_only or i > 0:
+                late = [v for v in valid if v not in first_half] or valid
+                at = late[min(i, len(late) - 1)]
+            else:
+                at = first_half[-1]
+            hook = next((h for h in hooks if h['node'] == at and (at, h['way']) not in taken), None)
+            if hook:
+                taken.add((at, hook['way']))
+            worlds = [("pole_a", ["the nursery warden"], ["the hydroponics foreman"]),
+                      ("pole_a", ["the hydroponics foreman"], ["the nursery warden"]),
+                      ("neither", [], ["the nursery warden", "the hydroponics foreman"]),
+                      ("mixed", ["the hydroponics foreman"], []),
+                      ("pole_b", [], ["the nursery warden"]), ("pole_a", [], []), ("neither", ["the council speaker"], [])]
+            answer, standing, lost = worlds[0] if (dup_now and i == 1) else worlds[i % len(worlds)]
+            seeds.append({"motivation": f"stub motivation {i + 2}", "strategy": f"stub strategy {i + 2}",
+                          "diverges_at": at, "trigger": "you told the sector first" if not linear else "you had warned every sector in turn",
+                          "trigger_kind": "accumulated" if linear else "act", "way": hook['way'] if hook else None,
+                          "ending": {"title": f"stub ending {i + 2}", "summary": f"stub: world {i + 2}", "answer": answer,
+                                     "standing": standing, "lost": lost, "changed": f"stub change {i + 2}"},
+                          "why_different": "stub: a different world"})
+        return {"assessment": "stub: the main line answers one way; these are the others", "seeds": seeds}
+
+    def p_s4e(self, p):
+        return {"reading": "stub: a competent outline", "scores": {a: {"note": f"stub {a}", "score": 3} for a in
+                ('plot', 'people', 'reveals', 'agency', 'specificity', 'genre')},
+                "best_thing": "stub: the second node", "worst_thing": "stub: the endings", "would_play": True}

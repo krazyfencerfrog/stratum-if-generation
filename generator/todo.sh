@@ -38,3 +38,8 @@ python main.py --story-id=kernel29 < ../tests/kernels/kernel29.txt
 python main.py --story-id=kernel30 < ../tests/kernels/kernel30.txt
 python main.py --story-id=kernel31 < ../tests/kernels/kernel31.txt
 python main.py --story-id=kernel32 < ../tests/kernels/kernel32.txt
+# added 2026-10-04 (fable response 5): genre fidelity (romance), an antagonist plan that advances on its own
+#  with companions who can be lost (court intrigue), a double tone with one companion who may turn (ghost comedy)
+python main.py --story-id=kernel33 < ../tests/kernels/kernel33.txt
+python main.py --story-id=kernel34 < ../tests/kernels/kernel34.txt
+python main.py --story-id=kernel35 < ../tests/kernels/kernel35.txt

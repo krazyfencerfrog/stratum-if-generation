@@ -382,8 +382,90 @@ def check_story(story):
     for a, b in repeated_nodes(nodes):
         notes.append(_finding('repeated_node', f'nodes {a} and {b} play the same turn the same way in the same beat '
                                                f'on different lines; the second retells the first', nodes=[a, b]))
+    for a, b in repeated_situations(story):
+        notes.append(_finding('repeated_situation', f'nodes {a} and {b} play the same turn in the same beat on different '
+                                                    f'lines and their summaries share most of their words; the situation '
+                                                    f'should differ, not only the way', nodes=[a, b]))
+    for a, b, world in same_worlds(lines):
+        notes.append(_finding('same_world', f'lines {a} and {b} end in the same world ({world}): the same answer with the '
+                                            f'same people standing and lost', lines=[a, b]))
+    static = static_companions(story)
+    if static:
+        notes.append(_finding('companions_static', static))
 
     return {'findings': findings, 'notes': notes}
+
+
+def world_key(ending):
+    ending = ending or {}
+    return (ending.get('answer'), frozenset(norm(x) for x in as_list(ending.get('standing'))),
+            frozenset(norm(x) for x in as_list(ending.get('lost'))))
+
+
+def same_worlds(lines):
+    """Pairs of lines whose endings leave the same world, with the world."""
+    seen, out = {}, []
+    for lid in list(lines):
+        e = lines[lid].get('ending') or {}
+        if not e.get('answer'):
+            continue
+        key = world_key(e)
+        if key in seen:
+            desc = f"answer {key[0]}" + (f", standing {', '.join(sorted(key[1]))}" if key[1] else '') + (f", lost {', '.join(sorted(key[2]))}" if key[2] else '')
+            out.append((seen[key], lid, desc))
+        else:
+            seen[key] = lid
+    return out
+
+
+def static_companions(story):
+    """A note when the cast has companions with breaking points, three or
+    more lines are built, and no companion's standing differs between
+    endings: the 'who is still with you' the Kernel asked for never
+    moved. Returns the note text, or None."""
+    lines = story.get('lines') or {}
+    seeds = [s for s in as_list((story.get('premise') or {}).get('cast_seeds')) if isinstance(s, dict) and s.get('breaking_point')]
+    if len(lines) < 3 or not seeds:
+        return None
+    varies = {}
+    for l in lines.values():
+        e = l.get('ending') or {}
+        if not e.get('answer'):
+            return None
+        for x in as_list(e.get('standing')):
+            varies.setdefault(norm(x), set()).add('standing')
+        for x in as_list(e.get('lost')):
+            varies.setdefault(norm(x), set()).add('lost')
+    if any(len(v) > 1 for v in varies.values()):
+        return None
+    names = ', '.join(str(s.get('role')) for s in seeds)
+    return (f'{len(lines)} lines and no companion whose standing differs between endings; the cast has breaking points '
+            f'({names}) that no line crossed')
+
+
+def repeated_situations(story, threshold=0.35):
+    """Pairs of nodes on different lines that fill the same beat with the
+    same turn (by any way) and whose summaries share most of their
+    distinctive four-word phrases: the same situation told twice with the
+    way changed."""
+    import example_guard
+    nodes = story.get('nodes') or {}
+    by_key = {}
+    for nid, n in nodes.items():
+        if n.get('turn') is None or not str(n.get('summary') or '').strip():
+            continue
+        by_key.setdefault((n.get('beat'), n.get('turn')), []).append(nid)
+    out = []
+    for ids in by_key.values():
+        for i in range(len(ids)):
+            for j in range(i + 1, len(ids)):
+                a, b = nodes[ids[i]], nodes[ids[j]]
+                if set(as_list(a.get('lines'))) & set(as_list(b.get('lines'))):
+                    continue
+                pa, pb = example_guard.ngrams(a.get('summary') or ''), example_guard.ngrams(b.get('summary') or '')
+                if pa and pb and len(pa & pb) / len(pa | pb) >= threshold:
+                    out.append((ids[i], ids[j]))
+    return out
 
 
 def repeated_nodes(nodes):

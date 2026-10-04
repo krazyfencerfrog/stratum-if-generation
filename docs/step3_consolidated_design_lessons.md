@@ -183,6 +183,19 @@ Read against the kernel1 run of the 2026-09-29 pipeline: 31.7 hours, one complet
 - **An example that is a test kernel was still in the prompts.** 3.5v's first example was kernel28 verbatim, and 3.5v's and 3.5r's engine example and 3.75's Example A were kernel1. All replaced or flagged. `tests/test_plumbing.py` fails if a live prompt mentions kernel1; nothing checks judgment shape automatically, so read each new example against the kernel list.
 - **Save what was sent.** `<prefix>_raw_input_prompt.txt` sits beside every trace. "The model never refers to this block" is only checkable when the exact prompt is on disk.
 
+## 6e. Pipeline-level patterns from the 2026-10-04 quality pass (fable_request_5)
+
+Read against nine real local-model runs on six kernels (docs/run_samples/2026-10-03). None of the fixes below has been validated on a live model yet; `fable_response_5.md` §8 is the checklist.
+
+- **An extraction tells you what is there; it cannot tell you what the audience will miss.** Phase 3 read "a dungeon crawl with a talking sword" correctly and the premise built a tower with no traps, no treasure and nothing living in it. What a genre owes its reader is a separate, cheap, thinking-off reading (3.4), handed forward as *defaults* under the Kernel and the brief. Keep the ranking explicit in every prompt that receives them, and never audit against them.
+- **A structure that only the player drives has no middle.** Turns are situations the player acts in; with nothing arriving on its own the middle is errands. The engine now names *events* (the opposition's plan, the pressure's stages) and the lines place them. Count them; do not ask whether "the world acts".
+- **The outline cannot vary what the premise never put at stake.** "Who is still with you at the end" never changed because no turn's ways differed in who was lost and no seed said what would make a companion leave. Breaking points on the cast and a companion-stakes rule on the turns are the material; the ending world (standing, lost) is the measurable result.
+- **Compare endings as worlds, not as prose.** Four endings that read differently were one ending with the price moved. Make every ending state `answer`, `standing`, `lost` in comparable form; equality of that tuple is computed, and the branch plan is refused once on it.
+- **Plan the forks together or they all come late.** One-seed-at-a-time judging cannot see that every seed so far leaves at the climax. A plan over all seeds can be checked for an early fork and for distinct worlds before any line is built; it also costs fewer calls.
+- **The analyst's words leak.** A clause from 3-0a's description became a lever, then a phrase in every node. A copied five-word phrase from the brief is a lookup (`brief_echoes`); refuse it once at construction, count it afterwards.
+- **Make quality rules soft.** A hard reject that fails twice stops the run; a quality rule (an event placed, a fork in the first half, no retold node) should cost one informed retry and then be noted, never fatal. `SoftReject` is that class.
+- **Measure before and after on the same brief.** Phase 3 is half the run and unaffected by prompt work after it; replaying from its saved files (ab.py) makes every prompt change comparable on a fixed kernel set with computed metrics. A model-graded score is a tiebreaker, not the measure.
+
 ## 6. What's settled — don't relitigate
 - `moral_valence`'s qualitative best/worst-case shape (3c).
 - The five-tier evidence_basis structure (§2.1) as the default starting point for any new field — apply the refinements above rather than reconsidering the tier set itself.

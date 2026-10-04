@@ -93,3 +93,48 @@ def copied_phrases(output, prompt_files, context_texts=()):
     for s in strings(output):
         out |= ngrams(s)
     return sorted(' '.join(g) for g in (out & example_phrases(prompt_files)) - allowed)
+
+
+# ---------------------------------------------------------------- the brief's own wording
+
+BRIEF_N = 5
+BRIEF_TEXT_KEYS = ('label', 'description', 'role', 'pole_a', 'pole_b', 'best_case', 'worst_case')
+
+
+def brief_phrases(brief, n=BRIEF_N):
+    """The distinctive n-word phrases of the brief's free-text fields (the
+    decision axis and its description, the thematic poles, the protagonist
+    role): phase 3's analytic wording, which is not the story's."""
+    out = set()
+    for entry in ((brief or {}).get('fields') or {}).values():
+        if not isinstance(entry, dict):
+            continue
+        for key in BRIEF_TEXT_KEYS:
+            value = entry.get(key)
+            if isinstance(value, str) and len(value.split()) >= n:
+                out |= ngrams(value, n)
+    return out
+
+
+def brief_echoes(output, brief, n=BRIEF_N):
+    """Phrases of n or more words copied from the brief's analytic text
+    into a construction output ("the sword's stated desire to be returned"
+    became a lever, then a phrase in every node). Sorted, longest first,
+    overlapping shorter matches dropped."""
+    wanted = brief_phrases(brief, n)
+    if not wanted:
+        return []
+    hits = []
+    for s in strings(output):
+        w = words(s)
+        i = 0
+        while i <= len(w) - n:
+            if tuple(w[i:i + n]) in wanted:
+                j = i + n
+                while j < len(w) and tuple(w[j - n + 1:j + 1]) in wanted:
+                    j += 1
+                hits.append(' '.join(w[i:j]))
+                i = j
+            else:
+                i += 1
+    return sorted(set(hits), key=lambda h: (-len(h), h))

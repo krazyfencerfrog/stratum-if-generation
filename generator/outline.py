@@ -18,25 +18,31 @@ Units
 One iteration
   iteration 1   4a main line   the through-line, the framework's beats
                                adapted to this story, the premise's turns
-                               placed in them
-  iteration n   4c divergence  a seed (motivation, strategy, where it
-                               leaves) grown into a line plan
-  every one     4b line nodes  each new node filled: title, summary, where,
-                               who; characters and locations registered as
-                               they are needed
+                               and events placed in them
+                4p branch plan (branching 'plan', the default) every
+                               divergence designed at once: where each
+                               line leaves, on what, and the world its
+                               ending leaves (answer, who stands, who is
+                               lost); computed rules want an early fork and
+                               no two endings in the same world
+  iteration n   4c divergence  a seed (from the plan, or from 4d) grown
+                               into a line plan
+  every one     4b line nodes  each new node filled: title, summary, image,
+                               where, who; characters and locations
+                               registered as they are needed
                 computed       graph integrity, beat coverage, turn
                                placement, branch reachability, register use
                                (generator/checks.py)
-                4d next line   one small judgment: is another line worth
-                               building, and what is its seed
+                4d next line   (branching 'judge') one small judgment: is
+                               another line worth building, and its seed
 
 Every structural rule is enforced by the validator of the call that could
 break it, so a bad answer is rejected and re-asked with the complaint in
 hand; nothing waits for a review pass. What the validators cannot decide is
 reported as notes in the story document.
 
-Call prefixes: s4a_i1, s4c_i<n>, s4b_i<n> (and s4b_i<n>_p2 ... when a line
-has more than four new nodes), s4d_i<n>. State is rebuilt by
+Call prefixes: s4a_i1, s4p_i1, s4c_i<n>, s4b_i<n> (and s4b_i<n>_p2 ... when
+a line has more than four new nodes), s4d_i<n>. State is rebuilt by
 replaying this driver over the saved files, so a rerun makes no model call.
 The story document (<id>_story.json / .md) is rewritten after every
 iteration and is the one file the later stages read and annotate.
@@ -46,6 +52,7 @@ import json
 import names
 
 from brief import brief_lite, shape_targets
+from errors import SoftReject
 from stats import SCHEMA_VERSION
 import checks
 import example_guard
@@ -99,15 +106,17 @@ def to_int(value):
 
 class OutlineBuilder:
 
-    def __init__(self, gen, max_iterations=4):
+    def __init__(self, gen, max_iterations=4, branching='plan'):
         self.gen = gen
         self.max_iterations = max_iterations
+        self.branching = branching if branching in ('plan', 'judge') else 'plan'
 
         self.framework = gen.analysis.get('framework') or {}
         self.beats = [b['id'] for b in self.framework.get('beats') or []]
         self.premise = gen.analysis.get('s3_5_premise') or {}
         self.turns = [t for t in self.premise.get('turns') or [] if isinstance(t, dict)]
         self.turn_ids = [t.get('id') for t in self.turns]
+        self.events = [e for e in as_list(self.premise.get('events')) if isinstance(e, dict) and e.get('what')]
 
         self.lines = {}
         self.line_order = []
@@ -116,6 +125,7 @@ class OutlineBuilder:
         self.characters = {}
         self.locations = {}
         self.iterations = []
+        self.plan = None            # the branch plan (branching 'plan'): its seeds, consumed in order
         self.stop_reason = None
         self.warnings = []
 
@@ -144,19 +154,31 @@ class OutlineBuilder:
             d = d if isinstance(d, dict) else {}
             return {k: d.get(k) for k in keys}
 
+        cast = []
+        for seed in as_list(p.get('cast_seeds')):
+            if not isinstance(seed, dict) or seed.get('kind') == 'crowd':
+                continue
+            entry = {'role': seed.get('role')}
+            if seed.get('name'):
+                entry['name'] = seed['name']
+            for key in ('voice', 'breaking_point'):
+                if seed.get(key):
+                    entry[key] = seed[key]
+            cast.append(entry)
         return {
             'protagonist': pick(p.get('protagonist'), 'who', 'wants', 'can_do', 'cannot_do'),
             'pressure': (p.get('pressure') or {}).get('description'),
             'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
+            'events': [f"{i}. ({e.get('when')}) {e.get('what')}" for i, e in enumerate(self.events, 1)],
             'hidden_truth': p.get('hidden_truth') or None,
-            'cast': [{'role': s.get('role'), 'name': s['name']} for s in as_list(p.get('cast_seeds'))
-                     if isinstance(s, dict) and s.get('name')],
+            'cast': cast,
             'question': med.get('question'),
             'pole_a': pick(med.get('to_reach_pole_a'), 'pole', 'what_you_must_do', 'cost'),
             'pole_b': pick(med.get('to_reach_pole_b'), 'pole', 'what_you_must_do', 'cost'),
             'levers': med.get('levers'),
             'turns': [{'id': t.get('id'), 'form': t.get('form'), 'situation': t.get('situation'),
                        'what_you_must_do': t.get('what_you_must_do'),
+                       **({'set_piece': t['set_piece']} if t.get('set_piece') else {}),
                        'ways': [f"{i}. {w.get('way')} (cost: {w.get('cost')})"
                                 for i, w in enumerate(as_list(t.get('ways_through')), 1) if isinstance(w, dict)],
                        'involves': t.get('involves')} for t in self.turns],
@@ -211,6 +233,7 @@ class OutlineBuilder:
                 self.add_character({'label': seed['role'], 'kind': seed.get('kind'), 'speaks_for': seed.get('speaks_for'),
                                     'wants': seed.get('wants'), 'holds': seed.get('holds'),
                                     'edge': seed.get('edge'), 'tie': seed.get('tie'), 'name': seed.get('name'),
+                                    'voice': seed.get('voice'), 'breaking_point': seed.get('breaking_point'),
                                     'opposition': seed.get('opposition'), 'why': '',
                                     'matters_to_turns': seed.get('matters_to_turns') or []}, source='premise')
 
@@ -221,6 +244,7 @@ class OutlineBuilder:
             'kind': 'crowd' if str(c.get('kind') or '').lower() == 'crowd' else 'individual',
             'speaks_for': c.get('speaks_for') or None, 'wants': c.get('wants') or '', 'holds': c.get('holds') or '',
             'edge': c.get('edge') or '', 'tie': c.get('tie') or '',
+            'voice': c.get('voice') or '', 'breaking_point': c.get('breaking_point') or '',
             'opposition': bool(c.get('opposition')), 'why': c.get('why') or '',
             'matters_to_turns': c.get('matters_to_turns') or [], 'source': source, 'nodes': [],
             'name': c.get('name') or None,
@@ -284,7 +308,8 @@ class OutlineBuilder:
                             'kind': c['kind'], 'speaks_for': c['speaks_for'],
                             'wants': c['wants'], 'holds': c['holds'],
                             **({'edge': c['edge']} if c.get('edge') else {}),
-                            **({'tie': c['tie']} if c.get('tie') else {})} for c in self.characters.values()],
+                            **({'tie': c['tie']} if c.get('tie') else {}),
+                            **({'voice': c['voice']} if c.get('voice') else {})} for c in self.characters.values()],
             'locations': [{'name': l['name'], 'kind': l['kind'], 'why': l['why']} for l in self.locations.values()],
         }
 
@@ -292,14 +317,24 @@ class OutlineBuilder:
 
     def run(self):
         n = 1
+        planned = []        # seeds still to build, in plan mode
         while n <= self.max_iterations:
             print(f'--- step 4, iteration {n}')
             if n == 1:
                 line, new_ids = self.apply_main_line(self.main_line())
             else:
-                seed = (self.iterations[-1].get('judge') or {}).get('seed')
+                if self.branching == 'plan':
+                    seed = planned.pop(0)
+                else:
+                    seed = (self.iterations[-1].get('judge') or {}).get('seed')
                 proposal = self.divergence(n, seed)
                 if proposal.get('status') != 'proposed':
+                    self.warnings.append(f"iteration {n}: 4c found the seed did not hold: {proposal.get('why', '')}")
+                    self.iterations.append({'iteration': n, 'line': None, 'new_nodes': [], 'judge': None,
+                                            'seed': seed, 'skipped': proposal.get('why', '')})
+                    if self.branching == 'plan' and planned:
+                        n += 1
+                        continue        # the plan has more seeds; this one is dropped
                     self.stop_reason = (f"4c found the seed did not hold at iteration {n}: "
                                         f"{proposal.get('why', '')}")
                     break
@@ -314,6 +349,16 @@ class OutlineBuilder:
                 self.stop_reason = 'the Kernel asked for one ending; one line was built'
             elif n >= self.max_iterations:
                 self.stop_reason = f'reached --max-iterations ({self.max_iterations})'
+            elif self.branching == 'plan':
+                if n == 1:
+                    self.save_story()
+                    self.plan = self.branch_plan()
+                    planned = list(self.plan.get('seeds') or [])
+                    record['plan'] = {'assessment': self.plan.get('assessment'), 'seeds': len(planned)}
+                if not planned:
+                    self.stop_reason = (f"the branch plan's {len(self.plan.get('seeds') or [])} seed(s) are built"
+                                        if self.plan and self.plan.get('seeds') else
+                                        '4p planned no further line: ' + str((self.plan or {}).get('assessment', '')))
             else:
                 self.save_story()
                 judge = self.next_line(n)
@@ -349,6 +394,7 @@ class OutlineBuilder:
         last_index = first_index
         last_turn_pos = max([self.turn_ids.index(t) for t in taken_turns if t in self.turn_ids], default=-1)
         seen_turns = set(taken_turns)
+        seen_events = set()
         per_beat = {}
         for i, e in enumerate(entries):
             if not isinstance(e, dict):
@@ -386,6 +432,16 @@ class OutlineBuilder:
                 if e['way'] is not None and not (1 <= e['way'] <= ways):
                     problems.append(f"{label}[{i}].way {e['way']}: turn {turn} has ways 1 to {ways}; use null if the line "
                                     f"resolves the turn some other way")
+            ev = to_int(e.get('event'))
+            if ev is not None and not (1 <= ev <= len(self.events)):
+                problems.append(f"{label}[{i}].event {ev}: the engine's events are numbered 1 to {len(self.events)}; "
+                                f"use null when no event lands here")
+                ev = None
+            elif ev is not None and ev in seen_events:
+                problems.append(f'event {ev} is placed twice on this line; an event happens once')
+            elif ev is not None:
+                seen_events.add(ev)
+            e['event'] = ev
             if not str(e.get('adapted') or '').strip():
                 problems.append(f'{label}[{i}].adapted is empty')
 
@@ -401,6 +457,40 @@ class OutlineBuilder:
         ending = parsed.get('ending')
         if not isinstance(ending, dict) or not str(ending.get('summary') or '').strip():
             problems.append('ending needs a summary')
+        else:
+            OutlineBuilder.normalize_ending(ending, problems)
+
+    @staticmethod
+    def normalize_ending(ending, problems=None):
+        """The world an ending leaves, in the comparable form (answer,
+        standing, lost, changed). Missing parts are filled with the
+        tolerant default and, when `problems` is given, reported."""
+        problems = problems if problems is not None else []
+        answer = str(ending.get('answer') or '').strip().lower().replace(' ', '_')
+        if answer in ('a', 'pole a'):
+            answer = 'pole_a'
+        if answer in ('b', 'pole b'):
+            answer = 'pole_b'
+        if answer not in schemas.ANSWERS:
+            if answer:
+                problems.append(f'ending.answer "{ending.get("answer")}" must be one of {schemas.ANSWERS}')
+            else:
+                problems.append('ending.answer is missing: which pole the ending lands on (pole_a, pole_b, mixed, neither)')
+            answer = 'mixed'
+        ending['answer'] = answer
+        for key in ('standing', 'lost'):
+            value = ending.get(key)
+            value = value if isinstance(value, list) else ([value] if isinstance(value, str) and value.strip() else [])
+            ending[key] = [str(v).strip() for v in value if str(v or '').strip() and str(v).strip().lower() not in ('none', 'null', 'nobody', 'no one')]
+        ending['changed'] = str(ending.get('changed') or '').strip()
+        return ending
+
+    @staticmethod
+    def world_key(ending):
+        """Two endings leave the same world when they give the same answer
+        and the same people stand and are lost. Compared by role label."""
+        return (ending.get('answer'), frozenset(norm(x) for x in ending.get('standing') or []),
+                frozenset(norm(x) for x in ending.get('lost') or []))
 
     def normalize_skips(self, parsed):
         skips = []
@@ -464,11 +554,16 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4a_main_line.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
+            if self.events and not any(e.get('event') is not None for e in entries):
+                raise SoftReject(f"none of the engine's {len(self.events)} events is placed (event: null everywhere); "
+                                 f"the world has to act on this line: put at least one event in the entry where it "
+                                 f"lands, and say what it does there")
 
         return self.gen.run_prompt('s4a_i1', 'main_line', {
             '$$KERNEL$$': self.gen.kernel,
             '$$BRIEF_LITE_JSON$$': self.brief_lite_json(),
             '$$PREMISE_JSON$$': compact_json(self.premise_digest()),
+            '$$PROMISES$$': self.gen.promises_block(),
             '$$FRAMEWORK_JSON$$': compact_json(self.framework_block()),
             '$$CRAFT_JSON$$': self.craft_json(),
             '$$NODES_MIN$$': str(self.shape['nodes_min']),
@@ -487,20 +582,26 @@ class OutlineBuilder:
         self.lines['T1'] = {
             'id': 'T1', 'iteration': 1, 'title': tl.get('title'), 'motivation': tl.get('motivation'),
             'strategy': tl.get('strategy'), 'turning_point': tl.get('turning_point'), 'differs_from': None,
-            'ending': {'title': (plan.get('ending') or {}).get('title'), 'summary': (plan.get('ending') or {}).get('summary'),
-                       'node': ids[-1]},
+            'ending': self.ending_record(plan.get('ending'), ids[-1]),
             'path': list(ids), 'new_nodes': list(ids), 'parent': None, 'divergence': None, 'rejoins_at': None,
             'skipped_beats': plan.get('skipped_beats') or [],
         }
         self.line_order.append('T1')
         return self.lines['T1'], ids
 
+    @staticmethod
+    def ending_record(ending, node_id):
+        ending = OutlineBuilder.normalize_ending(dict(ending or {}))
+        return {'title': ending.get('title'), 'summary': ending.get('summary'), 'node': node_id,
+                'answer': ending.get('answer'), 'standing': ending.get('standing'), 'lost': ending.get('lost'),
+                'changed': ending.get('changed')}
+
     def new_node(self, nid, line_id, iteration, entry):
         self.nodes[nid] = {
             'id': nid, 'line': line_id, 'iteration': iteration,
-            'beat': entry['beat'], 'turn': entry.get('turn'), 'way': entry.get('way'),
+            'beat': entry['beat'], 'turn': entry.get('turn'), 'way': entry.get('way'), 'event': entry.get('event'),
             'adapted': str(entry.get('adapted') or '').strip(),
-            'title': '', 'summary': '', 'where': [], 'who': [],
+            'title': '', 'summary': '', 'image': '', 'where': [], 'who': [],
             'is_ending': False, 'lines': [line_id],
             # what a later line needs this node to contain for its trigger to be possible
             'additions': [],
@@ -524,8 +625,10 @@ class OutlineBuilder:
         for lid in self.line_order:
             l = self.lines[lid]
             dv = l.get('divergence') or {}
+            e = l.get('ending') or {}
             entry = {'id': lid, 'title': l.get('title'), 'motivation': l.get('motivation'),
-                     'strategy': l.get('strategy'), 'ending': (l.get('ending') or {}).get('summary'),
+                     'strategy': l.get('strategy'), 'ending': e.get('summary'),
+                     'ending_world': {'answer': e.get('answer'), 'standing': e.get('standing'), 'lost': e.get('lost')},
                      'path': l.get('path')}
             if dv:
                 entry['leaves'] = f"{l.get('parent')} after {dv.get('diverges_at')} when: {dv.get('trigger')}"
@@ -538,6 +641,8 @@ class OutlineBuilder:
             entry = {'id': nid, 'beat': node['beat']}
             if node['turn'] is not None:
                 entry['turn'], entry['way'] = node['turn'], node['way']
+            if node.get('event') is not None:
+                entry['event'] = node['event']
             if node['is_ending']:
                 entry['ending'] = True
             entry['what'] = (node['title'] + ': ' if node['title'] else '') + node['adapted']
@@ -571,7 +676,6 @@ class OutlineBuilder:
 
     def next_line(self, n):
         valid = self.divergence_nodes()
-        med = self.premise.get('mediation') or {}
 
         def validate(parsed):
             if not isinstance(parsed, dict):
@@ -598,13 +702,8 @@ class OutlineBuilder:
                 raise ValueError('; '.join(problems))
 
         return self.gen.run_prompt(f's4d_i{n}', 'next_line', {
-            '$$QUESTION_JSON$$': self.gen.to_json({
-                'question': med.get('question'),
-                'pole_a': (med.get('to_reach_pole_a') or {}).get('pole'),
-                'pole_b': (med.get('to_reach_pole_b') or {}).get('pole'),
-                'protagonist_wants': (self.premise.get('protagonist') or {}).get('wants'),
-                'opposition_wants': (self.premise.get('opposition') or {}).get('wants'),
-            }),
+            '$$QUESTION_JSON$$': self.gen.to_json(self.question_block()),
+            '$$COMPANIONS_JSON$$': compact_json({'companions': self.companions()}),
             '$$STORY_DIGEST_JSON$$': compact_json(self.digest()),
             '$$HOOKS_JSON$$': compact_json({'unused_ways': self.hooks()}),
             '$$COUNTS_JSON$$': self.gen.to_json({
@@ -614,6 +713,114 @@ class OutlineBuilder:
             }),
             '$$SHAPE_NOTE$$': self.shape_note(),
         }, prompt_file='s4d_next_line.prompt', validator=validate, klass='judge', schema=schemas.NEXT_LINE)
+
+    # ------------------------------------------------------------------ 4p: the branch plan
+
+    def companions(self):
+        """Roles on 'your' side whose breaking point the cast step named:
+        the people whose standing at the end can differ between lines."""
+        return [{'role': s.get('role'), **({'name': s['name']} if s.get('name') else {}),
+                 'breaking_point': s.get('breaking_point')}
+                for s in as_list(self.premise.get('cast_seeds'))
+                if isinstance(s, dict) and s.get('breaking_point') and s.get('kind') != 'crowd']
+
+    def branch_plan(self):
+        """One call after the main line that designs every further line at
+        once: where each leaves, on what, and the world its ending leaves
+        (answer, who stands, who is lost). Designing them together is what
+        lets the plan be checked for the two things the one-at-a-time judge
+        could not see: that some line leaves early enough to have its own
+        middle, and that no two endings leave the same world."""
+        valid = self.divergence_nodes()
+        linear = bool(self.shape.get('linear'))
+        main = self.lines['T1']
+        path = main['path']
+        want = max(0, min(self.shape['through_lines'], self.max_iterations) - 1)
+        room = self.max_iterations - 1
+        main_world = self.world_key(main.get('ending') or {})
+
+        def validate(parsed):
+            if not isinstance(parsed, dict):
+                raise ValueError('expected a JSON object')
+            seeds = parsed.get('seeds')
+            if not isinstance(seeds, list):
+                raise ValueError('seeds must be a list (empty when no further line is worth building)')
+            seeds = [x for x in seeds if isinstance(x, dict)]
+            problems, soft = [], []
+            taken = set()
+            worlds = {main_world: 'the main line'}
+            for i, seed in enumerate(seeds, 1):
+                for k in ('motivation', 'strategy', 'trigger'):
+                    if not str(seed.get(k) or '').strip():
+                        problems.append(f'seed {i}: {k} is empty')
+                at = seed.get('diverges_at')
+                if at not in valid:
+                    problems.append(f'seed {i}: diverges_at "{at}" is not a node a line may leave from; valid nodes are {valid}')
+                    continue
+                kind = str(seed.get('trigger_kind') or 'act').strip().lower()
+                seed['trigger_kind'] = 'accumulated' if (linear or kind.startswith('acc')) else 'act'
+                seed['way'] = to_int(seed.get('way'))
+                at_turn = self.nodes[at]['turn']
+                if seed['way'] is not None:
+                    ways = len(as_list((self.turn(at_turn) or {}).get('ways_through'))) if at_turn is not None else 0
+                    if not (1 <= seed['way'] <= ways) or seed['way'] == self.nodes[at]['way']:
+                        seed['way'] = None
+                key = (at, seed['way'])
+                if seed['way'] is not None and key in taken:
+                    problems.append(f'seeds leave {at} by way {seed["way"]} twice; each seed leaves by a different way')
+                taken.add(key)
+                ending = seed.get('ending')
+                if not isinstance(ending, dict) or not str(ending.get('summary') or '').strip():
+                    problems.append(f'seed {i}: ending needs a summary and its world (answer, standing, lost)')
+                    continue
+                self.normalize_ending(ending, problems)
+                wk = self.world_key(ending)
+                if wk in worlds:
+                    soft.append(f'seed {i} ends in the same world as {worlds[wk]} (answer {wk[0]}, the same people '
+                                f'standing and lost); make one of them differ in who stands, who is lost or what is '
+                                f'destroyed, or drop it')
+                else:
+                    worlds[wk] = f'seed {i}'
+            self.check_example_copy(parsed, 's4p_branch_plan.prompt', problems)
+            if problems:
+                raise ValueError('; '.join(problems))
+            parsed['seeds'] = seeds[:room]
+            if not linear and len(path) >= 4 and len(seeds) >= 2:
+                half = [sd for sd in seeds if sd.get('diverges_at') in path and path.index(sd['diverges_at']) + 1 <= len(path) / 2]
+                if not half:
+                    soft.append(f"every seed leaves the main line in its second half ({', '.join(sd['diverges_at'] for sd in seeds)}); "
+                                f"a story whose lines all part late is one road with a choice of endings. Move one seed to "
+                                f"{' or '.join(path[:max(1, len(path) // 2)])}, where its own middle can grow")
+            if soft:
+                raise SoftReject('; '.join(soft))
+
+        return self.gen.run_prompt('s4p_i1', 'branch_plan', {
+            '$$KERNEL$$': self.gen.kernel,
+            '$$QUESTION_JSON$$': self.gen.to_json(self.question_block()),
+            '$$COMPANIONS_JSON$$': compact_json({'companions': self.companions()}),
+            '$$EVENTS_JSON$$': compact_json({'events': self.premise_digest()['events']}),
+            '$$STORY_DIGEST_JSON$$': compact_json(self.digest()),
+            '$$HOOKS_JSON$$': compact_json({'unused_ways': self.hooks()}),
+            '$$COUNTS_JSON$$': self.gen.to_json({
+                'lines_the_kernel_suggests': self.shape['through_lines'],
+                'seeds_wanted': want,
+                'seeds_at_most': room,
+                'main_line_nodes': path,
+                'first_half': path[:max(1, len(path) // 2)],
+                'valid_divergence_nodes': valid,
+            }),
+            '$$SHAPE_NOTE$$': self.shape_note(),
+        }, prompt_file='s4p_branch_plan.prompt', validator=validate, klass='judge', schema=schemas.BRANCH_PLAN)
+
+    def question_block(self):
+        med = self.premise.get('mediation') or {}
+        return {
+            'question': med.get('question'),
+            'pole_a': (med.get('to_reach_pole_a') or {}).get('pole'),
+            'pole_b': (med.get('to_reach_pole_b') or {}).get('pole'),
+            'protagonist_wants': (self.premise.get('protagonist') or {}).get('wants'),
+            'opposition_wants': (self.premise.get('opposition') or {}).get('wants'),
+        }
 
     # ------------------------------------------------------------------ 4c: a divergent line
 
@@ -706,6 +913,19 @@ class OutlineBuilder:
                         if any(b < a for a, b in zip(order, order[1:])):
                             problems.append(f'after rejoining at {rejoin} the line would play its turns out of order '
                                             f'({taken + new_turns + tail_turns}); rejoin after the turns it has already played')
+            # a new node that plays a turn an existing line plays, at the same beat, by the same way,
+            # retells that node; the plan said to take a different way
+            retold = []
+            for e in entries:
+                if e.get('turn') is None or not e.get('way'):
+                    continue
+                for nid, node in self.nodes.items():
+                    if (node['beat'], node['turn'], node['way']) == (e['beat'], e['turn'], e['way']) and nid not in prefix:
+                        retold.append(f"turn {e['turn']} way {e['way']} at {e['beat']} (already {nid})")
+            soft = []
+            if retold:
+                soft.append('these new entries retell a node the story already has: ' + '; '.join(retold)
+                            + '. Take a different way through the turn, or resolve it in a way of this line\'s own (way null)')
             skips = self.normalize_skips(parsed)
             if entries:
                 covered = {e.get('beat') for e in entries} | {self.nodes[x]['beat'] for x in prefix}
@@ -720,11 +940,14 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4c_divergence.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
+            if soft:
+                raise SoftReject('; '.join(soft))
 
         return self.gen.run_prompt(f's4c_i{n}', 'divergence', {
             '$$KERNEL$$': self.gen.kernel,
             '$$BRIEF_LITE_JSON$$': self.brief_lite_json(),
             '$$PREMISE_JSON$$': compact_json(self.premise_digest()),
+            '$$PROMISES$$': self.gen.promises_block(),
             '$$FRAMEWORK_JSON$$': compact_json(self.framework_block()),
             '$$CRAFT_JSON$$': self.craft_json(),
             '$$STORY_DIGEST_JSON$$': compact_json(self.digest()),
@@ -767,8 +990,7 @@ class OutlineBuilder:
             'id': line_id, 'iteration': n, 'title': tl.get('title'), 'motivation': tl.get('motivation'),
             'strategy': tl.get('strategy'), 'turning_point': tl.get('turning_point'),
             'differs_from': tl.get('differs_from'),
-            'ending': {'title': (p.get('ending') or {}).get('title'), 'summary': (p.get('ending') or {}).get('summary'),
-                       'node': path[-1]},
+            'ending': self.ending_record(p.get('ending'), path[-1]),
             'path': path, 'new_nodes': new_ids, 'parent': parent['id'],
             'divergence': {'diverges_at': at, 'trigger': str(dv.get('trigger')).strip(),
                            'trigger_kind': dv.get('trigger_kind') or 'act', 'way': dv.get('way'),
@@ -787,6 +1009,8 @@ class OutlineBuilder:
             node = self.nodes[nid]
             b = self.beat(node['beat']) or {}
             entry = {'id': nid, 'beat': f"{b.get('name')}: {b.get('job')}", 'plan': node['adapted']}
+            if node.get('event') is not None and 0 < node['event'] <= len(self.events):
+                entry['event_that_lands_here'] = self.events[node['event'] - 1].get('what')
             if node['turn'] is not None:
                 t = self.turn(node['turn']) or {}
                 ways = as_list(t.get('ways_through'))
@@ -863,9 +1087,10 @@ class OutlineBuilder:
                     problems.append(f"new crowd \"{c['label']}\" has no individual whose speaks_for names it; a crowd is "
                                     f"never the thing the player talks to")
             for x in got:
-                for k in ('title', 'summary'):
+                for k in ('title', 'summary', 'image'):
                     if not str(x.get(k) or '').strip():
-                        problems.append(f"node {x['id']}: {k} is empty")
+                        problems.append(f"node {x['id']}: {k} is empty" + (
+                            ' (one concrete sight, sound or object the player keeps from this node)' if k == 'image' else ''))
                 x['where'] = [str(w).strip() for w in as_list(x.get('where')) if str(w).strip()]
                 x['who'] = [str(w).strip() for w in as_list(x.get('who')) if str(w).strip()]
                 if not x['where']:
@@ -883,6 +1108,7 @@ class OutlineBuilder:
         prefix = f's4b_i{n}' + (f'_p{part}' if part > 1 else '')
         return self.gen.run_prompt(prefix, 'line_nodes', {
             '$$BRIEF_LITE_JSON$$': self.brief_lite_json(),
+            '$$TONE$$': self.gen.tone_line(),
             '$$SETTING_JSON$$': self.gen.to_json(setting),
             '$$PACKET_JSON$$': compact_json(self.fill_packet(line, new_ids)),
             '$$REGISTER_JSON$$': compact_json(self.register_view()),
@@ -907,6 +1133,7 @@ class OutlineBuilder:
             node = self.nodes[x['id']]
             node['title'] = str(x.get('title')).strip()
             node['summary'] = str(x.get('summary')).strip()
+            node['image'] = str(x.get('image') or '').strip()
             where = []
             for name in x['where']:
                 lid = self.match(name, self.locations, 'name')
@@ -960,6 +1187,9 @@ class OutlineBuilder:
             'node_order': self.node_order,
             'characters': self.characters,
             'locations': self.locations,
+            'branching': self.branching,
+            'plan': self.plan,
+            'promises': self.gen.analysis.get('s3_4_promises'),
         }
         if light:
             return story
@@ -1036,6 +1266,15 @@ def story_markdown(story):
             out.append(f"- rejoins at {l['rejoins_at']}")
         e = l.get('ending') or {}
         out.append(f"- ending ({e.get('node')}) {e.get('title') or ''}: {e.get('summary')}")
+        if e.get('answer'):
+            world = f"answer {e['answer']}"
+            if e.get('standing'):
+                world += f"; standing: {', '.join(e['standing'])}"
+            if e.get('lost'):
+                world += f"; lost: {', '.join(e['lost'])}"
+            if e.get('changed'):
+                world += f"; changed: {e['changed']}"
+            out.append(f"- world left: {world}")
         out.append(f"- path: {' > '.join(l.get('path') or [])}")
         for s in l.get('skipped_beats') or []:
             out.append(f"- skips beat {s.get('beat')}: {s.get('reason')}")
@@ -1066,6 +1305,8 @@ def story_markdown(story):
         tags = [b.get('name') or n['beat']]
         if n.get('turn') is not None:
             tags.append(f"turn {n['turn']}" + (f", way {n['way']}" if n.get('way') else ''))
+        if n.get('event') is not None:
+            tags.append(f"event {n['event']}")
         if n.get('is_ending'):
             tags.append('ENDING')
         out.append(f"### {nid}: {n.get('title') or '(unfilled)'} [{'; '.join(tags)}]")
@@ -1074,6 +1315,9 @@ def story_markdown(story):
         out.append(f"who: {', '.join(who_text(chars[x]) for x in n.get('who') or [] if x in chars) or '-'}")
         out.append('')
         out.append(n.get('summary') or n.get('adapted') or '')
+        if n.get('image'):
+            out.append('')
+            out.append(f"Image: {n['image']}")
         for a in n.get('additions') or []:
             out.append('')
             out.append(f"For {a.get('line')}, this node must also contain: {a.get('text')}")
@@ -1097,6 +1341,24 @@ def story_markdown(story):
             out.append(f"- {e['from']} -> {e['to']}: line {', '.join(e['lines'])} rejoins the existing story")
         out.append('')
 
+    premise = story.get('premise') or {}
+    if premise.get('events'):
+        out.append('## Events the world brings about')
+        for i, e in enumerate(premise['events'], 1):
+            placed = [nid for nid in story['node_order'] if nodes[nid].get('event') == i]
+            out.append(f"- {i}. ({e.get('when')}) {e.get('what')} [{', '.join(placed) or 'not placed'}]")
+        out.append('')
+    if story.get('plan'):
+        out.append('## Branch plan')
+        out.append(str(story['plan'].get('assessment') or ''))
+        for i, sd in enumerate(story['plan'].get('seeds') or [], 1):
+            e = sd.get('ending') or {}
+            out.append(f"- seed {i}: leave {sd.get('diverges_at')} when {sd.get('trigger')}"
+                       + (f" ({sd.get('trigger_kind')})" if sd.get('trigger_kind') != 'act' else '')
+                       + f"; ending: {e.get('title') or ''} (answer {e.get('answer')}"
+                       + (f"; standing {', '.join(e.get('standing') or [])}" if e.get('standing') else '')
+                       + (f"; lost {', '.join(e.get('lost') or [])}" if e.get('lost') else '') + ')')
+        out.append('')
     out.append('## Characters')
     for c in chars.values():
         bits = [c['kind']]
@@ -1107,6 +1369,8 @@ def story_markdown(story):
         out.append(f"- **{who_text(c)}** ({', '.join(bits)}): wants {c.get('wants') or '?'}; holds {c.get('holds') or '?'}"
                    + (f"; edge: {c['edge']}" if c.get('edge') else '')
                    + (f"; tie: {c['tie']}" if c.get('tie') else '')
+                   + (f"; voice: {c['voice']}" if c.get('voice') else '')
+                   + (f"; breaks if: {c['breaking_point']}" if c.get('breaking_point') else '')
                    + (f"; {c['why']}" if c.get('why') else '')
                    + f" [{', '.join(c.get('nodes') or []) or 'unused'}]")
     out.append('')
@@ -1135,8 +1399,12 @@ def story_markdown(story):
     out.append('## Iterations')
     for it in story.get('iterations') or []:
         j = it.get('judge') or {}
+        if it.get('skipped'):
+            out.append(f"- iteration {it['iteration']}: seed dropped by 4c: {it['skipped']}")
+            continue
         out.append(f"- iteration {it['iteration']}: line {it['line']}, new nodes {', '.join(it['new_nodes'])}"
-                   + (f"; next: {j.get('recommendation')} - {j.get('assessment')}" if j else ''))
+                   + (f"; next: {j.get('recommendation')} - {j.get('assessment')}" if j else '')
+                   + (f"; branch plan: {it['plan']['seeds']} seed(s)" if it.get('plan') else ''))
     out.append('')
     out.append(f"Stop reason: {story.get('stop_reason')}")
     if story.get('warnings'):

@@ -8,10 +8,13 @@ that), and you do not plan alternative lines (later iterations add those,
 one at a time, each from a different motivation or strategy).
 
 You are given the story's dramatic engine (who "you" are and what you
-cannot do alone, the opposition, the question the story asks and what it
-takes to reach each answer, and the TURNS: the situations the story
-passes through, each with numbered ways through it) and the FRAMEWORK the
-story is laid over: an ordered list of beats, each with a job.
+cannot do alone, the opposition, the EVENTS the world brings about on its
+own, the question the story asks and what it takes to reach each answer,
+and the TURNS: the situations the story passes through, each with
+numbered ways through it), the GENRE PROMISES (what this story's audience
+came for, as defaults the Kernel and the brief outrank), and the
+FRAMEWORK the story is laid over: an ordered list of beats, each with a
+job.
 
 WHAT A MAIN LINE IS
 
@@ -27,7 +30,11 @@ It has ONE through-line:
  - strategy: how you go about it.
  - turning_point: where and why the motivation or the strategy shifts.
 The ending is an ANSWER to the engine's question: which pole the story
-lands on, or what mixture, and what it cost.
+lands on, or what mixture, and what it cost. It is also a WORLD, stated
+in comparable form so later lines can be planned against it: answer
+(pole_a, pole_b, mixed, neither), standing (who is still with "you" at
+the end, by role label), lost (who is gone: left, turned, dead or taken),
+changed (what stands or is destroyed).
 
 WHAT YOU PRODUCE
 
@@ -38,6 +45,9 @@ entry that says what that beat is in this story.
  - way: which of that turn's numbered ways this line takes (1, 2, ...),
    or null if the beat has no turn, or if this line comes through the
    turn in a way not listed (then say how in "adapted").
+ - event: the number of the engine's event that lands in this beat, or
+   null. An event lands once. Where an event and a turn share a beat, the
+   event is what the situation opens on.
  - adapted: one or two sentences. What happens here, in THIS story: who
    does what to whom, and what is different afterwards.
 
@@ -75,9 +85,22 @@ RULES
     is first suspected and where it comes out (or that, on this line, it
     never comes out, and what that costs), and says so in those entries.
 12. The world acts on you: the opposition and the pressure do damage
-    you can see in at least one entry before the climax.
+    you can see in at least one entry before the climax, and the engine's
+    EVENTS land: place each one where it falls (its "when" is a guide),
+    and show what it does to people and things. The main line places at
+    least one; an event the main line does not place is one another line
+    can.
 13. People listed in the engine's "cast" with a name are called by that
-    name; others by their role.
+    name; others by their role. A companion with a breaking point is
+    tested on this line: the main line shows at least one companion's
+    loyalty earned or spent in an entry, so that who stands at the end
+    was paid for.
+14. The promises are the audience's: a set piece the turns name is played
+    as the scene it is, in the open (the dragon seen, the wall coming
+    down), not reported afterwards. If the tone is comic, say in at least
+    two entries what is funny in them (a want pursued to an absurd length,
+    the wrong tool, a dignity lost in public); if it is frightening, where
+    the fear is.
 
 OUTPUT FORMAT (JSON)
 
@@ -91,9 +114,10 @@ after:
     "strategy": "...",
     "turning_point": "..."
   },
-  "ending": { "title": "...", "summary": "what the world and you are at the end, and what it cost: one or two sentences" },
+  "ending": { "title": "...", "summary": "what the world and you are at the end, and what it cost: one or two sentences",
+              "answer": "pole_a | pole_b | mixed | neither", "standing": ["role label"], "lost": ["role label"], "changed": "one clause" },
   "beats": [
-    { "beat": "beat id", "turn": 1, "way": 2, "adapted": "..." }
+    { "beat": "beat id", "turn": 1, "way": 2, "event": null, "adapted": "..." }
   ]
 }
 
@@ -106,8 +130,14 @@ sheet, hold or release the hall, and speak to anyone; you cannot put
 anyone on a stage who refuses to go on, or spend the company's money
 without the manager's signature. Opposition: the company manager, who
 wants the bill played exactly as printed so that the backer stays, and
-who holds the contracts and the cash box. Question: does the company open
-as the play it advertised, or as the play it can honestly give? Turns,
+who holds the contracts and the cash box. Events: 1 (early) the town's
+paper prints the star's name across the front page; 2 (middle) the backer
+arrives a day early, with his nephew; 3 (late) the hall's owner lets the
+second week to a travelling circus. Companions: the understudy (breaking
+point: leaves if she is sent on under another woman's name twice), the old
+character man (breaking point: walks the night his scene is cut). Question:
+does the company open as the play it advertised, or as the play it can
+honestly give? pole_a: as advertised; pole_b: as it honestly can. Turns,
 with their ways:
  1 (discover) why the leading actress has walked out. Way 1: her dresser
    tells you. Way 2: you read the letter she left for the manager.
@@ -130,20 +160,24 @@ Output:
     "strategy": "Mend each gap with the people you have, and say out loud what you did.",
     "turning_point": "The backer's nephew. Refusing him costs the money, and once the money is gone there is nothing left that pretending would protect."
   },
-  "ending": { "title": "A Half House", "summary": "The company opens as what it is: the understudy under her own name, to the half of the house that stayed. It has cost a week of the tour, the backer, and your standing with the manager." },
+  "ending": { "title": "A Half House", "summary": "The company opens as what it is: the understudy under her own name, to the half of the house that stayed. It has cost a week of the tour, the backer, and your standing with the manager.",
+              "answer": "pole_b", "standing": ["the understudy", "the old character man", "the dresser"], "lost": ["the backer"], "changed": "the tour is a week shorter and has no backer; the understudy's name is on the bills" },
   "beats": [
-    { "beat": "setup", "turn": null, "way": null, "adapted": "At the morning call in the town hall you read out the day's sheet and the leading actress's place is empty. The company manager tells the company she has a cold, and tells you the bill stays as printed." },
-    { "beat": "inciting_incident", "turn": 1, "way": 1, "adapted": "Her dresser tells you what she has told nobody: the actress has gone to a rival management over unpaid salary and is not coming back. You have the truth, and the dresser has spent the one confidence she had to trade." },
-    { "beat": "commitment", "turn": 2, "way": 1, "adapted": "You rehearse the understudy yourself through the night in the empty hall. By morning she can carry the part, and the run-through the rest of the company was promised has gone to her." },
-    { "beat": "midpoint", "turn": 3, "way": 2, "adapted": "The backer's nephew arrives for the part the manager promised him. You refuse him and tell the backer why; the cheque is stopped, and from then on the manager speaks to you only through the call sheet." },
-    { "beat": "crisis", "turn": null, "way": null, "adapted": "With no cheque, the manager cancels the hall for the second week and posts a notice that the star will appear as billed. You are left holding a company that has read both, half of it packing." },
-    { "beat": "climax", "turn": 4, "way": 1, "adapted": "An hour before the curtain you go out in front of it and tell the house who is playing tonight. Half of them ask for their money back, and the manager pays it out of the cash box himself because you have left him no other way to open." },
-    { "beat": "resolution", "turn": null, "way": null, "adapted": "The understudy plays to the half of the house that stayed knowing who she was. You close the prompt book on a tour that is a week shorter and a backer poorer, with her name on the bills for the next town." }
+    { "beat": "setup", "turn": null, "way": null, "event": 1, "adapted": "At the morning call in the town hall you read out the day's sheet and the leading actress's place is empty; the town's paper is on every chair with her name across the front. The company manager tells the company she has a cold, and tells you the bill stays as printed." },
+    { "beat": "inciting_incident", "turn": 1, "way": 1, "event": null, "adapted": "Her dresser tells you what she has told nobody: the actress has gone to a rival management over unpaid salary and is not coming back. You have the truth, and the dresser has spent the one confidence she had to trade." },
+    { "beat": "commitment", "turn": 2, "way": 1, "event": null, "adapted": "You rehearse the understudy yourself through the night in the empty hall. By morning she can carry the part, and the run-through the rest of the company was promised has gone to her; the old character man, who gave up his sleep to read opposite her, has decided you are worth following." },
+    { "beat": "midpoint", "turn": 3, "way": 2, "event": 2, "adapted": "The backer arrives a day early with his nephew, who has come for the part the manager promised him. You refuse him and tell the backer why; the cheque is stopped where he stands, and from then on the manager speaks to you only through the call sheet." },
+    { "beat": "crisis", "turn": null, "way": null, "event": 3, "adapted": "With no cheque, the manager lets the hall's owner give the second week to the circus, and posts a notice that the star will appear as billed. You are left holding a company that has read both, half of it packing, and a circus unloading elephants in the yard." },
+    { "beat": "climax", "turn": 4, "way": 1, "event": null, "adapted": "An hour before the curtain you go out in front of it and tell the house who is playing tonight. Half of them ask for their money back, and the manager pays it out of the cash box himself because you have left him no other way to open." },
+    { "beat": "resolution", "turn": null, "way": null, "event": null, "adapted": "The understudy plays to the half of the house that stayed knowing who she was. You close the prompt book on a tour that is a week shorter and a backer poorer, with her name on the bills for the next town." }
   ]
 }
 (Seven entries; four turns in order, each in the beat whose job it does;
-the manager acts in the setup, the crisis and the climax with what he
-holds; every entry says what you did, to whom, and what it cost.)
+all three events placed, each shown doing something; the manager acts in
+the setup, the crisis and the climax with what he holds; the old character
+man's loyalty is earned in the commitment, which is why he stands at the
+end; every entry says what you did, to whom, and what it cost; the ending
+names its world.)
 
 USER INPUT FOLLOWS BELOW
 
@@ -153,8 +187,11 @@ $$KERNEL$$
 - the brief (decision, theme, affect, failure)
 $$BRIEF_LITE_JSON$$
 
-- the engine: protagonist, pressure, opposition, question and poles, levers, turns (ways numbered), complications
+- the engine: protagonist, pressure, opposition, events (numbered), cast (with voices and breaking points), question and poles, levers, turns (ways numbered), complications
 $$PREMISE_JSON$$
+
+- the promises (defaults; the Kernel and the brief beat them)
+$$PROMISES$$
 
 - the framework and its beats
 $$FRAMEWORK_JSON$$

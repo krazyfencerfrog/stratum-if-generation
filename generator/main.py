@@ -6,16 +6,19 @@ Reads a kernel on stdin and runs the pipeline:
   s1 kernel -> s2 rating filter + shape split (content kernel / shape prefs)
   -> phase 3 extraction (blind, nine steps) -> s3h cross-check
   -> constraint map + story brief (computed)
+  -> s3.4 genre promises: what the Kernel's audience expects and the
+     Kernel leaves open (thinking off; defaults the Kernel always beats)
   -> s3.5 premise: the dramatic engine, in three small builds
-        3.5a engine (protagonist, pressure, opposition, mediation)
+        3.5a engine (protagonist, pressure, opposition, events, mediation)
         3.5b turns  (the situations the story passes through)
         3.5c cast   (rough character sketches the turns need)
      then computed checks + 3.5v audit -> 3.5r repair -> re-audit
   -> s3.8 story form: a framework chosen from a computed shortlist
   -> step 4, the outline loop (generator/outline.py): the main line, then
-     one divergent line per iteration, each laid over the framework's beats
-     and filled at summary level; every check is computed; one small model
-     call per iteration judges whether another line is worth building
+     a branch plan (every divergence and its ending world designed
+     together), then one divergent line per iteration, each laid over the
+     framework's beats and filled at summary level; every check is computed
+  -> s4e outline judge: one cheap scoring call over the finished outline
 
 The product is a story graph: <id>_story.json and <id>_story.md.
 
@@ -36,13 +39,15 @@ import contextlib
 from pathlib import Path
 
 from llm_client import LlmCallError
+from errors import SoftReject, PipelineHalt
 from brief import (build_brief, brief_lines, constraint_fields, kernel_clauses,
-                   valid_serves, ending_tier_from_stated)
+                   valid_serves, ending_tier_from_stated, promises_lines, shape_targets)
 from stats import RunStats, call_profile, sampler_for, step_of, SCHEMA_VERSION
 import frameworks
 import schemas
 from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
+import evaluate
 import example_guard
 import names
 
@@ -100,13 +105,17 @@ SHAPE_TIERS = {
 
 TURN_FORMS = ('discover', 'persuade', 'trade', 'confront', 'conceal_or_reveal', 'sabotage',
               'endure', 'choose_whom', 'rescue', 'escape')
-COMPLICATION_BUDGET = {'minimal': 1, 'moderate': 3, 'generous': 4}
-PREMISE_KEYS = ('protagonist', 'arena', 'pressure', 'opposition', 'hidden_truth', 'mediation', 'turns',
+# A complication is craft, not invention against the Kernel: even a tightly
+# specified Kernel gets two (one of them a reversal).
+COMPLICATION_BUDGET = {'minimal': 2, 'moderate': 3, 'generous': 4}
+COMPLICATION_TEXT = {'minimal': 'exactly 2', 'moderate': '2 or 3', 'generous': '3 or 4'}
+PREMISE_KEYS = ('protagonist', 'arena', 'pressure', 'opposition', 'events', 'hidden_truth', 'mediation', 'turns',
                 'complications', 'cast_seeds')
+EVENT_WHEN = ('early', 'middle', 'late')
 
 # Files a story directory from before this schema would contain. Phase-3
 # outputs (and step 2's) have not changed shape and may be kept.
-STALE_FILE_RE = re.compile(r'_(s3_5_|s3_5v_|s3_5r\d|s3_6_|s3_7_|s3_75|s4a_|s4b_|s4c_|s4d_|s4_story)')
+STALE_FILE_RE = re.compile(r'_(s3_4_|s3_5_|s3_5v_|s3_5r\d|s3_6_|s3_7_|s3_75|s4a_|s4b_|s4c_|s4d_|s4p_|s4e_|s4_story)')
 STAMP_FILE = 'pipeline.json'
 
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
@@ -117,19 +126,6 @@ MENU_VERB = re.compile(r"\byou (?:choose|chose|decide|decided|pick|picked|opt|op
                        r"\b(?:choose|decide|elect|opt) (?:to|whether|between)\b", re.I)
 
 
-class SoftReject(ValueError):
-    """A validator complaint worth one retry but not worth stopping the
-    run: if the retry is still rejected for it, the answer is accepted and
-    whatever is wrong is left to the checks downstream (for the premise
-    repair, the next audit round). A saved answer it would reject is never
-    reported as stale."""
-
-
-class PipelineHalt(RuntimeError):
-    """Raised when a verify/repair loop exhausts its rounds with a hard
-    finding still standing, or a story directory was written by an older
-    schema. The pipeline stops rather than building on material it knows is
-    broken; the message names the files."""
 
 
 def get_client():
@@ -144,7 +140,8 @@ def get_client():
 
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
-                 breakers=True, framework_override=None, force_answer=True):
+                 breakers=True, framework_override=None, force_answer=True, promises=True,
+                 branching='plan', outline_judge=True):
         self.story_id = story_id
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
@@ -152,6 +149,9 @@ class StoryGenerator:
         self.breakers = breakers
         self.force_answer = force_answer
         self.framework_override = framework_override
+        self.promises_on = promises          # --no-promises skips 3.4; the prompts get "none"
+        self.branching = branching           # 'plan' (4p designs every divergence) or 'judge' (4d, one seed per iteration)
+        self.outline_judge = outline_judge   # --no-outline-judge skips 4e
 
         self.story_path_str = os.path.join(THIS_DIR, "..", "stories", self.story_id)
         self.story_path = Path(self.story_path_str)
@@ -215,8 +215,10 @@ class StoryGenerator:
             if stamp.get('schema_version') != SCHEMA_VERSION:
                 raise PipelineHalt(
                     f"{self.story_path_str} was written by pipeline schema {stamp.get('schema_version')}; "
-                    f"this pipeline is schema {SCHEMA_VERSION}. Delete the directory (or everything in it "
-                    f"after the s3h files, and {stamp_path.name}) to re-run."
+                    f"this pipeline is schema {SCHEMA_VERSION}. Delete the directory, or keep its phase-3 work "
+                    f"and delete only what this schema replaced:\n"
+                    f"  cd {self.story_path_str} && rm -f *_s3_4* *_s3_5* *_s3_6_* *_s3_7_* *_s3_75* *_s4* "
+                    f"*_story.json *_story.md *_eval.json {stamp_path.name}"
                 )
             return
         stale = sorted(p.name for p in self.story_path.iterdir() if STALE_FILE_RE.search(p.name))
@@ -226,7 +228,7 @@ class StoryGenerator:
                 f"{self.story_path_str} holds outputs from an older pipeline schema ({shown}). "
                 f"Delete the directory for a fresh run. To keep its phase-3 work (unchanged in this "
                 f"schema), delete only the stale files:\n"
-                f"  cd {self.story_path_str} && rm -f *_s3_5* *_s3_6_* *_s3_7_* *_s3_75* *_s4*"
+                f"  cd {self.story_path_str} && rm -f *_s3_4* *_s3_5* *_s3_6_* *_s3_7_* *_s3_75* *_s4*"
             )
         stamp_path.write_text(json.dumps({'schema_version': SCHEMA_VERSION,
                                           'created': time.strftime('%Y-%m-%dT%H:%M:%S')}, indent=2),
@@ -701,6 +703,15 @@ class StoryGenerator:
             for sk in subkeys:
                 if block.get(sk) in (None, '', [], {}):
                     problems.append(f'{key}.{sk} is missing or empty')
+        events = parsed.get('events')
+        events = events if isinstance(events, list) else ([events] if isinstance(events, dict) else [])
+        clean = []
+        for e in events:
+            if isinstance(e, dict) and str(e.get('what') or '').strip():
+                when = str(e.get('when') or '').strip().lower()
+                e['when'] = when if when in EVENT_WHEN else 'middle'
+                clean.append(e)
+        parsed['events'] = clean
         hidden = parsed.get('hidden_truth')
         if hidden in ('', {}, [], 'null', 'none'):
             parsed['hidden_truth'] = hidden = None
@@ -742,10 +753,29 @@ class StoryGenerator:
             involves = involves if isinstance(involves, list) else ([involves] if involves else [])
             t['involves'] = [str(r).strip() for r in involves if str(r).strip()]
             t['form'] = str(t.get('form') or '').strip().lower()
+            sp = t.get('set_piece')
+            t['set_piece'] = str(sp).strip() if isinstance(sp, str) and sp.strip().lower() not in ('', 'null', 'none') else None
         if not isinstance(parsed.get('complications'), list):
             parsed['complications'] = []
         if problems:
             raise ValueError('; '.join(problems))
+
+    def with_echo_check(self, validator, keys):
+        """Wraps a construction validator with the brief-echo check: a
+        phrase of five or more words copied from the brief's own field text
+        into the named sections ("the sword's stated desire to be returned",
+        used as a lever and then in every node) is a SoftReject: re-asked
+        once with the complaint, accepted if it comes back the same."""
+        brief = self.analysis.get('s3_brief')
+
+        def validate(parsed):
+            validator(parsed)
+            echoes = example_guard.brief_echoes({k: parsed.get(k) for k in keys if isinstance(parsed, dict)}, brief)
+            if echoes:
+                raise SoftReject('these phrases are the brief\'s own wording copied in as if they were things in the '
+                                 'story: ' + '; '.join(f'"{e}"' for e in echoes[:4]) + '. Name each thing in the '
+                                 'story\'s own words (what it is, what it does when used), everywhere it appears')
+        return validate
 
     def cast_validator(self, turns):
         """Rejects a cast that leaves a role the turns name without a
@@ -790,6 +820,9 @@ class StoryGenerator:
             s['role'] = wanted.get(norm(s['role']), str(s['role']).strip())
             s['kind'] = 'crowd' if str(s.get('kind') or '').strip().lower() == 'crowd' else 'individual'
             s['speaks_for'] = str(s['speaks_for']).strip() if isinstance(s.get('speaks_for'), str) and s['speaks_for'].strip().lower() not in ('', 'null', 'none') else None
+            for key in ('voice', 'breaking_point'):
+                v = s.get(key)
+                s[key] = str(v).strip() if isinstance(v, str) and v.strip().lower() not in ('', 'null', 'none') else None
             s['opposition'] = as_bool(s.get('opposition'))
             if norm(s['role']) in roles:
                 raise ValueError(f'duplicate role {s["role"]}')
@@ -804,8 +837,9 @@ class StoryGenerator:
         """The premise downstream reads: the three builds side by side, with
         each seed's matters_to_turns looked up from the turns."""
         premise = {'enrichment_budget': {'level': budget}}
-        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'hidden_truth', 'mediation'):
+        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'events', 'hidden_truth', 'mediation'):
             premise[key] = engine.get(key)
+        premise['events'] = premise.get('events') or []
         premise['turns'] = turns.get('turns')
         premise['complications'] = turns.get('complications') or []
         premise['cast_seeds'] = cast.get('cast_seeds') or []
@@ -850,6 +884,45 @@ class StoryGenerator:
         self.build_constraint_map()
         self.build_story_brief()
 
+    # ------------------------------------------------------------------ 3.4: genre promises
+
+    @staticmethod
+    def validate_promises(parsed):
+        if not isinstance(parsed, dict):
+            raise ValueError('expected a JSON object')
+        for key in ('promises', 'set_pieces', 'obligatory_cast', 'must_not'):
+            v = parsed.get(key)
+            parsed[key] = v if isinstance(v, list) else ([] if v in (None, '', 'none') else [v])
+        parsed['promises'] = [p for p in parsed['promises'] if isinstance(p, dict) and str(p.get('what') or '').strip()]
+        parsed['set_pieces'] = [p for p in parsed['set_pieces'] if isinstance(p, dict) and str(p.get('scene') or '').strip()]
+        parsed['obligatory_cast'] = [str(c).strip() for c in parsed['obligatory_cast'] if str(c or '').strip()]
+        parsed['must_not'] = [str(c).strip() for c in parsed['must_not'] if str(c or '').strip()]
+        for p in parsed['promises']:
+            p['in_kernel'] = as_bool(p.get('in_kernel'))
+        if not parsed['promises'] and not parsed['set_pieces']:
+            raise ValueError('promises and set_pieces are both empty; every genre owes its audience something')
+        if len(parsed['obligatory_cast']) > 3:
+            parsed['obligatory_cast'] = parsed['obligatory_cast'][:3]
+
+    def run_promises(self):
+        """3.4: what the Kernel's audience expects that the Kernel leaves
+        open (set pieces, the tone engine, obligatory cast, what the Kernel
+        rules out). Thinking off. The output reaches 3.5a/b and the line
+        plans as DEFAULTS; nothing checks the premise against it, so a
+        promise can never outrank the Kernel or a brief constraint.
+        Skipped with --no-promises, and the prompts get "none"."""
+        if not self.promises_on:
+            self.analysis['s3_4_promises'] = None
+            return None
+        return self.run_prompt('s3_4', 'promises', {
+            '$$KERNEL$$': self.kernel,
+            '$$BRIEF_LINES$$': brief_lines(self.analysis.get('s3_brief'),
+                                           only=('3b.', '3c.', '3-0c.', '3f.', '3-0a.primary', '3-0b.')),
+        }, validator=self.validate_promises, klass='classify', schema=schemas.PROMISES)
+
+    def promises_block(self):
+        return promises_lines(self.analysis.get('s3_4_promises'))
+
     # ------------------------------------------------------------------ 3.5: build
 
     def build_premise(self):
@@ -860,23 +933,27 @@ class StoryGenerator:
         budget = self.budget()
         engine = self.run_prompt('s3_5a', 'engine', {
             '$$BRIEF_LINES$$': table,
+            '$$PROMISES$$': self.promises_block(),
             '$$ENRICHMENT_BUDGET$$': budget,
             '$$KERNEL$$': self.kernel,
-        }, validator=self.validate_engine, klass='build', schema=schemas.ENGINE)
+        }, validator=self.with_echo_check(self.validate_engine, ('mediation', 'pressure', 'opposition', 'events')),
+            klass='build', schema=schemas.ENGINE)
         turns = self.run_prompt('s3_5b', 'turns', {
             '$$BRIEF_LINES$$': table,
+            '$$PROMISES$$': self.promises_block(),
             '$$ENRICHMENT_BUDGET$$': budget,
-            '$$COMPLICATION_COUNT$$': {'minimal': 'exactly 1', 'moderate': '2 or 3', 'generous': '3 or 4'}.get(budget, '2 or 3'),
+            '$$COMPLICATION_COUNT$$': COMPLICATION_TEXT.get(budget, '2 or 3'),
             '$$ENGINE_JSON$$': self.to_json(engine),
             '$$KERNEL$$': self.kernel,
-        }, validator=self.validate_turns, klass='build', schema=schemas.TURNS)
+        }, validator=self.with_echo_check(self.validate_turns, ('turns',)), klass='build', schema=schemas.TURNS)
         roles = []
         for t in turns['turns']:
             for r in t.get('involves') or []:
                 if r not in roles:
                     roles.append(r)
         cast = self.run_prompt('s3_5c', 'cast', {
-            '$$ENGINE_JSON$$': self.to_json({k: engine.get(k) for k in ('protagonist', 'opposition', 'mediation')}),
+            '$$ENGINE_JSON$$': self.to_json({k: engine.get(k) for k in ('protagonist', 'opposition', 'hidden_truth', 'mediation')}),
+            '$$TONE$$': self.tone_line(),
             '$$TURNS_JSON$$': compact_json({'turns': [{'id': t['id'], 'situation': t.get('situation'),
                                                        'involves': t.get('involves')} for t in turns['turns']]}),
             '$$ROLES$$': '\n'.join(f' - {r}' for r in roles) or ' (the turns name nobody)',
@@ -888,10 +965,19 @@ class StoryGenerator:
         """Names for the cast come from Python (generator/names.py), not the
         model: the role stays the key, the name rides along. Keeps any name a
         seed already has, so a repair that adds a seed names only that one."""
-        text = json.dumps({k: premise.get(k) for k in PREMISE_KEYS})
         premise['name_pool'] = names.assign_names(premise.get('cast_seeds') or [], self.story_id,
-                                                  [self.kernel or '', text], premise.get('name_pool'))
+                                                  [self.kernel or ''] + names.premise_texts(premise), premise.get('name_pool'))
         return premise
+
+    def tone_line(self):
+        """The brief's tone and affect in one line, for the calls that need
+        only that (the cast sketch, the outline judge)."""
+        f = (self.analysis.get('s3_brief') or {}).get('fields') or {}
+        tone = ', '.join(str(t) for t in ((f.get('3b.tone') or {}).get('descriptors') or []) if t)
+        affect = (f.get('3b.primary_affect') or {}).get('label') or ''
+        engine = (self.analysis.get('s3_4_promises') or {}).get('tone_engine') or ''
+        return (f"tone: {tone or '(none stated)'}; affect: {affect or '(none)'}"
+                + (f"; how the tone is produced: {engine}" if engine else ''))
 
     # ------------------------------------------------------------------ 3.5: verify
 
@@ -902,6 +988,20 @@ class StoryGenerator:
 
         def add(where, problem, quote=''):
             out.append({'source': 'computed', 'where': where, 'problem': problem, 'quote': quote})
+
+        events = [e for e in premise.get('events') or [] if isinstance(e, dict) and str(e.get('what') or '').strip()]
+        if not events:
+            add('events', 'the engine names no event: two or three things the opposition or the pressure brings about '
+                          'on their own schedule, whatever "you" do (each a picturable happening, with when it lands)')
+        elif len(events) > 4:
+            add('events', f'{len(events)} events; the engine names two or three', str(events[4].get('what')))
+        promises = self.analysis.get('s3_4_promises')
+        turns_all = [t for t in premise.get('turns') or [] if isinstance(t, dict)]
+        if isinstance(promises, dict) and promises.get('set_pieces') and turns_all \
+                and not any(t.get('set_piece') for t in turns_all):
+            add('turns.set_piece', 'no turn names the set piece it delivers; at least one turn is a scene the genre\'s '
+                                   'audience came for (one of the listed set pieces, or one of your own), with the world '
+                                   'acting, and says so in set_piece')
 
         prot = premise.get('protagonist') or {}
         cannot = str(prot.get('cannot_do') or '').strip()
@@ -1290,9 +1390,44 @@ class StoryGenerator:
 
     # ------------------------------------------------------------------ step 4
 
-    def run_outline(self, max_iterations):
-        builder = OutlineBuilder(self, max_iterations=max_iterations)
-        return builder.run()
+    def run_outline(self, max_iterations=None):
+        """max_iterations None: derived from the Kernel's shape (brief.shape_targets)."""
+        if max_iterations is None:
+            max_iterations = shape_targets(self.shape).get('default_max_iterations') or 4
+        builder = OutlineBuilder(self, max_iterations=max_iterations, branching=self.branching)
+        story = builder.run()
+        self.analysis['story'] = story
+        return story
+
+    # ------------------------------------------------------------------ 4e: the outline judge
+
+    def run_outline_judge(self):
+        """Computed metrics over the finished outline (evaluate.py), plus one
+        thinking-off call that scores it on six axes and names the best and
+        worst thing in it. Written to <id>_eval.json; report.py and ab.py
+        read it. The judge is the same local model grading its own work, so
+        its numbers are a weak signal, kept because they are cheap and
+        comparable across runs. --no-outline-judge skips the call; the
+        metrics are always computed."""
+        story = self.analysis.get('story')
+        if not story:
+            path = Path(self.story_file_path('story.json'))
+            if not path.is_file():
+                return None
+            story = json.loads(path.read_text(encoding='utf-8'))
+        result = {'metrics': evaluate.metrics(story, self.analysis.get('s3_4_promises')), 'judge': None}
+        if self.outline_judge:
+            result['judge'] = self.run_prompt('s4e', 'outline_judge', {
+                '$$KERNEL$$': self.kernel,
+                '$$TONE$$': self.tone_line(),
+                '$$PROMISES$$': self.promises_block(),
+                '$$OUTLINE$$': evaluate.judge_digest(story),
+            }, prompt_file='s4e_outline_judge.prompt', validator=evaluate.validate_judge, klass='classify',
+                schema=schemas.OUTLINE_JUDGE)
+        self.save_story_json('eval.json', result)
+        for line in evaluate.summary_lines(result):
+            print(line)
+        return result
 
 
 def as_bool(value, default=False):
@@ -1328,8 +1463,17 @@ if __name__ == "__main__":
     parser.add_argument("--rating", default=DEFAULT_RATING, help="(step2 input) US Film Rating to respect for generated story")
     parser.add_argument("--max-repairs", type=int, default=DEFAULT_MAX_REPAIRS,
                         help="repair rounds allowed in the 3.5 build/verify loop before halting (default 2)")
-    parser.add_argument("--max-iterations", type=int, default=4,
-                        help="step 4: maximum story lines to build, main line included (default 4)")
+    parser.add_argument("--max-iterations", type=int, default=None,
+                        help="step 4: maximum story lines to build, main line included (default: from the Kernel's "
+                             "ending tier: one 1, few 2, several 4, many 6, unstated 3; a linear shape gets two more)")
+    parser.add_argument("--branching", default='plan', choices=['plan', 'judge'],
+                        help="how divergent lines are seeded: 'plan' (default) designs every divergence and its ending "
+                             "world in one call after the main line (4p); 'judge' asks after each line whether another "
+                             "is worth building (4d), the behaviour before 2026-10-04")
+    parser.add_argument("--no-promises", action="store_true",
+                        help="skip 3.4 (genre promises); the premise and line prompts get 'none'")
+    parser.add_argument("--no-outline-judge", action="store_true",
+                        help="skip the 4e scoring call over the finished outline (the computed metrics still run)")
     parser.add_argument("--framework", default='', choices=[''] + frameworks.framework_ids(),
                         help="use this story framework instead of letting 3.8 choose")
     parser.add_argument("--no-think-steps", default='',
@@ -1345,7 +1489,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-breakers", action="store_true",
                         help="do not cut off calls that exceed their class's thinking or time limit")
     parser.add_argument("--stop-after", default='',
-                        help="stop after this step: 2, 3, 3.5, 3.75, 3.8 (default: run through the outline loop)")
+                        help="stop after this step: 2, 3, 3.4, 3.5, 3.75, 3.8 (default: run through the outline loop)")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
@@ -1359,7 +1503,8 @@ if __name__ == "__main__":
         gen = StoryGenerator(story_id=story_id, max_repairs=args.max_repairs,
                              no_think_steps=csv(args.no_think_steps), think_steps=csv(args.think_steps),
                              breakers=not args.no_breakers, framework_override=args.framework.strip() or None,
-                             force_answer=not args.no_force_answer)
+                             force_answer=not args.no_force_answer, promises=not args.no_promises,
+                             branching=args.branching, outline_judge=not args.no_outline_judge)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
@@ -1383,8 +1528,13 @@ if __name__ == "__main__":
         if args.stop_after == '3':
             finish()
 
+        # 3.4: what the genre owes the audience, as defaults for 3.5 and step 4.
+        gen.run_promises()
+        if args.stop_after == '3.4':
+            finish()
+
         # 3.5: the first step that CONSTRUCTS. Builds the dramatic engine
-        #  (protagonist, pressure, opposition, mediation, turns, cast seeds).
+        #  (protagonist, pressure, opposition, events, mediation, turns, cast seeds).
         gen.run_premise_expansion()
         if args.stop_after == '3.5':
             finish()
@@ -1400,8 +1550,10 @@ if __name__ == "__main__":
         if args.stop_after == '3.8':
             finish()
 
-        # step 4: the outline loop. Main line, then one divergent line per iteration.
+        # step 4: the outline loop. Main line, the branch plan, then one divergent line per iteration.
         gen.run_outline(max_iterations=args.max_iterations)
+        # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
+        gen.run_outline_judge()
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)

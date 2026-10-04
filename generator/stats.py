@@ -22,7 +22,7 @@ import os
 import re
 import time
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 # Qwen's published guidance for its thinking models: never greedy; these
 # values in thinking mode, the second set with thinking off. repeat_penalty

@@ -60,6 +60,19 @@ SHAPE = obj(
     ),
 )
 
+# ---------------------------------------------------------------- 3.4
+
+PROMISES = obj(
+    reading=S,
+    genre=S,
+    player_fantasy=S,
+    promises=arr(obj(what=S, why=S, in_kernel=B)),
+    set_pieces=arr(obj(scene=S, where=S)),
+    tone_engine=S,
+    obligatory_cast=arr(S),
+    must_not=arr(S),
+)
+
 # ---------------------------------------------------------------- 3.5
 
 POLE = obj(pole=S, what_you_must_do=S, cost=S)
@@ -69,20 +82,22 @@ ENGINE = obj(
     arena=obj(description=S, serves=S),
     pressure=obj(description=S, clock_or_stock=S, serves=S),
     opposition=obj(who_or_what=S, wants=S, means=S, serves=S),
+    events=arr(obj(what=S, when=enum(['early', 'middle', 'late']), serves=S)),
     hidden_truth=nullable(obj(truth=S, who_knows=S, what_it_changes=S, serves=S)),
     mediation=obj(question=S, to_reach_pole_a=POLE, to_reach_pole_b=POLE, levers=arr(S), serves=S),
 )
 
 TURNS = obj(
     turns=arr(obj(id=I, situation=S, what_you_must_do=S, ways_through=arr(obj(way=S, cost=S)),
-                  involves=arr(S), form=enum(TURN_FORMS), serves=S)),
+                  involves=arr(S), form=enum(TURN_FORMS), set_piece=STR_OR_NULL, serves=S)),
     complications=arr(obj(description=S, serves=S)),
 )
 
 CAST = obj(
     notes=S,
     cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
-                       wants=S, holds=S, edge=STR_OR_NULL, tie=S, opposition=B)),
+                       wants=S, holds=S, edge=STR_OR_NULL, tie=S, voice=STR_OR_NULL,
+                       breaking_point=STR_OR_NULL, opposition=B)),
 )
 
 PREMISE_CHECK = obj(
@@ -106,17 +121,20 @@ def story_form(framework_ids, modifier_ids):
 
 # ---------------------------------------------------------------- step 4
 
-BEAT_ENTRY = obj(beat=S, turn=INT_OR_NULL, way=INT_OR_NULL, adapted=S)
+BEAT_ENTRY = obj(beat=S, turn=INT_OR_NULL, way=INT_OR_NULL, event=INT_OR_NULL, adapted=S)
 SKIPPED = arr(obj(beat=S, reason=S))
+ANSWERS = ['pole_a', 'pole_b', 'mixed', 'neither']
+# the world an ending leaves, in a form two endings can be compared by
+ENDING = obj(title=S, summary=S, answer=enum(ANSWERS), standing=arr(S), lost=arr(S), changed=S)
 
 MAIN_LINE = obj(
     through_line=obj(title=S, motivation=S, strategy=S, turning_point=S),
-    ending=obj(title=S, summary=S),
+    ending=ENDING,
     beats=arr(BEAT_ENTRY),
 )
 
 LINE_NODES = obj(
-    nodes=arr(obj(id=S, title=S, summary=S, where=arr(S), who=arr(S))),
+    nodes=arr(obj(id=S, title=S, summary=S, image=S, where=arr(S), who=arr(S))),
     new_locations=arr(obj(name=S, kind=S, why=S)),
     new_characters=arr(obj(label=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
                            wants=S, holds=S, why=S)),
@@ -128,20 +146,41 @@ NEXT_LINE = obj(
     seed=nullable(obj(motivation=S, strategy=S, diverges_at=S, trigger=S, why_different=S)),
 )
 
+SEED = obj(motivation=S, strategy=S, diverges_at=S, trigger=S, trigger_kind=enum(['act', 'accumulated']),
+           way=INT_OR_NULL, ending=ENDING, why_different=S)
+
+BRANCH_PLAN = obj(
+    assessment=S,
+    seeds=arr(SEED),
+)
+
 DIVERGENCE = obj(
     status=enum(['proposed', 'nothing_worth_building']),
     why=S,
     through_line=nullable(obj(title=S, motivation=S, strategy=S, turning_point=S, differs_from=S)),
     divergence=nullable(obj(diverges_at=S, trigger=S, trigger_kind=enum(['act', 'accumulated']), way=INT_OR_NULL,
                             instead_of=S, opportunity=STR_OR_NULL, shift=S)),
-    ending=nullable(obj(title=S, summary=S)),
+    ending=nullable(ENDING),
     beats=arr(BEAT_ENTRY),
     skipped_beats=SKIPPED,
     rejoins_at=STR_OR_NULL,
 )
 
+# ---------------------------------------------------------------- 4e: the outline judge
+
+JUDGE_AXES = ['plot', 'people', 'reveals', 'agency', 'specificity', 'genre']
+
+OUTLINE_JUDGE = obj(
+    reading=S,
+    scores=obj(**{axis: obj(note=S, score=I) for axis in JUDGE_AXES}),
+    best_thing=S,
+    worst_thing=S,
+    would_play=B,
+)
+
 ALL = {
-    'SHAPE': SHAPE, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST, 'PREMISE_CHECK': PREMISE_CHECK,
-    'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE, 'LINE_NODES': LINE_NODES,
-    'NEXT_LINE': NEXT_LINE, 'DIVERGENCE': DIVERGENCE,
+    'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
+    'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
+    'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
+    'OUTLINE_JUDGE': OUTLINE_JUDGE,
 }

@@ -55,23 +55,55 @@ def pool_for(kernel, *texts):
     return best
 
 
-def gender_hint(role, texts):
+def gender_hint(role, texts, own=()):
     """'f', 'm' or 'n' from the pronouns in the sentences that mention the
-    role. Weak evidence on purpose: anything unclear gives 'n'."""
+    role, plus every pronoun in the seed's own fields (`own`: its wants,
+    edge, tie, voice, breaking point, which are about this person whether
+    or not they name the role). Weak evidence on purpose: anything unclear
+    gives 'n'."""
     head = re.sub(r"^(the|a|an)\s+", '', role.lower()).split("'")[0].strip()
     if not head:
         return 'n'
     f = m = 0
+
+    def count(sentence):
+        nonlocal f, m
+        f += len(re.findall(r'\b(she|her|hers|herself)\b', sentence, re.I))
+        m += len(re.findall(r'\b(he|him|his|himself)\b', sentence, re.I))
+
+    for text in own:
+        count(str(text or ''))
     for text in texts:
-        for sentence in re.split(r'(?<=[.;!?])\s+', text or ''):
+        for sentence in re.split(r'(?<=[.;!?])\s+', str(text or '')):
             if head in sentence.lower():
-                f += len(re.findall(r'\b(she|her|hers|herself)\b', sentence, re.I))
-                m += len(re.findall(r'\b(he|him|his|himself)\b', sentence, re.I))
+                count(sentence)
     if f > m:
         return 'f'
     if m > f:
         return 'm'
     return 'n'
+
+
+SEED_OWN_FIELDS = ('wants', 'holds', 'edge', 'tie', 'voice', 'breaking_point')
+
+
+def premise_texts(premise):
+    """The premise's prose, one string per field, for pronoun and genre
+    hints. (A JSON dump is one long sentence to the splitter, and every
+    pronoun in it would count for every role.)"""
+    out = []
+
+    def walk(v):
+        if isinstance(v, str):
+            out.append(v)
+        elif isinstance(v, dict):
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk({k: v for k, v in (premise or {}).items() if k != 'cast_seeds'})
+    return out
 
 
 def head_noun(role):
@@ -116,6 +148,7 @@ def assign_names(seeds, story_id, texts, pool_name=None):
     taken = [s['name'] for s in seeds if isinstance(s, dict) and s.get('name')]
     for s in seeds:
         if wants_a_name(s) and not s.get('name'):
-            s['name'] = pick(story_id, str(s['role']), pool_name, gender_hint(str(s['role']), texts), taken)
+            own = [s.get(k) for k in SEED_OWN_FIELDS if s.get(k)]
+            s['name'] = pick(story_id, str(s['role']), pool_name, gender_hint(str(s['role']), texts, own), taken)
             taken.append(s['name'])
     return pool_name

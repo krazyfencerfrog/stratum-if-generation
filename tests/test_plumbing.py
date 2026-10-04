@@ -295,7 +295,7 @@ def craft_spine_opt_in():
 
 @test
 def rejoin_new_cast_and_nothing():
-    run('graph', args=['--max-iterations=6'],
+    run('graph', args=['--max-iterations=6', '--branching=judge'],
         env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
     story = assert_story_ok('graph', min_lines=3)
     check(len(story['lines']) == 3, f"expected 3 lines, got {len(story['lines'])}")
@@ -310,6 +310,85 @@ def rejoin_new_cast_and_nothing():
     check(any(story['characters'][c]['label'] == 'the drone technician' for c in crowd_node['who']), 'a crowd was left without its voice')
     check(any('without a voice' in w for w in story['warnings']), 'the auto-added representative was not reported')
     check('the drone dock' in {l['name'] for l in story['locations'].values()}, 'the new location was not registered')
+
+
+@test
+def judge_mode_seeds_one_line_at_a_time():
+    run('judge', args=['--branching=judge'], env={'STUB_STOP_AFTER': '3'})
+    story = assert_story_ok('judge', min_lines=3)
+    check(story['branching'] == 'judge' and story.get('plan') is None, 'judge mode should not run the branch plan')
+    cs = calls('judge')
+    check([c['step'] for c in cs if c['step'] in ('s4d', 's4p')] == ['s4d', 's4d', 's4d'], f"expected three 4d calls and no 4p: {[c['step'] for c in cs]}")
+    check('4d recommended stopping' in story['stop_reason'], story['stop_reason'])
+    check(all((l.get('ending') or {}).get('answer') for l in story['lines'].values()), 'every line should state its ending world')
+
+
+@test
+def branch_plan_designs_every_divergence():
+    story = assert_story_ok('basic', min_lines=3)
+    check(story['branching'] == 'plan' and story['plan'] and len(story['plan']['seeds']) >= 2, 'the branch plan was not stored')
+    cs = calls('basic')
+    check([c['step'] for c in cs if c['step'] in ('s4d', 's4p')] == ['s4p'], f"plan mode should run 4p once and never 4d: {[c['step'] for c in cs]}")
+    main = story['lines']['T1']['path']
+    forks = [story['lines'][l]['divergence']['diverges_at'] for l in story['line_order'][1:]]
+    check(any(main.index(f) + 1 <= len(main) / 2 for f in forks), f'no line leaves in the first half: {forks} of {main}')
+    worlds = {(l['ending']['answer'], tuple(sorted(l['ending']['standing'])), tuple(sorted(l['ending']['lost']))) for l in story['lines'].values()}
+    check(len(worlds) == len(story['lines']), 'two lines end in the same world')
+    check(all(n.get('image') for n in story['nodes'].values()), 'every node should carry an image')
+    check(any(n.get('event') for n in story['nodes'].values()), 'no event was placed on any node')
+    md = load('basic', 'story.md')
+    check('## Branch plan' in md and 'world left:' in md and 'Image:' in md and '## Events the world brings about' in md, 'story.md is missing the new sections')
+    ev = load('basic', 'eval.json')
+    check(ev['metrics']['ending_distinctness'] == 1.0 and ev['metrics']['forks_in_first_half'] >= 1 and ev['judge']['total'] == 18,
+          f"eval metrics: {ev['metrics']}")
+    check(not [c for c in cs if c['step'] == 's4e' and c['mode'] != 'no_think'], 'the outline judge should run with thinking off')
+    # the plan's soft rules: all-late forks and duplicate worlds are re-asked once, then accepted
+    run('plan_late', env={'STUB_PLAN_LATE': '1'})
+    attempts = [c for c in calls('plan_late') if c['step'] == 's4p']
+    check(len(attempts) == 2 and not attempts[0]['ok'] and 'second half' in attempts[0]['error'] and attempts[1]['ok'],
+          f'an all-late plan should be re-asked once with the complaint: {attempts}')
+    run('plan_dup', env={'STUB_PLAN_DUP': '2'})
+    attempts = [c for c in calls('plan_dup') if c['step'] == 's4p']
+    check(len(attempts) == 2 and 'same world' in attempts[0]['error'] and attempts[1]['ok'] and attempts[1].get('soft_problems'),
+          f'a plan with two seeds in one world should be re-asked, then accepted with the problem noted: {attempts}')
+    assert_story_ok('plan_dup', min_lines=2)
+    # a plan with no seeds stops the loop after the main line
+    run('plan_empty', env={'STUB_PLAN_SEEDS': '0'})
+    story = assert_story_ok('plan_empty')
+    check(len(story['lines']) == 1 and '4p planned no further line' in story['stop_reason'], story['stop_reason'])
+    # a seed 4c cannot build is dropped and the next planned seed is tried
+    run('plan_skip', env={'STUB_NOTHING_ON': '2', 'STUB_PLAN_SEEDS': '3'}, args=['--max-iterations=5'])
+    story = assert_story_ok('plan_skip', min_lines=3)
+    check(any(it.get('skipped') for it in story['iterations']) and len(story['lines']) == 3, f"a dropped seed should not end the loop: {story['stop_reason']}")
+
+
+@test
+def premise_events_set_piece_and_echo():
+    # missing events and a missing set piece are computed findings the repair fills
+    run('noevents', env={'STUB_NO_EVENTS': '1', 'STUB_NO_SET_PIECE': '1'}, args=['--stop-after=3.5'])
+    loop = load('noevents', 's3_5_loop.json')
+    wheres = {f['where'] for f in loop['rounds'][0]['findings']}
+    check({'events', 'turns.set_piece'} <= wheres, f'missing events / set piece were not reported: {wheres}')
+    premise = load('noevents', 's3_5_premise_accepted.json')
+    check(not loop['still_failing'] and len(premise['events']) == 2 and any(t.get('set_piece') for t in premise['turns']),
+          'the repair should have supplied events and a set piece')
+    # the brief's own wording copied into a lever is a soft rejection: re-asked once
+    run('echo', env={'STUB_ECHO': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('echo') if c['step'] == 's3_5a']
+    check(len(attempts) == 2 and "brief's own wording" in attempts[0]['error'] and attempts[1]['ok'], f'echo check: {attempts}')
+    premise = load('echo', 's3_5_premise_accepted.json')
+    check(all(s.get('voice') for s in premise['cast_seeds'] if s['kind'] == 'individual'), 'individuals should carry a voice')
+    check(any(s.get('breaking_point') for s in premise['cast_seeds']), 'no companion has a breaking point')
+    # 4a's first answer places no event: a soft rejection, the retry places one
+    run('noplace', env={'STUB_NO_EVENT_PLACED': '1'}, args=['--max-iterations=1'])
+    attempts = [c for c in calls('noplace') if c['step'] == 's4a']
+    check(len(attempts) == 2 and 'events is placed' in attempts[0]['error'] and attempts[1]['ok'], f'event placement: {attempts}')
+    # promises off: the prompts get none and 3.4 never runs
+    run('nopromise', args=['--no-promises', '--stop-after=3.5'])
+    check(not [c for c in calls('nopromise') if c['step'] == 's3_4'], '3.4 ran under --no-promises')
+    check('beat them) ---\nnone' in load('nopromise', 's3_5a_raw_input_prompt.txt'), 'the engine prompt should receive "none" for the promises')
+    loop = load('nopromise', 's3_5_loop.json')
+    check(not any(f['where'] == 'turns.set_piece' for f in loop['rounds'][0]['findings']), 'no promises, no set-piece finding')
 
 
 @test
@@ -392,7 +471,7 @@ def kinds(story):
 def checks_catch_broken_graphs():
     good = load('graph', 'story.json') if os.path.isdir(story_dir('graph')) else None
     if good is None:
-        run('graph', args=['--max-iterations=6'], env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
+        run('graph', args=['--max-iterations=6', '--branching=judge'], env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
         good = load('graph', 'story.json')
     check(not kinds(good), 'the reference story is not clean')
 
@@ -432,6 +511,18 @@ def checks_catch_broken_graphs():
     menu = json.loads(json.dumps(good))
     menu['lines']['T2']['divergence']['trigger'] = 'You choose to vent the sector'
     check('menu_trigger' in {f['kind'] for f in checks.check_story(menu)['notes']}, 'a menu-phrased trigger was not noted')
+    dup = json.loads(json.dumps(good))
+    dup['lines']['T2']['ending'].update(answer='pole_b', standing=['the nursery warden', 'the hydroponics foreman'], lost=[])
+    for l in dup['lines'].values():
+        l['ending'].update(answer='pole_b', standing=['the nursery warden', 'the hydroponics foreman'], lost=[])
+    noted = {f['kind'] for f in checks.check_story(dup)['notes']}
+    check({'same_world', 'companions_static'} <= noted, f'same-world endings and static companions were not noted: {noted}')
+    told = json.loads(json.dumps(good))
+    a = next(n for n in t1 if told['nodes'][n]['turn'] is not None)
+    told['nodes'][a]['summary'] = 'The warden bars the nursery hatch while the foreman reads the gauge aloud to the families.'
+    told['nodes']['X9'] = dict(told['nodes'][a], id='X9', lines=['T9'], way=2,
+                               summary='The warden bars the nursery hatch while the foreman reads the gauge aloud, and you wait.')
+    check('repeated_situation' in {f['kind'] for f in checks.check_story(told)['notes']}, 'a retold situation was not noted')
 
 
 # ---------------------------------------------------------------- the loop's validators, driven directly
@@ -459,9 +550,21 @@ class FakeGen:
     def to_json(value, indent=2):
         return json.dumps(value)
 
+    @staticmethod
+    def promises_block():
+        return 'none'
+
+    @staticmethod
+    def tone_line():
+        return 'tone: (none stated)'
+
     def run_prompt(self, prefix, name, repl, prompt_file=None, validator=None, klass=None, schema=None):
+        from errors import SoftReject
         answer = json.loads(json.dumps(self.answers[prefix]))
-        validator(answer)
+        try:
+            validator(answer)
+        except SoftReject as e:      # main.py would re-ask once, then accept; here: accept
+            self.soft = str(e)
         return answer
 
     def save_story_json(self, *a):
@@ -476,7 +579,8 @@ def entry(beat, turn=None, way=None):
 
 def plan(beats):
     return {'through_line': {'title': 't', 'motivation': 'm', 'strategy': 's', 'turning_point': 'p', 'differs_from': 'd'},
-            'ending': {'title': 'e', 'summary': 'e'}, 'beats': beats, 'skipped_beats': []}
+            'ending': {'title': 'e', 'summary': 'e', 'answer': 'pole_a', 'standing': ['the widow'], 'lost': [], 'changed': 'c'},
+            'beats': beats, 'skipped_beats': []}
 
 
 def branch(at, beats, rejoin=None, skipped=()):
@@ -630,8 +734,12 @@ def cast_names_come_from_python():
     check(len({s['name'].split()[0] for s in named}) == len(named), 'two people share a given name')
     check(premise.get('name_pool') == 'scifi', f"kernel1 should draw from the scifi pool, got {premise.get('name_pool')}")
     again = [dict(s, name=None) for s in seeds]
-    names.assign_names(again, f'{PREFIX}basic', ['x'], premise['name_pool'])
+    kernel1 = open(os.path.join(KERNELS, 'kernel1.txt')).read()
+    names.assign_names(again, f'{PREFIX}basic', [kernel1] + names.premise_texts(premise), premise['name_pool'])
     check([s.get('name') for s in again] == [s.get('name') for s in seeds], 'names are not deterministic for a story id')
+    check(names.gender_hint('the foreman', [], own=['walks off if his sector is bled']) == 'm'
+          and names.gender_hint('the foreman', ['the foreman says his valve is shut. the warden says her sector is cold.']) == 'm',
+          'gender hints should read the seed\'s own fields and only the sentences that name the role')
     check(not names.wants_a_name({'role': 'the dragon', 'kind': 'individual'})
           and not names.wants_a_name({'role': 'the protagonist', 'kind': 'individual'}), 'a dragon or "you" was named')
     check(names.pool_for(open(os.path.join(KERNELS, 'kernel31.txt')).read()) == 'fantasy'
@@ -661,18 +769,26 @@ def late_forks_are_noted():
 
 @test
 def helpers():
-    for i in range(1, 33):
-        text = open(os.path.join(KERNELS, f'kernel{i}.txt'), encoding='utf-8').read()
+    kernel_files = sorted(glob.glob(os.path.join(KERNELS, 'kernel*.txt')))
+    check(len(kernel_files) >= 35, f'expected the kernel batch, found {len(kernel_files)}')
+    for path in kernel_files:
+        text = open(path, encoding='utf-8').read()
         clauses = brief.kernel_clauses(text)
-        check(clauses and all(c.strip() for _, c in clauses), f'kernel{i}: no clauses')
-        check([n for n, _ in clauses] == list(range(1, len(clauses) + 1)), f'kernel{i}: clause numbering')
+        check(clauses and all(c.strip() for _, c in clauses), f'{os.path.basename(path)}: no clauses')
+        check([n for n, _ in clauses] == list(range(1, len(clauses) + 1)), f'{os.path.basename(path)}: clause numbering')
+    eval_set = open(os.path.join(KERNELS, 'EVAL_SET.txt'), encoding='utf-8').read().split()
+    check(all(os.path.isfile(os.path.join(KERNELS, f'{k}.txt')) for k in eval_set) and 6 <= len(eval_set) <= 8, f'EVAL_SET: {eval_set}')
+    targets = brief.shape_targets({'endings': {'tier': 'many'}, 'linearity': 'linear'})
+    check(targets['through_lines'] == 6 and targets['default_max_iterations'] == 8, f'shape targets: {targets}')
+    check(brief.shape_targets({'endings': {'tier': 'one'}})['default_max_iterations'] == 1, 'one ending, one line')
     for stated, tier in (('6 or 7', 'several'), ('at least five', 'several'), ('a dozen', 'many'), ('one ending', 'one'),
                          ('a single ending', 'one'), ('more than one ending', None), ('at least one of them happy', None),
                          ('two or three', 'few'), ('the verdict should vary', None), ('', None)):
         check(brief.ending_tier_from_stated(stated) == tier, f'tier for {stated!r}')
     b = load('basic', 's3_brief.json')
     lines = brief.brief_lines(b)
-    check('3-0a.primary_decision_axis [constraint]' in lines and 'enrichment_budget' in lines, 'brief_lines lost a field')
+    check('3-0a.primary_decision_axis [constraint, inferred]' in lines and 'enrichment_budget' in lines, 'brief_lines lost a field')
+    check('3b.tone [constraint]:' in lines, 'an explicit field should not be marked inferred')
     check(len(lines) < len(json.dumps(b, indent=2)) * 0.7, 'brief_lines is not smaller than the JSON')
     check(brief.valid_serves('3-0a.primary_decision_axis', b) and brief.valid_serves('3c', b) and not brief.valid_serves('3x.nope', b), 'valid_serves')
     for s in ('s4b_i2', 's3_5v_r1', 's3_5r2', 's4d_i3'):
@@ -939,6 +1055,35 @@ def ollama_client_against_fake_server():
         check('server version' in out and 'recommended client settings' in out, f'probe output:\n{out[-2000:]}')
     finally:
         server.shutdown()
+
+
+@test
+def ab_harness_replays_from_phase3():
+    e = dict(os.environ, STRATUM_CLIENT='stub')
+    for k in list(e):
+        if k.startswith('STUB_'):
+            del e[k]
+    base = PREFIX + 'basic'
+    n_before = len(calls('basic'))
+    proc = subprocess.run([sys.executable, 'ab.py', 'run', '--variant', 'vj', '--kernels', base, '--fresh', '--',
+                           '--branching=judge', '--no-outline-judge'], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0, f'ab run failed:\n{proc.stderr.decode()[-2000:]}')
+    sid = f'{base}_vj'
+    check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
+    cs = calls(f'basic_vj')
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5v', 's3_8')],
+          f'the variant should start after phase 3: {[c["step"] for c in cs]}')
+    check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
+    story = assert_story_ok('basic_vj', min_lines=2)
+    check(story['kernel'] == load('basic', 'story.json')['kernel'], 'the variant did not inherit the kernel')
+    proc = subprocess.run([sys.executable, 'ab.py', 'compare', '--variants', 'vj', '--kernels', base], cwd=GEN, env=e, capture_output=True)
+    out = proc.stdout.decode()
+    check(proc.returncode == 0 and 'worlds' in out and 'means over kernels' in out, f'ab compare:\n{out[-1500:]}')
+    proc = subprocess.run([sys.executable, 'ab.py', 'eval', sid], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0 and b'outline metrics' in proc.stdout, 'ab eval')
+    # a source without phase 3 is skipped, not run
+    proc = subprocess.run([sys.executable, 'ab.py', 'run', '--variant', 'vj', '--kernels', PREFIX + 'nowhere'], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0 and b'no source directory' in proc.stderr, 'a missing source should be skipped with a message')
 
 
 @test

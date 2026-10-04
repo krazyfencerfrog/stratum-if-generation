@@ -50,7 +50,8 @@ WHERE A LINE CAN START
    you, who you win over), a line may start from the pattern of what the
    player did across the earlier nodes ("you broke every promise you
    made the thief on the road"): name the node where that pattern comes
-   due.
+   due. The companions' breaking points, given below, say what that
+   pattern would be.
 
 $$SHAPE_NOTE$$
 
@@ -124,6 +125,9 @@ USER INPUT FOLLOWS BELOW
 
 - the story's question
 $$QUESTION_JSON$$
+
+- companions and their breaking points (what would make each leave or turn)
+$$COMPANIONS_JSON$$
 
 - the story so far (one entry per node)
 $$STORY_DIGEST_JSON$$
