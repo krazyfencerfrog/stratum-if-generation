@@ -177,6 +177,14 @@ def repair_breakage_is_caught_at_once():
 
 
 @test
+def bad_turn_form_costs_a_retry_not_a_round():
+    run('badform', env={'STUB_BAD_FORM': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('badform') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and 'is not one of the forms' in (attempts[0].get('error') or ''), f'3.5b attempts: {attempts}')
+    check(load('badform', 's3_5_loop.json')['repair_rounds_used'] == 0, 'a bad turn form still cost a repair round')
+
+
+@test
 def hidden_truth_and_cast_edges():
     run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
     premise = load('gap', 's3_5_premise_accepted.json')

@@ -58,6 +58,8 @@ Scenario knobs (environment variables):
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
                                  iteration
     STUB_STOP_AFTER=3            4d says stop after this iteration (--branching=judge)
+    STUB_BAD_FORM=1              3.5b's first answer gives a turn the form "choose"
+                                 (tests that it costs one retry, not a repair round)
     STUB_SHIFT=1                 with --stage-a, 5a1 proposes a pattern shift on
                                  the first arc's state (tests the threshold math)
     STUB_NO_TELLS=1              5a2's first answer for each line leaves its tells
@@ -419,7 +421,9 @@ class StubClient(LlmClient):
                  "involves": ["the hydroponics foreman"], "form": "persuade", "set_piece": sp, "serves": "3c.core_thematic_axis"},
                 {"id": 3, "situation": "The council offers the override for one sector of your choosing.", "what_you_must_do": "decide whom to tell",
                  "ways_through": [{"way": "the sector hears first", "cost": "they barricade the valve"}, {"way": "nobody is told", "cost": "you become the council's instrument"}],
-                 "involves": ["the council speaker", "the nursery warden"], "form": "conceal_or_reveal", "set_piece": None, "serves": "3c.core_thematic_axis"},
+                 "involves": ["the council speaker", "the nursery warden"],
+                 "form": "choose" if env_int('STUB_BAD_FORM', 0) and RETRY_MARKER not in p else "conceal_or_reveal",
+                 "set_piece": None, "serves": "3c.core_thematic_axis"},
             ],
             "complications": [{"description": self.VIOLATION if hard else self.FIXED, "serves": "3c.core_thematic_axis"},
                               {"description": "The foreman's manual feed valve was welded half shut by the previous AI.", "serves": "3-0c.failure_triggers"}],

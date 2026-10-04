@@ -89,9 +89,17 @@ Plan:
 - Read 31, 32, 8, 35, 34 (done in conversation 2026-10-04); 33 when it
   lands. Write the quality ledger into `docs/run_samples/<date>/README.md`
   with the outputs, as for the 2026-10-03 samples.
-- Retry and repair forensics: which soft retries and audit findings fire,
-  how often, whether the fix took. A rule that fires on every kernel is a
-  rule the model cannot follow as written.
+- Retry and repair forensics (DONE 2026-10-04, over 32 saved runs):
+  validator rejections are rare (about 20 clauses in 32 runs, all fixed by
+  the retry); no step rule is one the model cannot follow. The cost is the
+  premise audit: 13 of 29 premise loops needed one or two repair rounds.
+  Findings: engine boundary 7 (a ledger or gate condition read as a system
+  the engine lacks), the brief's epistemic gap contradicted 5 (AI kernels),
+  turn form "choose" 5 (now a soft retry at 3.5b instead of a repair round),
+  failure presence 2 (reported as three findings each: presence, triggers,
+  cost, for one dawn deadline). Open: fold the three failure findings into
+  one; read the engine-boundary findings, which may be the audit being too
+  strict about ledgers and fees that are just objects.
 - Calibrate `evaluate.py` and the outline judge against the reading.
 
 ### Known weak spots from the runs [solo, then GPU]

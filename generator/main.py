@@ -725,13 +725,16 @@ class StoryGenerator:
             raise ValueError('; '.join(problems))
 
     @staticmethod
-    def validate_turns(parsed):
+    def validate_turns(parsed, check_forms=True):
+        """check_forms=False (the repair path) leaves the soft rules (turn
+        forms, roles written as plot functions) to the repair validator's own
+        check of what the repair broke."""
         if not isinstance(parsed, dict):
             raise ValueError('expected a JSON object')
         turns = parsed.get('turns')
         if not isinstance(turns, list) or len(turns) < 2:
             raise ValueError('turns must be a list of at least two turns')
-        problems = []
+        problems, bad_forms = [], []
         for i, t in enumerate(turns):
             if not isinstance(t, dict):
                 raise ValueError('each turn must be an object')
@@ -746,13 +749,23 @@ class StoryGenerator:
             involves = involves if isinstance(involves, list) else ([involves] if involves else [])
             t['involves'] = [str(r).strip() for r in involves if str(r).strip()]
             t['form'] = str(t.get('form') or '').strip().lower()
+            if t['form'] not in TURN_FORMS:
+                # caught here it costs one retry; left to the audit's computed check it cost a repair round
+                # (5 of 29 premise loops before 2026-10-04 wrote "choose")
+                bad_forms.append(f'turn {i + 1}: form "{t["form"]}" is not one of the forms: {", ".join(TURN_FORMS)} '
+                                 f'(a choice between people is choose_whom; a choice between ways is the form of '
+                                 f'what you do to get through)')
             sp = t.get('set_piece')
             t['set_piece'] = str(sp).strip() if isinstance(sp, str) and sp.strip().lower() not in ('', 'null', 'none') else None
         if not isinstance(parsed.get('complications'), list):
             parsed['complications'] = []
         if problems:
             raise ValueError('; '.join(problems))
+        if bad_forms and check_forms:
+            raise SoftReject('; '.join(bad_forms))
         plotty = sorted({r for t in turns for r in t['involves'] if FUNCTION_ROLE.search(r)})
+        if plotty and not check_forms:
+            plotty = []
         if plotty:
             raise SoftReject(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
                              f'Name each by what a reader would see or be told: an occupation, a relation, a '
@@ -1224,7 +1237,7 @@ class StoryGenerator:
                     raise ValueError(f'"revised" holds none of the sections {list(PREMISE_KEYS)}; return the ones you changed')
                 merged = self.merge_premise(current, parsed['revised'])
                 self.validate_engine(merged)
-                self.validate_turns({'turns': merged['turns'], 'complications': merged['complications']})
+                self.validate_turns({'turns': merged['turns'], 'complications': merged['complications']}, check_forms=False)
                 # what the repair broke that the computed checks can see: one
                 # retry now is cheaper than a whole audit and repair round
                 key = lambda f: (f['where'], f['problem'])
