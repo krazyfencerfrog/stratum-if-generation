@@ -94,7 +94,9 @@ world), the arc and supporting cast (wants, edge, tie, voice, breaking
 point), the premise's turns, events and hidden truth, the node list with
 summaries.
 
-Output, per arc character (and the protagonist, whose arc is written from
+Output, per arc character (and, lighter, per supporting character: see
+Decisions), plus the story's `state_visibility` with its reason, and for the
+protagonist whose arc is written from
 each line's motivation and turning point in the same form so the whole set
 can be checked together):
 
@@ -120,9 +122,9 @@ lost); a state fork names a state that some minor choice moves; no arc
 resolves on a single minor choice. Audit and repair as 3.5 does, if the
 checks are not enough.
 
-### A2. Node expansion (one call per major node, build class)
+### A2. Node expansion (one call per line, build class)
 
-For each major node, add minor nodes before, inside or after it, each of one
+For each line, and for each major node on it, add minor nodes before, inside or after it, each of one
 kind:
 
 - **opportunity**: a small choice that moves an arc's state ("help him hide
@@ -155,16 +157,27 @@ opportunities on the paths that reach it (aggregate, never single); every
 accumulated trigger's pattern is reachable; every resolution variant has a
 state condition; minor-node summaries stay within size.
 
-### Open questions (to settle before building)
+### Decisions (2026-10-04)
 
-- The packet for A2: a whole line at a time, or one major node with its
-  neighbours? (Per node is smaller; per line keeps arc pacing coherent.)
-- How visible arc state should be to the player (signposted outcomes vs.
-  discovered ones), which affects how opportunities are written.
-- Whether supporting characters get light arcs (a stance that shifts) or
-  none.
-- Where the old `additions` (what a later line needs a node to contain)
-  are honored: in A2, as part of the major node's expansion.
+- **A2 works a line at a time**, not a node at a time: an arc's moments are
+  paced across the whole line, and a per-node packet cannot see that. A
+  major node shared by several lines is expanded on the first line that
+  reaches it; later lines see its minor nodes and add only what their own
+  arcs need there.
+- **How visible arc state is, is decided per story**, in A1, with a reason:
+  `state_visibility` is `signposted` (characters say where they stand, "he
+  won't forget that"), `observed` (shown through what they do and where
+  they are, for the player to read) or `hidden` (discovered at the
+  resolution). It follows how observant the protagonist is and the story's
+  viewpoint (a detective notices; a frightened newcomer may not). A2 writes
+  opportunities to match.
+- **Supporting characters get light arcs**, or they read as cardboard: in
+  A1 each has `starts`, one or two `moments` where their stance shifts, and
+  an end stance per line; no forks of their own and no named state. A2 may
+  give them demonstration nodes. Functional characters get none.
+- **The outline's `additions`** (what a later line needs a node to contain
+  for its trigger to be possible) are honored in A2, as part of expanding
+  that major node. Can move later if it fits better elsewhere.
 
 **Cost.** Not the constraint (see principles). Rough: A0 a minute, A1 about
 5-10 minutes, A2 about 5-10 minutes per major node, so about 2-3 hours for
