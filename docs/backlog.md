@@ -86,9 +86,8 @@ Plan:
    the answer may be "40 KB for 3.5a/b and 4c, 25 KB for 4b".
 
 ### Review of the Fable 5 outlines [solo]
-- Read 31, 32, 8, 35, 34 (done in conversation 2026-10-04); 33 when it
-  lands. Write the quality ledger into `docs/run_samples/<date>/README.md`
-  with the outputs, as for the 2026-10-03 samples.
+- Quality ledger: DONE 2026-10-04, `docs/run_samples/2026-10-04/` (the six
+  Fable 5 runs and batch3's three). Still to read in depth: kernel33_f5.
 - Retry and repair forensics (DONE 2026-10-04, over 32 saved runs):
   validator rejections are rare (about 20 clauses in 32 runs, all fixed by
   the retry); no step rule is one the model cannot follow. The cost is the

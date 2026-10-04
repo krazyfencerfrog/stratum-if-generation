@@ -1,0 +1,1141 @@
+{
+  "schema_version": 5,
+  "story_id": "kernel8_f5",
+  "stage": "outline",
+  "kernel": "Write me an interactive story. Surprise me.",
+  "shape": {
+    "through_lines": 3,
+    "default_max_iterations": 3,
+    "endings_stated": "",
+    "endings_tier": "unstated",
+    "nodes_min": 5,
+    "nodes_max": 8,
+    "linear": false,
+    "choice_density": "unstated",
+    "note": "through_lines is how many distinct story lines (each with its own ending) the shape preference suggests; the review decides whether each next one is worth building."
+  },
+  "premise": {
+    "enrichment_budget": {
+      "level": "generous"
+    },
+    "protagonist": {
+      "who": "You are the new night assistant in a municipal archive’s reading room, hired to shelve a returned book before the building closes.",
+      "wants": "to understand what the book is and get the room back to an ordinary library before the building’s nightly close finishes it.",
+      "can_do": "read, examine, move shelves, talk to the night archivist and the night custodian, open the book’s pages, and use the room’s levers and passages.",
+      "cannot_do": "open the central book without the night key, move the central reading chair, or make the night archivist accept what the page says without showing her a fact she can check against the room itself.",
+      "serves": "3-0b.protagonist_identity"
+    },
+    "arena": {
+      "description": "A circular reading room in the basement of a municipal archive: long shelves, a central reading table, a bookcase that is a door, a wall crack at the corner, and a book that should not be on the shelf.",
+      "serves": "3f.setting_structure"
+    },
+    "pressure": {
+      "description": "The building is closing for the night: the lamps dim in stages, the shelves lock, and the book’s final page is left open for the night.",
+      "clock_or_stock": "none tracked; the night is told through lamp-out stages and rearrangements, because 3-0c names no failure",
+      "serves": "3e.timeline_duration"
+    },
+    "opposition": {
+      "who_or_what": "the building’s mechanism, administered by the night custodian",
+      "wants": "to close the book and file the current reader so the room can rest",
+      "means": "it moves shelves, locks doors, dims lamps, repeats the phrase, and can make the companion correct the same false fact",
+      "serves": "3c.core_thematic_axis"
+    },
+    "events": [
+      {
+        "what": "You open the returned book and find a page describing the reading room exactly, including your position at the center table; when you look up, the page has added a line about what you just did.",
+        "when": "early",
+        "serves": "3b.secondary_affects"
+      },
+      {
+        "what": "The lights fail for a minute; when they return, the shelves have shifted, the central table has moved to the corner, and the night archivist points at a crack in the wall and jokes that it spells READ, while the letters actually spell READER.",
+        "when": "middle",
+        "serves": "3b.secondary_affects"
+      },
+      {
+        "what": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page.",
+        "when": "late",
+        "serves": "3c.core_thematic_axis"
+      }
+    ],
+    "hidden_truth": {
+      "truth": "The reading room is a machine that files people as pages. The recurring phrase 'the reader is in the center of the room' is not a description but a job title: whoever stands at the center when the book closes becomes the next page. The night archivist is not wrong because careless; she is a copy of the previous reader, and the copy keeps correcting the same fact because the original is already filed.",
+      "who_knows": "the mechanism, and the night custodian, who has been closing the book each night to keep the copies from noticing",
+      "what_it_changes": "the choice is no longer about shelving a book but about choosing who stands at the center: you, the archivist, or the custodian, and whether the book is opened or closed",
+      "serves": "3-0b.epistemic_gap"
+    },
+    "mediation": {
+      "question": "Do you let the room finish its work, or do you stop it before it files you?",
+      "to_reach_pole_a": {
+        "pole": "let the room finish its work",
+        "what_you_must_do": "get the book to the central chair, have the companion correct the false fact, use the crack word to open the bookcase door, and stand at the center when the last lamp dims",
+        "cost": "the room files whoever is at the center; the companion’s copy is lost, the custodian’s night shift ends, and you become a page"
+      },
+      "to_reach_pole_b": {
+        "pole": "stop the room before it files you",
+        "what_you_must_do": "return the page to the book, move the central chair out of the center, and convince the companion to read the crack word backwards so the mechanism closes without a reader",
+        "cost": "the room forgets what it was for; the book is shelved, the archivist stops correcting the same fact, and the building’s nightly close becomes ordinary"
+      },
+      "levers": [
+        "the returned book",
+        "the night key",
+        "the central reading chair",
+        "the crack in the wall that spells READER",
+        "the night archivist’s repeated correction",
+        "the night custodian’s lamp"
+      ],
+      "serves": "3-0a.primary_decision_axis"
+    },
+    "turns": [
+      {
+        "id": 1,
+        "situation": "You open the returned book and find a page describing the reading room exactly, including your position at the center table; when you look up, the page has added a line about what you just did.",
+        "what_you_must_do": "find out what the returned book is recording",
+        "ways_through": [
+          {
+            "way": "you learn it by holding the page against the room and matching each line to the shelves, the table, and the corner crack",
+            "cost": "the page adds your name under the line for the reader, and the night custodian hears you say the word aloud"
+          },
+          {
+            "way": "you learn it from the night archivist, once you show her the page's line and let her check it against the room",
+            "cost": "she corrects the page's false line and becomes less sure of her own fact"
+          }
+        ],
+        "involves": [
+          "the night archivist",
+          "the night custodian"
+        ],
+        "form": "discover",
+        "set_piece": "a page in the returned book describing the exact room, including your own position at the center table, adding a line as you look up",
+        "serves": "3b.secondary_affects"
+      },
+      {
+        "id": 2,
+        "situation": "The lights fail for a minute; when they return, the shelves have shifted, the central table has moved to the corner, and the night archivist points at a crack in the wall and jokes that it spells READ, while the letters actually spell READER.",
+        "what_you_must_do": "get the night archivist to read the crack word as it is",
+        "ways_through": [
+          {
+            "way": "you get her to read it by showing her the page from the book that describes the corner crack and the word READER",
+            "cost": "she says the word is a job title and then corrects you with the false fact again, but slower"
+          },
+          {
+            "way": "you get her to read it by letting the night custodian's lamp pass over the crack so the letters stand out",
+            "cost": "the custodian dims the lamp and the shelves lock for the rest of the night"
+          },
+          {
+            "way": "you get her to read it by moving the central table back to the center so the crack can be seen from the room's middle",
+            "cost": "the table is not yours to move, and the archivist's copy flickers as if her page is being pulled"
+          }
+        ],
+        "involves": [
+          "the night archivist",
+          "the night custodian"
+        ],
+        "form": "persuade",
+        "set_piece": "the archivist pointing at a crack in the wall and laughing it off, while the letters spell READER",
+        "serves": "3b.secondary_affects"
+      },
+      {
+        "id": 3,
+        "situation": "The bookcase door is open only a hand's width, and the night custodian holds the night key in his palm while the last lamp begins to dim.",
+        "what_you_must_do": "get the night key to open the central book",
+        "ways_through": [
+          {
+            "way": "you get the key by giving the custodian the page with your name",
+            "cost": "the page is filed in the book and your name is no longer on it, but the archivist's correction stops for a minute"
+          },
+          {
+            "way": "you get the key by letting the archivist stand at the center while you hold the lamp",
+            "cost": "the archivist becomes the page for the night and the custodian's shift is saved"
+          },
+          {
+            "way": "you get the key by moving the central chair out of the center",
+            "cost": "the chair is locked and the room's shelves close around you"
+          }
+        ],
+        "involves": [
+          "the night custodian",
+          "the night archivist"
+        ],
+        "form": "trade",
+        "set_piece": null,
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "id": 4,
+        "situation": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page.",
+        "what_you_must_do": "settle who stands at the center when the book closes",
+        "ways_through": [
+          {
+            "way": "the book closes with you at the center, because you take the page with your name and sit in the central chair",
+            "cost": "the room is rested, the archivist stops correcting, and you become the next page"
+          },
+          {
+            "way": "the book closes with the archivist at the center, because you give her the page with your name and move the chair to her",
+            "cost": "she stops correcting and becomes a page, and you keep your name"
+          },
+          {
+            "way": "the book closes without a reader, because you move the chair out of the center, return the page to the book, and make the archivist read the crack backwards",
+            "cost": "the room forgets what it was for, and the building's close becomes ordinary"
+          }
+        ],
+        "involves": [
+          "the night archivist",
+          "the night custodian"
+        ],
+        "form": "choose_whom",
+        "set_piece": "the last lamp going out and the room rearranging in the dark, so when it comes back the central chair holds a page with your name and the book is open to the blank page",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "complications": [
+      {
+        "description": "The night key is not on the key ring; it is the small brass plate in the returned book's cover, and the book will not open to the final page unless it is used.",
+        "serves": "3b.secondary_affects"
+      },
+      {
+        "description": "The night archivist's correction is not a mistake: she says the same false fact because the fact is true in the room she was filed in.",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "description": "The night custodian has been closing the book each night to keep the copies from noticing, and he will not say which copy is next.",
+        "serves": "3c.core_thematic_axis"
+      }
+    ],
+    "cast_seeds": [
+      {
+        "role": "the night archivist",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to correct the false fact in the record and restore the room's order",
+        "holds": "the knowledge of the room's previous state and the ability to identify discrepancies in the text",
+        "edge": "is a copy of the previous reader and does not know she is a copy, believing her corrections are her own expertise",
+        "tie": "was the last person to stand at the center before being filed, and now serves as the room's memory",
+        "voice": "speaks with precise, academic detachment, treating the impossible as a clerical error: 'The timestamp is incorrect. It was 11:00, not 11:01. Please note the discrepancy.'",
+        "breaking_point": "turns if you fail to correct the specific false fact she identifies, as her existence depends on the record being right",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Brisa Penhallow"
+      },
+      {
+        "role": "the night custodian",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to complete the nightly close and ensure the book is filed without incident",
+        "holds": "the night key and control over the room's physical mechanisms like lights and shelves",
+        "edge": "knows the room files people as pages and has been closing the book each night to prevent the copies from realizing they are gone",
+        "tie": "is the administrator of the mechanism that trapped the archivist, and is responsible for her continued existence in the room",
+        "voice": "speaks in short, procedural instructions, avoiding eye contact and treating the room's strangeness as routine maintenance: 'The lamp is dimming. Please stand clear of the center table.'",
+        "breaking_point": null,
+        "opposition": true,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Cadhla Marrack"
+      }
+    ],
+    "name_pool": "fantasy"
+  },
+  "framework": {
+    "id": "kishotenketsu",
+    "name": "Kishotenketsu",
+    "shape": "a situation is introduced and deepened without conflict, an unexpected element recasts it, and the two are reconciled",
+    "modifier": {
+      "id": "episodic",
+      "name": "Episodic middle",
+      "effect": "Each middle beat is a self-contained instance of the story's recurring decision with its own small ending; what carries across them is what the protagonist is becoming."
+    },
+    "reading": "The story begins in a quiet, ordinary library and deepens as the room's strange logic reveals itself, moving from curiosity to a tense, surreal realization that the reader is being filed. It should land on a quiet, ambiguous reconciliation where the room's nature is accepted or resolved, rather than a dramatic confrontation or victory.",
+    "why": "The brief specifies no failure presence (3-0c.failure_presence) and a sustained trajectory (3b.primary_trajectory), which aligns with Kishotenketsu's lack of central conflict and its reliance on deepening situation. The 'Reconciliation' beat matches the required 'quiet, ambiguous resolution' (3c.moral_valence), whereas three_act and save_the_cat require climaxes or mirrored finales that contradict the brief's low-stakes, measured tone.",
+    "named_in_kernel": null,
+    "shortlist": [
+      "kishotenketsu",
+      "three_act",
+      "save_the_cat"
+    ],
+    "scores": {
+      "three_act": 2.0,
+      "freytag": 0.0,
+      "heros_journey": -1.0,
+      "save_the_cat": 1.0,
+      "fichtean_curve": -1.0,
+      "seven_point": 0.0,
+      "story_circle": 1.0,
+      "kishotenketsu": 5.0
+    },
+    "beats": [
+      {
+        "id": "ki",
+        "name": "Introduction (ki)",
+        "job": "the people and the place at rest: what an ordinary day here is",
+        "required": true
+      },
+      {
+        "id": "sho",
+        "name": "Development (sho)",
+        "job": "the same situation, deepened: more of what was introduced, with no new conflict required",
+        "required": true
+      },
+      {
+        "id": "ten",
+        "name": "Turn (ten)",
+        "job": "an unexpected element or viewpoint that recasts what came before",
+        "required": true
+      },
+      {
+        "id": "ketsu",
+        "name": "Reconciliation (ketsu)",
+        "job": "the turn and the earlier material are brought together into a new whole",
+        "required": true
+      }
+    ]
+  },
+  "lines": {
+    "T1": {
+      "id": "T1",
+      "iteration": 1,
+      "title": "The Reader in the Center",
+      "motivation": "You start out wanting to shelve the returned book and hand the reading room back to an ordinary nightly close, and by the end you want the people in the room to stay people, even if that means the room stops being what it was.",
+      "strategy": "You use the room's own record against itself: you check the page against the shelves, the crack, the lamp, and the chair, and you make Brisa Penhallow correct the fact she has been repeating because the record is all she has.",
+      "turning_point": "When Brisa Penhallow's repeated correction turns out to be the record of a reader who has already been filed, you stop trying to make the room ordinary and start deciding who, if anyone, it will file.",
+      "differs_from": null,
+      "ending": {
+        "title": "An Ordinary Close",
+        "summary": "The book is shelved, the central chair is out of the center, and the building closes as a plain municipal archive. It costs the room its purpose and the page that might have been you.",
+        "node": "N05",
+        "answer": "pole_b",
+        "standing": [
+          "the night archivist",
+          "the night custodian"
+        ],
+        "lost": [],
+        "changed": "the reading room is no longer a filing machine; the book is shelved and the nightly close is ordinary"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "parent": null,
+      "divergence": null,
+      "rejoins_at": null,
+      "skipped_beats": []
+    },
+    "T2": {
+      "id": "T2",
+      "iteration": 2,
+      "title": "The Archivist’s Page",
+      "motivation": "You start out wanting to shelve the returned book and finish the night, but once the page adds your name you come to want the room to keep working long enough to prove that its record can be corrected; by the end you want Brisa Penhallow to be the reader the room files, because her corrected certainty is the only thing that can stop the page from adding you.",
+      "strategy": "Let Brisa Penhallow check the page’s added line against the shelves, the central table, and the crack, let her correct the page’s false line, and keep the corrected page at the center table so the room treats her as the reader it is filing while you hold the lamp and keep the key from Cadhla Marrack.",
+      "turning_point": "The corrected page at the central table. Once Brisa Penhallow has checked the page against the room, the room no longer treats you as the only reader; it begins to pull her copy toward the center.",
+      "differs_from": "T1 stops the room before it files anyone and leaves both companions standing in an ordinary archive; this line lets the room finish its work by filing Brisa Penhallow, leaves Cadhla Marrack standing with his shift saved, and leaves the archive still working as a room that adds lines.",
+      "ending": {
+        "title": "The Archivist’s Page",
+        "summary": "The room finishes by filing Brisa Penhallow instead of you: her page takes the central chair, her fact stops being corrected, and the building closes as a working archive that still adds lines. Cadhla Marrack saves his shift and leaves with the key, and the room’s purpose remains intact.",
+        "node": "T2N03",
+        "answer": "pole_a",
+        "standing": [
+          "the night custodian"
+        ],
+        "lost": [
+          "the night archivist"
+        ],
+        "changed": "the central chair remains in the center occupied by Brisa Penhallow’s page; the room keeps adding lines instead of becoming an ordinary archive"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N02",
+        "trigger": "you show Brisa the page’s added line and let her check it against the room",
+        "trigger_kind": "act",
+        "way": 2,
+        "instead_of": "you held the page against the room and matched each line to the shelves, the central table, and the corner crack yourself",
+        "opportunity": null,
+        "shift": "The page has added your name under the line for the reader, and Brisa Penhallow checks the added line against the room and corrects the false part of it. Her correction makes the page stop adding you for a moment, so you come to want the room to keep working under her correction rather than stopping it before it files you."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: N02’s unused way 2 gives Brisa Penhallow the page before the room recasts the situation, and her corrected certainty becomes the line’s own engine. The seed’s ending world also holds, because turn 3’s way 2 and turn 4’s way 2 pay for Cadhla Marrack’s standing by filing Brisa Penhallow instead of you."
+    },
+    "T3": {
+      "id": "T3",
+      "iteration": 3,
+      "title": "The Locked Chair",
+      "motivation": "You start out wanting to shelve the returned book and finish the night, but once the shelves are locked and the crack has spelled READER, you come to want the key without giving the room your page, because the page is the only thing that can still name you as the reader; by the end you want the room stopped before it files you, even if stopping it means no one can open it again.",
+      "strategy": "Move the central chair out of the center before Cadhla Marrack can file the page, take the key from the locked chair, and make Brisa Penhallow read the crack backwards while the shelves close around you.",
+      "turning_point": "The chair’s lock. When you move the chair out of the center, the room does not treat it as furniture but as the key’s housing: the chair stays locked in the corner, the shelves close, and the night key comes free only with the room’s mechanism half-stopped.",
+      "differs_from": "T1 keeps both Brisa Penhallow and Cadhla Marrack and makes the building ordinary; this line keeps only Brisa, loses Cadhla, and leaves the room sealed and frozen rather than plain. T2 lets the room finish by filing Brisa and keeps Cadhla’s working archive; this line stops the room before it files anyone and freezes the room itself, with Cadhla gone and the chair locked.",
+      "ending": {
+        "title": "The Locked Chair",
+        "summary": "The room stops before it files you, but the chair stays locked in the corner and the shelves close around the building; Brisa Penhallow reads the crack backwards and the mechanism freezes with your page still in the book. Cadhla Marrack leaves with the key, and the room becomes a sealed room that no one can open again.",
+        "node": "T3N01",
+        "answer": "pole_b",
+        "standing": [
+          "the night archivist"
+        ],
+        "lost": [
+          "the night custodian"
+        ],
+        "changed": "the central chair remains locked in the corner and the shelves are closed for good, so the room is stopped but not ordinary"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "T3N01"
+      ],
+      "new_nodes": [
+        "T3N01"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N04",
+        "trigger": "you move the central chair out of the center before Cadhla Marrack files the page",
+        "trigger_kind": "act",
+        "way": 3,
+        "instead_of": "you give Cadhla Marrack the page with your name",
+        "opportunity": "The central chair’s lock is shown to hold the night key’s brass plate, so moving the chair releases the key and locks the chair in place.",
+        "shift": "The page with your name is still in the book, and the room has not yet filed it; when you move the chair, the shelves lock and the chair stays fixed in the corner, so the key is no longer a way to let the room finish but a way to stop it before it names you."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed works as given: N04’s unused third way gives the line its own price—moving the chair before the page is filed—and that price carries into the ending, where the room is stopped rather than made ordinary. The ending world differs from both existing lines: T1 keeps both companions and leaves a plain archive, while T2 lets the room finish by filing Brisa; this line keeps Brisa, loses Cadhla, and leaves the room sealed around a locked chair."
+    }
+  },
+  "line_order": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "nodes": {
+    "N01": {
+      "id": "N01",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ki",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You arrive in the municipal archive reading room with a returned book to shelve before the building closes. Brisa Penhallow is at the central table checking a timestamp and correcting a false fact as if it were a clerical error, while Cadhla Marrack moves through the aisles with a lamp, dimming it in stages and telling you to stand clear of the center table.",
+      "title": "The Night Close",
+      "summary": "You arrive in the municipal archive reading room with a returned book to shelve before the building closes, and the room is already beginning its nightly close. Brisa Penhallow is at the central table checking a timestamp and correcting a false fact as if it were a clerical error, while Cadhla Marrack moves through the aisles with a lamp and dims it in stages. You set the returned book on the central table and stand clear of it as she tells you to, so the close proceeds as if nothing is out of place.",
+      "image": "the returned book on the central table under a dimmed lamp",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N02": {
+      "id": "N02",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "sho",
+      "turn": 1,
+      "way": 1,
+      "event": 1,
+      "adapted": "You open the returned book and hold a page against the room, matching each line to the shelves, the central table, and the corner crack, and the page adds a line about what you just did. This is where the hidden truth is first suspected: the page adds your name under the line for the reader, and Cadhla Marrack hears you say the word aloud, which makes the lamps dim one step earlier than scheduled.",
+      "title": "The Page Adds a Line",
+      "summary": "You open the returned book and find a page describing the reading room exactly, including your position at the central table; when you look up, the page has added a line about what you just did. You hold the page against the room and match its lines to the shelves, the central table, and the corner crack, and the page adds your name under the line for the reader. Cadhla Marrack hears you say the word reader aloud, and the lamps dim one step earlier than scheduled while Brisa Penhallow watches the new entry without correcting it.",
+      "image": "the page with your name under the line for the reader",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N03": {
+      "id": "N03",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ten",
+      "turn": 2,
+      "way": 1,
+      "event": 2,
+      "adapted": "The lights fail for a minute; when they return, the shelves have shifted, the central table has moved to the corner, and Brisa Penhallow points at a crack in the wall and jokes that it spells READ, while the letters actually spell READER. You show her the page from the book that describes the corner crack and the word READER, and she says the word is a job title, then corrects you with the false fact again but slower; the hidden truth comes out here as a filing mechanism, not a mistake, and Cadhla Marrack dims the lamp and locks the shelves for the rest of the night.",
+      "title": "The Crack Spells It",
+      "summary": "You are in the room when the lights fail for a minute; when they return, the shelves have shifted and the central table has moved to the corner. Brisa Penhallow points at the wall crack and jokes that it spells READ, while the letters actually spell READER, and you show her the page that describes the crack and the word. She calls READER a job title and corrects you with the false fact again, slower, while Cadhla Marrack dims the lamp and locks the shelves, leaving the filing mechanism in place for the rest of the night.",
+      "image": "the wall crack spelling READER beside the moved central table",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N04": {
+      "id": "N04",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ketsu",
+      "turn": 3,
+      "way": 1,
+      "event": null,
+      "adapted": "The bookcase door is open only a hand's width, and Cadhla Marrack holds the night key in his palm while the last lamp begins to dim. You give him the page with your name, and he files it in the book; your name is no longer on the page, but Brisa Penhallow's correction stops for a minute, and the night key is in your hand.",
+      "title": "The Filed Page",
+      "summary": "The bookcase door stands open a hand's width, and Cadhla Marrack holds the night key, the key that opens the central book, while the last lamp begins to dim. You give him the page with your name, and he files it in the book, so your name is no longer on the page you carried while Brisa Penhallow's correction stops for a minute. The night key passes into your hand.",
+      "image": "the filed page sliding into the book, your name gone",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C02",
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [
+        {
+          "line": "T3",
+          "text": "The central chair’s lock is shown to hold the night key’s brass plate, so moving the chair releases the key and locks the chair in place."
+        }
+      ],
+      "annotations": {}
+    },
+    "N05": {
+      "id": "N05",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": 3,
+      "event": 3,
+      "adapted": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page. You return the page to the book, make Brisa Penhallow read the crack backwards, and the room itself takes the chair out of the center; the mechanism closes without a reader, Brisa Penhallow stops correcting the same fact, and the building's nightly close becomes ordinary.",
+      "title": "The Plain Close",
+      "summary": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page. You return the page to the book and make Brisa Penhallow read the corner crack backwards, while Cadhla Marrack turns the lever that closes the filing mechanism. The room takes the chair out of the center, the book is shelved with the page that might have been you, and the room forgets what it was for as the building closes as a plain municipal archive.",
+      "image": "the chair empty against the shelf, the book closed on a page",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N01": {
+      "id": "T2N01",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ten",
+      "turn": 2,
+      "way": 3,
+      "event": 2,
+      "adapted": "The lights fail for a minute, and when they return the shelves have shifted and the central table has moved to the corner. Brisa Penhallow points at the crack in the wall and jokes that it spells READ, but you move the central table back to the center so the crack can be seen from the room’s middle, and as you do it her copy flickers as if her page is being pulled. She reads READER out of the crack, and the corrected page at the center table takes the room’s attention like a record being checked.",
+      "title": "The Crack Spelled",
+      "summary": "The lamps fail for a minute, and Cadhla Marrack restores them only after the shelves have shifted and the central table has slid into the corner. Brisa Penhallow points at the wall crack and jokes that it spells READ, but you move the table back to the center so the crack can be seen from the room's middle, and her paper double flickers as if the page is being pulled. She reads READER out of the crack, and the corrected page on the central table takes the room's attention like a record being checked.",
+      "image": "the crack in the wall spelling READER under the returned lamp",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N02": {
+      "id": "T2N02",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ketsu",
+      "turn": 3,
+      "way": 2,
+      "event": null,
+      "adapted": "The bookcase door is open only a hand’s width, and Cadhla Marrack holds the night key in his palm while the last lamp begins to dim. You put the corrected page on the central table and let Brisa Penhallow stand at the center while you hold the lamp, and the room files her for the night; Cadhla Marrack’s shift is saved, he gives you the key, and Brisa Penhallow’s correction stops because the fact she kept repeating is now true in the page the room has made of her.",
+      "title": "The Key Given",
+      "summary": "The bookcase door stands open a hand's width, and Cadhla Marrack holds the night key in his palm as the last lamp begins to dim. You put the corrected page on the central table and set Brisa Penhallow at the center while you hold the lamp, and the room begins to treat her as the reader it is filing for the night. Cadhla gives you the key, his shift saved, and you turn it in the central book while Brisa stops correcting because the fact she kept repeating is now true in the page the room has made of her.",
+      "image": "the night key in your hand beside the corrected page",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N03": {
+      "id": "T2N03",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": 2,
+      "event": 3,
+      "adapted": "The last lamp goes out for good, and when it comes back the central chair is occupied by a page that has your name on it while the book lies open to the blank page. You give that page to Brisa Penhallow and move the central chair to her, and the book closes on her page while your name stays on your hand; Cadhla Marrack takes the key back and leaves through the service door, and the room settles into a working close that still adds lines.",
+      "title": "The Reader Filed",
+      "summary": "The last lamp goes out for good, and when the room's light returns the central chair holds a page with your name on it while the book lies open to a blank page. You give that page to Brisa Penhallow and move the chair to her, and the book closes on her page while your name stays on your hand. Cadhla Marrack takes the key back and leaves through the service door, and the building closes as a working archive that still adds lines.",
+      "image": "the central chair holding Brisa's page, your name inked on your hand",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N01": {
+      "id": "T3N01",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": null,
+      "event": 3,
+      "adapted": "The last lamp goes out for good, and when it comes back the central chair is locked in the corner with a page that has your name on it still in the book, while the shelves have closed around the room. You make Brisa Penhallow read the crack backwards, and the mechanism freezes instead of forgetting: the book stays open to the blank page, your name stays in the book, and Cadhla Marrack takes the key from the chair’s lock and leaves through the service door without another word.",
+      "title": "The Sealed Room",
+      "summary": "The last lamp goes out for good, and when the light returns the central chair is locked in the corner, the book is open to a blank page, and the page with your name on it is still in the book. You make Brisa Penhallow read the crack backwards while Cadhla Marrack takes the night key from the chair's lock, and the mechanism freezes before it files you, closing the shelves around the building. Cadhla leaves through the service door without another word, and the room becomes a sealed room that no one can open again.",
+      "image": "the book open to a blank page, your name in the book",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    }
+  },
+  "node_order": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T3N01"
+  ],
+  "characters": {
+    "C01": {
+      "id": "C01",
+      "label": "the night archivist",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to correct the false fact in the record and restore the room's order",
+      "holds": "the knowledge of the room's previous state and the ability to identify discrepancies in the text",
+      "edge": "is a copy of the previous reader and does not know she is a copy, believing her corrections are her own expertise",
+      "tie": "was the last person to stand at the center before being filed, and now serves as the room's memory",
+      "voice": "speaks with precise, academic detachment, treating the impossible as a clerical error: 'The timestamp is incorrect. It was 11:00, not 11:01. Please note the discrepancy.'",
+      "breaking_point": "turns if you fail to correct the specific false fact she identifies, as her existence depends on the record being right",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "name": "Brisa Penhallow",
+      "profile": null,
+      "packet": null
+    },
+    "C02": {
+      "id": "C02",
+      "label": "the night custodian",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to complete the nightly close and ensure the book is filed without incident",
+      "holds": "the night key and control over the room's physical mechanisms like lights and shelves",
+      "edge": "knows the room files people as pages and has been closing the book each night to prevent the copies from realizing they are gone",
+      "tie": "is the administrator of the mechanism that trapped the archivist, and is responsible for her continued existence in the room",
+      "voice": "speaks in short, procedural instructions, avoiding eye contact and treating the room's strangeness as routine maintenance: 'The lamp is dimming. Please stand clear of the center table.'",
+      "breaking_point": "",
+      "opposition": true,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "name": "Cadhla Marrack",
+      "profile": null,
+      "packet": null
+    }
+  },
+  "locations": {
+    "L01": {
+      "id": "L01",
+      "name": "the municipal archive reading room",
+      "kind": "a circular basement reading room",
+      "why": "the single room where the returned book is shelved, checked against the shelves, and the night close is completed",
+      "source": "T1",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    }
+  },
+  "branching": "plan",
+  "plan": {
+    "assessment": "T1 answers pole_b: you stop the room before it files you, keep both the night archivist and the night custodian, and leave the building as an ordinary municipal archive with the room’s purpose destroyed. Missing are a pole_a world where the room finishes its work by filing someone, and a pole_b world where the cost is Brisa rather than the room itself. The story can part early at N02, when Brisa checks the page against the room and the record stops being only yours.",
+    "seeds": [
+      {
+        "motivation": "The page adds your name the moment you hold it against the room, and you come to want the room to keep working long enough to show that its record can be corrected; Brisa’s certainty is the only thing that can make the page stop adding you.",
+        "strategy": "Let Brisa check the page’s line against the shelves, the table, and the crack, let her correct the page’s false line, and then keep the corrected page at the center table so the room treats her as the reader it is filing while you hold the lamp and keep the key from Cadhla.",
+        "diverges_at": "N02",
+        "trigger": "you show Brisa the page’s added line and let her check it against the room",
+        "trigger_kind": "act",
+        "way": 2,
+        "ending": {
+          "title": "The Archivist’s Page",
+          "summary": "The room finishes by filing Brisa instead of you: her page takes the central chair, her fact stops being corrected, and the building closes as a working archive that still adds lines. Cadhla saves his shift and leaves with the key, and the room’s purpose remains intact.",
+          "answer": "pole_a",
+          "standing": [
+            "the night custodian"
+          ],
+          "lost": [
+            "the night archivist"
+          ],
+          "changed": "the central chair remains in the center occupied by Brisa’s page; the room keeps adding lines instead of becoming an ordinary archive"
+        },
+        "why_different": "T1 stops the room before it files anyone and keeps both companions; this line lets the room finish by filing Brisa and leaves the room’s purpose intact."
+      },
+      {
+        "motivation": "Once the shelves are locked and the crack has spelled READER, you come to want the key without giving the room your page, because the page is the only thing that can still name you as the reader.",
+        "strategy": "Move the central chair out of the center before Cadhla can file the page, take the key from the locked chair, and make Brisa read the crack backwards while the shelves close around you.",
+        "diverges_at": "N04",
+        "trigger": "you move the central chair out of the center before Cadhla files the page",
+        "trigger_kind": "act",
+        "way": 3,
+        "ending": {
+          "title": "The Locked Chair",
+          "summary": "The room stops before it files you, but the chair stays locked in the corner and the shelves close around the building; Brisa reads the crack backwards and the mechanism freezes with your page still in the book. Cadhla leaves with the key, and the room becomes a sealed room that no one can open again.",
+          "answer": "pole_b",
+          "standing": [
+            "the night archivist"
+          ],
+          "lost": [
+            "the night custodian"
+          ],
+          "changed": "the central chair remains locked in the corner and the shelves are closed for good, so the room is stopped but not ordinary"
+        },
+        "why_different": "T1 keeps both companions and makes the building ordinary; this line keeps only Brisa, loses Cadhla, and leaves the room sealed rather than plain. The first seed lets the room finish by filing Brisa; this line stops the room before it files anyone but freezes the room itself."
+      }
+    ]
+  },
+  "promises": {
+    "reading": "The Kernel asks for surprise, which is a demand for the unexpected to feel inevitable. The audience wants to be dropped into a specific, vivid world where the rules are strange but consistent, and to discover that their own competence is the key to a puzzle they did not know they were solving. They want the thrill of recognition: the moment the weird becomes personal.",
+    "genre": "speculative mystery",
+    "player_fantasy": "To be the one person in a strange room who notices the detail everyone else misses, and to realize that the strange thing is not a monster but a mechanism, and that you are the only one who can operate it.",
+    "promises": [
+      {
+        "what": "a room that is not what it appears to be: a library that is actually a stomach, a train car that is actually a coffin, a house that is actually a clock",
+        "why": "the core surprise of the genre; the setting itself is the riddle",
+        "in_kernel": false
+      },
+      {
+        "what": "a recurring object or phrase that seems meaningless at first but becomes the key to the entire situation by the end",
+        "why": "the texture of discovery; the player feels smart for connecting dots they didn't know existed",
+        "in_kernel": false
+      },
+      {
+        "what": "a companion who is competent but wrong in a specific, consistent way, forcing the player to correct them",
+        "why": "connection to others is the thematic axis; the companion is the mirror that shows the player their own assumptions",
+        "in_kernel": false
+      },
+      {
+        "what": "a moment of physical danger that is solved by knowledge, not strength",
+        "why": "the player's competence is the weapon; the stakes are high but the solution is intellectual",
+        "in_kernel": false
+      },
+      {
+        "what": "a quiet, ambiguous resolution where the truth is revealed but the cost is left unstated",
+        "why": "the moral valence demands quiet ambiguity; the surprise is in what is left unsaid",
+        "in_kernel": false
+      }
+    ],
+    "set_pieces": [
+      {
+        "scene": "the player opening a book and finding a page that describes the exact room they are in, including the player's own position",
+        "where": "the center of the room"
+      },
+      {
+        "scene": "the companion pointing out a crack in the wall and laughing it off, while the player realizes the crack is spelling a word",
+        "where": "the corner of the room"
+      },
+      {
+        "scene": "the lights going out and the room rearranging itself in the dark, so that when they come back on, the player is in a different part of the space",
+        "where": "the entire room"
+      }
+    ],
+    "tone_engine": "Measured: the prose is calm and precise, which makes the strange elements feel more unsettling. Surprise is produced by withholding information until the player has formed a false certainty, then revealing the true shape of the situation in a single, quiet sentence.",
+    "obligatory_cast": [
+      "a companion who is confident and wrong, providing the contrast that highlights the player's insight",
+      "a presence that is not a person but a system, manifesting as changes in the environment rather than a character"
+    ],
+    "must_not": []
+  },
+  "edges": [
+    {
+      "from": "N01",
+      "to": "N02",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N02",
+      "to": "N03",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you held the page against the room and matched each line to the shelves, the central table, and the corner crack yourself"
+      ]
+    },
+    {
+      "from": "N03",
+      "to": "N04",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "N05",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you give Cadhla Marrack the page with your name"
+      ]
+    },
+    {
+      "from": "N02",
+      "to": "T2N01",
+      "lines": [
+        "T2"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you show Brisa the page’s added line and let her check it against the room",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T2N01",
+      "to": "T2N02",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N02",
+      "to": "T2N03",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "T3N01",
+      "lines": [
+        "T3"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you move the central chair out of the center before Cadhla Marrack files the page",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    }
+  ],
+  "grid": {
+    "beats": [
+      "ki",
+      "sho",
+      "ten",
+      "ketsu"
+    ],
+    "rows": {
+      "T1": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "N03"
+        ],
+        "ketsu": [
+          "N04",
+          "N05"
+        ]
+      },
+      "T2": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "T2N01"
+        ],
+        "ketsu": [
+          "T2N02",
+          "T2N03"
+        ]
+      },
+      "T3": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "N03"
+        ],
+        "ketsu": [
+          "N04",
+          "T3N01"
+        ]
+      }
+    },
+    "skipped": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    }
+  },
+  "hooks": [
+    {
+      "node": "N03",
+      "turn": 2,
+      "way": 2,
+      "what": "you get her to read it by letting the night custodian's lamp pass over the crack so the letters stand out",
+      "cost": "the custodian dims the lamp and the shelves lock for the rest of the night"
+    },
+    {
+      "node": "N03",
+      "turn": 2,
+      "way": 3,
+      "what": "you get her to read it by moving the central table back to the center so the crack can be seen from the room's middle",
+      "cost": "the table is not yours to move, and the archivist's copy flickers as if her page is being pulled"
+    },
+    {
+      "node": "N04",
+      "turn": 3,
+      "way": 2,
+      "what": "you get the key by letting the archivist stand at the center while you hold the lamp",
+      "cost": "the archivist becomes the page for the night and the custodian's shift is saved"
+    },
+    {
+      "node": "T2N01",
+      "turn": 2,
+      "way": 1,
+      "what": "you get her to read it by showing her the page from the book that describes the corner crack and the word READER",
+      "cost": "she says the word is a job title and then corrects you with the false fact again, but slower"
+    },
+    {
+      "node": "T2N01",
+      "turn": 2,
+      "way": 2,
+      "what": "you get her to read it by letting the night custodian's lamp pass over the crack so the letters stand out",
+      "cost": "the custodian dims the lamp and the shelves lock for the rest of the night"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 1,
+      "what": "you get the key by giving the custodian the page with your name",
+      "cost": "the page is filed in the book and your name is no longer on it, but the archivist's correction stops for a minute"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 3,
+      "what": "you get the key by moving the central chair out of the center",
+      "cost": "the chair is locked and the room's shelves close around you"
+    }
+  ],
+  "checks": {
+    "findings": [],
+    "notes": []
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "line": "T1",
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "judge": null,
+      "plan": {
+        "assessment": "T1 answers pole_b: you stop the room before it files you, keep both the night archivist and the night custodian, and leave the building as an ordinary municipal archive with the room’s purpose destroyed. Missing are a pole_a world where the room finishes its work by filing someone, and a pole_b world where the cost is Brisa rather than the room itself. The story can part early at N02, when Brisa checks the page against the room and the record stops being only yours.",
+        "seeds": 2
+      }
+    },
+    {
+      "iteration": 2,
+      "line": "T2",
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 3,
+      "line": "T3",
+      "new_nodes": [
+        "T3N01"
+      ],
+      "judge": null
+    }
+  ],
+  "stop_reason": "reached --max-iterations (3)",
+  "warnings": []
+}

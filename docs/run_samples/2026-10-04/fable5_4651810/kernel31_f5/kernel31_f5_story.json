@@ -1,0 +1,1980 @@
+{
+  "schema_version": 5,
+  "story_id": "kernel31_f5",
+  "stage": "outline",
+  "kernel": "An epic fantasy adventure. You're a young hedge-witch from a border village who gets swept up in a quest to stop an old dragon that has woken in the northern mountains. Along the way you gather a small party — a disgraced knight, a thief who knows the old roads, and a scholar from the capital who has her own reasons for wanting to reach the dragon first. I want real travel: forests, a river city, ruins, the mountain pass. The companions should matter, with their own loyalties that can pull against yours. different endings depending on how you deal with the dragon and who is still with you at the end.",
+  "shape": {
+    "through_lines": 4,
+    "default_max_iterations": 4,
+    "endings_stated": "Several",
+    "endings_tier": "several",
+    "nodes_min": 7,
+    "nodes_max": 9,
+    "linear": false,
+    "choice_density": "unstated",
+    "note": "through_lines is how many distinct story lines (each with its own ending) the shape preference suggests; the review decides whether each next one is worth building."
+  },
+  "premise": {
+    "enrichment_budget": {
+      "level": "minimal"
+    },
+    "protagonist": {
+      "who": "You are a young hedge-witch from a border village, still carrying the smell of smoke and wet roots when the northern tremors drive you out of your hedgerows and into the road.",
+      "wants": "to stop the awakened dragon before it breaks the old road and the people who have come with you scatter, break, or are lost to it.",
+      "can_do": "read the land's moods, bind small things with cord and breath, tend wounds, barter, carry the party's choices, and choose what the group carries toward the mountains.",
+      "cannot_do": "kill the dragon by yourself, command the old roads without the thief, read the ruin's true history without the scholar, or hold a companion in the party once that companion has turned away.",
+      "serves": "3-0b.protagonist_identity"
+    },
+    "arena": {
+      "description": "A border region from a hedgerow village to the northern peaks, threaded with a dark forest, a loud river city, a ruined waystation, and a high pass where the old dragon sleeps.",
+      "serves": "3f.setting_structure"
+    },
+    "pressure": {
+      "description": "The old dragon is waking in the northern peaks: the ground shakes, the snow goes dead, the river city's ward-stones crack, and the scholar says the old road will close before the next new moon.",
+      "clock_or_stock": "none tracked; the weeks are told through tremors, weather, the scholar's urgency, and which companions are still walking beside you.",
+      "serves": "3-0c.failure_triggers"
+    },
+    "opposition": {
+      "who_or_what": "the scholar from the capital",
+      "wants": "to be the one who speaks the name at the dragon's eye and pay the name-debt her family owes, so the dragon sleeps and the capital's shame stays hidden behind her.",
+      "means": "she carries the black name-stone, reads the old roads, can leave the party and make the quest hers, and can trade the party's passage for their secrets or their silence.",
+      "serves": "3c.core_thematic_axis"
+    },
+    "events": [
+      {
+        "what": "In the river city at night, lanterns reflect on the water and a misunderstanding scatters the party into different taverns, where each watches the same rain and hears a different rumor about the old road.",
+        "when": "early",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "what": "At the ruined waystation, the dragon's shadow passes over the peaks and blocks out the sun, and the ruin's stones test the party with a trial that leaves a wound in their trust rather than in their bodies.",
+        "when": "middle",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "what": "At the mountain pass, the high bridge over the chasm is broken by the tremor, the wind howls, and one companion steps back to let another lead, a silent transfer of weight that changes who the party believes will carry the answer to the dragon.",
+        "when": "late",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "hidden_truth": {
+      "truth": "The scholar is the last carrier of the name-stone, and the dragon's waking is not only a threat but a debt: if she speaks the name at the dragon's eye while the party's bond is still whole, the dragon sleeps and the name takes her memory of everyone she loved; if the name-stone cracks and the name leaves her mouth with that bond broken, the dragon's eye can stay open and the old road closes with the debt unpaid.",
+      "who_knows": "the scholar, and the ruin's stones, which show the old debt carved into the waystation's floor.",
+      "what_it_changes": "the quest stops being only about stopping the dragon and becomes a choice about who is allowed to pay for the old road, and the scholar's urgency becomes a wish to be the one who forgets the party rather than lose them while still remembering them.",
+      "serves": "3-0b.epistemic_gap"
+    },
+    "mediation": {
+      "question": "What do you bring to the dragon's eye: the party's sword, the scholar's name, or your own hand on the old bond?",
+      "to_reach_pole_a": {
+        "pole": "meet the dragon with what the party can do together",
+        "what_you_must_do": "keep the knight's sword, the thief's road, and the scholar's name-stone in the party's hands until the lair, then choose which of those things the dragon answers.",
+        "cost": "the companions must be willing to stand in the dragon's gaze, and if any of them has already turned away, the party's united act becomes smaller and the dragon's eye reflects fewer faces."
+      },
+      "to_reach_pole_b": {
+        "pole": "meet the dragon with a single giving that breaks a bond",
+        "what_you_must_do": "before the dragon's eye, place the black name-stone in the scholar's hand, the broken sword in the knight's hand, or your palm on the old bond in the lair floor, and keep the other companions out of the dragon's gaze so only the black name-stone, the broken sword, or your hand reaches the eye.",
+        "cost": "the person who gives is changed or lost to the party's memory, and the dragon may sleep while the bond that brought the party to the lair is broken."
+      },
+      "levers": [
+        "the knight's broken sword and the oath still tied to it",
+        "the thief's map of the old roads",
+        "the scholar's black name-stone",
+        "the merchant's ledger, opened to the party's page, where a mark or promise can settle passage",
+        "the ruin's floor, where the old debt is carved"
+      ],
+      "serves": "3-0a.primary_decision_axis"
+    },
+    "turns": [
+      {
+        "id": 1,
+        "situation": "The river city's ward-stones crack at night, and a quarrel over the merchant's ledger has sent the knight, the thief, and the scholar into different taverns, each watching the same rain from a different window.",
+        "what_you_must_do": "get the three companions back to one table before the merchant closes the city's old-road gate",
+        "ways_through": [
+          {
+            "way": "they sit at one table, because the thief buys their silences with the coin from his map-roll and the merchant opens the gate on a mark left in the ledger",
+            "cost": "the thief's map is spent, and he will not lead the old road again without a new price"
+          },
+          {
+            "way": "they sit at one table, because the scholar tells each of them the same lie about the old road and makes them trust her",
+            "cost": "the knight believes the scholar's lie, and his sword leaves your pack for her hand"
+          },
+          {
+            "way": "they sit at one table, because you mark the merchant's ledger with your village's smoke and the merchant lets the gate open on that promise",
+            "cost": "the merchant keeps a thread of your village's smoke, and your hedge-witch binds will be thinner in the mountains"
+          }
+        ],
+        "involves": [
+          "the river city merchant",
+          "the disgraced knight",
+          "the thief",
+          "the scholar"
+        ],
+        "form": "persuade",
+        "set_piece": "the river city at night, lanterns reflecting on the water, the party separated by a misunderstanding, each sitting in a different tavern watching the same rain",
+        "serves": "3-0a.secondary_decision_axes"
+      },
+      {
+        "id": 2,
+        "situation": "At the ruined waystation, the dragon's shadow passes over the peaks and blocks out the sun, and the floor's carved debt opens a crack in the party's trust.",
+        "what_you_must_do": "read what the ruin's floor says about the name-stone before the shadow closes the way",
+        "ways_through": [
+          {
+            "way": "the floor's debt comes out, because you set the black name-stone on the carved stone and let the ruin answer",
+            "cost": "the ruin takes the scholar's hand and leaves it burned with the old name, and she will not let anyone touch the stone again"
+          },
+          {
+            "way": "the floor's debt comes out, because the thief finds the capital's mark under the waystation's flagstones and reads it aloud",
+            "cost": "the scholar hears the capital's mark named, and her silence turns to a blade in the party's trust"
+          },
+          {
+            "way": "the floor's debt comes out, because the scholar says what the stones say and shows the party the debt carved in her family's hand",
+            "cost": "she says the name is a debt, but not who it was paid for, and the party leaves the ruin with a question no one will ask again"
+          }
+        ],
+        "involves": [
+          "the scholar",
+          "the thief",
+          "the disgraced knight"
+        ],
+        "form": "discover",
+        "set_piece": "the ruin's floor opening under the party's feet as the dragon's shadow blocks the sun, the old debt carved across the waystation",
+        "serves": "3-0b.epistemic_gap"
+      },
+      {
+        "id": 3,
+        "situation": "At the mountain pass, the tremor has broken the high bridge over the chasm, and the wind howls through the gap while the party stands on the broken span.",
+        "what_you_must_do": "get the party across the broken bridge before the pass closes",
+        "ways_through": [
+          {
+            "way": "the party crosses, because the thief leads over the old road and the scholar steps back to give you the black name-stone",
+            "cost": "the scholar's silence makes the knight doubt the party's answer, and he will not lift his sword for the dragon's eye"
+          },
+          {
+            "way": "the party crosses, because the knight takes the broken sword as a pole and the thief lets go of his map to steady the span",
+            "cost": "the thief's map falls into the chasm, and the old road will have to be read by the mountains themselves"
+          },
+          {
+            "way": "the party crosses, because you bind the broken planks with cord and breath and the scholar carries the name-stone while the knight and thief hold the wind",
+            "cost": "the scholar's hand is cut by the stone, and the party's trust in her is spent"
+          }
+        ],
+        "involves": [
+          "the thief",
+          "the disgraced knight",
+          "the scholar"
+        ],
+        "form": "choose_whom",
+        "set_piece": "the party crossing a high bridge over a chasm, the wind howling, as one companion steps back to let another lead, a silent transfer of weight",
+        "serves": "3-0a.primary_decision_axis"
+      },
+      {
+        "id": 4,
+        "situation": "In the dragon's lair, the old dragon's eye opens to the size of a shield and reflects the party's faces back at them, and the mountain's air is so cold the party's breath stands in the dark.",
+        "what_you_must_do": "put the black name-stone, the broken sword, or your own palm on the old bond in front of the dragon's eye before the old road closes",
+        "ways_through": [
+          {
+            "way": "the dragon sleeps, because the knight drives the broken sword into the eye's reflection and you read the oath from the hilt",
+            "cost": "the sword goes to dust and the knight's name leaves the hilt, so he walks back down the mountain without a title"
+          },
+          {
+            "way": "the dragon's eye stays open, because the scholar speaks the name at the dragon's eye and the black name-stone cracks, so the name leaves her mouth with the party's bond broken",
+            "cost": "the name takes her memory of the party, and she does not know your face when you reach her; the old road closes with the dragon still awake"
+          },
+          {
+            "way": "the dragon sleeps, because you press your hand to the old bond in the lair floor and give the smoke of your village",
+            "cost": "the bond holds, but the old road leaves your village and you will not be able to tend your hedgerows"
+          }
+        ],
+        "involves": [
+          "the disgraced knight",
+          "the scholar",
+          "the thief"
+        ],
+        "form": "confront",
+        "set_piece": "the final confrontation in the dragon's lair, where the choice of method is made in the presence of the creature's eye, reflecting the party's faces back at them",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "complications": [
+      {
+        "description": "The merchant's ledger records the party's passage as marked by the scholar's name-debt, so the mark she left was a promise to forget them.",
+        "serves": "3-0b.epistemic_gap"
+      },
+      {
+        "description": "The thief's map of the old roads is drawn in the scholar's hand: she has been leading them to the lair to speak the name alone.",
+        "serves": "3c.core_thematic_axis"
+      }
+    ],
+    "cast_seeds": [
+      {
+        "role": "the river city merchant",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to settle the mark for the party's passage before the tremors make the city's ledger meaningless",
+        "holds": "the ledger of marks and promises and the ward-stones that hold the city's gates",
+        "edge": "knows the mark is a formality for travelers but a death sentence for the city's own poor, and prices accordingly",
+        "tie": "holds the party's passage hostage to the knight's broken sword and the thief's map",
+        "voice": "speaks in the language of weight and balance, never of value: 'The stone cracks because it is tired. Your debt is heavy because you are many. One does not carry the other.'",
+        "breaking_point": null,
+        "opposition": false,
+        "matters_to_turns": [
+          1
+        ],
+        "name": "Severin Holloway"
+      },
+      {
+        "role": "the disgraced knight",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to redeem the oath tied to his broken sword before the dragon erases the honor that remains",
+        "holds": "the broken sword and the physical strength to hold the pass when the bridge fails",
+        "edge": "fights with the discipline of a man who has already lost, and hides his fear behind the weight of the blade",
+        "tie": "owes the scholar a silence about the capital's shame, and owes you the loyalty of a stranger who chose to follow",
+        "voice": "short, declarative sentences that sound like commands even when they are questions: 'The bridge is gone. What remains is enough. Is it?'",
+        "breaking_point": "turns if you ask him to sheathe the sword and let the scholar speak the name, for he believes the sword is the only thing that can hold the line",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Ash Hask"
+      },
+      {
+        "role": "the thief",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to reach the old roads' end before the capital's scholars claim them, and to keep the map that proves it",
+        "holds": "the map of the old roads and the knowledge of which paths are safe",
+        "edge": "trusts the road more than the people on it, and will sacrifice a companion to save the path",
+        "tie": "depends on your ability to read the land's moods to navigate the sections of the map that are blank",
+        "voice": "quick, practical, and slightly mocking, using nicknames for places: 'The bridge isn't broken, it's just done with us. Let's find the way down.'",
+        "breaking_point": "leaves if you choose to follow the scholar's lead over the map's path, for he believes the road is the only truth that doesn't change",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Teague Glaive"
+      },
+      {
+        "role": "the scholar",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to be the one who speaks the name at the dragon's eye and pay the name-debt her family owes",
+        "holds": "the black name-stone and the knowledge of the old debt carved into the ruin's floor",
+        "edge": "wants to forget the party rather than lose them while still remembering them, and hides this fear behind her urgency",
+        "tie": "carries the shame of the capital and the hope that the dragon's sleep will erase it",
+        "voice": "formal, precise, and heavy with the weight of history, using the past tense for the present: 'The stone is not a weapon. It is a memory. And memories are heavy.'",
+        "breaking_point": "turns if you refuse to let her speak the name, for she believes that without the debt paid, the dragon will wake again and the capital's shame will be eternal",
+        "opposition": true,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Rozenn Dunmore"
+      }
+    ],
+    "name_pool": "fantasy"
+  },
+  "framework": {
+    "id": "heros_journey",
+    "name": "Hero's journey (condensed)",
+    "shape": "the protagonist leaves a known world for an unknown one, is remade by an ordeal there, and returns changed",
+    "modifier": {
+      "id": "none",
+      "name": "no modifier",
+      "effect": ""
+    },
+    "reading": "The story begins with a young witch leaving a border village, driven by the escalating pressure of a waking dragon and the dispersing of her party. It builds through a sequence of escalating crises and relational fractures across dispersed locations, culminating in a confrontation where the protagonist must choose between duty and loyalty. The ending should feel like a decisive resolution of the threat, but the emotional weight lands on which bonds survived the journey, resulting in a best-case or worst-case outcome for the party's cohesion.",
+    "why": "Its shape matches the dispersed journey in 3f.setting_structure and the linear timeline in 3e.timeline_duration, moving from the 'Ordinary world' of the village to the 'Return' which aligns with the need to resolve the party's status (3c.moral_valence). While three_act is a fallback, the specific beats of leaving, trial, and return better scaffold the 'travel' and 'companion attachment' requirements (3b.secondary_affects) than the generic midpoint reversal of three_act, and fichtean_curve lacks the necessary setup for the initial departure and gathering of the party.",
+    "named_in_kernel": null,
+    "shortlist": [
+      "three_act",
+      "fichtean_curve",
+      "heros_journey"
+    ],
+    "scores": {
+      "three_act": 2.0,
+      "freytag": 0.0,
+      "heros_journey": 3.0,
+      "save_the_cat": 2.0,
+      "fichtean_curve": 3.0,
+      "seven_point": 2.0,
+      "story_circle": 0.0,
+      "kishotenketsu": -1.0
+    },
+    "beats": [
+      {
+        "id": "ordinary_world",
+        "name": "Ordinary world",
+        "job": "the known world and the protagonist's place in it, with what is missing from it",
+        "required": true
+      },
+      {
+        "id": "call",
+        "name": "The call",
+        "job": "what is asked of the protagonist, and why they would rather not",
+        "required": true
+      },
+      {
+        "id": "threshold",
+        "name": "Crossing the threshold",
+        "job": "the protagonist enters the unfamiliar world; its rules are not the ones they know",
+        "required": true
+      },
+      {
+        "id": "trials",
+        "name": "Trials",
+        "job": "tests, allies and enemies; the protagonist learns how the unfamiliar world works and what it wants from them",
+        "required": true
+      },
+      {
+        "id": "ordeal",
+        "name": "The ordeal",
+        "job": "the central crisis: the protagonist faces losing what they most fear to lose",
+        "required": true
+      },
+      {
+        "id": "reward",
+        "name": "The reward",
+        "job": "what the ordeal wins, and what it cost to win it",
+        "required": true
+      },
+      {
+        "id": "road_back",
+        "name": "The road back",
+        "job": "the consequence follows them toward home: a pursuit, a debt, a price still unpaid",
+        "required": false
+      },
+      {
+        "id": "return",
+        "name": "Return",
+        "job": "home again, changed: what the protagonist brings back and what no longer fits",
+        "required": true
+      }
+    ]
+  },
+  "lines": {
+    "T1": {
+      "id": "T1",
+      "iteration": 1,
+      "title": "The Smoke and the Stone",
+      "motivation": "You begin wanting to keep the party together long enough to stop the dragon, because a hedge-witch knows that a scattered party is already half defeated. By the end you want the dragon to sleep without making anyone in that party forget who they were to you, even if it costs the home you came from.",
+      "strategy": "Keep the three companions inside the same road, the same table, and the same gaze, and let the old debt be answered by the party’s bond rather than by one person’s silence.",
+      "turning_point": "At the ruined waystation, Rozenn Dunmore shows the debt carved in her family’s hand but will not say who the name was paid for. From then on the quest is no longer only about reaching the dragon; it is about whether the party can stand in the dragon’s eye without being broken by the scholar’s need to pay alone.",
+      "differs_from": null,
+      "ending": {
+        "title": "The Road Leaves the Village",
+        "summary": "The dragon sleeps because you press your own hand to the old bond in the lair floor and give the smoke of your village, while the party stands in the eye’s gaze together. It costs your hedgerows and the old road’s tie to your home: you can walk back, but you can no longer tend what you came from.",
+        "node": "N08",
+        "answer": "pole_b",
+        "standing": [
+          "the disgraced knight",
+          "the thief",
+          "the scholar"
+        ],
+        "lost": [
+          "the village’s old road",
+          "the hedge-witch’s home-tending"
+        ],
+        "changed": "the dragon sleeps, the old road no longer reaches your village, and the party remains whole but changed by what was given at the eye"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08"
+      ],
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08"
+      ],
+      "parent": null,
+      "divergence": null,
+      "rejoins_at": null,
+      "skipped_beats": []
+    },
+    "T2": {
+      "id": "T2",
+      "iteration": 2,
+      "title": "The Burned Hand",
+      "motivation": "After the ruin burns Rozenn Dunmore's hand with the old name, you come to want to stop the dragon without making the scholar's family debt the answer, because you have just watched the capital's shame take hold of her hand before her mouth; by the end you want the dragon to sleep with the stone still unbroken in your pack, even if it costs the scholar and the home you came from.",
+      "strategy": "Keep the black name-stone out of Rozenn Dunmore's reach, carry the debt in your own binds, and let the party's sword meet the dragon's eye instead of the scholar's name.",
+      "turning_point": "The moment you take the name-stone from the ruined floor and bind it in your pack while Rozenn Dunmore's burned hand stays closed around nothing: from then on, the quest is no longer the capital's debt but the party's choice of who will stand at the dragon's eye.",
+      "differs_from": "T1 keeps all three companions and loses only the home; this line gives the same pole_b answer but loses the scholar, because her burned hand and refused name make her the one who turns away, and the world is changed by the scholar's loss rather than by the road leaving the village alone.",
+      "ending": {
+        "title": "The Burned Hand",
+        "summary": "Rozenn Dunmore turns when you keep the name-stone from her and refuse to let her speak the name, and she leaves before the lair with her hand still marked by the old name. At the dragon's eye, Ash Hask drives the broken sword into the reflection while you read the oath from the hilt and keep the uncracked stone in your pack, so the dragon sleeps, but the scholar is gone and the capital's debt remains hers to carry.",
+        "node": "T2N04",
+        "answer": "pole_b",
+        "standing": [
+          "the disgraced knight",
+          "the thief"
+        ],
+        "lost": [
+          "the scholar",
+          "the hedge-witch's home-tending"
+        ],
+        "changed": "the scholar's hand is burned with the old name and the name-stone stays uncracked in your pack"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N04",
+        "trigger": "you set the black name-stone on the carved stone and let the ruin answer",
+        "trigger_kind": "act",
+        "way": 1,
+        "instead_of": "you let Rozenn Dunmore say what the stones say and show the party the debt carved in her family's hand",
+        "opportunity": null,
+        "shift": "The ruin burns Rozenn Dunmore's hand with the old name, and she will not let anyone touch the stone again. You see that the capital's debt is already taking her from the inside, before she has even spoken the name, so the question changes from how to stop the dragon to how to stop it without spending her."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: turn 2's way 1 burns Rozenn Dunmore's hand with the old name and makes the scholar's debt a visible wound, so the line can turn on keeping the name-stone from her. The ending world holds, with one necessary movement at the lair: because T1 already plays turn 4's way 3 at the same beat, this line reaches the same pole_b answer through turn 4's way 1, with the knight's sword carrying the single giving while your own binding keeps the scholar's name-stone uncracked in your pack."
+    },
+    "T3": {
+      "id": "T3",
+      "iteration": 3,
+      "title": "The Sword's Answer",
+      "motivation": "At the dragon's eye you come to want the party's sword to be the answer, because the road has kept Ash Hask's blade in the party's hands all the way north and you no longer wish to spend your village's smoke to make the line hold; by the end you want the dragon to sleep under the oath the party carried, even if it costs the knight the name that had held him to the line.",
+      "strategy": "Keep the sword, the road, and the name-stone in the party's hands until the lair, then let Ash Hask drive the broken sword into the eye's reflection while you read the oath from the hilt, so the dragon is stopped by what the party can do together rather than by a single giving.",
+      "turning_point": "The shield-wide eye. When it reflects the party's faces back at them, you see that the answer is already in Ash Hask's hand and in the oath still tied to the hilt, so you stop reaching for your village's smoke and let the sword go first.",
+      "differs_from": "Compared with T1, this line answers with the party's sword instead of your hand and loses the knight while keeping your village tendable; compared with T2, it keeps the scholar in the party's gaze and leaves the name-stone unbroken rather than making the capital's debt hers to carry alone.",
+      "ending": {
+        "title": "The Oath in the Hilt",
+        "summary": "The dragon sleeps under the sword's oath, but the broken sword goes to dust and the knight's name leaves the hilt. Ash Hask walks away as a nameless man, and you go back down the mountain with Teague Glaive and Rozenn Dunmore while your hedgerows are still yours to tend.",
+        "node": "T3N01",
+        "answer": "pole_a",
+        "standing": [
+          "the thief",
+          "the scholar"
+        ],
+        "lost": [
+          "the disgraced knight"
+        ],
+        "changed": "the broken sword is dust and the knight's name is gone from the hilt, while the old road still reaches your village"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "T3N01"
+      ],
+      "new_nodes": [
+        "T3N01"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N07",
+        "trigger": "you let Ash Hask drive the broken sword into the eye's reflection and read the oath from the hilt",
+        "trigger_kind": "act",
+        "way": 1,
+        "instead_of": "you pressed your hand to the old bond in the lair floor and gave the smoke of your village while the party stood in the eye's gaze",
+        "opportunity": null,
+        "shift": "The dragon's eye shows the party's faces together and the oath still tied to Ash Hask's hand; you see that the road has already carried the answer to the lair, and that spending your village's smoke would only make the line hold after the sword's answer was already spoken."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: N07 is the lair confrontation, and turn 4's first way lets the party's sword answer the dragon's eye while the scholar stays in the party's gaze. The seed's ending world holds: the knight is lost to the party when the sword's oath takes his name, the thief and scholar stand, and the village's old road remains because the hedge-witch's smoke is not spent."
+    },
+    "T4": {
+      "id": "T4",
+      "iteration": 4,
+      "title": "The Debt in Her Mouth",
+      "motivation": "After the waystation names the capital's mark, you come to want Rozenn Dunmore to be the one who speaks the name, because her family's debt is the oldest thing in the party and you have begun to believe the dragon will not sleep until the capital's shame is paid in her mouth; by the end you want the name paid even if it breaks the party's bond and leaves the road closed.",
+      "strategy": "Follow the scholar's lead over the map's path, let her carry the black name-stone to the lair, and let her speak the name at the dragon's eye even if the name takes her memory and the eye stays open.",
+      "turning_point": "The capital's mark under the waystation's flagstones. Once Teague Glaive reads it aloud, the sword and the map are no longer enough; the debt has a name, and the name has a mouth.",
+      "differs_from": "T1 answers the dragon with the hedge-witch's hand and keeps the scholar; this line answers with the scholar's name and loses her to the name, leaving the dragon awake. T2 keeps the name-stone unbroken in the hedge-witch's pack and lets the sword sleep the dragon; this line gives the stone back to the scholar and lets the name crack it. T3 lets the party's sword be the answer and keeps the scholar; this line lets the scholar's mouth be the answer and leaves the scholar behind.",
+      "ending": {
+        "title": "The Name in Her Mouth",
+        "summary": "Rozenn Dunmore speaks the name at the dragon's eye and the black name-stone cracks, but the name takes her memory of the party and the eye stays open. She does not know your face when you reach her, and the old road closes with the dragon still awake while Ash Hask and Teague Glaive stand in the cold with what is left of the party.",
+        "node": "T4N04",
+        "answer": "pole_b",
+        "standing": [
+          "the disgraced knight",
+          "the thief"
+        ],
+        "lost": [
+          "the scholar"
+        ],
+        "changed": "the black name-stone is cracked and the dragon is still awake beneath the closed old road"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "new_nodes": [
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N03",
+        "trigger": "you let the scholar tell each of them the same lie about the old road and make them trust her",
+        "trigger_kind": "act",
+        "way": 2,
+        "instead_of": "you marked the merchant's ledger with the smoke of your village and let Severin Holloway open the old-road gate on that promise",
+        "opportunity": null,
+        "shift": "Rozenn Dunmore's lie gives each companion a reason to trust her version of the old road, and Ash Hask's broken sword leaves your pack for her hand; from that moment the party's answer is no longer only your binds or the thief's map, but the scholar's mouth."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds: N03's unused way 2 puts the scholar's lie and the knight's sword into her orbit before the waystation, and the waystation's unused way 2 names the capital's mark so the scholar's debt becomes the party's visible wound. From there the line can follow her lead, keep the knight and thief in the party by showing why their old certainties no longer hold, and land in the seed's ending world at turn 4's unused way 2: the name is paid, the scholar is lost to memory, and the dragon's eye stays open."
+    }
+  },
+  "line_order": [
+    "T1",
+    "T2",
+    "T3",
+    "T4"
+  ],
+  "nodes": {
+    "N01": {
+      "id": "N01",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ordinary_world",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "In your border village the northern tremors crack the hedgerow stones and turn the river water grey; you bind a split fence with cord and breath while Severin Holloway’s merchant wagon waits at the gate, and Ash Hask, Teague Glaive, and Rozenn Dunmore arrive within a day because the old road is already asking for witnesses.",
+      "title": "The Cracked Hedgerow",
+      "summary": "The northern tremors crack the hedgerow stones and turn the river water grey. You bind a split fence with cord and breath while Severin Holloway's merchant wagon waits at the gate. By day's end Ash Hask, Teague Glaive, and Rozenn Dunmore have arrived at the village, and the old road has made a party of you.",
+      "image": "cracked hedge stones, grey river water, a wagon wheel sunk in mud",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N02": {
+      "id": "N02",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "call",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The village elders do not ask you to fight; they ask you to carry the party north before the snow goes dead, but you would rather stay and mend the roots. Rozenn Dunmore opens the black name-stone in her sleeve and says the capital’s shame is older than your village’s smoke, which makes the quest feel less like a task and more like a debt coming to collect.",
+      "title": "The Name-Stone",
+      "summary": "The village elder speaks for the elders and does not ask you to fight; he asks you to carry the party north before the snow goes dead. You would rather stay and mend the roots, but Rozenn Dunmore opens the black name-stone in her sleeve and says the capital's shame is older than your village's smoke, so the quest settles on you as a debt coming to collect.",
+      "image": "the black name-stone open in a sleeve, smoke curling from it",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C05",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N03": {
+      "id": "N03",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "threshold",
+      "turn": 1,
+      "way": 3,
+      "event": 1,
+      "adapted": "In the river city at night, lanterns reflect on the water and a quarrel over Severin Holloway’s ledger scatters Ash Hask, Teague Glaive, and Rozenn Dunmore into different taverns, each watching the same rain and hearing a different rumor about the old road. You mark the merchant’s ledger with the smoke of your village, and he opens the old-road gate on that promise; the cost lands on your binds, and you know the mountains will ask for thinner cord than your village can spare.",
+      "title": "The River City Scatter",
+      "summary": "In the river city at night, lanterns reflect on the water and a misunderstanding scatters Ash Hask, Teague Glaive, and Rozenn Dunmore into different taverns, each watching the same rain and hearing a different rumor about the old road. You bring them back to one table before Severin Holloway closes the old-road gate, mark his ledger with the smoke of your village, and make him open the gate on that promise; the cost lands on your binds, and you know the mountains will ask for thinner cord than your village can spare.",
+      "image": "a ledger page smoked black under the gate lantern",
+      "where": [
+        "L02",
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N04": {
+      "id": "N04",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "trials",
+      "turn": 2,
+      "way": 3,
+      "event": 2,
+      "adapted": "At the ruined waystation the dragon’s shadow passes over the peaks and blocks out the sun, and the floor’s carved debt opens under your feet. Rozenn Dunmore says what the stones say and shows the party the debt carved in her family’s hand, but she does not say who the name was paid for, so the ruin’s wound is not in your bodies but in the trust between you: the scholar’s urgency becomes a wish to be the one who forgets the party rather than lose them while still remembering them.",
+      "title": "The Waystation Debt",
+      "summary": "At the ruined waystation, the awakened dragon's shadow passes over the peaks and blocks out the sun, and the floor's carved debt opens under your feet. Rozenn Dunmore says what the stones say and shows the party the debt carved in her family's hand, but she does not say who the name was paid for. The wound is not in your bodies but in the trust between you: Teague Glaive's map goes quiet, Ash Hask's hand stays on his broken sword, and the scholar's urgency becomes a wish to be the one who forgets the party rather than lose them while still remembering them.",
+      "image": "a carved name-splitting in the floor as the shadow dims the light",
+      "where": [
+        "L04"
+      ],
+      "who": [
+        "C06",
+        "C04",
+        "C03",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N05": {
+      "id": "N05",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "trials",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "Rozenn Dunmore acts on what she has carried: she takes the black name-stone from your pack and reads the old roads by its light, steering the party toward the pass in a way that makes Teague Glaive suspect the map in his hand has been leading them to her lair. Ash Hask does not leave, but he tests the limit of his loyalty by asking whether the sword can hold the line if the name is refused, and you answer by keeping the sword in the party’s hands instead of giving it to the stone.",
+      "title": "The Stone's Road",
+      "summary": "Rozenn Dunmore takes the black name-stone from your pack and reads the old roads by its light, steering the party toward the pass while Teague Glaive watches the map and suspects it has led them to her lair. Ash Hask does not leave, but he asks whether the broken sword can hold the line if the name is refused. You answer by keeping the sword in the party's hands instead of giving it to the stone.",
+      "image": "the black name-stone glowing in Rozenn's hand, its light tracing the road",
+      "where": [
+        "L05"
+      ],
+      "who": [
+        "C04",
+        "C03",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N06": {
+      "id": "N06",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ordeal",
+      "turn": 3,
+      "way": 3,
+      "event": 3,
+      "adapted": "At the mountain pass the tremor breaks the high bridge over the chasm, the wind howls through the gap, and one companion steps back to let another lead in a silent transfer of weight that changes who the party believes will carry the answer. You bind the broken planks with cord and breath while Rozenn Dunmore carries the name-stone and Ash Hask and Teague Glaive hold the wind; her hand is cut by the stone, and the party’s trust in her is spent, but the party crosses together.",
+      "title": "The Broken Span",
+      "summary": "At the mountain pass, the tremor breaks the high bridge over the chasm, the wind howls through the gap, and Ash Hask steps back to let Rozenn Dunmore lead, a silent transfer of weight that changes who the party believes will carry the answer. You bind the broken planks with cord and breath while Rozenn Dunmore carries the black name-stone and Ash Hask and Teague Glaive hold the wind. Her hand is cut by the stone, and the party's trust in her is spent, but the party crosses together.",
+      "image": "the broken planks bound with cord over the howling gap",
+      "where": [
+        "L06"
+      ],
+      "who": [
+        "C03",
+        "C02",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N07": {
+      "id": "N07",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "reward",
+      "turn": 4,
+      "way": 3,
+      "event": null,
+      "adapted": "In the dragon’s lair the old dragon’s eye opens to the size of a shield and reflects the party’s faces back at them, and the mountain’s air is so cold the party’s breath stands in the dark. You press your hand to the old bond in the lair floor and give the smoke of your village, while Ash Hask, Teague Glaive, and Rozenn Dunmore stand in the eye’s gaze; the dragon sleeps, but the old road leaves your village and you will not be able to tend your hedgerows.",
+      "title": "The Shield-Wide Eye",
+      "summary": "In the dragon's lair the old dragon's eye opens to the size of a shield and reflects the party's faces in the cold, while your breath stands in the dark. You press your hand to the old bond in the lair floor and give the smoke of your village, while Ash Hask, Teague Glaive, and Rozenn Dunmore stand in the eye's gaze. The dragon sleeps, but the old road leaves your village and you will not be able to tend your hedgerows.",
+      "image": "the dragon's shield-wide eye reflecting four faces in the cold",
+      "where": [
+        "L07"
+      ],
+      "who": [
+        "C02",
+        "C04",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N08": {
+      "id": "N08",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "return",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You walk back down the mountain with the party still together, but the road no longer reaches your village; Ash Hask carries the broken sword without a title, Teague Glaive carries no map that can be trusted, and Rozenn Dunmore carries the black name-stone without the need to make the quest hers. You are changed: the dragon is stopped, the bond holds, and the home you came from is no longer a place you can tend.",
+      "title": "The Untended Road",
+      "summary": "You walk back down the mountain with the party still together, but the road no longer reaches your village. Ash Hask carries the broken sword without a title, Teague Glaive carries no map that can be trusted, and Rozenn Dunmore carries the black name-stone without the need to make the quest hers. The dragon sleeps because you pressed your own hand to the old bond and gave the smoke of your village, and the bond holds while the old road leaves your hedgerows untended.",
+      "image": "the empty road where your village used to be",
+      "where": [
+        "L05"
+      ],
+      "who": [
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N01": {
+      "id": "T2N01",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "trials",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You take the black name-stone from the ruined floor and bind it in your pack with cord and breath while Rozenn Dunmore's burned hand stays closed and refuses to reach it. She reads the old roads by the stone's light but does not take it back, and Teague Glaive sees the map in his hand leading where she points, so the party now follows a road that is hers without her having the stone in her hand.",
+      "title": "The Stone Bound",
+      "summary": "You take the black name-stone from the ruined floor and bind it in your pack with cord and breath while Rozenn Dunmore's burned hand stays closed and refuses to reach it. She reads the old roads by the stone's light and does not take it back, and Teague Glaive sees the map in his hand leading where she points, so the party follows a road that is hers without her having the stone in her hand.",
+      "image": "the black name-stone in your pack, her burned hand closed empty",
+      "where": [
+        "L04"
+      ],
+      "who": [
+        "C04",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N02": {
+      "id": "T2N02",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ordeal",
+      "turn": 3,
+      "way": 2,
+      "event": 3,
+      "adapted": "At the broken bridge the tremor splits the high span and the wind howls through the gap. Ash Hask takes the broken sword as a pole to steady the crossing, and Teague Glaive lets go of his map to hold the span, so the map falls into the chasm and the old road will have to be read by the mountains themselves. Rozenn Dunmore watches the stone in your pack and says nothing, and the party crosses without her leading.",
+      "title": "The Broken Span",
+      "summary": "At the mountain pass, the tremor splits the high span and the wind howls through the gap while the party stands on the broken bridge. Ash Hask takes the broken sword as a pole to steady the crossing, and Teague Glaive lets go of his map to hold the span, so the map falls into the chasm and the old road will have to be read by the mountains themselves. Rozenn Dunmore watches the stone in your pack and says nothing, and the party crosses without her leading.",
+      "image": "the broken sword braced under the span, wind snapping the map",
+      "where": [
+        "L06"
+      ],
+      "who": [
+        "C03",
+        "C02",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N03": {
+      "id": "T2N03",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "reward",
+      "turn": 4,
+      "way": 1,
+      "event": null,
+      "adapted": "In the dragon's lair the old dragon's eye opens to the size of a shield and reflects the party's faces back at them, but Rozenn Dunmore is not there to speak the name. You keep the black name-stone in your pack, uncracked, and Ash Hask drives the broken sword into the eye's reflection while you read the oath from the hilt; the sword goes to dust, the knight's name leaves the hilt, and the dragon sleeps.",
+      "title": "The Dragon's Eye",
+      "summary": "In the dragon's lair the old dragon's eye opens to the size of a shield and reflects the party's faces back at them, but Rozenn Dunmore is not there to speak the name. You keep the black name-stone in your pack, uncracked, and Ash Hask drives the broken sword into the eye's reflection while you read the oath from the hilt; the sword goes to dust, the knight's name leaves the hilt, and the dragon sleeps.",
+      "image": "the shield-sized eye reflecting your faces, the sword going to dust",
+      "where": [
+        "L07"
+      ],
+      "who": [
+        "C02",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N04": {
+      "id": "T2N04",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "return",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You walk back down the mountain with Ash Hask and Teague Glaive, but Rozenn Dunmore is not with you; she turned away before the lair with her burned hand still marked by the old name and the capital's debt still hers to carry. The name-stone stays in your pack, unbroken, and the old road no longer lets you tend your hedgerows the way you did before.",
+      "title": "The Down Mountain",
+      "summary": "Rozenn Dunmore turned away before the lair when you kept the name-stone from her and refused to let her speak the name, and now she is not with you as you walk back down the mountain with Ash Hask and Teague Glaive. The name-stone stays in your pack, unbroken, and the old road no longer lets you tend your hedgerows the way you did before.",
+      "image": "the unbroken name-stone in your pack, the road below the lair",
+      "where": [
+        "L05"
+      ],
+      "who": [
+        "C02",
+        "C03"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N01": {
+      "id": "T3N01",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "return",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "Rozenn Dunmore keeps the black name-stone uncracked in her hand and says the road has been answered, not her family's debt, while Teague Glaive points the way down by the mountains themselves. Ash Hask walks out of the lair with the broken sword gone to dust and no name left on the hilt, and he does not follow you down; you go back with the thief and the scholar, and the old road still reaches your village so your hedgerows can be tended.",
+      "title": "The Nameless Descent",
+      "summary": "The lair is quiet under the dragon's sleep, held by the sword's oath, and Ash Hask walks out with the broken sword gone to dust and no name left on the hilt. Rozenn Dunmore keeps the black name-stone uncracked in her hand and says the road has been answered, not her family's debt, while Teague Glaive points the way down by the mountains themselves. You do not follow Ash Hask down; you go back with the thief and the scholar, and the old road still reaches your village so your hedgerows can be tended.",
+      "image": "the empty hilt in Ash Hask's hand, the blade already dust",
+      "where": [
+        "L07",
+        "L05"
+      ],
+      "who": [
+        "C02",
+        "C04",
+        "C03",
+        "C06"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T4N01": {
+      "id": "T4N01",
+      "line": "T4",
+      "iteration": 4,
+      "beat": "trials",
+      "turn": 2,
+      "way": 2,
+      "event": 2,
+      "adapted": "At the ruined waystation the dragon's shadow blocks the sun and the floor's carved debt opens under the party's feet. Teague Glaive finds the capital's mark under the flagstones and reads it aloud, so Rozenn Dunmore hears her family's name named and her silence turns to a blade in the party's trust; Ash Hask does not take the broken sword back from her hand because the mark proves the line was held by a name before it was held by a blade.",
+      "title": "The Debt Under the Flagstones",
+      "summary": "The dragon's shadow passes over the peaks and blocks out the sun while the ruined waystation's carved debt opens under your feet. You read the floor's debt as Teague Glaive pulls the capital's mark from the flagstones and reads it aloud, and Rozenn Dunmore hears her family's name named. Her silence turns to a blade in the party's trust, and Ash Hask leaves the broken sword in her hand because the mark proves a name held the line before a blade.",
+      "image": "the capital's mark cut into the flagstone, the sun blocked out",
+      "where": [
+        "L04"
+      ],
+      "who": [
+        "C03",
+        "C04",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T4N02": {
+      "id": "T4N02",
+      "line": "T4",
+      "iteration": 4,
+      "beat": "ordeal",
+      "turn": 3,
+      "way": 1,
+      "event": 3,
+      "adapted": "At the mountain pass the tremor breaks the high bridge and the wind howls through the gap. Teague Glaive leads over the old road because the map's path and the scholar's lead meet at the chasm, and Rozenn Dunmore steps back to give you the black name-stone; you put it back in her hand, and her silence makes Ash Hask doubt the party's answer so he will not lift his sword for the dragon's eye.",
+      "title": "The Broken Bridge",
+      "summary": "The tremor has broken the high bridge over the chasm, and the wind howls through the gap while the party stands on the broken span. You get the party across before the pass closes, following Teague Glaive over the old road where the map's path and Rozenn Dunmore's lead meet at the chasm. You put the black name-stone back into Rozenn's hand as she steps back, and her silence makes Ash Hask doubt the party's answer so he will not lift his sword for the dragon's eye.",
+      "image": "the broken bridge swaying over the chasm, the wind howling",
+      "where": [
+        "L06"
+      ],
+      "who": [
+        "C03",
+        "C04",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T4N03": {
+      "id": "T4N03",
+      "line": "T4",
+      "iteration": 4,
+      "beat": "reward",
+      "turn": 4,
+      "way": 2,
+      "event": null,
+      "adapted": "In the dragon's lair the old dragon's eye opens to the size of a shield and reflects the party's faces back at them while the cold stands in the dark. Rozenn Dunmore speaks the name at the dragon's eye and the black name-stone cracks, so the name leaves her mouth with the party's bond broken; Ash Hask and Teague Glaive stand in the gaze, but the eye stays open and the old road closes with the dragon still awake.",
+      "title": "The Name at the Eye",
+      "summary": "The old dragon's eye opens to the size of a shield and reflects your faces back at you while the cold stands in the dark. You put the black name-stone on the old bond before the eye, but Rozenn Dunmore speaks the name at the dragon's eye and the black name-stone cracks. Ash Hask and Teague Glaive stand in the gaze, the eye stays open, and the old road closes with the dragon still awake while the name takes her memory of the party.",
+      "image": "the shield-sized eye reflecting the party's faces in the cold",
+      "where": [
+        "L07"
+      ],
+      "who": [
+        "C04",
+        "C02",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T4N04": {
+      "id": "T4N04",
+      "line": "T4",
+      "iteration": 4,
+      "beat": "return",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You reach Rozenn Dunmore in the cold and she does not know your face, so you walk back down the mountain with Ash Hask and Teague Glaive while she carries the cracked name-stone without the need to make the quest hers. The old road no longer reaches your village, the dragon is still awake beneath it, and the party's bond is paid in the scholar's forgetting.",
+      "title": "The Road Closed",
+      "summary": "You reach Rozenn Dunmore in the cold and she does not know your face, while the eye stays open and the old road closes with the dragon still awake. You walk back down the mountain with Ash Hask and Teague Glaive, who stand in the cold with what is left of the party, while she carries the cracked name-stone without the need to make the quest hers. The old road no longer reaches your village, and the party's bond is paid in the scholar's forgetting.",
+      "image": "the cracked name-stone in Rozenn's hand on the mountain road",
+      "where": [
+        "L07",
+        "L05"
+      ],
+      "who": [
+        "C04",
+        "C02",
+        "C03"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T4"
+      ],
+      "additions": [],
+      "annotations": {}
+    }
+  },
+  "node_order": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T2N04",
+    "T3N01",
+    "T4N01",
+    "T4N02",
+    "T4N03",
+    "T4N04"
+  ],
+  "characters": {
+    "C01": {
+      "id": "C01",
+      "label": "the river city merchant",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to settle the mark for the party's passage before the tremors make the city's ledger meaningless",
+      "holds": "the ledger of marks and promises and the ward-stones that hold the city's gates",
+      "edge": "knows the mark is a formality for travelers but a death sentence for the city's own poor, and prices accordingly",
+      "tie": "holds the party's passage hostage to the knight's broken sword and the thief's map",
+      "voice": "speaks in the language of weight and balance, never of value: 'The stone cracks because it is tired. Your debt is heavy because you are many. One does not carry the other.'",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N03"
+      ],
+      "name": "Severin Holloway",
+      "profile": null,
+      "packet": null
+    },
+    "C02": {
+      "id": "C02",
+      "label": "the disgraced knight",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to redeem the oath tied to his broken sword before the dragon erases the honor that remains",
+      "holds": "the broken sword and the physical strength to hold the pass when the bridge fails",
+      "edge": "fights with the discipline of a man who has already lost, and hides his fear behind the weight of the blade",
+      "tie": "owes the scholar a silence about the capital's shame, and owes you the loyalty of a stranger who chose to follow",
+      "voice": "short, declarative sentences that sound like commands even when they are questions: 'The bridge is gone. What remains is enough. Is it?'",
+      "breaking_point": "turns if you ask him to sheathe the sword and let the scholar speak the name, for he believes the sword is the only thing that can hold the line",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T3N01",
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "name": "Ash Hask",
+      "profile": null,
+      "packet": null
+    },
+    "C03": {
+      "id": "C03",
+      "label": "the thief",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to reach the old roads' end before the capital's scholars claim them, and to keep the map that proves it",
+      "holds": "the map of the old roads and the knowledge of which paths are safe",
+      "edge": "trusts the road more than the people on it, and will sacrifice a companion to save the path",
+      "tie": "depends on your ability to read the land's moods to navigate the sections of the map that are blank",
+      "voice": "quick, practical, and slightly mocking, using nicknames for places: 'The bridge isn't broken, it's just done with us. Let's find the way down.'",
+      "breaking_point": "leaves if you choose to follow the scholar's lead over the map's path, for he believes the road is the only truth that doesn't change",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T3N01",
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "name": "Teague Glaive",
+      "profile": null,
+      "packet": null
+    },
+    "C04": {
+      "id": "C04",
+      "label": "the scholar",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to be the one who speaks the name at the dragon's eye and pay the name-debt her family owes",
+      "holds": "the black name-stone and the knowledge of the old debt carved into the ruin's floor",
+      "edge": "wants to forget the party rather than lose them while still remembering them, and hides this fear behind her urgency",
+      "tie": "carries the shame of the capital and the hope that the dragon's sleep will erase it",
+      "voice": "formal, precise, and heavy with the weight of history, using the past tense for the present: 'The stone is not a weapon. It is a memory. And memories are heavy.'",
+      "breaking_point": "turns if you refuse to let her speak the name, for she believes that without the debt paid, the dragon will wake again and the capital's shame will be eternal",
+      "opposition": true,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08",
+        "T2N01",
+        "T2N02",
+        "T3N01",
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "name": "Rozenn Dunmore",
+      "profile": null,
+      "packet": null
+    },
+    "C05": {
+      "id": "C05",
+      "label": "the village elder",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the border village from scattering into the mountain road before the snow dies",
+      "holds": "the village's old hedge-rite and the first word of the northern road",
+      "edge": "",
+      "tie": "",
+      "voice": "",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "the node needs a person who can ask the hedge-witch to carry the party north",
+      "matters_to_turns": [],
+      "source": "T1",
+      "nodes": [
+        "N02"
+      ],
+      "name": "Nerys Underhay",
+      "profile": null,
+      "packet": null
+    },
+    "C06": {
+      "id": "C06",
+      "label": "the awakened dragon",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to wake fully from the old sleep",
+      "holds": "the old sleep and the shadow that falls over the peaks",
+      "edge": "",
+      "tie": "",
+      "voice": "",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "the node needs the dragon's shadow to pass over the waystation and test the party",
+      "matters_to_turns": [],
+      "source": "T1",
+      "nodes": [
+        "N04",
+        "T3N01"
+      ],
+      "name": null,
+      "profile": null,
+      "packet": null
+    }
+  },
+  "locations": {
+    "L01": {
+      "id": "L01",
+      "name": "the hedgerow village",
+      "kind": "a border village at the southern edge of the road",
+      "why": "the starting place where the tremors, the party, and the quest's first request happen",
+      "source": "T1",
+      "nodes": [
+        "N01",
+        "N02"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L02": {
+      "id": "L02",
+      "name": "the river city",
+      "kind": "a loud river city with taverns, gates, and ward-stones",
+      "why": "the first unfamiliar place the party enters, where the old-road gate is held",
+      "source": "T1",
+      "nodes": [
+        "N03"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L03": {
+      "id": "L03",
+      "name": "the old-road gate",
+      "kind": "the city's gate onto the old road",
+      "why": "the threshold the party must pass before the mountain road",
+      "source": "T1",
+      "nodes": [
+        "N03"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L04": {
+      "id": "L04",
+      "name": "the ruined waystation",
+      "kind": "a ruined waystation on the old road",
+      "why": "the place where the dragon's shadow tests the party and the name-debt opens",
+      "source": "T1",
+      "nodes": [
+        "N04",
+        "T2N01",
+        "T4N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L05": {
+      "id": "L05",
+      "name": "the mountain road",
+      "kind": "the high road between the ruined waystation and the pass",
+      "why": "where the party travels after the waystation and returns after the lair",
+      "source": "T1",
+      "nodes": [
+        "N05",
+        "N08",
+        "T2N04",
+        "T3N01",
+        "T4N04"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L06": {
+      "id": "L06",
+      "name": "the mountain pass",
+      "kind": "the high pass over the chasm where the old dragon sleeps",
+      "why": "where the broken bridge forces the party's crossing",
+      "source": "T1",
+      "nodes": [
+        "N06",
+        "T2N02",
+        "T4N02"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L07": {
+      "id": "L07",
+      "name": "the dragon's lair",
+      "kind": "the high place in the pass where the old dragon sleeps",
+      "why": "where the dragon's eye opens and the old bond is paid",
+      "source": "T1",
+      "nodes": [
+        "N07",
+        "T2N03",
+        "T3N01",
+        "T4N03",
+        "T4N04"
+      ],
+      "rooms": null,
+      "packet": null
+    }
+  },
+  "branching": "plan",
+  "plan": {
+    "assessment": "T1 answers the question with the hedge-witch's own hand on the old bond, keeping all three companions but losing the village's tendability and the old road's tie to home. The missing worlds are the party's sword as the answer, the scholar's name as the answer, and endings where a companion is lost rather than the home. The story can part early at the river city or the waystation, where the party's trust and the scholar's debt are first reshaped.",
+    "seeds": [
+      {
+        "motivation": "When the ruin burns Rozenn Dunmore's hand with the old name, you come to want to stop the dragon without making the scholar's family debt the answer, because you have just watched the capital's shame take hold of her hand before her mouth.",
+        "strategy": "Keep the black name-stone out of Rozenn's reach, carry the debt yourself, and at the dragon's eye press your own hand to the old bond rather than let her speak the name.",
+        "diverges_at": "N04",
+        "trigger": "you set the black name-stone on the carved stone and let the ruin answer",
+        "trigger_kind": "act",
+        "way": 1,
+        "ending": {
+          "title": "The Burned Hand",
+          "summary": "Rozenn Dunmore turns when you keep the stone from her and refuse to let her speak the name, and she leaves before the lair with her hand still marked by the old name. You press your own hand to the bond and give the smoke of your village, so the dragon sleeps, but the scholar is gone and the capital's debt remains hers to carry.",
+          "answer": "pole_b",
+          "standing": [
+            "the disgraced knight",
+            "the thief"
+          ],
+          "lost": [
+            "the scholar",
+            "the hedge-witch's home-tending"
+          ],
+          "changed": "the scholar's hand is burned with the old name and the name-stone stays uncracked in your pack"
+        },
+        "why_different": "T1 keeps all three companions and loses only the home; this line keeps the same answer but loses the scholar, and the world is changed by the scholar's burned hand rather than by the road leaving the village."
+      },
+      {
+        "motivation": "At the dragon's eye you come to want the party's sword to be the answer, because the road has kept Ash Hask's blade in the party's hands all the way north and you have no wish to spend your village's smoke to make the line hold.",
+        "strategy": "Let Ash Hask drive the broken sword into the eye's reflection and read the oath from the hilt, so the dragon is stopped by what the party can do together rather than by a single giving.",
+        "diverges_at": "N07",
+        "trigger": "you let the knight drive the broken sword into the eye's reflection and read the oath from the hilt",
+        "trigger_kind": "act",
+        "way": 1,
+        "ending": {
+          "title": "The Oath in the Hilt",
+          "summary": "The dragon sleeps under the sword's oath, but the broken sword goes to dust and the knight's name leaves the hilt. Ash Hask walks away as a nameless man, and you go back down the mountain with the thief and the scholar while your hedgerows are still yours to tend.",
+          "answer": "pole_a",
+          "standing": [
+            "the thief",
+            "the scholar"
+          ],
+          "lost": [
+            "the disgraced knight"
+          ],
+          "changed": "the broken sword is dust and the knight's name is gone from the hilt, while the old road still reaches your village"
+        },
+        "why_different": "T1 answers with the hedge-witch's hand and keeps the knight; this line answers with the party's sword, loses the knight, and leaves the village still tendable."
+      },
+      {
+        "motivation": "After the waystation's wound, you come to want Rozenn Dunmore to be the one who speaks the name, because her family's debt is the oldest thing in the party and you have begun to believe the dragon will not sleep until the capital's shame is paid in her mouth.",
+        "strategy": "Follow the scholar's lead over the map's path, let her carry the black name-stone to the lair, and let her speak the name at the dragon's eye even if it breaks the party's bond.",
+        "diverges_at": "N03",
+        "trigger": "you let the scholar tell each of them the same lie about the old road and make them trust her",
+        "trigger_kind": "act",
+        "way": 2,
+        "ending": {
+          "title": "The Name in Her Mouth",
+          "summary": "Rozenn Dunmore speaks the name at the dragon's eye and the black name-stone cracks, but the name takes her memory of the party and the eye stays open. She does not know your face when you reach her, and the old road closes with the dragon still awake while the knight and the thief stand in the cold with what is left of the party.",
+          "answer": "pole_b",
+          "standing": [
+            "the disgraced knight",
+            "the thief"
+          ],
+          "lost": [
+            "the scholar"
+          ],
+          "changed": "the black name-stone is cracked and the dragon is still awake beneath the closed old road"
+        },
+        "why_different": "T1 stops the dragon with the hedge-witch's hand and keeps the scholar; this line stops nothing fully, loses the scholar to the name, and leaves the dragon awake."
+      }
+    ]
+  },
+  "promises": {
+    "reading": "This is a classic high-fantasy quest: a small, mismatched band of travelers crossing a hostile landscape to confront a primordial threat. The writer wants the weight of the journey—the changing scenery, the deepening bonds, and the specific texture of a world that is old and dangerous. They are hoping to feel the scale of the myth and the intimacy of the party simultaneously, where the choice of how to face the dragon is inseparable from who you are willing to keep.",
+    "genre": "epic fantasy quest",
+    "player_fantasy": "To be the unlikely leader of a broken group, watching the world grow vast and strange around you, and realizing that the dragon is only half the battle; the other half is deciding which of your friends can survive the answer.",
+    "promises": [
+      {
+        "what": "the old dragon, not as a monster to be slain but as a presence that shifts the air pressure in the room, vast and ancient",
+        "why": "the audience came for the dragon; it must be met face-to-face as a character, not a plot point",
+        "in_kernel": true
+      },
+      {
+        "what": "the river city, a place of commerce and noise where the party's differences flare up over coin and reputation before the silence of the mountains",
+        "why": "provides the 'real travel' texture and a hub for character development away from the wilderness",
+        "in_kernel": true
+      },
+      {
+        "what": "a moment of loyalty tension where a companion acts against the group's interest to save themselves or their own goal, forcing the player to choose between the quest and the bond",
+        "why": "the Kernel specifies loyalties that pull against the player; this is the mechanical expression of that theme",
+        "in_kernel": true
+      },
+      {
+        "what": "the scholar's secret revealed: a personal stake in the dragon that recontextualizes her entire journey, turning a quest for information into a quest for redemption or power",
+        "why": "resolves the epistemic gap; the audience expects the 'scholar with her own reasons' to have a payoff",
+        "in_kernel": true
+      },
+      {
+        "what": "a ruin that is not just a map marker but a place where the history of the dragon is felt in the stones, offering a clue or a trial that tests the party's unity",
+        "why": "fulfills the 'ruins' travel promise with a specific atmospheric payoff",
+        "in_kernel": true
+      }
+    ],
+    "set_pieces": [
+      {
+        "scene": "the party crossing a high bridge over a chasm, the wind howling, as one companion steps back to let another lead, a silent transfer of weight",
+        "where": "the mountain pass approach"
+      },
+      {
+        "scene": "the river city at night, lanterns reflecting on the water, the party separated by a misunderstanding, each sitting in a different tavern watching the same rain",
+        "where": "the river city"
+      },
+      {
+        "scene": "the dragon's waking: the ground shaking in the northern peaks, a shadow passing over the sky that blocks out the sun, the party stopping to watch the horizon change",
+        "where": "the northern mountains"
+      },
+      {
+        "scene": "the final confrontation in the dragon's lair, where the choice of method (fight, talk, sacrifice) is made in the presence of the creature's eye, reflecting the party's faces back at them",
+        "where": "the dragon's lair"
+      }
+    ],
+    "tone_engine": "Epic and mythic: the language of the world is heavy with age and consequence; the landscape feels like a character with its own will. Wonder: the first time the party sees the dragon's scale or the full extent of the ruins, the sense of smallness must be palpable. The escalation is felt in the closing distance between the party members and the opening of the world around them.",
+    "obligatory_cast": [
+      "a local guide or merchant in the river city who knows the old roads but sells the information at a price the party cannot afford, forcing a compromise",
+      "a minor threat in the forest or ruins that tests the party's combat readiness without killing them, establishing the stakes of the dragon's power"
+    ],
+    "must_not": [
+      "no single-location story: the narrative must move through distinct environments (forest, city, ruins, mountains) as specified",
+      "no generic fantasy tropes without personal stakes: the companions must have specific, named loyalties that conflict with the quest, not just generic 'good guys'"
+    ]
+  },
+  "edges": [
+    {
+      "from": "N01",
+      "to": "N02",
+      "lines": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N02",
+      "to": "N03",
+      "lines": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N03",
+      "to": "N04",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you marked the merchant's ledger with the smoke of your village and let Severin Holloway open the old-road gate on that promise"
+      ]
+    },
+    {
+      "from": "N04",
+      "to": "N05",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you let Rozenn Dunmore say what the stones say and show the party the debt carved in her family's hand"
+      ]
+    },
+    {
+      "from": "N05",
+      "to": "N06",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N06",
+      "to": "N07",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N07",
+      "to": "N08",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you pressed your hand to the old bond in the lair floor and gave the smoke of your village while the party stood in the eye's gaze"
+      ]
+    },
+    {
+      "from": "N04",
+      "to": "T2N01",
+      "lines": [
+        "T2"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you set the black name-stone on the carved stone and let the ruin answer",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T2N01",
+      "to": "T2N02",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N02",
+      "to": "T2N03",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N03",
+      "to": "T2N04",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N07",
+      "to": "T3N01",
+      "lines": [
+        "T3"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you let Ash Hask drive the broken sword into the eye's reflection and read the oath from the hilt",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "N03",
+      "to": "T4N01",
+      "lines": [
+        "T4"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you let the scholar tell each of them the same lie about the old road and make them trust her",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T4N01",
+      "to": "T4N02",
+      "lines": [
+        "T4"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T4N02",
+      "to": "T4N03",
+      "lines": [
+        "T4"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T4N03",
+      "to": "T4N04",
+      "lines": [
+        "T4"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    }
+  ],
+  "grid": {
+    "beats": [
+      "ordinary_world",
+      "call",
+      "threshold",
+      "trials",
+      "ordeal",
+      "reward",
+      "road_back",
+      "return"
+    ],
+    "rows": {
+      "T1": {
+        "ordinary_world": [
+          "N01"
+        ],
+        "call": [
+          "N02"
+        ],
+        "threshold": [
+          "N03"
+        ],
+        "trials": [
+          "N04",
+          "N05"
+        ],
+        "ordeal": [
+          "N06"
+        ],
+        "reward": [
+          "N07"
+        ],
+        "road_back": [],
+        "return": [
+          "N08"
+        ]
+      },
+      "T2": {
+        "ordinary_world": [
+          "N01"
+        ],
+        "call": [
+          "N02"
+        ],
+        "threshold": [
+          "N03"
+        ],
+        "trials": [
+          "N04",
+          "T2N01"
+        ],
+        "ordeal": [
+          "T2N02"
+        ],
+        "reward": [
+          "T2N03"
+        ],
+        "road_back": [],
+        "return": [
+          "T2N04"
+        ]
+      },
+      "T3": {
+        "ordinary_world": [
+          "N01"
+        ],
+        "call": [
+          "N02"
+        ],
+        "threshold": [
+          "N03"
+        ],
+        "trials": [
+          "N04",
+          "N05"
+        ],
+        "ordeal": [
+          "N06"
+        ],
+        "reward": [
+          "N07"
+        ],
+        "road_back": [],
+        "return": [
+          "T3N01"
+        ]
+      },
+      "T4": {
+        "ordinary_world": [
+          "N01"
+        ],
+        "call": [
+          "N02"
+        ],
+        "threshold": [
+          "N03"
+        ],
+        "trials": [
+          "T4N01"
+        ],
+        "ordeal": [
+          "T4N02"
+        ],
+        "reward": [
+          "T4N03"
+        ],
+        "road_back": [],
+        "return": [
+          "T4N04"
+        ]
+      }
+    },
+    "skipped": {
+      "T1": [],
+      "T2": [],
+      "T3": [],
+      "T4": []
+    }
+  },
+  "hooks": [
+    {
+      "node": "N03",
+      "turn": 1,
+      "way": 1,
+      "what": "they sit at one table, because the thief buys their silences with the coin from his map-roll and the merchant opens the gate on a mark left in the ledger",
+      "cost": "the thief's map is spent, and he will not lead the old road again without a new price"
+    },
+    {
+      "node": "N04",
+      "turn": 2,
+      "way": 2,
+      "what": "the floor's debt comes out, because the thief finds the capital's mark under the waystation's flagstones and reads it aloud",
+      "cost": "the scholar hears the capital's mark named, and her silence turns to a blade in the party's trust"
+    },
+    {
+      "node": "N06",
+      "turn": 3,
+      "way": 1,
+      "what": "the party crosses, because the thief leads over the old road and the scholar steps back to give you the black name-stone",
+      "cost": "the scholar's silence makes the knight doubt the party's answer, and he will not lift his sword for the dragon's eye"
+    },
+    {
+      "node": "N06",
+      "turn": 3,
+      "way": 2,
+      "what": "the party crosses, because the knight takes the broken sword as a pole and the thief lets go of his map to steady the span",
+      "cost": "the thief's map falls into the chasm, and the old road will have to be read by the mountains themselves"
+    },
+    {
+      "node": "N07",
+      "turn": 4,
+      "way": 2,
+      "what": "the dragon's eye stays open, because the scholar speaks the name at the dragon's eye and the black name-stone cracks, so the name leaves her mouth with the party's bond broken",
+      "cost": "the name takes her memory of the party, and she does not know your face when you reach her; the old road closes with the dragon still awake"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 1,
+      "what": "the party crosses, because the thief leads over the old road and the scholar steps back to give you the black name-stone",
+      "cost": "the scholar's silence makes the knight doubt the party's answer, and he will not lift his sword for the dragon's eye"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 3,
+      "what": "the party crosses, because you bind the broken planks with cord and breath and the scholar carries the name-stone while the knight and thief hold the wind",
+      "cost": "the scholar's hand is cut by the stone, and the party's trust in her is spent"
+    },
+    {
+      "node": "T2N03",
+      "turn": 4,
+      "way": 2,
+      "what": "the dragon's eye stays open, because the scholar speaks the name at the dragon's eye and the black name-stone cracks, so the name leaves her mouth with the party's bond broken",
+      "cost": "the name takes her memory of the party, and she does not know your face when you reach her; the old road closes with the dragon still awake"
+    },
+    {
+      "node": "T2N03",
+      "turn": 4,
+      "way": 3,
+      "what": "the dragon sleeps, because you press your hand to the old bond in the lair floor and give the smoke of your village",
+      "cost": "the bond holds, but the old road leaves your village and you will not be able to tend your hedgerows"
+    },
+    {
+      "node": "T4N01",
+      "turn": 2,
+      "way": 1,
+      "what": "the floor's debt comes out, because you set the black name-stone on the carved stone and let the ruin answer",
+      "cost": "the ruin takes the scholar's hand and leaves it burned with the old name, and she will not let anyone touch the stone again"
+    },
+    {
+      "node": "T4N01",
+      "turn": 2,
+      "way": 3,
+      "what": "the floor's debt comes out, because the scholar says what the stones say and shows the party the debt carved in her family's hand",
+      "cost": "she says the name is a debt, but not who it was paid for, and the party leaves the ruin with a question no one will ask again"
+    },
+    {
+      "node": "T4N02",
+      "turn": 3,
+      "way": 2,
+      "what": "the party crosses, because the knight takes the broken sword as a pole and the thief lets go of his map to steady the span",
+      "cost": "the thief's map falls into the chasm, and the old road will have to be read by the mountains themselves"
+    },
+    {
+      "node": "T4N02",
+      "turn": 3,
+      "way": 3,
+      "what": "the party crosses, because you bind the broken planks with cord and breath and the scholar carries the name-stone while the knight and thief hold the wind",
+      "cost": "the scholar's hand is cut by the stone, and the party's trust in her is spent"
+    },
+    {
+      "node": "T4N03",
+      "turn": 4,
+      "way": 1,
+      "what": "the dragon sleeps, because the knight drives the broken sword into the eye's reflection and you read the oath from the hilt",
+      "cost": "the sword goes to dust and the knight's name leaves the hilt, so he walks back down the mountain without a title"
+    },
+    {
+      "node": "T4N03",
+      "turn": 4,
+      "way": 3,
+      "what": "the dragon sleeps, because you press your hand to the old bond in the lair floor and give the smoke of your village",
+      "cost": "the bond holds, but the old road leaves your village and you will not be able to tend your hedgerows"
+    }
+  ],
+  "checks": {
+    "findings": [],
+    "notes": [
+      {
+        "kind": "turn_cast_absent",
+        "issue": "node T2N03 plays turn 4 without ['the scholar'], whom the turn involves",
+        "lines": [],
+        "nodes": [
+          "T2N03"
+        ]
+      }
+    ]
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "line": "T1",
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "N08"
+      ],
+      "judge": null,
+      "plan": {
+        "assessment": "T1 answers the question with the hedge-witch's own hand on the old bond, keeping all three companions but losing the village's tendability and the old road's tie to home. The missing worlds are the party's sword as the answer, the scholar's name as the answer, and endings where a companion is lost rather than the home. The story can part early at the river city or the waystation, where the party's trust and the scholar's debt are first reshaped.",
+        "seeds": 3
+      }
+    },
+    {
+      "iteration": 2,
+      "line": "T2",
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 3,
+      "line": "T3",
+      "new_nodes": [
+        "T3N01"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 4,
+      "line": "T4",
+      "new_nodes": [
+        "T4N01",
+        "T4N02",
+        "T4N03",
+        "T4N04"
+      ],
+      "judge": null
+    }
+  ],
+  "stop_reason": "reached --max-iterations (4)",
+  "warnings": []
+}

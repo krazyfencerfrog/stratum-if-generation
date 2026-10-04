@@ -1,0 +1,1276 @@
+{
+  "schema_version": 5,
+  "story_id": "kernel32_f5",
+  "stage": "outline",
+  "kernel": "A dungeon crawl where your only companion is a cursed talking sword that wants to be put back where it was found. Funny, but with teeth.",
+  "shape": {
+    "through_lines": 3,
+    "default_max_iterations": 3,
+    "endings_stated": "",
+    "endings_tier": "unstated",
+    "nodes_min": 5,
+    "nodes_max": 8,
+    "linear": false,
+    "choice_density": "unstated",
+    "note": "through_lines is how many distinct story lines (each with its own ending) the shape preference suggests; the review decides whether each next one is worth building."
+  },
+  "premise": {
+    "enrichment_budget": {
+      "level": "moderate"
+    },
+    "protagonist": {
+      "who": "You are a dungeon crawler who has just pulled a cursed talking sword from a black stone niche in a flooded tower, and you are still holding it when the tower begins to close in around you.",
+      "wants": "to get out of the tower alive, with your hand still steady enough to hold a blade, and without losing the only companion the dungeon has let you keep.",
+      "can_do": "explore the tower, talk to the sword, use the sword as a weapon or tool, set the sword down where it can rest, and choose which of the tower’s paths to take.",
+      "cannot_do": "make the sword stop wanting to be returned, stop the tower’s traps, or fight the tower’s guardian without the sword in your hand.",
+      "serves": "3-0b.protagonist_identity"
+    },
+    "arena": {
+      "description": "A single flooded stone tower under a cliff, entered through a broken stair and ending in the vault where the sword was pulled from a black niche.",
+      "serves": "3f.setting_structure"
+    },
+    "pressure": {
+      "description": "The tower’s stone doors are sealing themselves one by one, and the only way out is through the vault where the sword was found, which means the moment for setting the blade into the black niche keeps arriving as the exit gets closer.",
+      "clock_or_stock": "none tracked; the closing is told through the doors sealing and the tower’s traps triggering, because 3-0c licenses only hazard_or_wrong_turn",
+      "serves": "3-0c.failure_triggers"
+    },
+    "opposition": {
+      "who_or_what": "the tower’s stone guardian, a warden of the niche",
+      "wants": "the sword returned to the black niche so the tower can sleep and the water can stop rising through the lower rooms",
+      "means": "it can close doors, trigger the tower’s traps, and make the sword’s curse heavier in your hand whenever you refuse to let it go",
+      "serves": "3c.core_thematic_axis"
+    },
+    "events": [
+      {
+        "what": "The first corridor after the entrance is a pressure-plate floor with a falling stone door, and the sword starts counting your steps and criticizing your grip while the door drops.",
+        "when": "early",
+        "serves": "3-0a.primary_decision_axis"
+      },
+      {
+        "what": "In a dry chamber, the sword tells, without being asked, the story of the last hand that held it, and the walls show the skeleton still in the grip.",
+        "when": "middle",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "what": "At the vault, the black niche opens and the stone guardian wakes, and the sword grows heavier in your hand as you hesitate to put it back.",
+        "when": "late",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "hidden_truth": null,
+    "mediation": {
+      "question": "Do you set the blade into the black niche and leave the tower with an empty hand, or keep it in your hand and let the curse keep you alive?",
+      "to_reach_pole_a": {
+        "pole": "put the sword back",
+        "what_you_must_do": "carry the sword to the black niche in the vault, set it down before the stone guardian, and leave the tower without it.",
+        "cost": "you give up the blade that has been saving you, and you leave the dungeon with an empty hand and whatever you saved."
+      },
+      "to_reach_pole_b": {
+        "pole": "keep the sword",
+        "what_you_must_do": "refuse to set the sword down at every chance, use it to open or fight your way through the tower, and take the curse’s weight into your own hand.",
+        "cost": "the sword grows heavier, your hand shakes, and the stone guardian marks you as the one who kept it."
+      },
+      "levers": [
+        "the black niche in the vault",
+        "the stone guardian of the niche",
+        "the pressure-plate corridor and its falling stone door",
+        "the sword’s own grip and the weight of its curse"
+      ],
+      "serves": "3-0a.primary_decision_axis"
+    },
+    "turns": [
+      {
+        "id": 1,
+        "situation": "The first corridor after the entrance is a pressure-plate floor with a falling stone door, and the sword starts counting your steps and criticizing your grip while the door drops.",
+        "what_you_must_do": "cross the pressure-plate floor before the stone door seals the corridor",
+        "ways_through": [
+          {
+            "way": "you cross, because you let the sword lay flat on the nearest plate and follow the dry line of stone it points to",
+            "cost": "the door drops to your shoulders and the sword narrates your escape as if it were a parade"
+          },
+          {
+            "way": "you cross, because you set the sword's pommel on the center plate to hold it down and step around it",
+            "cost": "the sword calls the plate a throne and your arm shakes under its weight"
+          },
+          {
+            "way": "you cross, because you drag the sword's pommel across the plates to mark a path and step on them as they rise",
+            "cost": "the stone guardian's hand closes the far door a hand's width narrower"
+          }
+        ],
+        "involves": [
+          "the sword",
+          "the stone guardian"
+        ],
+        "form": "endure",
+        "set_piece": "the pressure-plate floor under a falling stone door, the sword counting your steps and correcting your grip as the door drops",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "id": 2,
+        "situation": "In a dry chamber, the guardian seals the stair behind you and leaves only a crack in the wall; the sword tells, without being asked, the story of the last hand that held it, and the walls show the skeleton still in the grip.",
+        "what_you_must_do": "find out what the last hand did with the blade before the crack closes",
+        "ways_through": [
+          {
+            "way": "you learn it, because you let the sword finish the story, and it ends by asking if you have a map of the tower and whether you accept apologies at the exit",
+            "cost": "the chamber goes quiet, and the skeleton's grip looks less like a warning and more like a seat taken"
+          },
+          {
+            "way": "you learn it, because you set the sword on the floor and read the last hand's mark on the wall yourself",
+            "cost": "the guardian grinds the stair shut behind you, and the sword says you have the manners of a thief"
+          }
+        ],
+        "involves": [
+          "the sword",
+          "the stone guardian",
+          "the skeleton in the wall"
+        ],
+        "form": "discover",
+        "set_piece": "the dry chamber's quiet, the sword telling the last hand's story while the skeleton in the wall still holds the blade",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "id": 3,
+        "situation": "The water has risen to the bottom of the stair, and the stone guardian stands before the vault door with the black niche visible through the gap, waiting for the sword to be offered or refused.",
+        "what_you_must_do": "get into the vault before the water takes the stair",
+        "ways_through": [
+          {
+            "way": "the vault opens, because you tell the guardian what the last hand did and set the sword's pommel on the threshold",
+            "cost": "the guardian lifts its door only enough for you, and the sword is out of your hand for the first time"
+          },
+          {
+            "way": "the vault opens, because you use the sword to cut the guardian's stone latch",
+            "cost": "the guardian's eyes follow the cut, and the sword's weight climbs your wrist"
+          },
+          {
+            "way": "the vault opens, because you let the sword promise the guardian that you will return it",
+            "cost": "the sword says it believes you, and the water rises an inch"
+          }
+        ],
+        "involves": [
+          "the sword",
+          "the stone guardian"
+        ],
+        "form": "persuade",
+        "set_piece": null,
+        "serves": "3-0a.decision_mechanism"
+      },
+      {
+        "id": 4,
+        "situation": "At the vault, the black niche opens and the stone guardian wakes, and the sword grows heavier in your hand as you hesitate to put it back.",
+        "what_you_must_do": "settle what happens to the blade at the niche before the guardian closes the vault",
+        "ways_through": [
+          {
+            "way": "the blade goes into the niche, because you set it into the black stone and step back",
+            "cost": "you leave the tower with an empty hand and the guardian lets the water stop rising"
+          },
+          {
+            "way": "the blade stays in your hand, because you refuse the niche and cut the guardian's stone door open",
+            "cost": "the curse takes weight in your arm, your hand shakes, and the guardian marks you as the one who kept it"
+          }
+        ],
+        "involves": [
+          "the sword",
+          "the stone guardian"
+        ],
+        "form": "confront",
+        "set_piece": "the black niche opening in the vault, the sword growing heavier in your hand as the stone guardian waits for it to be returned",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "complications": [
+      {
+        "description": "The stone guardian's eyes track the sword, not you: it will open a door if you set the blade on the floor, but only for a hand's width.",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "description": "The sword's grip warms and fits your palm perfectly when you are tired, making it easier to keep it.",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "description": "The water line rises in the lower rooms each time a door seals, so the exit route through the vault floods if you wait.",
+        "serves": "3-0c.failure_triggers"
+      }
+    ],
+    "cast_seeds": [
+      {
+        "role": "the sword",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to be returned to the black niche to stop the curse from eroding its own substance",
+        "holds": "the curse that binds it to the holder and the knowledge of the tower's layout",
+        "edge": "is a cursed artifact that has been waiting for centuries and is now acutely aware of the physical toll its existence is taking on the player",
+        "tie": "is physically gripped by the player and cannot function without being held",
+        "voice": "speaks with the weary, specific complaints of a commuter stuck in traffic: 'If you could just try to be a little less enthusiastic about the concept of death, we might actually survive this hallway.'",
+        "breaking_point": null,
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "role": "the stone guardian",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "the sword returned to the niche so the tower can settle and the water can recede",
+        "holds": "the authority to seal doors, trigger traps, and increase the sword's weight",
+        "edge": "is a warden who has failed to protect the niche from the rising water and is now desperate for a solution, even if it means punishing the intruder",
+        "tie": "is bound to the niche and the sword by duty, viewing the player as an obstacle to rest",
+        "voice": "speaks in slow, grinding imperatives that sound like tectonic plates shifting: 'The stone does not negotiate. The stone closes.'",
+        "breaking_point": null,
+        "opposition": true,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "role": "the skeleton in the wall",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to be remembered as the one who failed to let go, rather than forgotten as a cautionary prop",
+        "holds": "the memory of the last holder's mistake and the physical evidence of the curse's final stage",
+        "edge": "is a previous holder who is now part of the wall, trapped in the moment of their refusal to release the blade",
+        "tie": "is the physical consequence of the player's potential choice, serving as a mirror to the player's current grip",
+        "voice": "does not speak, but its posture and the way the sword's spirit reacts to it convey a silent, desperate warning: 'Look at my hand. See how it is still trying to hold?'",
+        "breaking_point": null,
+        "opposition": false,
+        "matters_to_turns": [
+          2
+        ]
+      }
+    ],
+    "name_pool": "fantasy"
+  },
+  "framework": {
+    "id": "fichtean_curve",
+    "name": "Fichtean curve",
+    "shape": "the story opens inside the first crisis and climbs through crises of different kinds to a climax, with almost no preamble and a short aftermath",
+    "modifier": {
+      "id": "in_medias_res",
+      "name": "In medias res",
+      "effect": "Open inside the first premise turn's situation and fold the first beat's job into it; what the first beat would have shown arrives through what people do and say under pressure."
+    },
+    "reading": "The story begins immediately in the dungeon, climbing through escalating hazards and the deepening bond with the sword until the final choice at the vault. It should land on the wry, bittersweet resolution of that choice, with a short aftermath that settles the emotional weight of the decision.",
+    "why": "Its shape matches the escalating trajectory (3b.primary_trajectory) and the short timeline (3e.timeline_duration), where the 'Opening crisis' is the first corridor, the middle beats are the guardian and rising water, and the 'Climax' is the vault choice, followed by a brief 'Aftermath' for the bittersweet restoration (3c.moral_valence).",
+    "named_in_kernel": null,
+    "shortlist": [
+      "fichtean_curve",
+      "save_the_cat",
+      "three_act"
+    ],
+    "scores": {
+      "three_act": 2.0,
+      "freytag": 0.0,
+      "heros_journey": -1.0,
+      "save_the_cat": 3.0,
+      "fichtean_curve": 5.0,
+      "seven_point": 1.0,
+      "story_circle": 1.0,
+      "kishotenketsu": 1.0
+    },
+    "beats": [
+      {
+        "id": "opening_crisis",
+        "name": "Opening crisis",
+        "job": "the story opens inside the first crisis; who the protagonist is and what is at stake are shown by how it is met",
+        "required": true
+      },
+      {
+        "id": "second_crisis",
+        "name": "Second crisis",
+        "job": "a worse crisis, different in kind; what the first one spent or revealed shapes it",
+        "required": true
+      },
+      {
+        "id": "third_crisis",
+        "name": "Third crisis",
+        "job": "the price of the earlier ways through comes due, and the opposition makes its strongest move",
+        "required": true
+      },
+      {
+        "id": "climax",
+        "name": "Climax",
+        "job": "the last crisis, where the story's question is answered by what the protagonist does",
+        "required": true
+      },
+      {
+        "id": "aftermath",
+        "name": "Aftermath",
+        "job": "brief: what is left, and what it cost",
+        "required": true
+      }
+    ]
+  },
+  "lines": {
+    "T1": {
+      "id": "T1",
+      "iteration": 1,
+      "title": "The Empty Hand",
+      "motivation": "You start out wanting to get out of the flooded tower alive with a steady hand and the only companion the dungeon has given you. By the end you want the sword to stop being a thing you carry and become a place it belongs, even if that leaves your hand empty.",
+      "strategy": "Use the sword as the tower’s temporary tool: let it point, press, cut, and tell its own story while you keep deferring the real choice until the niche is in front of you.",
+      "turning_point": "In the dry chamber the sword finishes the last hand’s story and the skeleton’s grip stops looking like a warning and starts looking like a seat taken; from then on, every chance to set the blade down is no longer a delay but a test.",
+      "differs_from": null,
+      "ending": {
+        "title": "The Empty Hand",
+        "summary": "You set the sword into the black niche and step back; the stone guardian lets the water stop and the tower sleep, and you leave with a steady, empty hand and no companion to complain about your grip.",
+        "node": "N05",
+        "answer": "pole_a",
+        "standing": [],
+        "lost": [
+          "the sword"
+        ],
+        "changed": "the tower is sealed and the water stills; the sword rests in the niche and your hand is empty"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "parent": null,
+      "divergence": null,
+      "rejoins_at": null,
+      "skipped_beats": []
+    },
+    "T2": {
+      "id": "T2",
+      "iteration": 2,
+      "title": "The Marked Path",
+      "motivation": "You start out wanting to get out of the flooded tower alive with a steady hand and the only companion the dungeon has given you. After the far door narrows in answer to the groove you drag with the sword's pommel, you come to want to make the tower legible by leaving a path in its stones, because the tower reads the mark you leave. By the end you want the mark to be enough: a third answer that lets you leave with an empty hand without giving the sword back to the niche or keeping the curse in your grip.",
+      "strategy": "Keep using the sword as a surveyor's tool: drag its pommel to mark passages, answer the guardian's narrowing, and at the vault set the blade on the floor as a marker between you and the niche rather than into the niche or back in your hand.",
+      "turning_point": "At the vault threshold you realize the guardian is not waiting for you to choose the sword; it is waiting for the tower to be answered by a mark, so you stop treating the blade as either yours or the niche's and start using it as the tower's own sign.",
+      "differs_from": "T1 answers the story's question by putting the sword into the black niche and letting the tower sleep with an empty hand, while this line answers with neither: the sword is left as a mark in the tower's floor, the niche stays open, and the water keeps moving.",
+      "ending": {
+        "title": "The Marked Path",
+        "summary": "You drag the sword's pommel across the vault floor and set the blade in the groove between you and the black niche, neither returned nor kept. The stone guardian follows the mark and lets you pass with an empty hand, but the niche stays open and the water keeps moving because the blade is not home. You leave the tower with a steady hand and no companion, and the tower is left awake with a path written in its stones.",
+        "node": "T2N04",
+        "answer": "neither",
+        "standing": [],
+        "lost": [
+          "the sword"
+        ],
+        "changed": "the tower has a marked path and the niche remains open, so the water is still moving"
+      },
+      "path": [
+        "N01",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N01",
+        "trigger": "you dragged the sword's pommel across the pressure plates to mark a path and stepped on them as they rose",
+        "trigger_kind": "act",
+        "way": 3,
+        "instead_of": "you let the sword lay flat on the nearest plate and followed the dry line of stone it pointed to",
+        "opportunity": null,
+        "shift": "The far door narrows a hand's width after you drag the pommel across the plates, and the sword complains that you are marking its way through its own house. You learn that the tower reads the mark you leave, and the blade becomes a surveyor's tool: you come to want to make the tower legible by leaving a path in its stones, because the narrowing shows you the tower can be answered by a mark, not only by returning the blade."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: way 3 of turn 1 already gives the player a physical mark and the tower a response to that mark, and the seed turns that response into a new want. The seed's ending world also holds: the sword is neither returned to the niche nor kept in the hand, but left as a mark in the tower, so the answer is neither and the tower does not sleep."
+    },
+    "T3": {
+      "id": "T3",
+      "iteration": 3,
+      "title": "The One Who Kept It",
+      "motivation": "You start out wanting to get out of the flooded tower alive with a steady hand and the only companion the dungeon has given you. At the vault the sword's warmth in your palm becomes the only proof that you were allowed to keep anything, and you come to want to keep the blade because the guardian's closing door is a taking, not an invitation; by the end you want to be the keeper, even if your hand shakes and the tower stays awake.",
+      "strategy": "Refuse the niche, cut the guardian's stone door open with the sword, and leave with the blade in your hand, accepting the curse's weight and the guardian's mark.",
+      "turning_point": "The guardian's hand closes toward the vault while the sword grows heavier in your palm: the niche stops being an exit and becomes a taking, so you cut the stone door open instead of offering the blade.",
+      "differs_from": "Compared with T1, this line gives the other answer to the question: the sword stays in your shaking hand and the tower stays awake rather than sleeping with the niche closed and your hand empty. Compared with T2, this line does not make a third mark in the stones or leave the sword on the floor; it keeps the blade as a companion, so the price is the curse in your arm rather than the sword's absence.",
+      "ending": {
+        "title": "The One Who Kept It",
+        "summary": "You leave the tower with the sword in your shaking hand while the curse takes weight in your arm. The guardian marks you as the one who kept it, the niche remains open, and the water rises through the lower rooms.",
+        "node": "T3N01",
+        "answer": "pole_b",
+        "standing": [
+          "the sword"
+        ],
+        "lost": [],
+        "changed": "the niche remains open and the guardian marks you as the one who kept the sword, so the tower is awake"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "T3N01"
+      ],
+      "new_nodes": [
+        "T3N01"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N04",
+        "trigger": "you refused the niche and cut the guardian's stone door open",
+        "trigger_kind": "act",
+        "way": 2,
+        "instead_of": "you set the blade into the black stone and stepped back",
+        "opportunity": null,
+        "shift": "The sword grows heavier in your hand and the niche pulls at your wrist while the curse warms your palm, and the guardian's closing door does not ask you to offer the blade: it closes as if to take it. You learn that keeping the sword is the only way to stop the tower from deciding what you are allowed to hold."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: N04 already contains the niche, the waking guardian, and the sword's increasing weight, and turn 4's unused way 2 gives the refusal and the cut with their cost. The ending world holds because the blade stays in your hand, the guardian's mark and the rising water make the tower's wakefulness the price, and the sword is the companion who stands with you."
+    }
+  },
+  "line_order": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "nodes": {
+    "N01": {
+      "id": "N01",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "opening_crisis",
+      "turn": 1,
+      "way": 1,
+      "event": 1,
+      "adapted": "You are still in the first corridor when the pressure-plate floor starts dropping the stone door behind you, and the sword lays flat on the nearest plate, counts your steps, and corrects your grip with the weary specificity of someone stuck in traffic; the humor is the sword narrating your escape like a parade while the door drops to your shoulders and the water in the lower rooms rises. The stone guardian’s grinding hand closes the far door, and afterwards you have crossed the corridor with the sword still in your hand, but the tower has shown you that the blade can be set down as a tool without being returned.",
+      "title": "The First Crossing",
+      "summary": "The first corridor's pressure plates start dropping the stone door behind you, and you let the sword lie flat on the nearest plate while it counts your steps and criticizes your grip like a commuter dictating parade order. You follow the dry line of stone it points to while the door drops to your shoulders and the stone guardian's hand closes the far door. You cross with the sword still in your hand, and the tower has shown you that the blade can be set down as a tool without being returned.",
+      "image": "the sword flat on a pressure plate, the door dropping",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N02": {
+      "id": "N02",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "second_crisis",
+      "turn": 2,
+      "way": 1,
+      "event": 2,
+      "adapted": "In the dry chamber the guardian seals the stair behind you and leaves only a crack in the wall, and the sword tells the story of the last hand that held it without being asked, ending by asking whether you have a map of the tower and whether you accept apologies at the exit; the quiet is funny because the cursed blade is doing the work of a tired commuter explaining a bad commute. The skeleton in the wall is still gripping the blade, and afterwards the grip looks less like a warning and more like a seat taken, so the sword is no longer just a weapon you are using but a history you are holding.",
+      "title": "The Last Hand",
+      "summary": "In the dry chamber, the stone guardian seals the stair behind you and leaves only a crack in the wall, while the sword tells the story of the last hand that held it without being asked and the wall shows the skeleton still gripping the blade. You let it finish before the crack closes, and it ends by asking whether you have a map of the tower and whether you accept apologies at the exit. The chamber goes quiet, and the grip looks less like a warning and more like a seat taken, so the sword is no longer just a weapon but a history you are holding.",
+      "image": "a skeleton's hand still closed around the blade in the wall",
+      "where": [
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N03": {
+      "id": "N03",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "third_crisis",
+      "turn": 3,
+      "way": 1,
+      "event": 3,
+      "adapted": "At the vault the black niche opens and the stone guardian wakes, its slow eyes tracking the sword rather than you, and the water has risen to the bottom of the stair; you tell the guardian what the last hand did and set the sword’s pommel on the threshold, and the guardian lifts the vault door only enough for you to pass. The sword is out of your hand for the first time, and the fear is real because the water is taking the stair and the guardian’s patience is stone; afterwards you have entered the vault with the blade still yours, but you have had to let it rest on the threshold, and the tower now knows you can do it.",
+      "title": "The Threshold",
+      "summary": "At the vault, the black niche opens and the stone guardian wakes, and the sword grows heavier in your hand as you hesitate to put it back. You tell the guardian what the last hand did and set the sword's pommel on the threshold while the water takes the bottom of the stair. The guardian lifts the vault door only enough for you to pass while the sword is out of your hand for the first time, and you enter with the blade still yours, but you have had to let it rest on the threshold, and the tower now knows you can do it.",
+      "image": "the sword's pommel resting on the vault threshold",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N04": {
+      "id": "N04",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "climax",
+      "turn": 4,
+      "way": 1,
+      "event": null,
+      "adapted": "In the vault the black niche waits and the sword grows heavier in your hand as you hesitate, the curse warming your palm and making it fit perfectly at the worst possible moment; the stone guardian does not negotiate, it only closes, and the menace is the weight climbing your wrist while the water presses against the vault’s lower stones. You set the blade into the black stone and step back, and afterwards the sword is no longer in your hand: the niche closes around it, the guardian’s eyes drop, and the water stops rising.",
+      "title": "The Return to the Niche",
+      "summary": "In the vault the black niche waits while the sword grows heavier in your hand, warming your palm into a perfect fit at the worst moment. The stone guardian does not negotiate, only closes, and the sword makes one last commuter's complaint about the fit as the water presses against the lower stones. You set the blade into the black stone and step back, and the niche closes around it, the guardian's eyes drop, and the water stops rising as your hand goes empty.",
+      "image": "the black niche closing over the sword, the waterline stopped",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N05": {
+      "id": "N05",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You leave the tower with an empty hand and whatever you saved, your grip steady now that the curse is no longer in your arm; the stone guardian lets the vault sleep and the water stand still, and the only companion the dungeon has let you keep is back in the black stone where it was found. What remains is the quiet cost: the tower is safe, the sword is home, and your hand is empty.",
+      "title": "The Empty Hand",
+      "summary": "You take the broken stair with an empty hand and whatever you saved, your grip steady now that the curse is no longer in your arm. In the vault behind you, the stone guardian lets the tower sleep and the water stand still, and the sword, back in the black stone, settles into its place without another complaint. What remains is the quiet cost: the tower is safe, the sword is home, and your hand is empty.",
+      "image": "your steady, empty hand at the broken stair",
+      "where": [
+        "L03",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N01": {
+      "id": "T2N01",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "second_crisis",
+      "turn": 2,
+      "way": 2,
+      "event": 2,
+      "adapted": "In the dry chamber the guardian seals the stair behind you and leaves only a crack in the wall, and the sword starts telling the last hand's story before you can stop it. You set the sword's pommel on the flagstone and read the last hand's mark on the wall yourself: a dragged groove beside the skeleton, not a warning but a path the tower had once read. The funny part is the sword's tone, as if you have interrupted a man in a traffic jam to inspect his parking ticket, and then it says you have the manners of a thief while the guardian grinds the stair shut behind you. Afterwards you understand that the last hand did not merely hold the blade; the last hand marked the tower, and the sword is a stylus as much as a weapon.",
+      "title": "The Last Hand's Mark",
+      "summary": "In the dry chamber the stone guardian seals the stair behind you and leaves only a crack in the wall. The sword starts telling the last hand's story before you can stop it, in the tone of a commuter interrupted while reading a parking ticket, and you set its pommel on the flagstone to read the dragged groove beside the skeleton in the wall, whose hand still grips the stone. The stone guardian grinds the stair shut while the sword complains that you have the manners of a thief, leaving you with the mark and the blade as a stylus.",
+      "image": "the dragged groove beside the skeleton, still dark in the wall",
+      "where": [
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N02": {
+      "id": "T2N02",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "third_crisis",
+      "turn": 3,
+      "way": 2,
+      "event": 3,
+      "adapted": "At the vault the black niche opens and the stone guardian wakes, its slow eyes tracking the sword and the mark you have left behind. The water has risen to the bottom of the stair, and you use the sword to cut the guardian's stone latch by dragging the pommel along the seam, scoring a line that makes the tower's narrowing look less like a refusal and more like a question. The guardian's eyes follow the cut, the sword's weight climbs your wrist, and it complains that you are turning its house into a signpost. The vault opens because the mark is an answer the tower can follow, but the sword is no longer only your companion: it is the tower's own notation, and the price is that the blade is now part of the path you are making.",
+      "title": "The Latch Cut",
+      "summary": "At the vault the black niche opens and the stone guardian wakes, its slow eyes tracking the sword and the mark you have left behind. The water has risen to the bottom of the broken stair, and the sword grows heavier in your hand as you hesitate to put it back, so you drag the pommel along the guardian's stone latch and score a line that makes the narrowing look like a question. The vault opens because the mark is an answer the tower can follow, but the blade is now part of the path you are making as it complains that you are turning its house into a signpost.",
+      "image": "the scored line along the stone latch, still dark",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N03": {
+      "id": "T2N03",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "climax",
+      "turn": 4,
+      "way": null,
+      "event": null,
+      "adapted": "In the vault the black niche waits and the sword grows heavier in your hand as you hesitate, the curse warming your palm and making it fit perfectly at the worst possible moment. Instead of setting the blade into the niche or refusing it in your hand, you drag the pommel across the vault floor from the threshold to the niche and set the sword in the groove between you and the black stone, pommel toward you and tip toward the niche but not in it. The stone guardian follows the mark, its hand sliding along the groove and opening the vault door only along the line you have made, wide enough for you but not for the blade. The menacing part is that the water keeps moving while you do it, as if the tower has not been put to sleep but only given a new instruction; the sword's curse leaves your hand, but it does not leave the tower.",
+      "title": "The Groove",
+      "summary": "In the vault the black niche waits and the sword grows heavier in your hand as you hesitate, the curse warming your palm and making it fit perfectly at the worst possible moment. Instead of setting the blade into the niche or refusing it in your hand, you drag the pommel across the vault floor from the threshold to the niche and set the sword in the groove between you and the black stone, pommel toward you and tip toward the niche but not in it. The stone guardian follows the mark, its hand sliding along the groove and opening the vault door only along the line you have made, wide enough for you but not for the blade, while the water keeps moving and the curse leaves your hand but not the tower.",
+      "image": "the sword in the groove, pommel toward you, tip toward the niche",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N04": {
+      "id": "T2N04",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You leave the tower with an empty hand and whatever you saved, your grip steady now that the sword is no longer in your arm. The black niche remains open in the vault, the sword lies in the groove you dragged across the floor, and the water keeps moving through the lower rooms because the blade is not home. The only companion the dungeon has let you keep is now a mark in the tower's stones, and the tower is awake with a path written in it.",
+      "title": "The Marked Exit",
+      "summary": "You leave the tower with an empty hand and whatever you saved, your grip steady now that the sword is no longer in your arm. The stone guardian remains at the vault, the door still open only along your line, while the black niche stays open and the sword lies in the groove you dragged across the floor. The water keeps moving through the lower rooms because the blade is not home, and the only companion the dungeon has let you keep is now a mark in the tower's stones.",
+      "image": "the sound of water moving through the lower rooms under your feet",
+      "where": [
+        "L03",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N01": {
+      "id": "T3N01",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The guardian's hand closes the vault door behind you and leaves a cold stone seam across your wrist as the mark of the keeper, while the water in the lower rooms keeps rising because the niche is still open. The sword, still in your shaking hand, calls the mark a permanent employee badge and complains that its return policy is void.",
+      "title": "The Keeper's Mark",
+      "summary": "The guardian's hand closes the vault door behind you and leaves a cold stone seam across your wrist, marking you as the one who kept the blade. The water in the lower rooms keeps rising because the black niche is still open, and the sword, still in your shaking hand, calls the mark a permanent employee badge and complains that its return policy is void. You leave the tower by the broken stair with the sword in your hand while the curse takes weight in your arm.",
+      "image": "the cold stone seam across your wrist, sword still in hand",
+      "where": [
+        "L03",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    }
+  },
+  "node_order": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T2N04",
+    "T3N01"
+  ],
+  "characters": {
+    "C01": {
+      "id": "C01",
+      "label": "the sword",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to be returned to the black niche to stop the curse from eroding its own substance",
+      "holds": "the curse that binds it to the holder and the knowledge of the tower's layout",
+      "edge": "is a cursed artifact that has been waiting for centuries and is now acutely aware of the physical toll its existence is taking on the player",
+      "tie": "is physically gripped by the player and cannot function without being held",
+      "voice": "speaks with the weary, specific complaints of a commuter stuck in traffic: 'If you could just try to be a little less enthusiastic about the concept of death, we might actually survive this hallway.'",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T3N01"
+      ],
+      "name": null,
+      "profile": null,
+      "packet": null
+    },
+    "C02": {
+      "id": "C02",
+      "label": "the stone guardian",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "the sword returned to the niche so the tower can settle and the water can recede",
+      "holds": "the authority to seal doors, trigger traps, and increase the sword's weight",
+      "edge": "is a warden who has failed to protect the niche from the rising water and is now desperate for a solution, even if it means punishing the intruder",
+      "tie": "is bound to the niche and the sword by duty, viewing the player as an obstacle to rest",
+      "voice": "speaks in slow, grinding imperatives that sound like tectonic plates shifting: 'The stone does not negotiate. The stone closes.'",
+      "breaking_point": "",
+      "opposition": true,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T3N01"
+      ],
+      "name": null,
+      "profile": null,
+      "packet": null
+    },
+    "C03": {
+      "id": "C03",
+      "label": "the skeleton in the wall",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to be remembered as the one who failed to let go, rather than forgotten as a cautionary prop",
+      "holds": "the memory of the last holder's mistake and the physical evidence of the curse's final stage",
+      "edge": "is a previous holder who is now part of the wall, trapped in the moment of their refusal to release the blade",
+      "tie": "is the physical consequence of the player's potential choice, serving as a mirror to the player's current grip",
+      "voice": "does not speak, but its posture and the way the sword's spirit reacts to it convey a silent, desperate warning: 'Look at my hand. See how it is still trying to hold?'",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        2
+      ],
+      "source": "premise",
+      "nodes": [
+        "N02",
+        "T2N01"
+      ],
+      "name": null,
+      "profile": null,
+      "packet": null
+    }
+  },
+  "locations": {
+    "L01": {
+      "id": "L01",
+      "name": "the first corridor",
+      "kind": "a corridor in the flooded tower",
+      "why": "where the opening crisis happens as the tower seals you in",
+      "source": "T1",
+      "nodes": [
+        "N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L02": {
+      "id": "L02",
+      "name": "the dry chamber",
+      "kind": "a dry room in the tower",
+      "why": "where the sword's history becomes a held history",
+      "source": "T1",
+      "nodes": [
+        "N02",
+        "T2N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L03": {
+      "id": "L03",
+      "name": "the vault",
+      "kind": "the tower's lower vault",
+      "why": "where the sword's return is tested",
+      "source": "T1",
+      "nodes": [
+        "N03",
+        "N04",
+        "N05",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L04": {
+      "id": "L04",
+      "name": "the broken stair",
+      "kind": "the broken stair leading out of the flooded tower",
+      "why": "where you leave the tower after the sword is returned",
+      "source": "T1",
+      "nodes": [
+        "N05",
+        "T2N04",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    }
+  },
+  "branching": "plan",
+  "plan": {
+    "assessment": "T1 answers the question by putting the sword back, leaving the tower asleep, the water still, and your hand empty. The missing worlds are keeping the blade under the curse and losing the sword without returning it to the niche. The story can part early at N01, where the sword can be set or dragged on the plates instead of carried, and again at N02, where you can set it down and read the last hand's mark yourself.",
+    "seeds": [
+      {
+        "motivation": "When you drag the sword's pommel across the plates, the tower answers by narrowing the far door, and the sword complains that you are marking its way through its own house; you come to want to make the tower legible by leaving a path in its stones, because the door's narrowing shows you that the tower reads the mark you leave.",
+        "strategy": "Keep using the sword as a surveyor's tool, dragging its pommel to mark passages and answer the guardian's narrowing, and at the vault set it on the floor as a marker between you and the niche rather than into the niche or keeping it.",
+        "diverges_at": "N01",
+        "trigger": "you dragged the sword's pommel across the pressure plates to mark a path and stepped on them as they rose",
+        "trigger_kind": "act",
+        "way": 3,
+        "ending": {
+          "title": "The Marked Path",
+          "summary": "The sword remains in the groove you dragged across the vault floor, and the guardian follows the mark to let you pass with an empty hand. The niche stays open and the water keeps moving, because the blade is not home, and the tower is left awake with a path written in its stones.",
+          "answer": "neither",
+          "standing": [],
+          "lost": [
+            "the sword"
+          ],
+          "changed": "the tower has a marked path and the niche remains open, so the water is still moving"
+        },
+        "why_different": "T1 puts the sword into the niche and lets the tower sleep, while this line leaves the sword as a mark in the tower's floor, so the answer is neither and the water keeps moving."
+      },
+      {
+        "motivation": "At the vault the sword grows heavier in your hand and the niche pulls at your wrist, and the curse warms your palm in a way that feels like the only proof you held it; you come to want to keep the blade because the guardian's closing door is not an invitation but a taking.",
+        "strategy": "Refuse the niche, cut the guardian's stone door open with the sword, and leave with the blade in your hand, accepting the curse's weight and the guardian's mark.",
+        "diverges_at": "N04",
+        "trigger": "you refused the niche and cut the guardian's stone door open",
+        "trigger_kind": "act",
+        "way": 2,
+        "ending": {
+          "title": "The One Who Kept It",
+          "summary": "You leave the tower with the sword in your shaking hand while the curse takes weight in your arm. The guardian marks you as the one who kept it, the niche remains open, and the water rises through the lower rooms.",
+          "answer": "pole_b",
+          "standing": [
+            "the sword"
+          ],
+          "lost": [],
+          "changed": "the niche remains open and the guardian marks you as the one who kept the sword, so the tower is awake"
+        },
+        "why_different": "T1 leaves you with an empty hand and a sleeping tower, and seed 1 loses the sword to the tower's floor; this keeps the sword with you and makes the curse your price, not the tower's sleep."
+      }
+    ]
+  },
+  "promises": {
+    "reading": "The author wants the classic dungeon crawl—traps, treasure, and a monster at the bottom—but filtered through the specific friction of a relationship with an inanimate object that is actively trying to leave. They are hoping for the relief of a witty banter partner in a hostile space, tempered by the genuine dread that the partner is also a curse that could snap at any moment.",
+    "genre": "comedy-dungeon crawl",
+    "player_fantasy": "To be the competent, slightly weary adventurer who has to solve a puzzle while their weapon complains, argues, and occasionally tries to seduce you into dropping it, all while the dungeon tries to kill you.",
+    "promises": [
+      {
+        "what": "a sword that has opinions, a memory, and a specific, recurring desire to be returned to its resting place",
+        "why": "this is the companion; without its voice and its goal, the story is just a dungeon crawl",
+        "in_kernel": true
+      },
+      {
+        "what": "a dungeon environment that is actively hostile: traps, monsters, or architecture that resists the player",
+        "why": "the 'dungeon crawl' genre promise; the setting must be a challenge, not just a backdrop",
+        "in_kernel": true
+      },
+      {
+        "what": "comedy born from the mismatch between the sword's grand, cursed perspective and the player's practical, survival-focused one",
+        "why": "the 'funny' promise; the humor must come from the relationship, not just random jokes",
+        "in_kernel": true
+      },
+      {
+        "what": "moments of genuine danger where the sword's curse or the dungeon's threat feels like it could end the story permanently",
+        "why": "the 'teeth' promise; the comedy needs stakes to work, and the 'menacing' tone requires real threat",
+        "in_kernel": true
+      },
+      {
+        "what": "a recurring temptation or opportunity to put the sword down, which the player must actively resist or defer",
+        "why": "the core decision axis; the story is about the choice to keep using the curse",
+        "in_kernel": true
+      },
+      {
+        "what": "a final confrontation or moment where the sword's desire to be returned clashes with the player's need for it",
+        "why": "the thematic resolution of the 'companionship vs. belonging' axis",
+        "in_kernel": false
+      }
+    ],
+    "set_pieces": [
+      {
+        "scene": "the player is stuck on a pressure plate or in a riddle trap, and the sword is loudly critiquing their technique while time runs out",
+        "where": "a trap room or corridor"
+      },
+      {
+        "scene": "a quiet moment in a safe room or campfire where the sword tells a story about its past, and the player realizes the sword is lonely, not just cursed",
+        "where": "a rest area or dungeon safe room"
+      },
+      {
+        "scene": "the player is forced to choose between saving a trapped NPC or keeping the sword in hand to fight the monster guarding the exit",
+        "where": "a branching path or choke point"
+      },
+      {
+        "scene": "the sword's curse manifests physically (e.g., it grows heavier, the player's hand shakes, or the dungeon reacts) as the player hesitates to put it back",
+        "where": "the dungeon's central chamber or the sword's original resting place"
+      }
+    ],
+    "tone_engine": "Funny: the sword is the straight man to the player's improvisation, or vice versa; the humor comes from the absurdity of a cursed object having a commute. Menacing: the dungeon is not a joke; the traps are real, the monsters are hungry, and the sword's curse has a physical cost that escalates as the player refuses to let go.",
+    "obligatory_cast": [
+      "the dungeon's guardian or a monster that has been waiting for the sword to return",
+      "a non-player character who knows the sword's history and warns the player about the cost of keeping it"
+    ],
+    "must_not": [
+      "no other human companions: the only companion is the sword",
+      "no romance or sexual tension between the player and the sword (it is a companion, not a lover)",
+      "no silent or non-sentient weapons: the sword must talk"
+    ]
+  },
+  "edges": [
+    {
+      "from": "N01",
+      "to": "N02",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you let the sword lay flat on the nearest plate and followed the dry line of stone it pointed to"
+      ]
+    },
+    {
+      "from": "N02",
+      "to": "N03",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N03",
+      "to": "N04",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "N05",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you set the blade into the black stone and stepped back"
+      ]
+    },
+    {
+      "from": "N01",
+      "to": "T2N01",
+      "lines": [
+        "T2"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you dragged the sword's pommel across the pressure plates to mark a path and stepped on them as they rose",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T2N01",
+      "to": "T2N02",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N02",
+      "to": "T2N03",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N03",
+      "to": "T2N04",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "T3N01",
+      "lines": [
+        "T3"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you refused the niche and cut the guardian's stone door open",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    }
+  ],
+  "grid": {
+    "beats": [
+      "opening_crisis",
+      "second_crisis",
+      "third_crisis",
+      "climax",
+      "aftermath"
+    ],
+    "rows": {
+      "T1": {
+        "opening_crisis": [
+          "N01"
+        ],
+        "second_crisis": [
+          "N02"
+        ],
+        "third_crisis": [
+          "N03"
+        ],
+        "climax": [
+          "N04"
+        ],
+        "aftermath": [
+          "N05"
+        ]
+      },
+      "T2": {
+        "opening_crisis": [
+          "N01"
+        ],
+        "second_crisis": [
+          "T2N01"
+        ],
+        "third_crisis": [
+          "T2N02"
+        ],
+        "climax": [
+          "T2N03"
+        ],
+        "aftermath": [
+          "T2N04"
+        ]
+      },
+      "T3": {
+        "opening_crisis": [
+          "N01"
+        ],
+        "second_crisis": [
+          "N02"
+        ],
+        "third_crisis": [
+          "N03"
+        ],
+        "climax": [
+          "N04"
+        ],
+        "aftermath": [
+          "T3N01"
+        ]
+      }
+    },
+    "skipped": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    }
+  },
+  "hooks": [
+    {
+      "node": "N01",
+      "turn": 1,
+      "way": 2,
+      "what": "you cross, because you set the sword's pommel on the center plate to hold it down and step around it",
+      "cost": "the sword calls the plate a throne and your arm shakes under its weight"
+    },
+    {
+      "node": "N02",
+      "turn": 2,
+      "way": 2,
+      "what": "you learn it, because you set the sword on the floor and read the last hand's mark on the wall yourself",
+      "cost": "the guardian grinds the stair shut behind you, and the sword says you have the manners of a thief"
+    },
+    {
+      "node": "N03",
+      "turn": 3,
+      "way": 2,
+      "what": "the vault opens, because you use the sword to cut the guardian's stone latch",
+      "cost": "the guardian's eyes follow the cut, and the sword's weight climbs your wrist"
+    },
+    {
+      "node": "N03",
+      "turn": 3,
+      "way": 3,
+      "what": "the vault opens, because you let the sword promise the guardian that you will return it",
+      "cost": "the sword says it believes you, and the water rises an inch"
+    },
+    {
+      "node": "T2N01",
+      "turn": 2,
+      "way": 1,
+      "what": "you learn it, because you let the sword finish the story, and it ends by asking if you have a map of the tower and whether you accept apologies at the exit",
+      "cost": "the chamber goes quiet, and the skeleton's grip looks less like a warning and more like a seat taken"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 1,
+      "what": "the vault opens, because you tell the guardian what the last hand did and set the sword's pommel on the threshold",
+      "cost": "the guardian lifts its door only enough for you, and the sword is out of your hand for the first time"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 3,
+      "what": "the vault opens, because you let the sword promise the guardian that you will return it",
+      "cost": "the sword says it believes you, and the water rises an inch"
+    },
+    {
+      "node": "T2N03",
+      "turn": 4,
+      "way": 1,
+      "what": "the blade goes into the niche, because you set it into the black stone and step back",
+      "cost": "you leave the tower with an empty hand and the guardian lets the water stop rising"
+    },
+    {
+      "node": "T2N03",
+      "turn": 4,
+      "way": 2,
+      "what": "the blade stays in your hand, because you refuse the niche and cut the guardian's stone door open",
+      "cost": "the curse takes weight in your arm, your hand shakes, and the guardian marks you as the one who kept it"
+    }
+  ],
+  "checks": {
+    "findings": [],
+    "notes": []
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "line": "T1",
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "judge": null,
+      "plan": {
+        "assessment": "T1 answers the question by putting the sword back, leaving the tower asleep, the water still, and your hand empty. The missing worlds are keeping the blade under the curse and losing the sword without returning it to the niche. The story can part early at N01, where the sword can be set or dragged on the plates instead of carried, and again at N02, where you can set it down and read the last hand's mark yourself.",
+        "seeds": 2
+      }
+    },
+    {
+      "iteration": 2,
+      "line": "T2",
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 3,
+      "line": "T3",
+      "new_nodes": [
+        "T3N01"
+      ],
+      "judge": null
+    }
+  ],
+  "stop_reason": "reached --max-iterations (3)",
+  "warnings": []
+}

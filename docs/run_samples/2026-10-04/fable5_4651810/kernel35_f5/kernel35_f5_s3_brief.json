@@ -1,0 +1,189 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "how to get the boat under way under the ghost's captaincy",
+      "description": "At each point where the boat must move, choose a concrete method toward the ghost—appease his captain's terms, obey or defy him, or work around his refusal—while your brother-in-law's pressure to sell pushes for a faster exit.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [
+        {
+          "label": "what to do with your brother-in-law's safety and his demand for money",
+          "relation": "nested"
+        }
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_landscape": {
+      "shape": "layered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "canal-boat inheritor",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "none",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_cost": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "fright",
+      "binding": "constraint"
+    },
+    "3b.primary_trajectory": {
+      "shape": "sustained",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "financial anxiety",
+        "frustration"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "funny",
+        "eerie"
+      ],
+      "binding": "constraint"
+    },
+    "3b.somatic_address": {
+      "level": 1,
+      "channels": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.transgression": {
+      "ceiling": 2,
+      "floor": 1,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "authority of the dead",
+      "pole_b": "agency of the living",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "negotiating with the ghost",
+        "asserting ownership",
+        "selling the boat"
+      ],
+      "binding": "constraint"
+    },
+    "3c.moral_valence": {
+      "best_case": "comic, uneasy success",
+      "worst_case": "frightened, costly escape",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "invited",
+      "floor": "invited",
+      "types": [
+        "dream_or_vision"
+      ],
+      "interactive": "interactive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "default"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "default"
+    },
+    "3f.setting_structure": {
+      "ceiling": "single",
+      "floor": "single",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_scale": {
+      "ceiling": "room_or_building",
+      "floor": "room_or_building",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 3,
+      "max": 5,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "ghost's captaincy/acceptance",
+        "brother-in-law safety/money state",
+        "boat departure state"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "minimal"
+}

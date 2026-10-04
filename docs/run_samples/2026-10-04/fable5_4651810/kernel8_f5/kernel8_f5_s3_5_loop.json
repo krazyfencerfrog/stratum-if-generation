@@ -1,0 +1,36 @@
+{
+  "accepted_source": "s3_5r1_premise_repair.json#revised",
+  "accepted_copy": "s3_5_premise_accepted.json",
+  "repair_rounds_used": 1,
+  "max_repairs": 2,
+  "still_failing": false,
+  "rounds": [
+    {
+      "round": 0,
+      "source": "s3_5_premise.json",
+      "findings": [
+        {
+          "source": "engine boundary",
+          "where": "a system the engine lacks, or a way to lose 3-0c does not name",
+          "problem": "This is a deadline the player is expected to meet before a threshold event, and the failure model names no failure trigger that licenses it.",
+          "quote": "the book’s final page is due to be filled by the time the last lamp goes out"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "source": "s3_5r1_premise_repair.json#revised",
+      "changed": [
+        "pressure"
+      ],
+      "repair_log": [
+        {
+          "finding": "engine boundary: a deadline in pressure that 3-0c does not license",
+          "change": "removed the due-by-last-lamp deadline from pressure.description, leaving the final page open for the night as an atmospheric state rather than a task to meet.",
+          "disagreement": ""
+        }
+      ],
+      "findings": []
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "metrics": {
+    "lines": 3,
+    "nodes": 9,
+    "nodes_per_line": [
+      5,
+      5,
+      5
+    ],
+    "summary_words_mean": 77.6,
+    "summary_words_range": [
+      56,
+      101
+    ],
+    "summaries_in_target_share": 0.44,
+    "images_present_share": 1.0,
+    "fork_positions": [
+      2,
+      4
+    ],
+    "main_line_length": 5,
+    "earliest_fork_share": 0.4,
+    "forks_in_first_half": 1,
+    "accumulated_triggers": 0,
+    "late_forks": false,
+    "endings": 3,
+    "distinct_ending_worlds": 3,
+    "ending_distinctness": 1.0,
+    "distinct_answers": [
+      "neither",
+      "pole_a",
+      "pole_b"
+    ],
+    "companions_whose_standing_varies": [],
+    "ending_worlds_stated_share": 1.0,
+    "turn_forms": [
+      "discover",
+      "trade",
+      "rescue",
+      "confront"
+    ],
+    "set_piece_turns": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "set_piece_nodes": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "T2N01",
+      "T2N02"
+    ],
+    "events": 3,
+    "events_placed": 3,
+    "complications": 2,
+    "cast_with_voice": 5,
+    "cast_with_breaking_point": 1,
+    "cast": 5,
+    "turn_similarity_max": 0.34,
+    "repeated_phrases": [
+      "the cold stone room (5 nodes)",
+      "aulus domitius rufus's seal (4 nodes)",
+      "in the cold stone (3 nodes)"
+    ],
+    "repeated_phrase_count": 3,
+    "brief_echoes": [],
+    "retold_nodes": 0,
+    "repeated_situations": 0,
+    "opposition_nodes_per_line": [
+      3,
+      3,
+      4
+    ],
+    "characters": 6,
+    "locations": 5,
+    "unused_characters": 0,
+    "promise_coverage": 0.78,
+    "promises_uncovered": [
+      "the succession shock: the moment the old emperor dies or is declared dead, and the new ruler's agents arrive to demand the 'ledger' of who said what",
+      "the texture of the 'real': the specific, gritty details of Roman life—the price of oil, the quality of the water, the political slang of the streets—grounding the high stakes in daily reality"
+    ],
+    "check_findings": 0,
+    "check_notes": [
+      "turn_cast_absent",
+      "turn_cast_absent",
+      "turn_cast_absent",
+      "turn_cast_absent",
+      "companions_static"
+    ]
+  },
+  "judge": {
+    "reading": "The outline presents a tight, four-turn political thriller centered on a freedwoman's bathhouse during a Roman succession crisis. It reads as a competent procedural where the mechanics of information exchange are the primary engine, though the emotional stakes of the family dynamic are often summarized rather than dramatized.",
+    "scores": {
+      "plot": {
+        "note": "The escalation is linear and predictable: N01 (news) to N02 (arrest) to N03 (copy) to N04 (seal). The 'middle' is largely made of errands (sending the jar, waiting for the seal) rather than the world acting on its own. The surprise is low; the player knows by N02 that the ledger is the key, so the tension is in the execution, not the discovery.",
+        "score": 3
+      },
+      "people": {
+        "note": "Characters are defined by their function in the information flow. Aulus Domitius Rufus is a flat procedural force ('The water is cold. The list is short.'). Tullia Paulla's voice ('The ink is dry') is a strong, specific trait, but her want (safety) is static. The conflict is between lists, not between people with competing, evolving desires.",
+        "score": 3
+      },
+      "reveals": {
+        "note": "The core reveal is that the player's daughter has already copied the list (N03), which shifts the agency from the player to the daughter's prior action. However, this is stated rather than revealed through play. The 'different senator' in T2 is a vague placeholder that lacks the specific weight of Marcus Tullius Gallus, making the T2 reveal feel like a data swap rather than a dramatic turn.",
+        "score": 3
+      },
+      "agency": {
+        "note": "The lines part early (after N02), which is good. However, the endings are variations of 'who is marked as the source.' T1 marks Tullia, T2 marks the rival, T3 leaves the door sealed. The 'worlds' left behind are distinct in terms of who survives, but the player's active choices in N03 and N04 are often passive reactions to the officer's demands. The agency feels constrained by the 'ledger' mechanic.",
+        "score": 4
+      },
+      "specificity": {
+        "note": "Strong on physical objects: 'sealed wax tablet', 'clay oil jar with a cracked wax seal', 'wet caldarium stones'. However, the political landscape is abstract. 'The new emperor', 'the purge list', and 'the chancery' are generic historical terms. The 'different senator' in T2 is a failure of specificity; naming him would ground the cost. The images are real, but the context is thin.",
+        "score": 4
+      },
+      "genre": {
+        "note": "Delivers the 'keeper of secrets' fantasy and the 'bathhouse as confessional' promise. The set pieces (the freeze in the caldarium, the dragging of the senator) are present and well-placed. It avoids the 'toga movie' spectacle effectively. The tone is wary and grounded, though perhaps too dry to fully capture the 'family stake' emotional weight requested by the Kernel.",
+        "score": 4
+      }
+    },
+    "best_thing": "The image in T2N01: 'a clay oil jar with a cracked wax seal, the copied list visible through the gap in the lid' is a concrete, tactile, and highly specific image that perfectly encapsulates the precariousness of the situation and the physicality of the genre.",
+    "worst_thing": "The character of 'the different senator' in line T2. Using a placeholder phrase instead of a named character with a specific voice and want weakens the stakes of that ending. If the rival's ledger saves Tullia but destroys a generic 'different senator,' the emotional cost is diluted compared to the specific loss of Marcus Tullius Gallus in T1.",
+    "would_play": true,
+    "total": 21
+  }
+}

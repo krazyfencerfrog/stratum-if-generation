@@ -1,0 +1,133 @@
+{
+  "metrics": {
+    "lines": 4,
+    "nodes": 17,
+    "nodes_per_line": [
+      8,
+      8,
+      8,
+      7
+    ],
+    "summary_words_mean": 82.4,
+    "summary_words_range": [
+      56,
+      104
+    ],
+    "summaries_in_target_share": 0.18,
+    "images_present_share": 1.0,
+    "fork_positions": [
+      4,
+      7,
+      3
+    ],
+    "main_line_length": 8,
+    "earliest_fork_share": 0.38,
+    "forks_in_first_half": 2,
+    "accumulated_triggers": 0,
+    "late_forks": false,
+    "endings": 4,
+    "distinct_ending_worlds": 4,
+    "ending_distinctness": 1.0,
+    "distinct_answers": [
+      "pole_a",
+      "pole_b"
+    ],
+    "companions_whose_standing_varies": [
+      "disgraced knight",
+      "scholar"
+    ],
+    "ending_worlds_stated_share": 1.0,
+    "turn_forms": [
+      "persuade",
+      "discover",
+      "choose_whom",
+      "confront"
+    ],
+    "set_piece_turns": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "set_piece_nodes": [
+      "N03",
+      "N04",
+      "N06",
+      "N07",
+      "T2N02",
+      "T2N03",
+      "T4N01",
+      "T4N02",
+      "T4N03"
+    ],
+    "events": 3,
+    "events_placed": 3,
+    "complications": 2,
+    "cast_with_voice": 4,
+    "cast_with_breaking_point": 3,
+    "cast": 4,
+    "turn_similarity_max": 0.2,
+    "repeated_phrases": [
+      "the black name stone (9 nodes)",
+      "hask and teague glaive (4 nodes)",
+      "ash hask and teague (4 nodes)",
+      "you walk back down (3 nodes)",
+      "with cord and breath (3 nodes)",
+      "wind howls through the (3 nodes)"
+    ],
+    "repeated_phrase_count": 20,
+    "brief_echoes": [],
+    "retold_nodes": 0,
+    "repeated_situations": 0,
+    "opposition_nodes_per_line": [
+      8,
+      6,
+      8,
+      7
+    ],
+    "characters": 6,
+    "locations": 7,
+    "unused_characters": 0,
+    "promise_coverage": 0.89,
+    "promises_uncovered": [
+      "the old dragon, not as a monster to be slain but as a presence that shifts the air pressure in the room, vast and ancient"
+    ],
+    "check_findings": 0,
+    "check_notes": [
+      "turn_cast_absent"
+    ]
+  },
+  "judge": {
+    "reading": "This is a mythic quest where a hedge-witch leads a fractured party to an ancient dragon, driven by a central conflict between communal duty and a scholar's personal redemption. The structure is tight, with a clear branching point at the river city that determines whether the party remains united or fractures, leading to two distinct emotional payoffs: a self-sacrifice that preserves the group but erases the protagonist's home, or a betrayal that saves the knight but destroys the scholar's identity. The writing leans heavily into a specific, atmospheric tone of 'heavy age' and 'mythic weight', using consistent imagery of smoke, stone, and cord to bind the narrative threads together.",
+    "scores": {
+      "plot": {
+        "note": "The escalation is steady, moving from village to city to ruin to pass, but the middle (N04-N06) feels like a series of atmospheric set-pieces rather than distinct tactical challenges; the 'world acting on its own' is mostly the weather and the dragon's shadow, which is effective for tone but limits active plot surprises.",
+        "score": 3
+      },
+      "people": {
+        "note": "The characters have strong, specific voices (Ash's commands, Teague's nicknames) and clear, conflicting wants. Rozenn's opposition is well-defined as an internal/external rival for the quest's purpose, making the loyalty tension in T2 feel earned and costly.",
+        "score": 4
+      },
+      "reveals": {
+        "note": "The reveal of Rozenn's family debt in N04/T2N01 is the core twist, recontextualizing her presence. However, the mechanics of the 'name-stone' and 'old bond' are introduced early (N02) and remain somewhat abstract; the payoff is emotional rather than a hard mechanical reversal.",
+        "score": 3
+      },
+      "agency": {
+        "note": "The branch at N03 is significant and creates two distinct middles. T1 focuses on the protagonist's sacrifice (losing home), while T2 focuses on the companion's sacrifice (losing memory/friend). The endings leave different worlds: one where the road is gone but the party is whole, and one where the party is broken but the road is closed. This is a strong use of agency.",
+        "score": 4
+      },
+      "specificity": {
+        "note": "The images are vivid and consistent ('cracked hedge stones', 'ledger page smoked black', 'shield-wide eye'). However, there is a heavy reliance on abstract nouns like 'the bond', 'the debt', and 'the name' which occasionally blur the line between physical object and metaphor. The 'smoke of your village' is a strong, specific image that grounds the magic.",
+        "score": 4
+      },
+      "genre": {
+        "note": "Delivers the epic fantasy quest promise with the requested 'wonder' and 'mythic' tone. The dragon is a presence, not just a monster. The river city and mountain pass set pieces match the Kernel's expectations. The 'unlikely leader' fantasy is supported by the protagonist's role as the one who binds the group with 'cord and breath'.",
+        "score": 4
+      }
+    },
+    "best_thing": "The contrast between the two endings: T1's 'you can walk back, but you can no longer tend what you came from' versus T2's 'the scholar does not know your face'. Both are poignant, specific consequences that fit the mythic tone perfectly.",
+    "worst_thing": "The mechanical clarity of the 'old bond' and 'name-stone' is slightly murky. It is unclear if the player has any active choice in *how* they interact with these objects during the journey, or if they are purely narrative devices that trigger the endings. The 'agency' feels slightly passive in the middle nodes (N04-N06) where the protagonist mostly 'watches' or 'binds' rather than making strategic combat or social choices.",
+    "would_play": true,
+    "total": 22
+  }
+}

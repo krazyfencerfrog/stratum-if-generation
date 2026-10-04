@@ -1,0 +1,48 @@
+{
+  "accepted_source": "s3_5r1_premise_repair.json#revised",
+  "accepted_copy": "s3_5_premise_accepted.json",
+  "repair_rounds_used": 1,
+  "max_repairs": 2,
+  "still_failing": false,
+  "rounds": [
+    {
+      "round": 0,
+      "source": "s3_5_premise.json",
+      "findings": [
+        {
+          "source": "engine check",
+          "where": "everything the engine and the turns name is something a reader can picture: the levers, the pressure, the situations and the ways through are people, places, objects, documents, events or things said, not coined abstractions. If one is not, quote it.",
+          "problem": "The levers include abstract states rather than only people, places, objects, documents, events, or things said.",
+          "quote": "the child's confidence in you"
+        },
+        {
+          "source": "engine boundary",
+          "where": "a system the engine lacks, or a way to lose 3-0c does not name",
+          "problem": "The premise asks the player to watch and manage relationship quantities that can be lost or spent, but these are licensed by the relational_collapse failure trigger and the Kernel's own courtier and trust resources.",
+          "quote": "courtier allegiance and the child's trust are tracked as relationships"
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "source": "s3_5r1_premise_repair.json#revised",
+      "changed": [
+        "mediation",
+        "pressure"
+      ],
+      "repair_log": [
+        {
+          "finding": "The levers include abstract states rather than only people, places, objects, documents, events, or things said.",
+          "change": "Replaced the abstract lever 'the child's confidence in you' and the other abstract levers with concrete objects, documents, people, or events: the child's lesson book left open on your desk, the crown questions written in the child's lesson book, the named courtiers, the servants who come to your study with what they have heard, the sealed coronation oath, the crown in the rite chamber, the seating order in the regent's steward's hand, and the aging servant.",
+          "disagreement": ""
+        },
+        {
+          "finding": "The premise asks the player to watch and manage relationship quantities that can be lost or spent, but these are licensed by the relational_collapse failure trigger and the Kernel's own courtier and trust resources.",
+          "change": "Rewrote pressure.clock_or_stock so courtier allegiance and the child's trust are carried by concrete people, seats, words, and documents rather than by an abstract relationship-tracking system, and made the loss a relational_collapse event: a courtier refusing you, a seat removed, a servant silent, or the child stopping his questions.",
+          "disagreement": ""
+        }
+      ],
+      "findings": []
+    }
+  ]
+}

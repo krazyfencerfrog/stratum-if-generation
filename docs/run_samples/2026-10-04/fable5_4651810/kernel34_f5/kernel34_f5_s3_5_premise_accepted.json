@@ -1,0 +1,360 @@
+{
+  "enrichment_budget": {
+    "level": "moderate"
+  },
+  "protagonist": {
+    "who": "You are the tutor to the child king in the palace, nine days from the midsummer rite, with no guard, no seat in the crown council, and a classroom full of questions the child has not learned to answer.",
+    "wants": "to keep the child safe and the crown in the child's hand by the rite, or to choose honestly which of those you must give up.",
+    "can_do": "prepare the child, choose what to tell him, listen to servants, send servants, court or release the three courtiers who hold pieces of the rite, and use what you learn to alter the order of the day.",
+    "cannot_do": "command soldiers, force a courtier to stay loyal, make the child trust faster than he is willing, or stop the regent's ritual once it has been sealed and seated.",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "The palace and its midsummer rite precinct in the city's heart: the tutor's study, the child's bedchamber, the tapestry gallery, the servants' hall, the great hall, and the rite chamber where the crown will be laid.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "Nine days remain until the midsummer rite, and the regent's plan moves forward on its own: decrees are read, the oath is drafted, the crown is carried to the rite chamber, and the court's seating is fixed day by day.",
+    "clock_or_stock": "A nine-day clock and the regent's ritual stages are tracked; courtier allegiance and the child's trust are carried by named courtiers, their seats, their words, and which servants may speak in your study, and a loss is a courtier refusing you, a seat removed, a servant silent, or the child stopping his questions, as relational_collapse.",
+    "serves": "3-0c.failure_triggers"
+  },
+  "opposition": {
+    "who_or_what": "The regent, the child's uncle, and the rite machinery he administers.",
+    "wants": "to put a grown hand on the crown at midsummer because he believes the child will be ruled from behind a screen and the realm will founder; he wants the rite to pass cleanly and the child left unharmed enough to be set aside.",
+    "means": "He controls the crown council's decrees, the rite's liturgy, the court's seating, the servants' access, and the private audiences through which courtiers decide what they fear most.",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "In the great hall, the regent's steward reads a decree that the child must answer the crown questions at the midsummer rite, and that if the child falters, the regent will be crowned as crown-holder in his place.",
+      "when": "early",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "what": "A courtier you have leaned on is removed from the rite committee after the regent offers a private audience; the courtier accepts the regent's seat because the regent has named the courtier's child in the new household order.",
+      "when": "middle",
+      "serves": "3c.secondary_thematic_axis"
+    },
+    {
+      "what": "The regent's chaplain seals the coronation oath and places the crown in the rite chamber; the aging servant who has served you for years leaves a folded copy of the oath's wording on your study desk, where you find it by the window.",
+      "when": "late",
+      "serves": "3b.primary_affect"
+    }
+  ],
+  "hidden_truth": null,
+  "mediation": {
+    "question": "What is the child's trust for: a crown he can keep, or a crown that keeps him safe?",
+    "to_reach_pole_a": {
+      "pole": "rightful rule: block the regent's coronation and put the child's hand on the crown",
+      "what_you_must_do": "Prepare the child to answer the crown questions, bring at least two of the three courtiers to stand with the child at the rite, and use servant information to expose the regent's seating and oath before the rite is sealed.",
+      "cost": "The child learns what is at stake and may close his lesson book to you; a courtier you have won may be removed or turn away; the servants who gave you information may be punished in front of you."
+    },
+    "to_reach_pole_b": {
+      "pole": "pragmatic rule: let the regent's coronation pass and preserve the child under it",
+      "what_you_must_do": "Let the regent's ritual advance, soften the child's preparation so he does not falter publicly, and trade courtier allegiance for the regent's promise that the child will remain unharmed in the palace.",
+      "cost": "The child is left with a crown that is not his; the courtiers you have won accept the regent's hand; the servants who spoke for you are sent away or punished, and the child stops asking you questions, spending his trust on survival."
+    },
+    "levers": [
+      "the child's lesson book left open on your desk",
+      "the crown questions written in the child's lesson book",
+      "the seating courtier, the treasury courtier, and the oath courtier",
+      "the servants who come to your study with what they have heard",
+      "the regent's sealed coronation oath",
+      "the crown in the rite chamber",
+      "the seating order in the regent's steward's hand",
+      "the aging servant"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "In the great hall, the regent's steward reads the decree that the child king must answer the crown questions at the midsummer rite, and that if the child falters, the regent will be crowned in his place.",
+      "what_you_must_do": "find out what the crown questions will ask and who holds their wording",
+      "ways_through": [
+        {
+          "way": "you learn it from the aging servant, who brings you a folded list of the old questions from his trunk",
+          "cost": "the steward sees the servant cross the hall and narrows the servants' access to the child's bedchamber"
+        },
+        {
+          "way": "you learn it from the seating courtier, who shows you the draft because you let him keep his place on the rite committee",
+          "cost": "the child must practice one question aloud in the corridor, and the court hears his voice break"
+        }
+      ],
+      "involves": [
+        "the regent's steward",
+        "the aging servant",
+        "the seating courtier",
+        "the child king"
+      ],
+      "form": "discover",
+      "set_piece": null,
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "id": 2,
+      "situation": "The seating courtier is removed from the rite committee after a private audience, because the regent has named the courtier's child in the new household order.",
+      "what_you_must_do": "get another courtier to take up the seating order before the regent fixes the court's places for the rite",
+      "ways_through": [
+        {
+          "way": "the treasury courtier agrees, because you let him ask the child a question at lesson and the child answered without fear",
+          "cost": "the treasury courtier now knows the child dreads the crown questions, and he will test that dread before the rite"
+        },
+        {
+          "way": "the oath courtier agrees, because you gave him the old oath wording the aging servant kept",
+          "cost": "the oath courtier is no longer free to refuse the regent's chaplain, and the child's lesson is shortened to make room for his counsel"
+        }
+      ],
+      "involves": [
+        "the regent",
+        "the seating courtier",
+        "the treasury courtier",
+        "the oath courtier",
+        "the aging servant"
+      ],
+      "form": "persuade",
+      "set_piece": null,
+      "serves": "3c.secondary_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "The regent's steward has fixed the court's seating for the rite, placing the child beside the regent rather than before the crown.",
+      "what_you_must_do": "change the seating order before the rite day",
+      "ways_through": [
+        {
+          "way": "the seating changes, because you trade the child's private fear to the treasury courtier for his word to the steward",
+          "cost": "the child learns that his fear has been used, and the aging servant is called to the servants' hall to be questioned"
+        },
+        {
+          "way": "the seating changes, because you let the oath courtier carry the old oath wording to the regent's chaplain",
+          "cost": "the chaplain now holds both the old and the new wording, and the child's place is moved only to a seat that looks like an error"
+        }
+      ],
+      "involves": [
+        "the regent's steward",
+        "the treasury courtier",
+        "the oath courtier",
+        "the child king",
+        "the aging servant"
+      ],
+      "form": "trade",
+      "set_piece": null,
+      "serves": "3c.secondary_thematic_axis"
+    },
+    {
+      "id": 4,
+      "situation": "The regent's chaplain has sealed the coronation oath and placed the crown in the rite chamber, and the regent raises a cup at the banquet in the great hall to the future of the realm, with the child watching from the tapestry gallery.",
+      "what_you_must_do": "answer the regent's toast before it reaches the child's ears",
+      "ways_through": [
+        {
+          "way": "you answer by naming the child's hand on the crown, and the regent's steward reads the decree again in the hall",
+          "cost": "the child hears that his faltering is still the regent's way, and the oath courtier steps back from you in the candlelight"
+        },
+        {
+          "way": "you answer by accepting the regent's future, and the regent names the child's place in the new household order",
+          "cost": "the child is safe in the palace, but the treasury courtier's child is named before the child's own name is spoken"
+        }
+      ],
+      "involves": [
+        "the regent",
+        "the regent's steward",
+        "the regent's chaplain",
+        "the child king",
+        "the oath courtier",
+        "the treasury courtier"
+      ],
+      "form": "confront",
+      "set_piece": "the great hall under the toast, the child's face in the tapestry gallery, the sealed crown already in the rite chamber",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "id": 5,
+      "situation": "At the rite chamber, the child king must answer the crown questions, the regent's oath is sealed, and the crown waits on the cushion before the rite chair.",
+      "what_you_must_do": "settle which hands will stand with the child when the crown is lifted",
+      "ways_through": [
+        {
+          "way": "the child's hand goes on the crown, because the treasury courtier and the oath courtier stand in the rite chamber and the child answers the first question",
+          "cost": "the child learns what he has risked, and the aging servant is dismissed from the servants' hall before the rite is done"
+        },
+        {
+          "way": "the regent's hand takes the crown, because you trade the oath courtier's seat for the regent's promise that the child will remain in the palace",
+          "cost": "the child's trust is spent on survival, and the treasury courtier's child is seated in the household order before the child"
+        }
+      ],
+      "involves": [
+        "the regent",
+        "the child king",
+        "the treasury courtier",
+        "the oath courtier",
+        "the aging servant",
+        "the regent's chaplain"
+      ],
+      "form": "choose_whom",
+      "set_piece": null,
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The folded copy of the oath the aging servant leaves on your study desk has a marginal mark showing the regent's chaplain changed the wording of the crown question.",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "description": "The treasury courtier's kindness to the child was arranged by the regent's steward, who wanted the child to speak before the court.",
+      "serves": "3c.secondary_thematic_axis"
+    },
+    {
+      "description": "The oath courtier's old wording is true only if the child answers in the old form, which the regent's chaplain has not allowed.",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the regent's steward",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "the rite to proceed without incident so his household order is not questioned",
+      "holds": "the decree and the seating arrangements",
+      "edge": "arranges the seating to keep the child visible but powerless, believing this is a kindness",
+      "tie": "serves the regent who has appointed him to manage the rite",
+      "voice": "speaks in procedural absolutes that sound like benevolence: 'The chair is placed here for the child's comfort, not his command.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        3,
+        4
+      ],
+      "name": "Linden Dunmore"
+    },
+    {
+      "role": "the aging servant",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to see the child treated with the respect due to his name",
+      "holds": "memory of the child's mother and the old court's ways",
+      "edge": "remembers when the regent was a boy who feared the dark, and has not said so",
+      "tie": "has served the child since infancy and watches over him from the shadows",
+      "voice": "speaks in fragments of the past that answer the present: 'The queen did not kneel. She stood. You might try.'",
+      "breaking_point": "leaves the palace the day you let the child be moved without his consent",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "name": "Cadoc Ashgrove"
+    },
+    {
+      "role": "the seating courtier",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain their position in the court's hierarchy",
+      "holds": "the authority to arrange the physical space of the rite",
+      "edge": "removed from the committee to protect their child, and resents the regent's paternalism",
+      "tie": "owes the regent their current station but fears for their child's safety",
+      "voice": "measures the room in inches of dignity: 'If the child sits here, he is a guest. If he sits there, he is a prisoner. Choose.'",
+      "breaking_point": "turns against the regent if their child is moved again without warning",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2
+      ],
+      "name": "Emrys Hask"
+    },
+    {
+      "role": "the child king",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to be trusted with the questions and not made a fool",
+      "holds": "the crown's legitimacy and the court's expectation of his rule",
+      "edge": "wants to be a king but is terrified of the silence that follows his answers",
+      "tie": "trusts you as the only person who does not speak over him",
+      "voice": "asks questions that are not questions, seeking permission to exist: 'Is it true that if I say nothing, the crown stays with me?'",
+      "breaking_point": "stops listening to you the moment you correct his tone in front of the regent",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        3,
+        4,
+        5
+      ],
+      "name": "Wren Tollen"
+    },
+    {
+      "role": "the regent",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to secure the realm by ruling it himself, believing the child is unfit",
+      "holds": "the crown council's decrees and the rite's machinery",
+      "edge": "genuinely believes he is saving the child from a burden he cannot bear",
+      "tie": "is the child's uncle and has raised him as a son, not a sovereign",
+      "voice": "speaks with the patience of a man who has already won: 'You are young. The realm is old. One must yield to the other.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        2,
+        4,
+        5
+      ],
+      "name": "Morrow Ludd"
+    },
+    {
+      "role": "the treasury courtier",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the realm's coffers full and the peace intact",
+      "holds": "the funds that pay for the rite and the court's loyalty",
+      "edge": "fears the child's independence more than the regent's control, as it threatens stability",
+      "tie": "serves the regent who guarantees their financial security",
+      "voice": "counts the cost of every gesture: 'A crown is expensive. A silence is cheaper. Which can you afford?'",
+      "breaking_point": "withdraws support if the child's rule leads to visible waste or debt",
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "name": "Rurik Merrow"
+    },
+    {
+      "role": "the oath courtier",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to ensure the rite's legal and spiritual validity",
+      "holds": "the sealed coronation oath and the ritual's form",
+      "edge": "believes the oath binds the regent more than the child, and fears the regent will break it",
+      "tie": "serves the regent who appointed them to oversee the oath",
+      "voice": "recites the rules as if they are prayers: 'The oath is ink. The ink is dry. The dry ink does not move.'",
+      "breaking_point": "opposes the regent if the oath is read incorrectly or altered",
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "name": "Brannoc Glaive"
+    },
+    {
+      "role": "the regent's chaplain",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to perform the rite with perfect liturgical accuracy",
+      "holds": "the sealed crown and the rite chamber's sanctity",
+      "edge": "fears that the child's failure will be seen as a divine rejection of the line",
+      "tie": "serves the regent who directs the spiritual tone of the court",
+      "voice": "speaks in the passive voice of the gods: 'It is done. It is set. It is not to be questioned.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        4,
+        5
+      ],
+      "name": "Yestin Penhallow"
+    }
+  ],
+  "name_pool": "fantasy"
+}

@@ -1,0 +1,188 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "what to disclose to each new emperor",
+      "description": "At each imperial succession, choose which overheard senatorial remarks, names, or omissions to offer to the new ruler, deciding whom the disclosure protects or endangers.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint"
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "bathhouse-owning freedwoman",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "soft",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [
+        "detection_or_exposure"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_cost": {
+      "value": "narrative_setback",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "pervasive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "wary vigilance",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "fear for family"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "grounded",
+        "serious"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.somatic_address": {
+      "level": 2,
+      "channels": [
+        "heat/steam",
+        "public proximity"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.transgression": {
+      "ceiling": 4,
+      "floor": 2,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "honest testimony",
+      "pole_b": "family survival",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "candid disclosure",
+        "selective testimony",
+        "strategic silence"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "family survives with dignity",
+      "worst_case": "hollow survival, family broken",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "invited",
+      "floor": "invited",
+      "types": [
+        "flashback"
+      ],
+      "interactive": "interactive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_duration": {
+      "ceiling": "years",
+      "floor": "years",
+      "binding": "constraint"
+    },
+    "3f.setting_structure": {
+      "ceiling": "clustered",
+      "floor": "clustered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_scale": {
+      "ceiling": "city_or_region",
+      "floor": "city_or_region",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 3,
+      "max": 5,
+      "binding": "default"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "imperial suspicion/exposure",
+        "disclosure/who-knows-what",
+        "family/political standing"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "minimal"
+}

@@ -1,0 +1,309 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are a freedwoman who owns a working bathhouse in a Roman city district, where senators come to be scrubbed and speak too freely.",
+    "history": "You were freed by a senator's steward after years as a bathhouse attendant, and you bought the caldarium with a dowry and a debt to the imperial oil merchant.",
+    "wants": "to keep your daughter safe and the bathhouse open through the next succession without selling your memory for a price that breaks your family",
+    "need": "to find out whether the truth you kept can still be trusted to keep you alive",
+    "can_do": "scrub senators, overhear, keep a mental ledger, write names on a scroll, choose what to hand over, bargain with the Praetorian officer, and use the bathhouse's private steam room and service corridor",
+    "cannot_do": "make a new emperor accept less than a list, stop the Praetorian officer from arresting someone named, or keep your daughter from copying the list if she is in the chancery",
+    "ties": [
+      {
+        "who": "the Praetorian officer",
+        "what": "the man who has come to your bathhouse at each succession and offers a price for your silence"
+      },
+      {
+        "who": "the rival freedman",
+        "what": "the owner of the bathhouse across the street who also listens and sells what he hears"
+      },
+      {
+        "who": "the tired senator",
+        "what": "the man who said the wrong thing in the caldarium and whose fate hangs on your memory"
+      },
+      {
+        "who": "your daughter",
+        "what": "the scribe in the imperial chancery who copies the purge lists"
+      }
+    ],
+    "open": "whether you become the honest keeper of the truth or the mother who buys safety with a name",
+    "gender": "f",
+    "serves": "3-0b.protagonist_identity",
+    "name": "Flavia Crassa"
+  },
+  "arena": {
+    "description": "A Roman city district centered on a working bathhouse with caldarium, apodyterium, service corridor, and a small owner's house on the same street, plus the cold stone chamber of the new emperor's advisor in a nearby senator's villa.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "Each emperor's death brings a new ruler's agents to the bathhouse within days, demanding the ledger of who spoke against the last man, while the purge lists your daughter copies begin to name senators from the caldarium.",
+    "clock_or_stock": "none tracked; the year of four emperors is told through the arrivals of agents, the sealing of the baths, and the growing purge list, because 3-0c licenses only soft detection_or_exposure",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "the Praetorian officer who collects testimony for each new emperor and runs the purge in the city district",
+    "wants": "to be the man who found the real conspiracy and to buy his own safety with a price that makes your silence worth more than your daughter's life",
+    "means": "he can arrest senators, seize the bathhouse, tax the oil and water, put your daughter's name on a purge list, and force the rival freedman's competing ledger into the new emperor's advisor's hands",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "The news of the old emperor's death reaches the caldarium; the steam stops, the senators freeze half-naked, and the Praetorian officer enters the apodyterium for the ledger.",
+      "when": "early",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "what": "A senator is dragged from the apodyterium by the Praetorian Guard, still dripping, while you watch from the service corridor; the rival freedman's ledger names a different senator, and the officer offers to spare your daughter if you confirm his list.",
+      "when": "middle",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "what": "The new emperor's advisor summons you to a cold stone room with the scroll of names, and at home the family dinner goes quiet because your daughter has copied the purge list and the officer's seal is on the bathhouse door.",
+      "when": "late",
+      "serves": "3b.primary_affect"
+    }
+  ],
+  "hidden_truth": null,
+  "mediation": {
+    "question": "What do you hand to the new emperor: the honest testimony you kept, or the selective silence that keeps your family alive?",
+    "to_reach_pole_a": {
+      "pole": "honest testimony",
+      "what_you_must_do": "write down what you actually heard in the caldarium and give the senator's name, even when the tired senator's fate depends on it",
+      "cost": "the Praetorian officer can use the name to break the senator's household, and your daughter may be marked as the source of the list"
+    },
+    "to_reach_pole_b": {
+      "pole": "family survival",
+      "what_you_must_do": "choose a name that protects your daughter, whether by naming the rival freedman, confirming the officer's list, or withholding the senator's name until the purge passes",
+      "cost": "the truth you kept becomes a price, and the family may survive with the bathhouse sealed, the daughter's post lost, or the dignity broken"
+    },
+    "levers": [
+      "the bathhouse ledger scroll",
+      "the rival freedman's competing list",
+      "the Praetorian officer's seal on the bathhouse door",
+      "your daughter's chancery post",
+      "the senator's half-naked testimony",
+      "the caldarium's private steam room"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "The news of the old emperor's death reaches the caldarium; the steam stops, the senators freeze half-naked, and the Praetorian officer enters the apodyterium for the ledger.",
+      "what_you_must_do": "find out what the officer means by the ledger before you give him a name",
+      "ways_through": [
+        {
+          "way": "you learn it from the officer's seal, because you make him press his seal onto a wax tablet and show you the first name he expects",
+          "cost": "the tablet names the tired senator, and every man in the apodyterium hears his name"
+        },
+        {
+          "way": "you learn it from the rival freedman, because you let him hear the stopped steam and ask what his ledger wants",
+          "cost": "he takes the service corridor key for the night and tells the officer you were listening in the caldarium"
+        }
+      ],
+      "involves": [
+        "the Praetorian officer",
+        "the tired senator",
+        "the rival freedman"
+      ],
+      "form": "discover",
+      "set_piece": "the steam dying in the caldarium, the senators frozen half-naked, the officer asking for the ledger in the apodyterium",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "id": 2,
+      "situation": "A senator is dragged from the apodyterium by the Praetorian Guard, still dripping, while you watch from the service corridor; the rival freedman's ledger names a different senator, and the officer offers to spare your daughter if you confirm his list.",
+      "what_you_must_do": "get the officer to take a ledger instead of the senator's confession",
+      "ways_through": [
+        {
+          "way": "the officer takes the bathhouse ledger scroll, because you give him the tired senator's name in your own hand",
+          "cost": "the senator is taken to the guard's cell and your daughter's name is written on the scroll as the source"
+        },
+        {
+          "way": "the officer takes the rival freedman's list, because you let him tear your scroll and read the rival's name aloud",
+          "cost": "the rival keeps your oil contract for the winter and the different senator's household is broken"
+        },
+        {
+          "way": "the officer lets the senator stand, because you make him seal your daughter's chancery post before he takes any list",
+          "cost": "the seal is on the bathhouse door and the senator is held in the apodyterium until the advisor comes"
+        }
+      ],
+      "involves": [
+        "the Praetorian officer",
+        "the rival freedman",
+        "the tired senator",
+        "your daughter"
+      ],
+      "form": "trade",
+      "set_piece": "a senator dragged out of the baths by the Praetorian Guard, still half-naked and dripping, while you watch from the service corridor",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "The new emperor's advisor summons you to a cold stone room with the scroll of names, and at home the family dinner goes quiet because your daughter has copied the purge list and the officer's seal is on the bathhouse door.",
+      "what_you_must_do": "get the daughter's copied purge list back before the advisor sees it",
+      "ways_through": [
+        {
+          "way": "the list comes back because you send the tired senator's steward to the chancery with a bathhouse oil jar and ask for the scroll in the oil",
+          "cost": "the senator's household loses a senator's favor and your daughter's hand is burned by the wax"
+        },
+        {
+          "way": "the list comes back because you let the officer's seal stay on the door and give the advisor the bathhouse ledger scroll",
+          "cost": "the bathhouse is sealed and your daughter's post is lost"
+        },
+        {
+          "way": "the list comes back because your daughter hands it to you at the door of the cold stone room",
+          "cost": "she names the tired senator first and the advisor hears it"
+        }
+      ],
+      "involves": [
+        "the new emperor's advisor",
+        "your daughter",
+        "the Praetorian officer",
+        "the tired senator"
+      ],
+      "form": "rescue",
+      "set_piece": "the family dinner in silence, the officer's seal on the door, the daughter's copied list under the grain",
+      "serves": "3b.secondary_affects"
+    },
+    {
+      "id": 4,
+      "situation": "The advisor has the scroll and the officer has the seal; the new emperor's men wait in the cold stone room for the name that will break the conspiracy in the district.",
+      "what_you_must_do": "set the last name on the scroll before the advisor seals it",
+      "ways_through": [
+        {
+          "way": "the scroll names the tired senator, because you write his name in the advisor's presence and give him the caldarium's testimony",
+          "cost": "the officer breaks the senator's household and your daughter is marked as the source of the list"
+        },
+        {
+          "way": "the scroll names the rival freedman, because you hand the advisor the rival's list and the officer's seal",
+          "cost": "the rival is arrested and the bathhouse keeps its door but your daughter's post is gone"
+        },
+        {
+          "way": "the scroll is blank at the bottom, because you give the advisor your own hand and let him choose",
+          "cost": "the advisor chooses the officer's list and the bathhouse is sealed"
+        }
+      ],
+      "involves": [
+        "the new emperor's advisor",
+        "the Praetorian officer",
+        "your daughter",
+        "the tired senator",
+        "the rival freedman"
+      ],
+      "form": "confront",
+      "set_piece": "the cold stone room, the scroll of names in your hand, the advisor's seal waiting",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The tired senator has been telling the Praetorian officer what he heard in the caldarium, because his household needs the officer's seal to keep his wife from the purge.",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "description": "The daughter's copied purge list carries the officer's seal, so it is no longer a copy but the officer's own draft handed through her hand.",
+      "serves": "3g.state_richness"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the Praetorian officer",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to identify the true conspirators to secure his own promotion and safety",
+      "holds": "the authority to arrest, the seal on the bathhouse door, and a list of names to confirm",
+      "edge": "he needs a real conspiracy to exist so his job matters, and he is willing to sacrifice the innocent to prove he found the truth",
+      "tie": "he has come to your bathhouse at each succession and offers a price for your silence",
+      "voice": "speaks in flat, procedural facts that carry the weight of a verdict: 'The water is cold. The list is short. Choose.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Aulus Domitius Rufus"
+    },
+    {
+      "role": "the tired senator",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to survive the purge by being forgotten",
+      "holds": "the specific, damning words he spoke in the caldarium that you overheard",
+      "edge": "he is so exhausted by the politics that he would rather be dead than wrong, yet he clings to life because he has nowhere else to go",
+      "tie": "he is the man who said the wrong thing in the caldarium and whose fate hangs on your memory",
+      "voice": "mumbles apologies to the steam and the stones, as if they are the only ones who can hear him: 'I was only thirsty. I was only thirsty when I said it.'",
+      "breaking_point": null,
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Marcus Tullius Gallus"
+    },
+    {
+      "role": "the rival freedman",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to own the district's secrets and sell them to the highest bidder",
+      "holds": "a competing ledger of names that contradicts yours",
+      "edge": "he listens as carefully as you do, but he trusts the coin more than the word, and he will sell your silence before he sells his own",
+      "tie": "he is the owner of the bathhouse across the street who also listens and sells what he hears",
+      "voice": "laughs too loudly to cover the fact that he is counting his profit: 'A name is just a price tag, isn't it? Let's see what it's worth.'",
+      "breaking_point": null,
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        4
+      ],
+      "name": "Titus Marius Sulla"
+    },
+    {
+      "role": "your daughter",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "f",
+      "wants": "to keep her post in the chancery and stay out of the purge",
+      "holds": "the copy of the purge list she has already made in the imperial archive",
+      "edge": "she is competent and cold in her work, but she loves you enough to lie to you about what she has copied",
+      "tie": "she is the scribe in the imperial chancery who copies the purge lists and is your only family",
+      "voice": "uses the precise, dry language of the office to describe personal feelings: 'The ink is dry. The name is there. It cannot be unsaid.'",
+      "breaking_point": "turns against you if you make her choose between her career and your life without asking her first",
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        3,
+        4
+      ],
+      "name": "Tullia Paulla"
+    },
+    {
+      "role": "the new emperor's advisor",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to stabilize the new regime by identifying the ringleaders quickly",
+      "holds": "the final decision on which names are executed and which are spared",
+      "edge": "he is detached from the human cost, viewing the purge as a necessary surgery to save the body of the state",
+      "tie": "he holds the power that determines whether the officer's list or your testimony is accepted",
+      "voice": "speaks in calm, abstract terms about the health of the state: 'We do not need enemies. We need order. Order requires a few names.'",
+      "breaking_point": null,
+      "opposition": false,
+      "matters_to_turns": [
+        3,
+        4
+      ],
+      "name": "Servius Aemilius Verus"
+    }
+  ],
+  "name_pool": "ancient_roman"
+}
