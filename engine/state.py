@@ -56,7 +56,14 @@ class GameState:
     # ------------------------------------------------------------ saves
 
     def clone(self):
-        return copy.deepcopy(self)
+        c = GameState.__new__(GameState)
+        c.__dict__.update(self.__dict__)
+        for key in ('flags', 'stats', 'locations', 'placements'):
+            setattr(c, key, dict(getattr(self, key)))
+        for key in ('visited', 'used', 'fired'):
+            setattr(c, key, set(getattr(self, key)))
+        c.arcs = {k: dict(v) for k, v in self.arcs.items()}
+        return c
 
     def to_dict(self):
         return {'scene': self.scene, 'room': self.room, 'ending': self.ending, 'flags': dict(self.flags),

@@ -352,6 +352,29 @@ a handful of moments). Python assembles the package, validates every
 condition and id, composes ending variants, and runs the playtest
 simulator on the result.
 
+**The playtest is the check, in the loop** (as the computed checks are for
+the outline). `engine/story.validate` and `engine/playtest.py` run on every
+scene D returns, assembled with what is built so far; their findings are
+the repair list a separate repair call receives, returning only what it
+changed. What they catch that a reader of the JSON would not:
+- **stuck states**: some sequence of actions leaves no way to any ending;
+- **missed opportunities**: an arc-moving choice offered to under half of
+  curious simulated players. The rule this enforces: **a scene's way
+  forward must not bypass its opportunities.** The demo's first draft had
+  "Untie the line" open from turn one, and 65% of players left the scene
+  without ever being offered Lazlo's ledger choice. The fix is narrative
+  gating (your first try at the line brings Lazlo up the steps with the
+  ledger, and the line comes free once you have answered him), with a
+  neutral answer so the choice is offered, never forced one way.
+  Discoveries a player may miss by design are marked `optional`;
+- **pattern shifts random play triggers** (over 15% of random plays) or
+  that no consistent style can reach;
+- content nothing ever offers (interactions, topics, events, nudges, scene
+  exits, ending resolutions), and people named before anyone introduced
+  them.
+The walkthroughs (the shortest route to each ending and resolution
+combination) go into the run's report for a human to read.
+
 Carry over from `generator/later/node_build.py` where it fits: the state
 registry, `mechanical_checks` (reachability, reads before writes, menu
 options that are moral labels rather than acts), node repair from a finding
@@ -373,6 +396,8 @@ the tone line and the cast's voices. Not designed further yet.
    model and the menu builder; hand-write a tiny package (two scenes of
    kernel35) and play it in a terminal.~~ Done 2026-10-04 (engine_design.md
    §11; `python engine/cli.py engine/examples/kernel35_demo.json`).
-2. The playtest simulator on the engine format.
+2. ~~The playtest simulator on the engine format.~~ Done 2026-10-04
+   (`python engine/playtest.py <package> --walkthroughs`; see §5 for how
+   stage D uses it).
 3. Stage A (A0-A2) on one kernel, then B, C, D, checked against the
    hand-written package.

@@ -27,6 +27,7 @@ from runtime import Engine, EngineError, SaveMismatch, leaves   # noqa: E402
 from state import GameState                             # noqa: E402
 from story import Story, validate                       # noqa: E402
 import cli                                              # noqa: E402
+import playtest                                         # noqa: E402
 
 TESTS = []
 
@@ -97,7 +98,7 @@ def expressions_evaluate_and_refuse():
 def demo_package_validates():
     errors, notes = validate(Story(demo_data()))
     check(not errors, f'demo has errors: {errors}')
-    check(any("'untie'" in n for n in notes), f'one-use story verb not noted: {notes}')
+    check(any("'open'" in n for n in notes), f'one-use story verb not noted: {notes}')
     check(not any('introduced' in n for n in notes), f'demo names someone unintroduced: {notes}')
 
 
@@ -182,10 +183,11 @@ def scene_one_forward_path_is_always_open():
         for _ in range(30):
             if eng.state.scene != 'S01':
                 break
-            options = [o for o in ids(eng) if o != 'S01.cast_off']
-            check(eng.state.room != 'stern_deck' or 'S01.cast_off' in ids(eng),
-                  'cast off missing on the stern deck')
-            eng.act(rng.choice(options))
+            untie = {'S01.try_untie', 'S01.untie_blocked', 'S01.cast_off'}
+            check(eng.state.room != 'stern_deck' or untie & set(ids(eng)), 'no way to work the line on the stern deck')
+            check(not eng.state.flags.get('answered_ledger') or eng.state.room != 'stern_deck'
+                  or 'S01.cast_off' in ids(eng), 'ledger answered but cast off missing')
+            eng.act(rng.choice([o for o in ids(eng) if o != 'S01.cast_off']))
 
 
 # ---------------------------------------------------------------- play
@@ -202,7 +204,7 @@ def demo_plays_to_endings_shaped_by_state():
     check('almost, on your shoulder' in text and "nerve: holding" in text, f'warm resolutions missing: {text}')
     cold = Engine(Story(demo_data()))
     cold.start(seed=1)
-    view = play(cold, ['go:cabin', 'talk:lazlo:the_ledger', 'S01.mock_fear', 'go:stern_deck', 'S01.cast_off'])
+    view = play(cold, ['S01.try_untie', 'S01.untie_blocked', 'S01.mock_fear', 'S01.cast_off'])
     check(view['scene'] == 'S02' and 'shouting the price of diesel at you' in view['room']['text'],
           f"the tell did not follow lazlo_nerve: {view['room']}")
     view = play(cold, ['go:bow', 'take:bow_line', 'S02.jump'])
@@ -305,14 +307,96 @@ def history_records_and_rewinds_to_any_point():
         check(other.history == eng.history, 'history did not survive a save')
 
 
+# ---------------------------------------------------------------- playtest
+
+def shift_package(at_least, share):
+    """One scene, three choices that each move `s` up or down, and a pattern
+    shift to ending SHIFT; otherwise ending PLAIN once all three are made."""
+    inter = []
+    for k in range(3):
+        for d in ('up', 'down'):
+            inter.append({'id': f'c{k}{d}', 'verb': 'talk', 'object': 'ann', 'detail': f'q{k}{d}',
+                          'detail_label': f'answer {k} {d}', 'when': f'not flags.done{k}', 'once': True,
+                          'text': f'You answer {d}.', 'effects': [{'set': f'done{k}'}, {'move': 's', 'dir': d}]})
+    return {
+        'format': 'stratum-story/1', 'story_id': 'shift', 'title': 'shift',
+        'states': {'s': {'meaning': 'test'}},
+        'world': {'rooms': {'hall': {'name': 'the hall', 'description': [{'text': 'A hall.'}]}},
+                  'objects': {}, 'characters': {'ann': {'name': 'Ann', 'description': [{'text': 'Ann.'}],
+                                                         'topics': {}}}},
+        'scenes': {'S1': {'rooms': ['hall'], 'cast': {'ann': 'hall'}, 'interactions': inter,
+                          'exits': [{'to': 'SHIFT', 'when': f"pattern('s','up',{at_least},{share})"},
+                                    {'to': 'PLAIN', 'when': 'flags.done0 and flags.done1 and flags.done2'}]}},
+        'start': {'scene': 'S1', 'room': 'hall'},
+        'endings': {'SHIFT': {'text': [{'text': 'Shifted.'}]}, 'PLAIN': {'text': [{'text': 'Plain.'}]}},
+    }
+
+
+@test
+def playtest_explores_the_demo():
+    story = Story(demo_data())
+    result = playtest.explore(story)
+    errors, notes = playtest.explore_findings(story, result)
+    check(not errors and not result['truncated'], f'demo exploration: {errors}')
+    check(set(result['endings']) == {'END_DEMO'} and len(result['endings']['END_DEMO']) >= 10,
+          f"resolution combinations: {result['endings']}")
+    i = next(iter(result['endings']['END_DEMO'].values()))
+    check(playtest.path_to(result, i), 'no walkthrough')
+    curious = playtest.play(story, 'up', runs=40)
+    check(curious['opportunities_seen']['S01.price_fear'] == 1.0, f"the gated choice is missable: {curious['opportunities_seen']}")
+
+
+@test
+def playtest_finds_stuck_states_and_missed_choices():
+    data = demo_data()
+    # the jump uses up the bow line without ending the scene, and the other answers close
+    s2 = data['scenes']['S02']['interactions']
+    jump = next(i for i in s2 if i['id'] == 'S02.jump')
+    jump['effects'] = [{'take': 'bow_line'}, {'set': 'jumped'}]
+    for it in s2:
+        if it['id'] != 'S02.jump':
+            it['when'] = 'not flags.reported and not flags.jumped'
+    story = Story(data)
+    errors, _ = playtest.explore_findings(story, playtest.explore(story))
+    check(any(e.startswith('STUCK') and 'S02' in e and 'jump for it' in e for e in errors), f'stuck state missed: {errors}')
+    # an ungated way forward makes the ledger choice missable
+    data = demo_data()
+    s1 = data['scenes']['S01']['interactions']
+    next(i for i in s1 if i['id'] == 'S01.cast_off')['when'] = 'true'
+    for it in s1:
+        if it['id'] in ('S01.try_untie', 'S01.untie_blocked'):
+            it['when'] = 'false'
+    story = Story(data)
+    plays = [playtest.play(story, 'up', runs=60)]
+    _, notes = playtest.play_findings(story, plays)
+    check(any('S01.price_fear' in n and 'curious plays' in n for n in notes), f'missable choice not noted: {notes}')
+    check(not any('the_logbook' in n for n in notes), 'an optional discovery was noted')
+
+
+@test
+def playtest_measures_pattern_shifts():
+    loose = Story(shift_package(1, 0.5))       # one 'up' answer is enough: random play shifts often
+    plays = [playtest.play(loose, s, runs=200) for s in ('random', 's:up')]
+    errors, _ = playtest.play_findings(loose, plays)
+    check(any('pattern shift S1 -> SHIFT' in e and 'not clear enough' in e for e in errors), f'loose shift passed: {errors}')
+    strict = Story(shift_package(3, 0.75))     # all three up: 1 in 8 random plays
+    plays = [playtest.play(strict, s, runs=400) for s in ('random', 's:up', 's:down')]
+    errors, notes = playtest.play_findings(strict, plays)
+    rate = plays[0]['shift_rates'][('S1', 'SHIFT')]
+    check(not errors and 0.05 < rate < 0.2, f'strict shift: rate {rate}, {errors}')
+    check(plays[1]['shift_rates'][('S1', 'SHIFT')] == 1.0 and plays[2]['shift_rates'][('S1', 'SHIFT')] == 0.0,
+          f"styles: {[p['shift_rates'] for p in plays]}")
+
+
 @test
 def terminal_player_runs_a_script():
     out = io.StringIO()
     eng = Engine(Story(demo_data()))
-    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Untie (-> 1 the stern line), 5 Wait; then in S02 quit
+    # stern deck root: 1 Look, 2 Examine, 3 Go, 4 Untie (-> 1 the stern line), 5 Wait
     cli.play(eng, ['4', '1', 'q'], out=out)
     text = out.getvalue()
-    check('pistol' in text and eng.state.scene == 'S02', f'scripted play failed:\n{text}')
+    check('Before you do' in text and eng.state.placements['lazlo'] == 'stern_deck',
+          f'scripted play failed:\n{text}')
     out = io.StringIO()
     cli.play(Engine(Story(demo_data())), ['3', 'b', 'x', 'r', 'q'], out=out)
     check('pick a number' in out.getvalue() and 'nothing to rewind' in out.getvalue(), out.getvalue())

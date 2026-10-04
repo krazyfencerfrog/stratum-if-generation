@@ -55,8 +55,7 @@ def parse(text):
 
 def evaluate(text, state):
     """True or false (or a number, for arithmetic) for `text` in `state`."""
-    rng = random.Random(f'{state.seed}|{text}')
-    return _eval(parse(text), state, rng, text)
+    return _eval(parse(text), state, None, text)
 
 
 def _eval(node, state, rng, text):
@@ -132,10 +131,9 @@ def _call(name, args, state, rng, text):
             return state.scene == args[0]
         if name == 'visited':
             return args[0] in state.visited
-        if name == 'd':
-            return rng.randint(1, int(args[0]))
-        if name == 'chance':
-            return rng.random() < float(args[0])
+        if name in ('d', 'chance'):
+            rng = random.Random(f'{state.seed}|{text}')     # made only when asked: most conditions roll nothing
+            return rng.randint(1, int(args[0])) if name == 'd' else rng.random() < float(args[0])
     except (TypeError, ValueError) as e:
         raise ExpressionError(f'bad arguments to {name}() in {text!r}: {e}')
     raise ExpressionError(f'unknown function {name!r} in {text!r}')

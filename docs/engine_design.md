@@ -405,6 +405,17 @@ for reference.
   the menu keeps one shape (verb, then object) and a lone option never
   jumps to the root and points at the solution; `all` merges every single
   option ("Untie › the stern line").
+- **Things a character holds** are visible (examinable, readable) while
+  they are in the room; only things in the room can be taken.
+- **Playtest** (`engine/playtest.py`): an exhaustive search over normalized
+  states (turn counters capped at the largest threshold any condition
+  compares them with; fixed seed) for reachability, stuck states and content
+  that never happens, plus simulated players (random; `up`/`down`/
+  `<state>:dir` styles that are also curious, preferring options they have
+  not tried) for endings, resolution combinations, missed opportunities and
+  pattern-shift rates. An interaction or topic may be marked `optional`
+  (a discovery the player may miss by design). The demo: 14,639 states,
+  about 2 s.
 - **Introductions:** the validator notes event or nudge text naming a
   character whom neither the intro nor a scene opening (this scene or an
   earlier one) has introduced; events fire wherever the player is, so an

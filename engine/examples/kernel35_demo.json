@@ -326,7 +326,8 @@
                 "move": "captain_regard",
                 "dir": "up"
               }
-            ]
+            ],
+            "optional": true
           },
           "mira": {
             "label": "Mira",
@@ -354,6 +355,10 @@
           }
         ],
         "here": [
+          {
+            "text": "Lazlo stands by the cleat with his ledger open, like a toll-keeper between you and the rope.",
+            "when": "in_scene('S01') and at('stern_deck')"
+          },
           {
             "text": "Lazlo Brandt sits at the table with his ledger, adding up what the boat owes him.",
             "when": "in_scene('S01')"
@@ -525,6 +530,50 @@
           ]
         },
         {
+          "id": "S01.put_off",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "later",
+          "detail_label": "'Later. Let's get her moving first.'",
+          "when": "flags.saw_ledger and not flags.answered_ledger",
+          "once": true,
+          "text": "He looks at you for a long moment, then writes today's date beside the nuisance line and closes the book. 'Later,' he agrees, in the voice of a man adding interest.",
+          "effects": [
+            {
+              "set": "answered_ledger"
+            }
+          ]
+        },
+        {
+          "id": "S01.try_untie",
+          "verb": "untie",
+          "object": "stern_line",
+          "room": "stern_deck",
+          "when": "not flags.lazlo_stopped and not flags.answered_ledger",
+          "once": true,
+          "text": "You crouch at the cleat, and before you have the first turn of the knot loose, Lazlo comes up the cabin steps with his ledger open. 'Before you do anything expensive,' he says, and holds the book out to you.",
+          "effects": [
+            {
+              "set": "lazlo_stopped"
+            },
+            {
+              "set": "saw_ledger"
+            },
+            {
+              "place": "lazlo",
+              "to": "stern_deck"
+            }
+          ]
+        },
+        {
+          "id": "S01.untie_blocked",
+          "verb": "untie",
+          "object": "stern_line",
+          "room": "stern_deck",
+          "when": "flags.lazlo_stopped and not flags.answered_ledger",
+          "text": "Lazlo puts his good shoe on the cleat. 'Ledger first,' he says. 'Then the rope.'"
+        },
+        {
           "id": "S01.cast_off",
           "verb": "untie",
           "object": "stern_line",
@@ -534,7 +583,8 @@
             {
               "set": "cast_off"
             }
-          ]
+          ],
+          "when": "flags.answered_ledger"
         }
       ],
       "events": [

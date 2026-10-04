@@ -82,12 +82,14 @@ class Engine:
         return [c for c, r in self.state.placements.items() if r == self.state.room]
 
     def visible_objects(self):
-        """Objects in the player's room or carried, whose `when` (if any) holds."""
+        """Objects in the player's room, carried, or held by someone here,
+        whose `when` (if any) holds."""
         st = self.state
         out = []
+        holders = set(self.present())
         for oid, obj in self.story.objects.items():
             loc = st.locations.get(oid)
-            if loc in (st.room, 'player') and evaluate(obj.get('when', 'true'), st):
+            if (loc in (st.room, 'player') or loc in holders) and evaluate(obj.get('when', 'true'), st):
                 out.append(oid)
         return out
 
@@ -201,7 +203,21 @@ class Engine:
         if opt['verb'] in FREE:
             self.queue.append(self._free_text(opt))
             return self.view(show_room=opt['verb'] == 'look')
-        st.new_seed()
+        moved_room, scene_before = self.perform(opt)
+        self.timeline.append(st.clone())
+        view = self.view(show_room=moved_room or st.scene != scene_before)
+        text = view['text'] or ([f"You are in {view['room']['name']}."] if view.get('room') else [])
+        self.history.append({'label': self.label_of(opt), 'text': text, 'turn': st.turns})
+        return view
+
+    def perform(self, opt, reseed=True):
+        """Carry out one (non-free) option from options(): text queued,
+        effects, turns, events, nudges, scene exits. No snapshot and no view,
+        so the playtest simulator can step through states cheaply. Returns
+        (moved_room, scene_before)."""
+        st, s = self.state, self.story
+        if reseed:
+            st.new_seed()
         before = _signature(st)
         moved_room = False
         src = opt['source']
@@ -240,11 +256,7 @@ class Engine:
         st.turns_in_scene += 1
         scene_before = st.scene
         self._settle(progress_since=before)
-        self.timeline.append(st.clone())
-        view = self.view(show_room=moved_room or st.scene != scene_before)
-        text = view['text'] or ([f"You are in {view['room']['name']}."] if view.get('room') else [])
-        self.history.append({'label': self.label_of(opt), 'text': text, 'turn': st.turns})
-        return view
+        return moved_room, scene_before
 
     def label_of(self, opt):
         """An option as the menu path that names it: 'Talk › Lazlo Brandt › about the ledger'."""
