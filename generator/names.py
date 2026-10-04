@@ -223,16 +223,72 @@ def compose(pool, gender, rng):
     return f'{given} {surname}'.strip(), [given] + ([surname.split()[-1]] if surname else [])
 
 
+def home_culture(pool_name, story_id, texts=()):
+    """For a pool with cultures (modern): the story's home culture. A setting
+    cue in the texts decides it (a canal boat or a pub is British, Lagos is
+    Nigerian); with none, the pool's default home half the time, else one
+    chosen by the story id. None for a pool without cultures."""
+    pool = POOLS.get(pool_name) or {}
+    cultures = pool.get('cultures')
+    if not cultures:
+        return None
+    text = ' '.join(str(t) for t in texts).lower()
+    scores = {name: sum(len(re.findall(r'\b' + re.escape(cue) + r'\b', text)) for cue in c.get('cues') or [])
+              for name, c in cultures.items()}
+    best = max(scores, key=lambda k: (scores[k], k == pool.get('default_home')))
+    if scores[best]:
+        return best
+    rng = random.Random(f'{story_id}|home')
+    if pool.get('default_home') in cultures and rng.random() < pool.get('default_home_share', 0.5):
+        return pool['default_home']
+    return rng.choice(sorted(cultures))
+
+
+def with_culture(pool_name, story_id, texts=()):
+    """The pool name with the story's home culture attached, where the pool
+    has cultures: 'modern' -> 'modern:british'."""
+    culture = home_culture(pool_name, story_id, texts)
+    return f'{pool_name}:{culture}' if culture else pool_name
+
+
+def split_pool(pool_name):
+    """'modern:british' -> ('modern', 'british'); 'fantasy' -> ('fantasy', None)."""
+    name, _, culture = (pool_name or '').partition(':')
+    return name, culture or None
+
+
+def culture_pool(pool, home, rng):
+    """For a pool with cultures: the sub-pool one person's names come from.
+    Most of the cast is from the home culture; a person's given name and
+    surname come from one culture, except for an occasional mixed family."""
+    cultures = pool['cultures']
+    names = sorted(cultures)
+    home = home if home in cultures else rng.choice(names)
+    culture = home if rng.random() < pool.get('home_share', 0.7) else rng.choice(names)
+    # the shared unisex names (Sam, Jules, Quinn) are anglophone; elsewhere a
+    # person of no stated gender takes any of the culture's own names
+    unisex = pool.get('n') or [] if culture in pool.get('unisex_cultures', ()) else []
+    sub = dict(cultures[culture], style=pool.get('style', 'given_surname'), n=unisex)
+    if rng.random() < pool.get('mixed_share', 0.1):
+        sub['surnames'] = cultures[rng.choice(names)]['surnames']
+    return sub
+
+
 def pick(story_id, role, pool_name, gender, taken):
     """One name not yet taken in this story, drawn deterministically from the
     story id and the role, in the style of the pool (or of the character's
-    own people, when the role names one)."""
-    pool = POOLS.get(race_pool(role) or pool_name) or POOLS['modern']
+    own people, when the role names one). A pool name may carry the story's
+    home culture ('modern:british'); without one, it is chosen by story id."""
+    pool_name, home = split_pool(pool_name)
+    own = race_pool(role)
+    pool = POOLS.get(own or pool_name) or POOLS['modern']
     rng = random.Random(f'{story_id}|{role.lower()}')
+    if pool.get('cultures'):
+        home = home or home_culture(own or pool_name, story_id)
     used = {part.lower() for name in taken for part in name.split()}
     name = None
     for _ in range(200):
-        name, unique = compose(pool, gender, rng)
+        name, unique = compose(culture_pool(pool, home, rng) if pool.get('cultures') else pool, gender, rng)
         if not any(u.lower() in used for u in unique) and name not in taken:
             return name
     return name
@@ -257,6 +313,8 @@ def assign_names(seeds, story_id, texts, pool_name=None, reserved=()):
     and for pronoun hints. reserved: names already given (the protagonist's)
     that no seed may share a part of. Returns the pool used."""
     pool_name = pool_name or pool_for(*texts)
+    if ':' not in pool_name and POOLS.get(pool_name, {}).get('cultures'):
+        pool_name = f'{pool_name}:{home_culture(pool_name, story_id, texts)}'
     taken = [n for n in reserved if n] + [s['name'] for s in seeds if isinstance(s, dict) and s.get('name')]
     for s in seeds:
         if wants_a_name(s) and not s.get('name'):

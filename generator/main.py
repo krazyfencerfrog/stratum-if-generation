@@ -958,7 +958,7 @@ class StoryGenerator:
         model: the role stays the key, the name rides along. Keeps any name a
         seed already has, so a repair that adds a seed names only that one."""
         texts = [self.kernel or ''] + names.premise_texts(premise)
-        pool = premise.get('name_pool') or names.pool_for(*texts)
+        pool = premise.get('name_pool') or names.with_culture(names.pool_for(*texts), self.story_id, texts)
         identity = ((self.analysis.get('s3_brief') or {}).get('fields') or {}).get('3-0b.protagonist_identity') or {}
         human = str(identity.get('type') or 'human').lower() == 'human'
         you = names.name_protagonist(premise.get('protagonist'), self.story_id, pool, human)

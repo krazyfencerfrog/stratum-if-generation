@@ -781,6 +781,26 @@ def name_pools_styles_and_races():
 
 
 @test
+def modern_names_keep_a_culture():
+    import names
+    check(names.with_culture('modern', 'x', ['a wedding planner in Lagos']) == 'modern:west_african', 'Lagos cue ignored')
+    check(names.with_culture('modern', 'x', ['a decrepit canal boat']) == 'modern:british', 'canal cue ignored')
+    check(names.with_culture('fantasy', 'x', ['a dragon']) == 'fantasy', 'a pool without cultures got one')
+    cultures = names.POOLS['modern']['cultures']
+    home_hits = coherent = total = 0
+    for k in range(40):
+        cast = [{'role': f'the witness number {i}', 'kind': 'individual', 'gender': 'fm'[i % 2]} for i in range(6)]
+        names.assign_names(cast, f'story{k}', ['a wedding planner in Lagos'], 'modern:west_african')
+        for c in cast:
+            given, surname = c['name'].split()[0], c['name'].split()[-1]
+            total += 1
+            home_hits += given in cultures['west_african']['f'] + cultures['west_african']['m']
+            coherent += any(given in v['f'] + v['m'] and surname in v['surnames'] for v in cultures.values())
+    check(home_hits / total > 0.7, f'home culture share {home_hits / total:.2f}')
+    check(coherent / total > 0.85, f'given name and surname from one culture in only {coherent / total:.2f}')
+
+
+@test
 def protagonist_is_named_first():
     import names
     you = {'who': 'You inherited a canal boat.', 'gender': 'm'}
