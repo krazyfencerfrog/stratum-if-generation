@@ -178,9 +178,41 @@ OUTLINE_JUDGE = obj(
     would_play=B,
 )
 
+# ---------------------------------------------------------------- stage A (arcs.py)
+
+ARC_CAST = obj(cast=arr(obj(who=S, note=S, tier=enum(['supporting', 'functional']))))
+
+UP_DOWN = enum(['up', 'down'])
+UP_DOWN_OR_NULL = {'type': ['string', 'null'], 'enum': ['up', 'down', None]}
+MOMENT = obj(node=S, kind=enum(['turn', 'reveal', 'test', 'demonstration']), change=S)
+ARC = obj(
+    who=S,
+    state=obj(name=S, meaning=S, up_when=S, down_when=S),
+    starts=S,
+    moments=arr(MOMENT),
+    resolutions=arr(obj(lines=arr(S), direction=UP_DOWN_OR_NULL, stands_with_you=B, becomes=S)),
+)
+ARC_PLAN = obj(
+    visibility_note=S,
+    state_visibility=enum(['signposted', 'observed', 'hidden']),
+    arcs=arr(ARC),
+    light_arcs=arr(obj(who=S, starts=S, moments=arr(obj(node=S, change=S)), ends=S)),
+    protagonist={'type': 'object', 'additionalProperties': obj(arc=S)},
+    setups=arr(obj(setup=S, payoff=S, what=S)),
+    pattern_shifts=arr(obj(required=['state', 'direction', 'at', 'does', 'why'], state=S, direction=UP_DOWN, at=S,
+                           does=enum(['resolution', 'ending', 'line']), to=S, why=S)),
+)
+OPTION = obj(do=S, effect=S, moves=arr(obj(state=S, direction=UP_DOWN)), active=B)
+MINOR_NODE = obj(
+    required=['after', 'kind', 'serves', 'title', 'summary', 'image', 'who'],
+    after=S, kind=enum(['opportunity', 'revelation', 'demonstration', 'resolution']), serves=arr(S),
+    title=S, summary=S, image=S, who=arr(S), options=arr(OPTION), tell=obj(at=S, how=S), warns=S,
+)
+LINE_EXPANSION = obj(notes=S, minor_nodes=arr(MINOR_NODE))
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
     'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
-    'OUTLINE_JUDGE': OUTLINE_JUDGE,
+    'OUTLINE_JUDGE': OUTLINE_JUDGE, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
 }

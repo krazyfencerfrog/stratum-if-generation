@@ -452,6 +452,54 @@ def stale_directories_fail_loudly():
 
 
 @test
+def stage_a_expands_arcs():
+    import arcs
+    # the threshold math: "3 of 4, three quarters" is met by random play 31% of the time (the design note)
+    check(abs(arcs.random_pattern_rate([(0.5, 0.5)] * 4, 3, 0.75) - 0.3125) < 1e-9, 'random pattern rate is off')
+    th = arcs.shift_threshold([(0.5, 0.5)] * 4)
+    check(th and th['random_rate'] < arcs.RANDOM_SHIFT_LIMIT and th['at_least'] >= 3, f'threshold: {th}')
+    check(arcs.shift_threshold([(0.5, 0.5)] * 2) is None, 'two opportunities produced a pattern shift')
+    seq = ['N01', 'N01a', 'N01b', 'N01c', 'N02']
+    check(arcs.tell_in_reach(seq, 1, 4, lambda t: t.startswith('N') and len(t) == 3), 'the next major node is in reach')
+    check(not arcs.tell_in_reach(seq, 1, 1, lambda t: True), 'a tell on its own node is in reach')
+
+    run('stagea', args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})
+    result = load('stagea', 'arcs.json')
+    tiers = {t['tier'] for t in result['tiers'].values()}
+    check(tiers == {'arc', 'supporting', 'functional'}, f'tiers: {result["tiers"]}')
+    check(result['plan'].get('light_arcs'), 'the supporting character got no light arc')
+    check(result['checks'] == [] and result['playtest']['findings'] == [],
+          f"stage A findings: {result['checks'] + result['playtest']['findings']}")
+    minors = result['minor_nodes']
+    check(minors and all(m['id'][-1].isalpha() and m['id'][:-1] in load('stagea', 'story.json')['nodes']
+                         for m in minors.values()), f'minor node ids: {list(minors)}')
+    opps = [m for m in minors.values() if m['kind'] == 'opportunity']
+    check(opps and all(m.get('tell', {}).get('at') for m in opps), 'an opportunity has no tell')
+    check(all(2 <= len(m['options']) <= 3 for m in opps), 'an opportunity without two or three options')
+    states = set(result['states'])
+    check(all(mv['state'] in states for m in opps for o in m['options'] for mv in o['moves']), 'a move names an undeclared state')
+    graph = result['graph']
+    for l, line in graph['lines'].items():
+        check(line['path'][0] in graph['nodes'] and all(n in graph['nodes'] for n in line['path']), f'{l}: path broken')
+    check(any(len(e['groups']) for e in result['endings'].values()), 'no ending variants were composed')
+    check(load('stagea', 'arcs.md').startswith('# '), 'no markdown report')
+    n = len(calls('stagea'))
+    run('stagea', fresh=False, args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})
+    check(len(calls('stagea')) == n, 'a second run of stage A made model calls')
+
+    # a pattern shift: its condition is computed, and random play rarely meets it
+    run('stageshift', args=['--stage-a'], env={'STUB_SHIFT': '1'})
+    shifts = load('stageshift', 'arcs.json')['pattern_shifts']
+    check(len(shifts) == 1 and shifts[0].get('when', '').startswith('pattern('), f'shift: {shifts}')
+    check(shifts[0]['threshold']['random_rate'] < arcs.RANDOM_SHIFT_LIMIT, f"shift threshold: {shifts[0]['threshold']}")
+    # missing tells are re-asked with the complaint
+    run('stagetells', args=['--stage-a', '--max-iterations=1'], env={'STUB_NO_TELLS': '1'})
+    rejected = [f for f in os.listdir(story_dir('stagetells')) if 's5a2' in f and 'rejected' in f]
+    check(rejected, 'opportunities without tells were accepted without a retry')
+    check(load('stagetells', 'arcs.json')['checks'] == [], 'the retry did not fix the tells')
+
+
+@test
 def every_prompt_is_exercised():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt'))}
     unused = have - used_prompts

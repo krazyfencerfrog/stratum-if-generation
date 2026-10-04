@@ -48,6 +48,7 @@ import schemas
 from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
 import evaluate
+import arcs
 import example_guard
 import names
 
@@ -1444,6 +1445,32 @@ class StoryGenerator:
         return result
 
 
+    # ------------------------------------------------------------------ stage A: arcs and node expansion
+
+    def run_arcs(self, story=None):
+        """Stage A (generator/arcs.py, docs/later_stages.md §2): the arc cast,
+        the arc plan, one expansion call per line, then the computed
+        thresholds, composed endings, checks and a playtest of the expanded
+        graph. Writes <id>_arcs.json and <id>_arcs.md. Every call replays from
+        its saved file, so running with --stage-a on a finished story
+        directory makes model calls for stage A only."""
+        story = story or self.analysis.get('story')
+        if not story:
+            path = Path(self.story_file_path('story.json'))
+            if not path.is_file():
+                raise PipelineHalt('stage A needs a finished outline (<id>_story.json)')
+            story = json.loads(path.read_text(encoding='utf-8'))
+        result = arcs.ArcBuilder(self, story).run()
+        self.save_story_json('arcs.json', result)
+        self.save_story_file('arcs.md', arcs.arcs_markdown(result, story))
+        found = result['checks'] + result['playtest']['findings']
+        print(f"stage A: {len(result['minor_nodes'])} minor nodes, {len(result['states'])} states, "
+              f"{len(result['pattern_shifts'])} pattern shift(s), {len(found)} finding(s)")
+        for f in found:
+            print(f'  - {f}')
+        return result
+
+
 def as_bool(value, default=False):
     """A verdict the model wrote: true, "true", "yes". Anything unreadable is
     the default, which each caller sets to the answer that raises no finding
@@ -1504,6 +1531,9 @@ if __name__ == "__main__":
                         help="do not cut off calls that exceed their class's thinking or time limit")
     parser.add_argument("--stop-after", default='',
                         help="stop after this step: 2, 3, 3.4, 3.5, 3.75, 3.8 (default: run through the outline loop)")
+    parser.add_argument("--stage-a", action="store_true",
+                        help="after the outline, run stage A (arcs and node expansion: <id>_arcs.json, <id>_arcs.md); "
+                             "on a finished story directory only stage A makes model calls")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
@@ -1568,6 +1598,8 @@ if __name__ == "__main__":
         gen.run_outline(max_iterations=args.max_iterations)
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
         gen.run_outline_judge()
+        if args.stage_a:
+            gen.run_arcs()
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)

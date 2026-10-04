@@ -58,6 +58,10 @@ Scenario knobs (environment variables):
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
                                  iteration
     STUB_STOP_AFTER=3            4d says stop after this iteration (--branching=judge)
+    STUB_SHIFT=1                 with --stage-a, 5a1 proposes a pattern shift on
+                                 the first arc's state (tests the threshold math)
+    STUB_NO_TELLS=1              5a2's first answer for each line leaves its tells
+                                 out (tests the informed retry)
     STUB_NO_EVENTS=1             3.5a names no events (a computed finding the
                                  repair must fill)
     STUB_NO_SET_PIECE=1          no turn names a set piece (a computed finding)
@@ -159,6 +163,9 @@ class StubClient(LlmClient):
             ('You are step 4d', 's4d'),
             ('You are step 4p', 's4p'),
             ('You are step 4e', 's4e'),
+            ('You are step 5a0', 's5a0'),
+            ('You are step 5a1', 's5a1'),
+            ('You are step 5a2', 's5a2'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -731,3 +738,116 @@ class StubClient(LlmClient):
         return {"reading": "stub: a competent outline", "scores": {a: {"note": f"stub {a}", "score": 3} for a in
                 ('plot', 'people', 'reveals', 'agency', 'specificity', 'genre')},
                 "best_thing": "stub: the second node", "worst_thing": "stub: the endings", "would_play": True}
+
+    # ------------------------------------------------------------------ stage A
+
+    def p_s5a0(self, p):
+        cands = self.section(p, 'CANDIDATES (') or []
+        return {"cast": [{"who": c['who'], "note": f"stub: {'recurs and warms' if i == 0 else 'delivers a scene'}",
+                          "tier": 'supporting' if i == 0 else 'functional'} for i, c in enumerate(cands)]}
+
+    def p_s5a1(self, p):
+        pk = self.section(p, 'THE OUTLINE (') or {}
+        lines = {l['id']: l for l in pk.get('lines') or []}
+        main = next(iter(lines)) if lines else 'T1'
+        arcs = []
+        for i, a in enumerate(pk.get('arc_cast') or []):
+            first = re.sub(r'[^a-z]', '', a['who'].split()[0].lower()) or f'c{i}'
+            name = f'{first}_trust' if all(not x['state']['name'].startswith(first) for x in arcs) else f'{first}{i}_trust'
+            moments, resolutions = [], []
+            for l in a.get('lines') or []:
+                path = lines[l]['path']
+                moments.append({"node": path[min(1, len(path) - 1)], "kind": "test", "change": f"stub: tested on {l}"})
+                end = lines[l]['ending']
+                person, _, label = a['who'].lower().partition(' (')
+                label = label.rstrip(')')
+                standing = any(str(x).lower() in (person, label) for x in end.get('standing') or [])
+                lost = not standing
+                if l == main:
+                    resolutions += [{"lines": [l], "direction": "up", "stands_with_you": True, "becomes": "stub: stays"},
+                                    {"lines": [l], "direction": "down", "stands_with_you": False, "becomes": "stub: goes"}]
+                else:
+                    resolutions.append({"lines": [l], "direction": None, "stands_with_you": not lost,
+                                        "becomes": "stub: ends as the line says"})
+            arcs.append({"who": a['who'], "state": {"name": name, "meaning": "stub: how far they trust you",
+                                                    "up_when": "you keep your word", "down_when": "you break it"},
+                         "starts": "stub: wary", "moments": moments, "resolutions": resolutions})
+        shifts = []
+        if env_int('STUB_SHIFT', 0) and arcs and main in lines and len(lines[main]['path']) >= 5:
+            shifts.append({"state": arcs[0]['state']['name'], "direction": "down", "at": lines[main]['path'][-2],
+                           "does": "resolution", "to": "", "why": "stub: if you broke your word every time"})
+        main_path = lines.get(main, {}).get('path') or []
+        return {"visibility_note": "stub: you notice", "state_visibility": "observed", "arcs": arcs,
+                "light_arcs": [{"who": c['who'], "starts": "stub", "moments": [{"node": main_path[0], "change": "stub"}],
+                                "ends": "stub"} for c in pk.get('supporting_cast') or []],
+                "protagonist": {l: {"arc": f"stub: who you become on {l}"} for l in lines},
+                "setups": [{"setup": main_path[0], "payoff": main_path[-1], "what": "stub"}] if len(main_path) > 1 else [],
+                "pattern_shifts": shifts}
+
+    def p_s5a2(self, p):
+        pk = self.section(p, 'THIS LINE (') or {}
+        path = pk.get('path') or []
+        majors = [n['id'] for n in path]
+        open_nodes = [n['id'] for n in path if not n.get('ending')]
+        lines_of = {n['id']: set(n.get('lines') or []) for n in path}
+
+        def tell_safe(nid):    # the next major node is on every line through this one
+            i = majors.index(nid)
+            return i + 1 < len(majors) and lines_of[majors[i + 1]] >= lines_of[nid]
+        own = [n for n in open_nodes if tell_safe(n)
+               and not any(m['id'] == n and m.get('already_expanded') for m in path)]
+        own = own or [n for n in open_nodes if tell_safe(n)] or open_nodes
+        arcs = pk.get('arcs') or []
+        shifts = pk.get('pattern_shifts') or []
+        retry = RETRY_MARKER in p
+        no_tells = env_int('STUB_NO_TELLS', 0) and not retry
+        groups = {}
+
+        def nxt(after):
+            return majors[majors.index(after) + 1] if majors.index(after) + 1 < len(majors) else after
+
+        def opportunity(state, who, after, active):
+            options = [{"do": "keep your word", "effect": "they relax", "moves": [{"state": state, "direction": "up"}], "active": False},
+                       {"do": "break it", "effect": "they go quiet", "moves": [{"state": state, "direction": "down"}], "active": False}]
+            if active:
+                options.append({"do": "try to fix it yourself", "effect": "it works, or it does not",
+                                "moves": [{"state": state, "direction": "up"}], "active": True})
+            node = {"after": after, "kind": "opportunity", "serves": [who], "title": "A Small Promise",
+                    "summary": "stub: " + " ".join(["a small situation where your word to them is tested"] * 3),
+                    "image": "a promise written on a napkin", "who": [who], "options": options}
+            if not no_tells:
+                node["tell"] = {"at": nxt(after), "how": "they look at you differently"}
+            return node
+
+        k = 0
+        for a in arcs:
+            need = 2
+            for sh in shifts:
+                if sh['state'] == a['state']['name'] and sh['at'] in majors:
+                    need = 3
+            slots = [n for n in own if not shifts or all(majors.index(n) < majors.index(sh['at']) for sh in shifts
+                                                           if sh['state'] == a['state']['name'] and sh['at'] in majors)]
+            slots = slots or own
+            who = a['who'].split(' (')[0]
+            for j in range(need):
+                after = slots[j % len(slots)]
+                groups.setdefault(after, []).append(opportunity(a['state']['name'], who, after, active=(k == 0)))
+                k += 1
+        for sh in shifts:
+            if sh['at'] in majors:
+                owner = next((a['who'].split(' (')[0] for a in arcs if a['state']['name'] == sh['state']), None)
+                before = [n for n in open_nodes if majors.index(n) < majors.index(sh['at'])]
+                if owner and before:
+                    groups.setdefault(before[-1], []).insert(0, {
+                        "after": before[-1], "kind": "demonstration", "serves": [owner], "title": "Nearly Gone",
+                        "summary": "stub: " + " ".join(["they stand at the door with their coat on"] * 3),
+                        "image": "a coat over an arm", "who": [owner], "warns": sh['state']})
+        out = []
+        for n in majors:
+            out.extend(groups.get(n, []))
+        if majors and path[-1].get('ending') and arcs:
+            out.append({"after": majors[-1], "kind": "resolution", "serves": [arcs[0]['who'].split(' (')[0]],
+                        "title": "Where They Stand", "summary": "stub: " + " ".join(["where they end up at the close"] * 4),
+                        "image": "an empty chair", "who": []})
+        return {"notes": "stub: two chances per arc", "minor_nodes": out}
+
