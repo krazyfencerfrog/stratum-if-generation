@@ -15,7 +15,7 @@ LIST 2, CONSTRAINTS. The numbered lines below are the extracted fields the premi
 
 LIST 3, ENGINE CHECKS. The numbered checks below ask whether the dramatic engine is really there. They exist because a real earlier run produced a premise in which every turn was the story's question handed to the player as a two-button choice, and the story built on it was a menu. For each check: does it hold? When it does not, quote the words that fail it.
 
-THE SEARCH, MECHANICS. Does the premise require a system the engine lacks (combat or skill checks, puzzle minigames, an economy or a reputation score the player watches), or a way to lose that the failure model below does not name? Report each such thing with the premise's words. Two things are permitted and are NOT reported: a tracked clock or stock that one of the failure model's triggers, or the Kernel's own words, licenses; and a person whose stance changes because of named things the player did (that is a flag, which the engine has). What is reported is a QUANTITY the player is expected to watch and push past a threshold. If there is nothing, mechanics is an empty list.
+THE SEARCH, MECHANICS. Does the premise require a system the engine lacks (combat or skill checks, puzzle minigames, an economy or a reputation score the player watches), or a way to lose that the failure model below does not name? Report each such thing with the premise's words. Two things are permitted and are NOT reported: a tracked clock or stock that one of the failure model's triggers, or the Kernel's own words, licenses; and a person whose stance changes because of named things the player did (that is a flag, which the engine has). What is reported is a QUANTITY the player is expected to watch and push past a threshold. Also NOT reported: an object or document that records something (a ledger, a bill, a contract, a log), which is a thing in the story, not a system; and a deadline the story uses as pressure (before dawn, by the last lamp), unless the premise says that missing it ends the story in a failure the failure model does not name. For each entry, write the note first, then "permitted": true if on reflection it is one of the permitted things (it is then dropped), false if it stands. If there is nothing, mechanics is an empty list.
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after. In every entry "note" comes before the verdict: one sentence saying what in the premise you looked at and why the verdict follows. Mind the direction of each verdict: "contradiction" and "violated" are true when something is WRONG; "holds" is true when the check is SATISFIED. A quote is the premise's own words, copied from one place.
@@ -24,7 +24,7 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after. 
   "clauses": [ {"n": integer, "note": string, "contradiction": boolean, "quote": string} ],
   "constraints": [ {"n": integer, "note": string, "violated": boolean, "quote": string} ],
   "engine": [ {"id": string, "note": string, "holds": boolean, "quote": string} ],
-  "mechanics": [ {"material": string, "note": string} ]
+  "mechanics": [ {"material": string, "note": string, "permitted": boolean} ]
 }
 
 One entry for every numbered clause, every numbered constraint and every engine check, in order, including the ones that are fine.
@@ -46,7 +46,8 @@ Constraint 6: "3-0b.epistemic_gap [constraint]: present false". Premise: one tur
 
 A permitted clock beside a violation.
 Failure model: 3-0c.failure_triggers [constraint]: types time_pressure. Premise: pressure.clock_or_stock = "the tide, which covers the causeway twice a day"; complications include "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough".
-"mechanics": [ {"material": "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough", "note": "A quantity the player is expected to watch and push past a threshold; the engine has no such system and no extracted field licenses it."} ]
+"mechanics": [ {"material": "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough", "note": "A quantity the player is expected to watch and push past a threshold; the engine has no such system and no extracted field licenses it.", "permitted": false},
+               {"material": "the causeway warden's register of everyone who has crossed", "note": "A document the player can read, show or burn; nobody watches a number.", "permitted": true} ]
 (The tide is a clock for the extracted time_pressure trigger, so it is not reported.)
 
 The engine missing.

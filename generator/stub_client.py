@@ -464,7 +464,7 @@ class StubClient(LlmClient):
             "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": False, "quote": ""} for n in constraints],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
                        for e in engine],
-            "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system."}]
+            "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "permitted": False}]
                           if hard else []),
         }
 

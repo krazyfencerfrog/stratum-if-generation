@@ -104,7 +104,7 @@ PREMISE_CHECK = obj(
     clauses=arr(obj(n=I, note=S, contradiction=B, quote=S)),
     constraints=arr(obj(n=I, note=S, violated=B, quote=S)),
     engine=arr(obj(id=S, note=S, holds=B, quote=S)),
-    mechanics=arr(obj(material=S, note=S)),
+    mechanics=arr(obj(material=S, note=S, permitted=B)),
 )
 
 PREMISE_REPAIR = obj(

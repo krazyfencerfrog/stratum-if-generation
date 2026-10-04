@@ -1183,7 +1183,9 @@ class StoryGenerator:
                 findings.append({'source': 'engine check', 'where': check_text.get(str(e.get('id')), str(e.get('id'))),
                                  'problem': str(e.get('note') or 'the check does not hold'), 'quote': str(e.get('quote') or '')})
         for e in answer.get('mechanics') or []:
-            if isinstance(e, dict) and str(e.get('material') or '').strip():
+            # the auditor may argue itself out of an entry in its note (kernel34: "...but these are licensed");
+            # its own verdict on the entry decides
+            if isinstance(e, dict) and str(e.get('material') or '').strip() and not as_bool(e.get('permitted'), False):
                 findings.append({'source': 'engine boundary', 'where': 'a system the engine lacks, or a way to lose 3-0c does not name',
                                  'problem': str(e.get('note') or ''), 'quote': str(e.get('material'))})
         return findings
