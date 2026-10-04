@@ -513,6 +513,19 @@ def stage_a_expands_arcs():
     run('stagea', fresh=False, args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})
     check(len(calls('stagea')) == n, 'a second run of stage A made model calls')
 
+    # B0: scenes from stage A's groups, subjects with where they first appear, a room target
+    import scenes
+    b0 = scenes.plan(load('stagea', 'story.json'), result)
+    story = load('stagea', 'story.json')
+    check(len(b0['scenes']) == len(story['nodes']) and all(sc['nodes'][0] == sc['major'] for sc in b0['scenes']),
+          'one scene per major node, minor nodes after it')
+    check(sum(len(sc['nodes']) - 1 for sc in b0['scenes']) == len(result['minor_nodes']), 'a minor node is in no scene')
+    people = [x for x in b0['subjects'] if x['kind'] == 'person' and x['id']]
+    check(people and all(x['first_scene'] for x in people if story['characters'][x['id']].get('nodes')),
+          f'a person who appears has no first scene: {people}')
+    check(b0['rooms']['min'] >= scenes.MIDDLE_GROUND, f"room target below the middle ground: {b0['rooms']}")
+    check(all(sc.get('next') for sc in b0['scenes'] if not sc['ending']), 'a scene that is not an ending leads nowhere')
+
     # a pattern shift: its condition is computed, and random play rarely meets it
     run('stageshift', args=['--stage-a'], env={'STUB_SHIFT': '1'})
     shifts = load('stageshift', 'arcs.json')['pattern_shifts']

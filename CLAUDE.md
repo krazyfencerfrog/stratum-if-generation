@@ -42,6 +42,7 @@ python batch.py status; python batch.py report                        # progress
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt
 python main.py --story-id=kernel1 --stage-a < ../tests/kernels/kernel1.txt   # also stage A (replays everything already saved)
 python arcs.py kernel35_f5                                             # stage A alone, on an outline made by older code
+python scenes.py kernel35_f5                                           # stage B0: scenes, subjects, the room target (no model)
 ```
 
 Other flags: `--max-repairs` (3.5 repair rounds, default 2), `--framework=<id>` (skip the 3.8 choice), `--no-think-steps` / `--think-steps` (comma-separated prefixes, steps or step_names to run with thinking off / on, overriding the call's class), `--no-breakers`, `--no-force-answer` (skip budget forcing), `--craft-spine` (run the optional 3.75 craft spine), `--no-promises` (skip 3.4), `--branching=plan|judge` (how divergent lines are seeded), `--no-outline-judge` (skip the 4e scoring call; the metrics still run). Environment: `STRATUM_SAMPLER=model` (send no sampler options), `STRATUM_PRESENCE_PENALTY`. Output goes to `stories/<story_id>/`. `stories/` is not gitignored; `*.log` is.

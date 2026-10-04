@@ -365,7 +365,12 @@ needs, and a world worth wandering in.
 
 ### Steps
 
-**B0 (Python): scenes and subjects.** Group each line's expanded path
+**B0 (Python): scenes and subjects.** Built 2026-10-04 (`generator/scenes.py`;
+`python scenes.py <id>` writes `<id>_scenes.json`): one scene per major node
+and its minor nodes (minor nodes inherit its places); consecutive groups that
+every line passes through together, in the same places, with no event
+between, are listed as merge candidates and not merged; the room target's
+floor is ten for every story. Objects are left to B2. As designed:  Group each line's expanded path
 (major and minor nodes, from A2) into scenes: consecutive nodes in the same
 places with no time jump (the engine's unit; engine_design §2). The model
 reviews only the borderline joins, if any. Collect the subject list: every
