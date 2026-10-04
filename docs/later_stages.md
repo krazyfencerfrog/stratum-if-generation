@@ -184,6 +184,12 @@ line itself (a jump to another line where the graph has a node to land on).
 A1 declares each one: `{"state", "direction", "threshold", "at": node,
 "does": "resolution | ending | line", "to": target}`; the computed checks
 confirm all three conditions.
+The fixed rule is not enough by itself: with exactly four opportunities,
+"three of four" is met by random play about 31% of the time (found by
+`generator/playtest.py`). So the threshold is computed, not declared: Python
+sets it from the number of opportunities on the paths to the shift so that
+random play triggers it rarely (target under 15%), and the playtest
+simulator verifies it by sampling.
 
 **Arc state and line shifts.** Opportunities move named states. A line's
 ending may come in variants keyed to state (a companion stays or goes). An

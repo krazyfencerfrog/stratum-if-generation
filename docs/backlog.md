@@ -90,13 +90,6 @@ worked example `docs/stage_a_example_kernel35.md`). Next: stages B, C and D
 at the same level. Small open items for A: composing resolution variants;
 whether some outline forks should become pattern triggers.
 
-### Playtest simulator [solo]
-Python that walks a story graph with play styles (always conciliatory,
-always dismissive, random, mixed) and reports which endings, variants and
-shifts each reaches. Designed for stage A, but useful now: on today's
-outlines it checks that every line and ending is reachable from its
-triggers.
-
 ### Protagonist fields on the model [GPU]
 The defined-but-steerable protagonist (history, need, ties, open, gender,
 a Python name; commits 8b46995, 3769dd9) has not run on the model yet. Starting
@@ -132,6 +125,11 @@ more of a fixed budget for the story. Pairs with the budget investigation.
   a kill.
 
 ## Done
+- 2026-10-04: playtest simulator (`generator/playtest.py`). On the five Fable 5
+  outlines: all valid, but every ending is reached with at most ONE decision
+  per playthrough, the case for stage A in one number. Its random-play check
+  showed the fixed pattern-shift threshold is too loose (31% of random play
+  meets 3-of-4), so thresholds are now computed in the design.
 - 2026-10-04: kernel audit: retired 9, 18, 23 (duplicates); added 36 horror with a
   group, 37 crew heist, 38 Victorian murder, 39 ancient Rome, 40 frontier West;
   evaluation split into EVAL_SET (9, two nights) and EVAL_QUICK (4, one night).

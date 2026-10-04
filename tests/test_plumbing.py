@@ -797,6 +797,45 @@ def protagonist_is_named_first():
 
 
 @test
+def playtest_walks_outlines_and_patterns():
+    import playtest
+    story = json.load(open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.json')))
+    st = playtest.Story(story)
+    plays = playtest.playthroughs(st)
+    check({p['ending'] for p in plays if p.get('ending')} == set(st.endings), 'the stub story has an unreachable ending')
+    check(playtest.check(st, plays) == [], f'the stub story has playtest findings: {playtest.check(st, plays)}')
+
+    def graph(n_opps):
+        # n_opps opportunities, each with an up and a down option, then a node whose
+        # shift edge fires when the state went down at least 3 times, 3/4 of the time
+        nodes, edges = {}, []
+        ids = [f'O{i}' for i in range(n_opps)] + ['F', 'END_A', 'END_B']
+        for i in range(n_opps):
+            nodes[f'O{i}'] = {'title': f'opp {i}', 'options': [{'do': 'warm', 'effects': [{'state': 'trust', 'direction': 'up'}]},
+                                                               {'do': 'cold', 'effects': [{'state': 'trust', 'direction': 'down'}]}]}
+        nodes['F'] = {'title': 'the fork'}
+        nodes['END_A'] = {'title': 'stays', 'is_ending': True}
+        nodes['END_B'] = {'title': 'leaves', 'is_ending': True}
+        for a, b in zip(ids[:n_opps], ids[1:n_opps + 1]):
+            edges.append({'from': a, 'to': b, 'kind': 'continue', 'lines': ['T1'], 'otherwise': []})
+        edges.append({'from': 'F', 'to': 'END_A', 'kind': 'continue', 'lines': ['T1'], 'otherwise': []})
+        edges.append({'from': 'F', 'to': 'END_B', 'kind': 'branch', 'lines': ['T2'], 'trigger': {'text': 'you were cold to her all night', 'kind': 'accumulated'},
+                      'condition': {'state': 'trust', 'direction': 'down', 'at_least': 3, 'share': 0.75}})
+        lines = {'T1': {'path': ids[:n_opps + 1] + ['END_A']}, 'T2': {'path': ids[:n_opps + 1] + ['END_B'], 'divergence': {'diverges_at': 'F'}}}
+        return playtest.Story({'nodes': nodes, 'edges': edges, 'lines': lines, 'line_order': ['T1', 'T2']})
+
+    st = graph(3)
+    down = playtest.playthroughs(st, playtest.styles()['always_down'])
+    up = playtest.playthroughs(st, playtest.styles()['always_up'])
+    check(all(p['ending'] == 'END_B' for p in down), f'consistent cold play should shift to END_B: {[p["ending"] for p in down]}')
+    check(all(p['ending'] == 'END_A' for p in up), 'warm play should never shift')
+    findings, report = playtest.shift_checks(st)
+    check(findings == [], f'3-of-3 pattern: {findings} {report}')
+    findings, report = playtest.shift_checks(graph(4))
+    check(any('random playthroughs' in f for f in findings), f'a pattern random play hits about 30% of the time should be flagged: {report}')
+
+
+@test
 def late_forks_are_noted():
     import checks
     main = {'path': ['N01', 'N02', 'N03', 'N04', 'N05', 'N06']}
