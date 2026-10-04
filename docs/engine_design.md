@@ -87,7 +87,14 @@ One JSON document:
 
 A room has a description (text variants: the first whose `when` holds;
 random among a list where marked), fragments (conditional snippets before
-or after), exits, and an image id. Exits are interactions under the verb
+or after), exits, and an image id.
+
+Room text is **layered**, so where the story is changes what a place is
+like now: the permanent base (written by B2: what the place is, its
+fixtures), the current scene's layer (written by D: what is different now,
+"water is coming through the floor"), state fragments (small changes: the
+lamp lit or dark), then who and what is here. The engine composes them in
+that order. Exits are interactions under the verb
 **Go**; an exit to a room the current scene does not open is not shown.
 
 ### 4.2 Objects
@@ -249,10 +256,11 @@ the current scene whose `room` is the player's room or null and whose
 Talk to present characters about known topics, Examine visible objects,
 Inventory).
 
-- **Level 1, verbs** with at least one available interaction, from a fixed
-  set: Look, Go, Talk, Examine, Take, Give, Show, Use, Wait, plus a small
-  number the story may add (Pour, Salute) when an interaction needs a verb
-  of its own. A verb with nothing available is not shown.
+- **Level 1, verbs** with at least one available interaction: the core set
+  (Look, Examine, Go, Talk, Take, Give, Show, Use, Wait) plus whatever story
+  verbs the package declares. There is no limit on story verbs: an action
+  story may be built mostly from its own (Climb, Shoot, Dodge, Break). A
+  verb with nothing available is not shown.
 - **Level 2, objects** for the chosen verb: rooms for Go, characters for
   Talk, objects for Examine/Take/Use.
 - **Level 3, details** where the interaction has one: the topic for Talk,
@@ -260,9 +268,17 @@ Inventory).
 - A level with exactly one option collapses into its parent ("Wait"; "Talk
   -> Lazlo" when he is the only one there and only one topic is known).
 
-The engine returns the menu as a tree; the front end draws it (a radial UI
-later, a terminal list now). Each leaf carries the interaction id the
-front end sends back.
+The menu is always visible (it is the only way to act), showing the root
+level, the verbs; choosing one opens its objects, and so on. The engine
+returns the menu as a tree; the front end draws it (a radial UI later, a
+terminal list now). Each leaf carries the interaction id the front end
+sends back.
+
+**Examine everything.** Every object, person and room the text names can be
+examined, and most have something to say even when it leads nowhere. Heavy
+interaction is the point, and it also masks which objects and conversations
+matter: if only the important things were interactive, the menu would point
+at the solution.
 
 ## 7. One action, in order
 
@@ -309,11 +325,25 @@ model replace frames as the unit of navigation. The old `generation/`
 directory (genre pools, cast discovery) stays in the mothballed repository
 for reference.
 
-## 10. Open questions
+## 10. Decisions (2026-10-04)
 
-- The verb set: is the fixed set right, and how freely may a story add verbs?
-- How much of a room's description is per scene (written by D) versus
-  permanent (written by B2)?
-- Whether a scene can let the player wander rooms freely, or should guide
-  them (a "nudge" event after N idle turns), so a scene never stalls.
-- Save compatibility across regenerated stories (probably none needed).
+- **Verbs:** the core set plus any number of story verbs. A story verb used
+  by only one interaction in the whole story is flagged by the validator
+  (it likely points at a solution: "Salute" appearing on the wheel says
+  what to do), as a note, never an error.
+- **Room text is layered:** permanent base (B2), scene layer (D), state
+  fragments, then who and what is here. Story position changes the room.
+- **Scenes do not stall:** the player wanders the scene's rooms freely;
+  every scene has a forward path findable from every state (the outline's
+  default edge as an explicit or signposted interaction; the playtest
+  simulator checks every state, not just that an exit exists), and one or
+  two nudges per scene fire after a number of actions without progress (a
+  character prompts, or the world pushes: time pressure arriving).
+- **Saves** record the package's hash; loading a save into a regenerated
+  story says so plainly instead of breaking. No compatibility across
+  versions.
+- **Examine everything:** every named object, person and room is
+  examinable, most with something to say; heavy interaction masks what
+  matters.
+- **The menu is always visible,** at its root (the verbs), drilling down on
+  choice.
