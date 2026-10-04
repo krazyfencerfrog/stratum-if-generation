@@ -23,6 +23,7 @@ class GameState:
         self.used = set()             # interaction ids of `once` interactions already used
         self.fired = set()            # event and nudge ids already fired
         self.seen = set()             # characters and objects the player has encountered
+        self.heard = set()            # what the player has read: examined, asked, thought; 'room:<id>' described
         self.moments = {}             # moment id -> actions since its options were first offered
         self.turns = 0                # time that has passed (actions that changed something, moves, waits)
         self.turns_in_scene = 0
@@ -63,7 +64,7 @@ class GameState:
         c.__dict__.update(self.__dict__)
         for key in ('flags', 'stats', 'locations', 'placements'):
             setattr(c, key, dict(getattr(self, key)))
-        for key in ('visited', 'used', 'fired', 'seen'):
+        for key in ('visited', 'used', 'fired', 'seen', 'heard'):
             setattr(c, key, set(getattr(self, key)))
         c.arcs = {k: dict(v) for k, v in self.arcs.items()}
         c.moments = dict(self.moments)
@@ -73,7 +74,7 @@ class GameState:
         return {'scene': self.scene, 'room': self.room, 'ending': self.ending, 'flags': dict(self.flags),
                 'stats': dict(self.stats), 'arcs': copy.deepcopy(self.arcs), 'locations': dict(self.locations),
                 'placements': dict(self.placements), 'visited': sorted(self.visited), 'used': sorted(self.used),
-                'fired': sorted(self.fired), 'seen': sorted(self.seen), 'moments': dict(self.moments),
+                'fired': sorted(self.fired), 'seen': sorted(self.seen), 'heard': sorted(self.heard), 'moments': dict(self.moments),
                 'turns': self.turns, 'turns_in_scene': self.turns_in_scene,
                 'idle': self.idle, 'actions': self.actions, 'seed': self.seed}
 
@@ -91,5 +92,6 @@ class GameState:
         s.used = set(data.get('used') or [])
         s.fired = set(data.get('fired') or [])
         s.seen = set(data.get('seen') or [])
+        s.heard = set(data.get('heard') or [])
         s.moments = dict(data.get('moments') or {})
         return s

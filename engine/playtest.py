@@ -146,6 +146,7 @@ class Normalizer:
             st.idle = min(st.idle, self.idle.get(st.scene, 0))
         st.seed = SEED
         st.actions = 0                        # nothing reads the action count
+        st.heard = set()                      # what was read only marks the menu
         if not self.uses_visited:
             st.visited = set()
         st.seen = st.seen & self.seen_subjects     # only what some condition asks about

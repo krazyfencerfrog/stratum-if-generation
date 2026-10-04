@@ -21,6 +21,9 @@ from state import GameState
 from story import Story, ending_groups, pick_text
 
 DETAIL_WORD = {'talk': 'about', 'give': 'to', 'show': 'to', 'use': 'on'}
+NEWS = ('examine', 'talk', 'think')     # verbs whose options are marked new until taken
+GROUP_AT = 8                            # an object with more options than this sorts its grouped ones into groups
+GROUP_LABELS = {'person': 'people', 'place': 'places', 'object': 'things', 'event': 'what happened'}
 FREE = ('look', 'inventory')          # meta actions: no turn passes, nothing fires
 CHAIN_LIMIT = 10                      # scene changes or event rounds in one action
 SAVE_FORMAT = 'stratum-save/1'
@@ -111,11 +114,13 @@ class Engine:
         s, st = self.story, self.state
         built, authored = [], []
 
-        def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None):
+        def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None,
+                group=None):
             into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail,
                          'object_label': obj_label or (s.name_of(obj) if obj else None),
                          'detail_label': detail_label or (s.name_of(detail) if detail else None),
-                         'source': source, 'weight': weight})
+                         'source': source, 'weight': weight, 'group': group,
+                         'new': verb in NEWS and oid not in st.heard})
 
         add(built, 'look', 'look')
         for oid in self.visible_objects():
@@ -136,7 +141,7 @@ class Engine:
                     continue
                 if evaluate(topic.get('known_when', 'true'), st):
                     add(built, f'talk:{cid}:{tid}', 'talk', cid, tid, detail_label=topic.get('label') or tid,
-                        source=('topic', cid, tid))
+                        source=('topic', cid, tid), group=topic.get('group'))
         room = s.rooms.get(st.room) or {}
         for ex in room.get('exits') or []:
             if ex['to'] in self.open_rooms() and evaluate(ex.get('when', 'true'), st):
@@ -154,7 +159,7 @@ class Engine:
                 topic = (s.characters[it['object']].get('topics') or {}).get(it['detail'])
                 detail_label = (topic or {}).get('label')
             add(authored, it['id'], it['verb'], it.get('object'), it.get('detail'), it.get('object_label'),
-                detail_label, source=('interaction', it), weight=it.get('weight'))
+                detail_label, source=('interaction', it), weight=it.get('weight'), group=it.get('group'))
 
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
         return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken] + authored
@@ -204,17 +209,29 @@ class Engine:
                 if obj is None:
                     for o in opts:
                         vnode['children'].append(dict({'label': None, 'id': o['id']},
-                                                      **({'weight': o['weight']} if o.get('weight') else {})))
+                                                      **({'weight': o['weight']} if o.get('weight') else {}),
+                                                      **({'new': True} if o.get('new') else {})))
                     continue
                 onode = {'label': opts[0]['object_label'], 'children': []}
+                groups = {}
                 for o in opts:
                     leaf = {'label': None if o['detail'] is None else detail_text(verb, o['detail_label']), 'id': o['id']}
                     if o.get('weight'):
                         leaf['weight'] = o['weight']
-                    onode['children'].append(leaf)
+                    if o.get('new'):
+                        leaf['new'] = True
+                    if o.get('group') and len(opts) > GROUP_AT:
+                        if o['group'] not in groups:     # many options: the grouped ones go one level down
+                            groups[o['group']] = {'label': GROUP_LABELS.get(o['group'], o['group']), 'children': []}
+                        groups[o['group']]['children'].append(leaf)
+                    else:
+                        onode['children'].append(leaf)
+                order = list(GROUP_LABELS)
+                for g in sorted(groups, key=lambda g: (order.index(g) if g in order else len(order), g)):
+                    onode['children'].append(groups[g])
                 vnode['children'].append(onode)
             root['children'].append(vnode)
-        root['children'] = [_collapse(c, collapse or self.collapse) for c in root['children']]
+        root['children'] = [_mark_new(_collapse(c, collapse or self.collapse)) for c in root['children']]
         return root
 
     # ------------------------------------------------------------ acting
@@ -229,7 +246,7 @@ class Engine:
         self.queue = []
         if opt['verb'] in FREE:
             self.queue.append(self._free_text(opt))
-            return self.view(show_room=opt['verb'] == 'look')
+            return self.view(show_room=opt['verb'] == 'look', full=True)
         moved_room, scene_before = self.perform(opt)
         self.timeline.append(st.clone())
         view = self.view(show_room=moved_room or st.scene != scene_before)
@@ -250,6 +267,8 @@ class Engine:
         moved_room = False
         takes_time = None
         src = opt['source']
+        if opt['verb'] in NEWS:
+            st.heard.add(opt['id'])
         if src and src[0] == 'interaction':
             it = src[1]
             self.queue.append(pick_text(it.get('text'), st, it['id']))
@@ -482,16 +501,20 @@ class Engine:
 
     # ------------------------------------------------------------ the view
 
-    def describe(self):
+    def describe(self, full=False):
         """The current room, layered: base description, the scene's layer,
-        state fragments, then who and what is here."""
+        state fragments, then who and what is here. The base description is
+        given the first time and on Look; after that, only what is particular
+        to now."""
         s, st = self.story, self.state
         room = s.rooms.get(st.room) or {}
+        full = full or f'room:{st.room}' not in st.heard
+        st.heard.add(f'room:{st.room}')
         pre, post = [], []
         for frag in room.get('fragments') or []:
             if evaluate(frag.get('when', 'true'), st):
                 (pre if frag.get('position') == 'pre' else post).append(frag['text'])
-        layers = pre + [pick_text(room.get('description'), st, st.room),
+        layers = pre + [pick_text(room.get('description'), st, st.room) if full else '',
                         pick_text((self.scene().get('room_text') or {}).get(st.room), st, f'{st.scene}.{st.room}')]
         layers += post
         for cid in self.present():
@@ -504,14 +527,14 @@ class Engine:
             layers.append(f'You can see {_join(listed)}.')
         return {'name': room.get('name', st.room), 'text': ' '.join(x for x in layers if x)}
 
-    def view(self, show_room=True):
+    def view(self, show_room=True, full=False):
         st = self.state
         out = {'text': [t for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
                'ending': st.ending, 'room': None, 'menu': None}
         if st.ending:
             out['ending_title'] = self.story.endings[st.ending].get('title')
             return out
-        out['room'] = self.describe() if show_room else None
+        out['room'] = self.describe(full) if show_room else None
         out['menu'] = self.menu()
         return out
 
@@ -604,6 +627,15 @@ def _collapse(node, mode):
     for c in node['children']:
         if c['label'] is None:
             c['label'] = node['label']      # an objectless option beside others: its verb's own name
+    return node
+
+
+def _mark_new(node):
+    """A menu node is new when anything under it is."""
+    if 'children' in node:
+        node['children'] = [_mark_new(c) for c in node['children']]
+        if any(c.get('new') for c in node['children']):
+            node['new'] = True
     return node
 
 

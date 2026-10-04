@@ -72,7 +72,8 @@ def show_level(node, path, out):
     for key, child in zip(KEYS, node['children']):
         more = '' if 'id' in child else ' …'
         mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
-        print(f'  {key}. {child["label"]}{more}{mark}', file=out)
+        new = ' •' if child.get('new') else ''                      # not yet examined, asked or thought
+        print(f'  {key}. {child["label"]}{more}{new}{mark}', file=out)
     print('  ' + ('[b] prev menu  ' if path else '') + '[u] unwind  [h] history  [s] save  [l] load  [q] quit', file=out)
 
 

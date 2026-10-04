@@ -333,6 +333,42 @@ def shift_package(at_least, share):
 
 
 @test
+def menu_marks_what_is_new_groups_topics_and_rooms_go_brief():
+    data = demo_data()
+    eng = Engine(Story(data))
+    view = eng.start(seed=1)
+    base = data['world']['rooms']['stern_deck']['description'][0]['text'][:30]
+    check(base in view['room']['text'], 'the first visit did not give the room in full')
+    examine = next(c for c in view['menu']['children'] if c['label'] == 'Examine')
+    check(examine.get('new') and all(c.get('new') for c in examine['children']), f'nothing examined yet: {examine}')
+    thing = next(c for c in examine['children'] if c.get('id', '').startswith('examine:') and c['id'] != 'examine:you')
+    eng.act(thing['id'])
+    examine = next(c for c in eng.menu()['children'] if c['label'] == 'Examine')
+    again = next(c for c in examine['children'] if c.get('id') == thing['id'])
+    check(not again.get('new') and examine.get('new'), f'examined, still new (or the rest lost the mark): {examine}')
+    eng.act('go:cabin')
+    back = eng.act('go:stern_deck')
+    check(base not in back['room']['text'] and back['room']['name'], f"a revisit repeated the base text: {back['room']}")
+    check(base in eng.act('look')['room']['text'], 'Look did not give the room in full')
+    eng.rewind()
+    check(eng.state.room == 'cabin', 'rewind after the brief revisit')
+    # many topics: the grouped ones go one level down, the story's own stay on top
+    data = demo_data()
+    topics = data['world']['characters']['lazlo']['topics']
+    for k in range(7):
+        topics[f'thing{k}'] = {'label': f'the thing {k}', 'group': 'object', 'says': [{'text': f'Thing {k}.'}]}
+    topics['mira_p'] = {'label': 'Mira', 'group': 'person', 'says': [{'text': 'Mira.'}]}
+    eng = Engine(Story(data))
+    eng.start(seed=1)
+    eng.act('go:cabin')
+    talk = next(c for c in eng.menu()['children'] if c['label'] == 'Talk')
+    lazlo = talk['children'][0]
+    labels = [c['label'] for c in lazlo['children']]
+    check(labels[-2:] == ['people', 'things'] and len(next(c for c in lazlo['children'] if c['label'] == 'things')['children']) == 7
+          and 'about the ledger' in labels, f'topic groups: {labels}')
+
+
+@test
 def playtest_explores_the_demo():
     story = Story(demo_data())
     result = playtest.explore(story)

@@ -431,6 +431,19 @@ for reference.
   ◆). The playtest explorer drops what cannot matter from a state (other
   scenes' interactions and events, flags read only by text, seen-subjects no
   condition asks about), which keeps the demo at 27k states.
+- **Built after the first generated world (2026-10-04):** `heard` (what the
+  player has examined, asked or thought, and which rooms have been
+  described): menu leaves for examine, talk and think carry `new` until
+  taken, and a node is new when anything under it is (the terminal player
+  marks it •). A room's base description is given on the first visit and
+  on Look; a revisit gives only the scene layer, fragments and who and what
+  is here. Topics (and interactions) may carry `group` (person, place,
+  object, event): an object with more than 8 options sorts its grouped ones
+  into submenus (people, places, things, what happened) after its ungrouped
+  ones. The playtest checks every explored state's menu: every option in it
+  exactly once, no level showing two entries alike or one unlabelled, no
+  level wider than 29 (the terminal player's keys). The terminal player
+  takes one key press per choice.
 - **Planned with stage B (2026-10-04, superseded by the entry above):** a `seen` state
   (people present in rooms the player enters, objects seen or examined;
   `seen('x')` in conditions) so conversations about anything encountered
