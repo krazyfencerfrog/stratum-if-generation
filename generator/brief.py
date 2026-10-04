@@ -249,6 +249,12 @@ def field_line(field_id, entry):
     entry = entry or {}
     parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k not in ('binding', 'inferred')]
     binding = entry.get('binding', 'free') + (', inferred' if entry.get('inferred') else '')
+    if binding == 'free':
+        # phase 3 must put SOMETHING in a field the Kernel says nothing about;
+        # shown bare, that placeholder reads as a choice (kernel8, "surprise
+        # me", came out a quiet one-room drama because every placeholder
+        # was the smallest option)
+        binding = 'free: a placeholder nothing in the Kernel chose; replace it freely'
     return f"{field_id} [{binding}]: " + '; '.join(parts)
 
 

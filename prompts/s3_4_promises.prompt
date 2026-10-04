@@ -54,6 +54,14 @@ RULES
  3. Promises are about what the audience came for, not about structure:
     nothing here says how many endings, how many choices, or how long.
  4. No proper names. No plot order. No menus.
+ 5. A brief line marked [free: a placeholder ...] is not a preference: the
+    Kernel chose nothing there. When most lines are free (the Kernel says
+    almost nothing: "surprise me", "I want a mystery"), you are the one
+    who chooses: commit to one specific, vivid kind of story with its own
+    dangers, places and wonders, and let its promises fill the free
+    fields. Never let placeholders such as "single setting", "no failure"
+    or "measured tone" make the story small; a Kernel that asks to be
+    surprised is asking for something bold.
 
 OUTPUT FORMAT (JSON)
 

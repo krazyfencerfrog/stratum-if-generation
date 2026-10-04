@@ -39,6 +39,7 @@ GENRE_WORDS = {
 
 # roles that are not people, or not one person: they keep their role
 NOT_A_PERSON = re.compile(r"\b(dragon|sword|blade|ai|ship|computer|machine|beast|creature|spirit|ghost|wolf|hound|"
+                          r"skeleton|corpse|remains|golem|statue|automaton|construct|idol|wraith|specter|spectre|"
                           r"horse|storm|council|crowd|crew|families|villagers|guards|navy|army|mob|house|tower|"
                           r"system|core|voice|swarm|hive)\b", re.I)
 
@@ -109,13 +110,20 @@ def premise_texts(premise):
 def head_noun(role):
     """The word a role is about: "the tower warden" -> warden, "the cursed
     talking sword" -> sword, "the keeper of the bridge" -> keeper."""
-    words = re.sub(r"'s\b", '', str(role).lower()).split(' of ')[0].split()
+    words = re.split(r'\s(?:of|in|on|at|from|with|under|behind|beside|by|who|that)\s',
+                     re.sub(r"'s\b", '', str(role).lower()))[0].split()
     return words[-1] if words else ''
+
+
+# made of something no person is made of: "the stone guardian", "the clockwork warden"
+NOT_FLESH = re.compile(r"\b(stone|iron|bronze|brass|clockwork|wooden|bone|skeletal|marble|granite|glass|"
+                       r"spectral|ghostly|mechanical|crystal|clay)\b", re.I)
 
 
 def wants_a_name(seed):
     return (isinstance(seed, dict) and seed.get('role') and seed.get('kind') != 'crowd'
             and not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
+            and not NOT_FLESH.search(str(seed['role']))
             and re.sub(r'^(the|a|an)\s+', '', str(seed['role']).strip().lower()) not in ('protagonist', 'you', 'player'))
 
 
