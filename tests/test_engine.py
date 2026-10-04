@@ -348,6 +348,26 @@ def playtest_explores_the_demo():
 
 
 @test
+def playtest_checks_what_the_menu_shows():
+    check(len(cli.KEYS) == playtest.MAX_CHOICES, 'the playtest and the terminal player disagree on menu width')
+    data = demo_data()
+    s1 = data['scenes']['S01']['interactions']
+    twin = dict(next(i for i in s1 if i['id'] == 'S01.cast_off'), id='S01.cast_off_twin')
+    s1.append(twin)                     # a second entry labelled exactly like the first
+    story = Story(data)
+    errors, _ = playtest.explore_findings(story, playtest.explore(story, max_states=300))
+    check(any(e.startswith('MENU: scene S01') and 'times' in e for e in errors), f'twin menu entries missed: {errors}')
+    eng = Engine(story)
+    eng.start(seed=1)
+    many = [{'id': f'x{k}', 'verb': 'wave', 'object': None, 'detail': None} for k in range(playtest.MAX_CHOICES + 1)]
+    real = eng.options
+    eng.options = lambda: real() + [dict(o, object_label=None, detail_label=None) for o in many]
+    eng.menu = lambda: {'label': None, 'children': [{'label': f'w{k}', 'id': o['id']} for k, o in enumerate(many)]}
+    problems = playtest.menu_problems(eng)
+    check(any('more than' in p for p in problems) and any('not in the menu' in p for p in problems), f'{problems}')
+
+
+@test
 def playtest_finds_stuck_states_and_missed_choices():
     data = demo_data()
     # the jump uses up the bow line without ending the scene, and the other answers close

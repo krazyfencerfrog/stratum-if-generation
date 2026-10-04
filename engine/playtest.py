@@ -36,7 +36,7 @@ import sys
 from collections import Counter, deque
 
 from expressions import evaluate, parse
-from runtime import FREE, Engine
+from runtime import FREE, Engine, leaves
 from story import Story, ending_groups, validate
 
 RANDOM_SHIFT_LIMIT = 0.15
@@ -195,6 +195,40 @@ def time_taking(eng):
 
 # ---------------------------------------------------------------- exhaustive exploration
 
+MAX_CHOICES = 29          # entries one menu level can show: the keys the terminal player has (cli.KEYS)
+
+
+def menu_problems(eng):
+    """What a person at the menu cannot do that the explorer can: an option
+    missing from the menu or in it twice, two entries one level shows alike,
+    an entry with no label, a level with more entries than keys."""
+    tree = eng.menu()
+    found = Counter(i for _, i in leaves(tree))
+    problems = []
+    for o in eng.options():
+        if found[o['id']] == 0:
+            problems.append(f"option {o['id']} is not in the menu")
+        elif found[o['id']] > 1:
+            problems.append(f"option {o['id']} is in the menu {found[o['id']]} times")
+
+    def walk(node, path):
+        kids = node.get('children') or []
+        where = ' › '.join(path) or 'the top level'
+        if len(kids) > MAX_CHOICES:
+            problems.append(f'{where} has {len(kids)} entries, more than the {MAX_CHOICES} a menu level can show')
+        labels = Counter(str(c.get('label') or '').strip().lower() for c in kids)
+        if labels.get(''):
+            problems.append(f'{where} has an entry with no label')
+        for label, n in labels.items():
+            if label and n > 1:
+                problems.append(f'{where} shows {label!r} {n} times')
+        for c in kids:
+            if 'children' in c:
+                walk(c, path + [str(c.get('label') or '')])
+    walk(tree, [])
+    return problems
+
+
 def explore(story, max_states=50000):
     norm = Normalizer(story)
     eng = Engine(story)
@@ -205,6 +239,7 @@ def explore(story, max_states=50000):
     endings = {}                               # ending -> {combo: state index}
     truncated = False
     clipped = set()                            # states that lost a successor to the limit
+    menus = {}                                 # (scene, problem) -> the first state it shows in
     queue = deque([0])
     while queue:
         i = queue.popleft()
@@ -215,6 +250,8 @@ def explore(story, max_states=50000):
             endings.setdefault(st.ending, {}).setdefault(resolution_combo(story, st), i)
             continue
         eng.state = st.clone()
+        for problem in menu_problems(eng):
+            menus.setdefault((st.scene, problem), i)
         for opt in time_taking(eng):
             offered.add(opt['id'])
             eng.state = st.clone()
@@ -255,7 +292,8 @@ def explore(story, max_states=50000):
                 todo.append(i)
     stuck = [i for i in range(len(states)) if i not in can]
     return {'states': states, 'parent': parent, 'truncated': truncated, 'offered': offered, 'taken': taken,
-            'fired': fired, 'scenes': scenes, 'exits_taken': exits_taken, 'endings': endings, 'stuck': stuck}
+            'fired': fired, 'scenes': scenes, 'exits_taken': exits_taken, 'endings': endings, 'stuck': stuck,
+            'menus': menus}
 
 
 def path_to(result, i):
@@ -287,6 +325,8 @@ def explore_findings(story, result):
         first = min(idxs, key=lambda i: len(path_to(result, i)))
         errors.append(f'STUCK: {len(idxs)} state(s) in scene {sid} from which no ending can be reached; '
                       f"the first comes after: {' / '.join(path_to(result, first)) or '(the start)'}")
+    for (sid, problem), i in result.get('menus', {}).items():
+        errors.append(f"MENU: scene {sid}: {problem}; first after: {' / '.join(path_to(result, i)) or '(the start)'}")
     for sid, sc in story.scenes.items():
         if sid not in result['scenes']:
             continue
