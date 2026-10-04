@@ -353,6 +353,20 @@ needs, and a world worth wandering in.
   each must contribute to the story's feel: specific details and at least
   one thing worth examining.
 
+**Built 2026-10-04** (`generator/world.py`, prompts `s6b1`, `s6b1f`, `s6b2`,
+`s6b2m`, `s6b1c`, `s6b3`; `main.py --stage-b`, or `python world.py <id>` on
+a directory with stage A's output). Not yet run on the live model. Settled
+while building: the order is B1 (with the functional people batched),
+B2 and the map, then B1c (conversation needs the places and the notable
+objects to exist), then B3; every node sets `done_<node id>` when it plays
+(stage D's job), so text can be keyed "after N04a"; the model writes
+variants as `{state, direction, after, text}` and Python compiles them to
+conditions (a state variant is `pattern(state, dir, 1, 0.6)`); conversation
+about a person or object is gated by `seen(id)`, about a place by visiting
+one of its rooms, about an event by the done flag of the node where it
+lands. The plumbing test wraps the stub world in a one-scene package and
+runs the engine's validator over it.
+
 ### Engine additions these need
 
 - `seen` state: characters present in a room the player enters and objects

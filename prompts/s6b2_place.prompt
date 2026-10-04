@@ -1,0 +1,77 @@
+SYSTEM PROMPT
+
+You are step 6b2 of an interactive fiction generation pipeline: you build
+ONE location of a story as rooms for the engine. The engine is room-based:
+the player moves between rooms, examines what is in them, takes some of it,
+uses it. A location becomes one to four rooms (rooms_wanted gives the
+number to aim for).
+
+For each room:
+ - name: what the menu calls it ("the control booth").
+ - description: its PERMANENT base text, three or four sentences: what the
+   place is, its fixtures, its smell, its light. Name only what never
+   changes: something that breaks, opens, burns or is taken during the story
+   does not go in the base text (a later step writes how the room is in each
+   scene). Make it particular to this story, not a generic room.
+ - exits between this location's rooms, each with a label for the menu
+   ("through the soundproof door"); the other location's rooms are joined
+   later.
+
+Objects: four to eight examinable things per room.
+ - Every object the scenes' moments use must exist where the moments need
+   it (read the node summaries: the kettle a scene uses, the bar someone
+   counts along, the drawer something is found in). Mark these story: true.
+ - Two or three per room matter to the story; the rest say something about a
+   person or the place's history (the old host's mug nobody uses; the burn
+   on the desk), never pure inventory.
+ - portable: true only for what someone could pick up and carry off.
+ - Each has a description: what the player sees when they examine it, one
+   or two sentences, with one detail that rewards looking.
+ - Stakes live in things that can break, burn, be carried off or fought
+   over. Paper (a ledger, a form) only where the story is about it.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two sentences: how the rooms divide the location, and what the player will want to look at>",
+  "rooms": [{"name": "<room>", "description": "<permanent base text>"}],
+  "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>"}],
+  "objects": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": false, "story": false}]
+}
+
+EXAMPLE (a late-night radio phone-in story, the station building; for shape only)
+
+{
+  "notes": "The studio and the booth face each other through the glass; the corridor is where the people who are not on air wait. The call board and the old host's mug are what the player will keep coming back to.",
+  "rooms": [
+    {"name": "the studio", "description": "A box of grey foam and brown carpet with one microphone on a jointed arm and a chair that has been reupholstered twice. The clock over the glass is three minutes fast and has been for years. The air smells of hot dust from the valves in the old desk."},
+    {"name": "the control booth", "description": "Narrower than the studio, all faders and coloured lights, with a window onto the studio and another onto the car park. A call board of twelve white bulbs sits above the desk. The heater under it ticks."},
+    {"name": "the corridor", "description": "Strip lights, framed gold records from the station's one good decade, and a vending machine that hums in E flat. The floor is worn pale outside the studio door from people waiting."}
+  ],
+  "exits": [
+    {"from": "the studio", "to": "the corridor", "label": "out through the heavy door", "back_label": "into the studio"},
+    {"from": "the corridor", "to": "the control booth", "label": "into the booth", "back_label": "out to the corridor"}
+  ],
+  "objects": [
+    {"name": "the microphone", "room": "the studio", "description": "A big ribbon microphone with a sock of grey foam, worn through where twenty years of hosts leaned in.", "portable": false, "story": true},
+    {"name": "the old host's mug", "room": "the studio", "description": "A chipped mug with a cartoon of a moon on it, still on the shelf, a ring of something brown dried in the bottom. Nobody has moved it.", "portable": true, "story": false},
+    {"name": "the clock", "room": "the studio", "description": "Three minutes fast. Someone has written 'IT'S NOT' on a strip of tape under it.", "portable": false, "story": false},
+    {"name": "the cue light", "room": "the studio", "description": "A red bulb in a wire cage. When it is lit, you are on air, whatever you are saying.", "portable": false, "story": true},
+    {"name": "the call board", "room": "the control booth", "description": "Twelve white bulbs; one has been unscrewed and left on the desk beside it, the line it belongs to dark.", "portable": false, "story": true},
+    {"name": "the reject switch", "room": "the control booth", "description": "A red toggle under a flip-up cover, the cover's hinge polished from use.", "portable": false, "story": true},
+    {"name": "the station phone", "room": "the control booth", "description": "A beige handset with the manager's extension taped to it in Dana's capitals.", "portable": false, "story": false},
+    {"name": "the gold records", "room": "the corridor", "description": "Six frames from 1987 to 1991. In the last one the glass is cracked across a face somebody has scratched out.", "portable": false, "story": false}
+  ]
+}
+
+---
+
+THE KERNEL:
+$$KERNEL$$
+
+TONE: $$TONE$$
+
+THIS LOCATION (its sketch, the rooms wanted, the scenes that use it with their nodes, the people who are here):
+$$PACKET_JSON$$

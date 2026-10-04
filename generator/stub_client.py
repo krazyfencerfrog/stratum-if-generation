@@ -60,6 +60,8 @@ Scenario knobs (environment variables):
     STUB_STOP_AFTER=3            4d says stop after this iteration (--branching=judge)
     STUB_BAD_FORM=1              3.5b's first answer gives a turn the form "choose"
                                  (tests that it costs one retry, not a repair round)
+    STUB_FUNCTIONAL=1            5a0 makes every candidate functional (exercises
+                                 stage B's functional batch)
     STUB_SHIFT=1                 with --stage-a, 5a1 proposes a pattern shift on
                                  the first arc's state (tests the threshold math)
     STUB_NO_TELLS=1              5a2's first answer for each line leaves its tells
@@ -168,6 +170,12 @@ class StubClient(LlmClient):
             ('You are step 5a0', 's5a0'),
             ('You are step 5a1', 's5a1'),
             ('You are step 5a2', 's5a2'),
+            ('You are step 6b1f of', 's6b1f'),
+            ('You are step 6b1c of', 's6b1c'),
+            ('You are step 6b1 of', 's6b1'),
+            ('You are step 6b2m of', 's6b2m'),
+            ('You are step 6b2 of', 's6b2'),
+            ('You are step 6b3 of', 's6b3'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -748,7 +756,8 @@ class StubClient(LlmClient):
     def p_s5a0(self, p):
         cands = self.section(p, 'CANDIDATES (') or []
         return {"cast": [{"who": c['who'], "note": f"stub: {'recurs and warms' if i == 0 else 'delivers a scene'}",
-                          "tier": 'supporting' if i == 0 else 'functional'} for i, c in enumerate(cands)]}
+                          "tier": 'supporting' if i == 0 and not env_int('STUB_FUNCTIONAL', 0) else 'functional'}
+                         for i, c in enumerate(cands)]}
 
     def p_s5a1(self, p):
         pk = self.section(p, 'THE OUTLINE (') or {}
@@ -854,4 +863,65 @@ class StubClient(LlmClient):
                         "title": "Where They Stand", "summary": "stub: " + " ".join(["where they end up at the close"] * 4),
                         "image": "an empty chair", "who": []})
         return {"notes": "stub: two chances per arc", "minor_nodes": out}
+
+    # ------------------------------------------------------------------ stage B
+
+    @staticmethod
+    def v(text, state=None, direction=None, after=None):
+        return {"state": state, "direction": direction, "after": after, "text": text}
+
+    def p_s6b1(self, p):
+        pk = self.section(p, 'THIS PERSON (') or {}
+        who = pk.get('who', 'someone')
+        own = ((pk.get('arc') or {}).get('state') or {}).get('name')
+        first_node = next((sc['nodes'][0]['id'] for sc in pk.get('scenes') or [] if sc.get('nodes')), None)
+        n = 3 if pk.get('tier') == 'arc' else 2
+        desc = ([self.v(f"stub: {who} stands closer to you than before", own, 'up')] if own else []) + \
+               [self.v(f"stub: {who}, plainly dressed, watching the door")]
+        topics = [{"label": f"{who.split(' (')[0]} topic {k + 1}", "known_after": first_node if k == n - 1 else None,
+                   "says": [self.v(f"stub: what {who.split(' (')[0]} says about thing {k + 1}")], "moves": []} for k in range(n)]
+        return {"notes": "stub", "history": "stub: a past that matters" if pk.get('tier') == 'arc' else None,
+                "description": desc, "here": [self.v(f"stub: {who.split(' (')[0]} is here.")], "topics": topics}
+
+    def p_s6b1f(self, p):
+        people = self.section(p, 'THE PEOPLE (') or []
+        return {"note": "stub", "people": [{"who": x['who'], "description": f"stub: {x['who']} in a work coat",
+                                            "here": f"stub: {x['who']} is here.",
+                                            "topics": [{"label": "their work", "says": "stub: it is a living"}]} for x in people]}
+
+    def p_s6b2(self, p):
+        pk = self.section(p, 'THIS LOCATION (') or {}
+        name = (pk.get('location') or {}).get('name') or 'the place'
+        n = max(1, min(4, int(pk.get('rooms_wanted') or 1)))
+        rooms = [{"name": f"{name}, part {i + 1}", "description": "stub: " + " ".join(["a particular corner of " + name] * 4)}
+                 for i in range(n)]
+        exits = [{"from": rooms[i]['name'], "to": rooms[i + 1]['name'], "label": "onward", "back_label": "back"} for i in range(n - 1)]
+        objects = [{"name": f"{r['name']} thing {k + 1}", "room": r['name'], "description": "stub: worth a look",
+                    "portable": k == 0, "story": k == 1} for r in rooms for k in range(4)]
+        return {"notes": "stub", "rooms": rooms, "exits": exits, "objects": objects}
+
+    def p_s6b2m(self, p):
+        pk = self.section(p, 'THE LOCATIONS, THE SCENES') or {}
+        locs = [l for l in pk.get('locations') or [] if l.get('rooms')]
+        connective, adjacent = [], []
+        for a, b in zip(locs, locs[1:]):
+            cname = f"the way from {a['name']} to {b['name']}"
+            connective.append({"name": cname, "description": "stub: " + " ".join(["a path that smells of the story"] * 4),
+                               "examinable": [{"name": f"a mark on {cname}", "description": "stub: someone passed here"}]})
+            adjacent += [{"from_room": a['rooms'][0], "to_room": cname, "label": "along the way", "back_label": "back"},
+                         {"from_room": cname, "to_room": b['rooms'][0], "label": "on", "back_label": "back along the way"}]
+        return {"notes": "stub", "connective": connective, "adjacent": adjacent}
+
+    def p_s6b1c(self, p):
+        pk = self.section(p, 'AND THE SUBJECTS') or {}
+        who = (pk.get('who') or 'someone').split(' (')[0]
+        return {"notes": "stub", "lines": [{"subject": x['subject'], "says": [self.v(f"stub: {who} on {x['subject']}")]}
+                                           for x in pk.get('subjects') or []]}
+
+    def p_s6b3(self, p):
+        pk = self.section(p, 'YOU (who you are') or {}
+        return {"notes": "stub", "description": [self.v("stub: you, tired, in a borrowed coat")],
+                "carrying": [{"name": "a keepsake", "description": "stub: it was hers"}],
+                "think": [{"label": label, "known_after": None, "says": [self.v(f"stub: what you think about {label}")]}
+                          for label in ("your history", "the person you owe", "what you need")]}
 

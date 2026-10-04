@@ -49,6 +49,8 @@ from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
 import evaluate
 import arcs
+import scenes
+import world as world_stage
 import example_guard
 import names
 
@@ -1496,6 +1498,30 @@ class StoryGenerator:
         return result
 
 
+    # ------------------------------------------------------------------ stage B: the world
+
+    def run_world(self, story=None, arcs_result=None):
+        """Stage B (generator/world.py, docs/later_stages.md §3): B0 scenes and
+        subjects, then characters, places and the map, conversation, and you.
+        Writes <id>_scenes.json, <id>_world.json and <id>_world.md."""
+        story = story or self.analysis.get('story') or json.loads(Path(self.story_file_path('story.json')).read_text(encoding='utf-8'))
+        if arcs_result is None:
+            path = Path(self.story_file_path('arcs.json'))
+            if not path.is_file():
+                raise PipelineHalt('stage B needs stage A (<id>_arcs.json); run with --stage-a')
+            arcs_result = json.loads(path.read_text(encoding='utf-8'))
+        plan = scenes.plan(story, arcs_result, self.analysis.get('s3_brief'), self.analysis.get('s3_4_promises'))
+        self.save_story_json('scenes.json', plan)
+        result = world_stage.WorldBuilder(self, story, arcs_result, plan).run()
+        self.save_story_json('world.json', result)
+        self.save_story_file('world.md', world_stage.world_markdown(result))
+        print(f"stage B: {len(result['world']['rooms'])} rooms, {len(result['world']['objects'])} objects, "
+              f"{len(result['world']['characters'])} people; {len(result['checks'])} finding(s)")
+        for f in result['checks']:
+            print(f'  - {f}')
+        return result
+
+
 # a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
 FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
 
@@ -1563,6 +1589,9 @@ if __name__ == "__main__":
     parser.add_argument("--stage-a", action="store_true",
                         help="after the outline, run stage A (arcs and node expansion: <id>_arcs.json, <id>_arcs.md); "
                              "on a finished story directory only stage A makes model calls")
+    parser.add_argument("--stage-b", action="store_true",
+                        help="after stage A, run stage B (the world: characters, places, conversation, you; "
+                             "<id>_world.json, <id>_world.md); implies --stage-a")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
@@ -1627,8 +1656,10 @@ if __name__ == "__main__":
         gen.run_outline(max_iterations=args.max_iterations)
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
         gen.run_outline_judge()
-        if args.stage_a:
-            gen.run_arcs()
+        if args.stage_a or args.stage_b:
+            arcs_result = gen.run_arcs()
+            if args.stage_b:
+                gen.run_world(arcs_result=arcs_result)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)

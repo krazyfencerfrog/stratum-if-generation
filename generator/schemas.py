@@ -210,9 +210,35 @@ MINOR_NODE = obj(
 )
 LINE_EXPANSION = obj(notes=S, minor_nodes=arr(MINOR_NODE))
 
+# ---------------------------------------------------------------- stage B (world.py)
+
+VARIANT = obj(state=STR_OR_NULL, direction=UP_DOWN_OR_NULL, after=STR_OR_NULL, text=S)
+WORLD_CHARACTER = obj(
+    notes=S, history=STR_OR_NULL, description=arr(VARIANT), here=arr(VARIANT),
+    topics=arr(obj(required=['label', 'known_after', 'says'], label=S, known_after=STR_OR_NULL, says=arr(VARIANT),
+                   moves=arr(obj(state=S, direction=UP_DOWN)))),
+)
+WORLD_FUNCTIONAL = obj(note=S, people=arr(obj(who=S, description=S, here=S, topics=arr(obj(label=S, says=S)))))
+WORLD_PLACE = obj(
+    notes=S, rooms=arr(obj(name=S, description=S)),
+    exits=arr(obj(**{'from': S}, to=S, label=S, back_label=S)),
+    objects=arr(obj(name=S, room=S, description=S, portable=B, story=B)),
+)
+WORLD_MAP = obj(
+    notes=S, connective=arr(obj(name=S, description=S, examinable=arr(obj(name=S, description=S)))),
+    adjacent=arr(obj(from_room=S, to_room=S, label=S, back_label=S)),
+)
+WORLD_CONVERSATION = obj(notes=S, lines=arr(obj(subject=S, says=arr(VARIANT))))
+WORLD_YOU = obj(
+    notes=S, description=arr(VARIANT), carrying=arr(obj(name=S, description=S)),
+    think=arr(obj(label=S, known_after=STR_OR_NULL, says=arr(VARIANT))),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
     'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
     'OUTLINE_JUDGE': OUTLINE_JUDGE, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
+    'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
+    'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU,
 }

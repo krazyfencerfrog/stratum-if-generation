@@ -539,6 +539,44 @@ def stage_a_expands_arcs():
 
 
 @test
+def stage_b_builds_an_engine_world():
+    import world as world_stage
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    # variants compile to engine conditions, conditional first, the default last
+    problems = []
+    got = world_stage.compile_variants([{'state': None, 'text': 'plain'}, {'state': 'nerve', 'direction': 'up', 'text': 'brave'},
+                                        {'after': 'N02', 'text': 'later'}], {'nerve'}, {'N02': {}}, problems, 'x')
+    check(not problems and [v.get('when') for v in got] == ["pattern('nerve','up',1,0.6)", 'flags.done_N02', None],
+          f'compiled variants: {got} {problems}')
+    world_stage.compile_variants([{'state': 'courage', 'direction': 'up', 'text': 'x'}], {'nerve'}, {}, problems, 'y')
+    check(problems, 'an unknown state compiled')
+
+    run('stageb', args=['--stage-b'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1'})
+    result = load('stageb', 'world.json')
+    w = result['world']
+    story = load('stageb', 'story.json')
+    people = [c for c, ch in story['characters'].items() if ch.get('kind') != 'crowd']
+    check(set(w['characters']) == set(people), f"people built: {sorted(w['characters'])} vs {people}")
+    check(len(w['rooms']) >= 10 and all(r['exits'] for r in w['rooms'].values()), 'rooms missing or unjoined')
+    check(any(o['location'] == 'player' for o in w['objects'].values()), 'you carry nothing')
+    check(len(result['protagonist']['think']) >= 3, 'fewer than three things to think about')
+    gated = [t for c in w['characters'].values() for t in c['topics'].values() if "seen('" in (t.get('known_when') or '')]
+    check(gated, 'no conversation about encountered subjects')
+    # the world is valid engine data, wrapped in a one-scene package with the done flags declared
+    rooms = list(w['rooms'])
+    pkg = {'format': 'stratum-story/1', 'story_id': 'stageb', 'title': 'world check', 'protagonist': result['protagonist'],
+           'states': {k: {'meaning': v.get('meaning')} for k, v in load('stageb', 'arcs.json')['states'].items()},
+           'world': {'rooms': w['rooms'], 'objects': w['objects'], 'characters': w['characters']},
+           'initial_flags': {f: False for f in result['done_flags']},
+           'scenes': {'S1': {'rooms': rooms, 'cast': {c: rooms[0] for c in w['characters']}, 'interactions': [],
+                             'exits': [{'to': 'END', 'when': 'turns >= 3'}]}},
+           'start': {'scene': 'S1', 'room': rooms[0]}, 'endings': {'END': {'text': [{'text': 'end'}]}}}
+    errors, _ = engine_validate(EngineStory(pkg))
+    check(not errors, f'the world is not valid engine data: {errors[:5]}')
+
+
+@test
 def every_prompt_is_exercised():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt'))}
     unused = have - used_prompts
