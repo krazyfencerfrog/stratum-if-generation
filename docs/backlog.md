@@ -155,6 +155,22 @@ engine (rooms, objects, characters with topics).
 3.5a, 3.5b, 4a and 4c carry 26-40 KB. Find text that changes nothing
 (redundant rules, oversized examples) and cut it: a smaller input leaves
 more of a fixed budget for the story. Pairs with the budget investigation.
+Measured 2026-10-04: 3.5a's template is 24 KB, 11 KB of it the two
+calibration examples (each with a reasoning paragraph and a full output);
+3.5b 20 KB, 4c 16 KB. Deliberately not cut blind: wait for the premise A/B
+(which tests whether the protagonist fields added to 3.5a hurt), then try a
+trimmed 3.5a (one example, or examples without their reasoning) as an A/B
+variant at the same budget.
+
+### Question for the user: relationship states at the premise level
+The premise audit (3.5v) reports "the crew's trust rises or falls with each
+favour, and they open the gate only if it is high enough" as a system the
+engine lacks; its own example says so. That rule predates the new engine,
+which has arc states and pattern conditions, and stage A builds exactly
+such states (perceived through tells, never as numbers). Should 3.5 be
+allowed to name a relationship that moves with the player's choices and
+gates something, leaving stage A to make it playable? Undecided; the audit
+still forbids it.
 
 ### Code health [solo]
 - Review `main.py` (about 1,500 lines) and `outline.py`: three authors in
