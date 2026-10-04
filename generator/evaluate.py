@@ -35,6 +35,12 @@ def content_words(text):
     return {w for w in words(text) if example_guard.content(w)}
 
 
+PAPERWORK = re.compile(r"\b(ledgers?|receipts?|contracts?|papers|forms?|signatures?|signed|signs?|countersign\w*|logbooks?|"
+                       r"registers?|files?|seals?|sealed|oaths?|letters?|fees?|clauses?|deeds?|documents?|invoices?|"
+                       r"accounts?|tickets?|permits?|certificates?|licen[cs]es?|warrants?|writs?|petitions?|treaty|"
+                       r"charters?|ledger|bills? of)\b", re.I)
+
+
 def phrases(text, n=PHRASE_N):
     return example_guard.ngrams(text, n)
 
@@ -132,6 +138,11 @@ def metrics(story, promises=None):
     out['repeated_phrase_count'] = len(tics)
     brief = story.get('brief') or {}
     out['brief_echoes'] = example_guard.brief_echoes(summaries, brief)[:5] if brief else []
+    # paperwork: how much of the story turns on documents, fees and signatures (2026-10-04: 70-100% of node
+    # summaries on most kernels, a heist and a Roman bathhouse among them)
+    papery = [s for s in summaries if PAPERWORK.search(s)]
+    out['paperwork_share'] = round(len(papery) / len(summaries), 2) if summaries else 0
+    out['paperwork_words'] = sorted({m.lower() for s in summaries for m in PAPERWORK.findall(s)})[:12]
     out['retold_nodes'] = len(checks.repeated_nodes(nodes))
     out['repeated_situations'] = len(checks.repeated_situations(story))
 
@@ -248,6 +259,7 @@ KEY_COLUMNS = [
     ('lines', 'lines'), ('nodes', 'nodes'), ('earliest_fork_share', 'fork@'), ('forks_in_first_half', 'early'),
     ('ending_distinctness', 'worlds'), ('promise_coverage', 'promise'), ('events_placed', 'events'),
     ('repeated_phrase_count', 'tics'), ('repeated_situations', 'retold'), ('summaries_in_target_share', 'sized'),
+    ('paperwork_share', 'paper'),
 ]
 
 
