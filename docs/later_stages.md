@@ -170,6 +170,21 @@ Rules for opportunities (decided 2026-10-04):
 node's position on each line that passes through it, and a shared major
 node is expanded once, with every line through it in the packet.
 
+**Pattern shifts** (decided 2026-10-04). An obvious pattern of choices may
+change any level of the story: an arc's resolution, a line's ending, or the
+line itself (a jump to another line where the graph has a node to land on).
+"Obvious" means it cannot be random:
+- at least three opportunities on the path so far moved the state, and at
+  least three quarters of them moved it the same way;
+- before the shift lands, the player has seen at least two of those
+  opportunities' tells and one warning: a demonstration node where the
+  character visibly nears the edge (with rollback, the player sees it coming
+  and can turn back without a long rewind);
+- every path through the shift point also has a way to avoid it.
+A1 declares each one: `{"state", "direction", "threshold", "at": node,
+"does": "resolution | ending | line", "to": target}`; the computed checks
+confirm all three conditions.
+
 **Arc state and line shifts.** Opportunities move named states. A line's
 ending may come in variants keyed to state (a companion stays or goes). An
 edge may also be `accumulated`: a line shift triggered by a state pattern

@@ -162,6 +162,12 @@ Two arc characters, two supporting, no functional. The arc cast is closed.
       "ends": {"T1": "Steps back and lets the boat pass, the old rule kept.", "T2": "Names the salute for you when you sign, though nobody makes it.", "T3": "Hauls the boat into the side cut himself, the rule broken and him the one who broke it."}
     }
   },
+  "pattern_shifts": [
+    {"state": "captain_regard", "direction": "down", "threshold": "every opportunity that moved it on the path (at least 3 of 3) went down",
+     "at": "N06", "does": "line", "to": "T3N02",
+     "how": "At the lock the captain will not take a salute from someone who has dismissed him all night: the gates stay jammed, and the boat can only be hauled into the side cut by Stellan Ilunga's rope, which is T3's climax.",
+     "warning": "N05a: as Lazlo signs, the lamps dim everywhere except where you stand, and the captain is seen for the first time without looking at you."}
+  ],
   "setup_payoff": [
     {"setup_node": "N01", "payoff_node": "N06", "what": "Lazlo's tea, which he guards like a fee, becomes the salute.", "lines": ["T1"]},
     {"setup_node": "N04", "payoff_node": "N07", "what": "The crack only the dark shows is where the hull leaks as the boat finally moves.", "lines": ["T1"]}
@@ -268,6 +274,13 @@ boat.
 ```
 
 ---
+
+Pattern shift (added 2026-10-04): if you dismiss the captain at every
+opportunity on T1 (N02a, N04a, and the bow-line attempt counts against him
+too), he refuses the salute at N06 and the line jumps to T3's side-cut
+climax (T3N02). It needs a clear majority (3 of 3 here), two tells (the
+dark wheelhouse lamp at N03, the timbers groaning at you at N05) and the
+warning at N05a before it lands.
 
 Changes after review (2026-10-04): N02a and N04a gained an active attempt
 (tie off yourself; bail and plug the crack), each with its own effect when it
