@@ -235,6 +235,9 @@ class SceneCompiler:
                 if not room:
                     problems.append(f"prop {p['name']!r}: room {p.get('room')!r} is not open in this scene")
                     continue
+                if norm(p['name']) in names:     # already in the world: the scene uses that one
+                    props[norm(p['name'])] = names[norm(p['name'])]
+                    continue
                 oid = slug(p['name'], taken | set(new_objects))
                 new_objects[oid] = {'name': p['name'], 'location': room, 'portable': bool(p.get('portable')),
                                     'listed': bool(p.get('portable')), 'description': [{'text': p.get('description') or p['name']}]}

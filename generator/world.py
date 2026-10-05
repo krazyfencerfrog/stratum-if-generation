@@ -474,7 +474,9 @@ class WorldBuilder:
         return tied[:OWN_OBJECTS]
 
     def b1c_conversation(self, cid):
-        everyone = [s for s in self.subject_list() if s['subject'] not in (self.world['characters'][cid]['name'],)]
+        curated = {norm(t['label']) for t in self.world['characters'][cid]['topics'].values()}
+        everyone = [s for s in self.subject_list() if s['subject'] != self.world['characters'][cid]['name']
+                    and norm(s['subject']) not in curated]      # never a second topic on what a curated one covers
         subjects = [s for s in everyone if s['kind'] != 'object'] + self.own_objects(cid, everyone)
         packet = {'who': self.who(cid), 'voice': self.chars[cid].get('voice'), 'tie': self.chars[cid].get('tie'),
                   'tier': self.tiers.get(cid), 'arc': self.arc_of(cid), 'states': sorted(self.states),
@@ -501,6 +503,8 @@ class WorldBuilder:
         for x in as_list(answer.get('lines')):
             s = names.get(norm(x.get('subject')))
             if not s:
+                continue
+            if norm(s['subject']) in {norm(t['label']) for t in topics.values()}:
                 continue
             tid = slug('about ' + s['subject'], topics)
             topics[tid] = {'label': s['subject'], 'known_when': s['gate'], 'group': s['kind'],
@@ -544,8 +548,15 @@ class WorldBuilder:
                             'description': compile_variants(answer.get('description'), self.states, self.nodes, problems, 'you'),
                             'think': think}
         taken = set(self.world['objects']) | set(self.world['rooms']) | set(self.chars)
+        by_name = {norm(x['name']): k for k, x in self.world['objects'].items()}
         for o in as_list(answer.get('carrying')):
-            if isinstance(o, dict) and o.get('name'):
+            if isinstance(o, dict) and o.get('name') and norm(o['name']) in by_name:
+                # the thing already exists (the sale papers on the table): you have it, not a second one
+                x = self.world['objects'][by_name[norm(o['name'])]]
+                x.update({'location': 'player', 'portable': True, 'listed': True, 'story': True})
+                if o.get('description'):
+                    x['description'] = [{'text': o['description']}]
+            elif isinstance(o, dict) and o.get('name'):
                 oid = slug(o['name'], taken)
                 taken.add(oid)
                 self.world['objects'][oid] = {'name': o['name'], 'location': 'player', 'portable': True, 'listed': True,

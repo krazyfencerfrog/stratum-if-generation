@@ -569,6 +569,11 @@ def stage_b_builds_an_engine_world():
     w = result['world']
     names = [r['name'] for r in w['rooms'].values()]
     check(len(set(names)) == len(names), f'two rooms share a name: {sorted(names)}')
+    things = [o['name'].lower() for o in w['objects'].values()]
+    check(len(set(things)) == len(things), 'two objects share a name')
+    for c in w['characters'].values():
+        labels = [t['label'].lower() for t in c['topics'].values()]
+        check(len(set(labels)) == len(labels), f"{c['name']} has two topics with one label")
     story = load('stageb', 'story.json')
     people = [c for c, ch in story['characters'].items() if ch.get('kind') != 'crowd']
     check(set(w['characters']) == set(people), f"people built: {sorted(w['characters'])} vs {people}")
