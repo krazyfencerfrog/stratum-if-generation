@@ -55,20 +55,13 @@ from brief import brief_lite, shape_targets
 from errors import SoftReject
 from stats import SCHEMA_VERSION
 import checks
+from checks import as_list
 import example_guard
 import frameworks
 import schemas
 
 
 FILL_CHUNK = 4      # nodes filled per 4b call
-
-
-def as_list(value):
-    if value is None:
-        return []
-    if isinstance(value, list):
-        return value
-    return [value]
 
 
 def compact_json(obj):

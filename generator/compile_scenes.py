@@ -35,7 +35,6 @@ import sys
 
 import checks
 import schemas
-from errors import SoftReject
 from world import compile_variants, slug, as_list, compact
 
 norm = checks.norm

@@ -37,6 +37,7 @@ import re
 import sys
 
 import checks
+from checks import as_list
 import example_guard
 import schemas
 from errors import SoftReject
@@ -47,10 +48,6 @@ VARIANT_SHARE = 0.6
 OWN_OBJECTS = 12             # object subjects one person is asked about, at most
 EXAMINABLE_PER_ROOM = (4, 8)
 ID_RE = re.compile(r'[^a-z0-9]+')
-
-
-def as_list(v):
-    return v if isinstance(v, list) else ([] if v is None else [v])
 
 
 def compact(obj):

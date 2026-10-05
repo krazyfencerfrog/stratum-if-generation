@@ -35,6 +35,7 @@ import re
 import sys
 
 import checks
+from checks import as_list
 import playtest
 import schemas
 from errors import SoftReject
@@ -52,12 +53,6 @@ RESOLUTION_SHARE = 0.6
 SUMMARY_WORDS = (20, 70)
 TELL_REACH = 2                  # a tell lands within this many nodes after its opportunity, or at the next major node
 STATE_NAME = re.compile(r'^[a-z][a-z0-9_]{2,40}$')
-
-
-def as_list(value):
-    if value is None:
-        return []
-    return value if isinstance(value, list) else [value]
 
 
 def compact(obj):

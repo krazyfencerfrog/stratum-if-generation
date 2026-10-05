@@ -134,12 +134,6 @@ def _fields(bundle):
 CLASS_RANK = {'constraint': 2, 'default': 1, 'free': 0}
 
 
-def binding_for(field_id, constraint_map):
-    """Strongest binding class among the map entries under this field id
-    (the map lists leaf paths such as 3b.transgression.ceiling)."""
-    return binding_and_tier(field_id, constraint_map)[0]
-
-
 def binding_and_tier(field_id, constraint_map):
     """(binding class, evidence tier of the strongest entry). A constraint
     whose tier is strong_inference is one phase 3 inferred rather than read:
