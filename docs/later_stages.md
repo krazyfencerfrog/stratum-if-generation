@@ -601,6 +601,25 @@ compiled 15 scenes in about 2 hours. What it taught:
 - Conversation breadth needs a limit: everyone commenting on every object is
   filler. A person is asked about the things tied to them.
 
+### Second live run (2026-10-05, kernel35_f5, the clean rebuild)
+
+The whole current pipeline from the saved outline: stages A, B, C and D in
+177 minutes, 36 calls. Stage B built 61 objects and 4 people; stage D
+compiled 9 scenes, and the package plays: seekers reach an ending in every
+run (main line 42 of 50 to its own ending, branch seekers 48 of 50 to T2's),
+in 19 to 24 actions. What it taught:
+- Things were still made per place: the mooring line four times, the tiller,
+  the keys, the knife, and the cat (a character) as an object too, so menus
+  listed them twice. A place's thing whose name exists is the one already
+  made, and the place call sees what exists.
+- Every scene's first attempt was rejected because "the cat" found the
+  object before the person: an hour of retries. Placement looks people up
+  first.
+- A way on came as a verb and a detail with no object ("go", "up the plank
+  gangway"); the detail is now the object.
+- The cat as a character works: its topics are reactions ("pads to the
+  bollard, sits on the knot, and meows once; the line creaks looser").
+
 ## 6. Prose
 
 After D: the text the player reads, written into the package's text
