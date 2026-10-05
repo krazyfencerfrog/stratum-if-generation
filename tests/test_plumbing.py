@@ -617,6 +617,9 @@ def stages_c_and_d_compile_a_playable_package():
     ways = [it for sc in package['scenes'].values() for it in sc['interactions']
             if any(str(e.get('set', '')).startswith('go_') for e in it.get('effects') or [])]
     check(ways and all(it.get('reach') == 'any' for it in ways), 'a way on depends on having its object at hand')
+    neutral = {m['neutral'] for sc in package['scenes'].values() for m in sc.get('moments') or [] if m.get('neutral')}
+    check(all(it.get('reach') == 'any' and not it.get('room') for sc in package['scenes'].values()
+              for it in sc['interactions'] if it['id'] in neutral), 'a neutral option can be out of reach')
     free = [it for sc in package['scenes'].values() for it in sc['interactions'] if it.get('object_label') == 'the water']
     check(free, 'an action on something that is not a thing (the water) did not compile as free text')
     moves = [e for sc in package['scenes'].values() for it in sc['interactions'] for e in it.get('effects') or [] if 'move' in e]

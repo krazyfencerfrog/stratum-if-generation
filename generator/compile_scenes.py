@@ -142,20 +142,31 @@ class SceneCompiler:
 
     def reconcile(self):
         """Stage C's computed checks, before compiling: every scene's rooms are
-        joined among themselves, and every scene leads somewhere."""
+        joined among themselves (rooms that are not get a way between them,
+        so nothing a scene needs is out of reach), and every scene leads
+        somewhere."""
         rooms = self.world['rooms']
-        for sc in self.plan['scenes']:
-            open_ = self.open_rooms(sc)
-            seen, todo = set(), [open_[0]]
+
+        def joined(start, open_):
+            seen, todo = set(), [start]
             while todo:
                 r = todo.pop()
                 if r in seen:
                     continue
                 seen.add(r)
                 todo += [e['to'] for e in rooms[r]['exits'] if e['to'] in open_]
-            apart = [rooms[r]['name'] for r in open_ if r not in seen]
-            if apart:
-                self.findings.append(f"C: scene {sc['id']} opens rooms that do not connect among themselves: {apart}")
+            return seen
+        for sc in self.plan['scenes']:
+            open_ = self.open_rooms(sc)
+            seen = joined(open_[0], open_)
+            while len(seen) < len(open_):
+                apart = next(r for r in open_ if r not in seen)
+                near = next((r for r in seen if rooms[r].get('location') == rooms[apart].get('location')), open_[0])
+                for a, b in ((near, apart), (apart, near)):
+                    rooms[a]['exits'].append({'to': b, 'label': f"to {rooms[b]['name']}"})
+                self.findings.append(f"C: scene {sc['id']}: {rooms[apart]['name']} ({apart}) was out of reach; "
+                                     f"joined it to {rooms[near]['name']} ({near})")
+                seen = joined(open_[0], open_)
             if not sc['ending'] and not self.out_edges(sc):
                 self.findings.append(f"C: scene {sc['id']} leads nowhere")
 
@@ -395,6 +406,12 @@ class SceneCompiler:
                 it['once'] = True
             if any(str(e.get('set', '')).startswith(f'go_{sid}__') for e in it.get('effects') or []):
                 it['reach'] = 'any'     # a way on is findable from every state: never behind fetching a thing
+        for m in moments:               # a moment is a choice, not a puzzle: its options never wait on fetching a thing,
+            for it in interactions:     # and the neutral one, which lets a required moment pass, is there in any room
+                if it['id'] in m['options']:
+                    it['reach'] = 'any'
+                    if it['id'] == m.get('neutral'):
+                        it.pop('room', None)
 
         events = [{'id': f'{sid}.enter', 'when': 'true', 'effects': [{'set': f"done_{sc['major']}"}]}]
         for k, ev in enumerate(as_list(answer.get('events')), 1):
