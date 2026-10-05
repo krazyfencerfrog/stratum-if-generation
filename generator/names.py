@@ -79,7 +79,9 @@ def race_pool(role):
 NOT_A_PERSON = re.compile(r"\b(dragon|sword|blade|ai|ship|computer|machine|beast|creature|spirit|ghost|wolf|hound|"
                           r"skeleton|corpse|remains|golem|statue|automaton|construct|idol|wraith|specter|spectre|"
                           r"horse|storm|council|crowd|crew|families|villagers|guards|navy|army|mob|house|tower|"
-                          r"system|core|voice|swarm|hive)\b", re.I)
+                          r"system|core|voice|swarm|hive|"
+                          r"dog|puppy|cat|kitten|parrot|bird|raven|crow|owl|monkey|ape|goat|cow|ox|donkey|mule|pig|"
+                          r"rat|mouse|snake|adder|serpent|fox|bear|terrier|spaniel|mare|stallion|pony|falcon|hawk)\b", re.I)
 
 
 def pool_scores(kernel, *texts):
