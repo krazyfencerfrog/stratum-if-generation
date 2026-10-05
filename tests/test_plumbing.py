@@ -606,6 +606,9 @@ def stage_b_builds_an_engine_world():
     check(len(set(names)) == len(names), f'two rooms share a name: {sorted(names)}')
     things = [o['name'].lower() for o in w['objects'].values()]
     check(len(set(things)) == len(things), 'two objects share a name')
+    who = {x.lower() for c in story_chars for x in c} if (story_chars := [(ch.get('name') or '', ch.get('label') or '')
+                                                           for ch in load('stageb', 'story.json')['characters'].values()]) else set()
+    check(not (set(things) & (who - {''})), f'a person was made a thing: {sorted(set(things) & who)}')
     for c in w['characters'].values():
         labels = [t['label'].lower() for t in c['topics'].values()]
         check(len(set(labels)) == len(labels), f"{c['name']} has two topics with one label")

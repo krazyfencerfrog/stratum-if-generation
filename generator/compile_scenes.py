@@ -78,6 +78,16 @@ class SceneCompiler:
                         out.setdefault(first, xid)
         return out
 
+    def people(self):
+        """Characters by name, role and first name: a placement means a person,
+        whatever thing shares the name."""
+        out = {}
+        for cid, x in self.world['characters'].items():
+            for key in (x.get('name'), x.get('role'), (x.get('name') or '').split(' ')[0]):
+                if norm(key):
+                    out.setdefault(norm(key), cid)
+        return out
+
     def required_states(self):
         """States some ending variant or pattern shift reads."""
         found = set()
@@ -255,7 +265,7 @@ class SceneCompiler:
         start = open_names.get(norm(answer.get('start_room'))) or open_[0]
         cast = {}
         for pl in as_list(answer.get('placement')):
-            cid = self.resolve(pl.get('who'), names, open_)
+            cid = self.resolve(pl.get('who'), names, open_, self.people())
             room = open_names.get(norm(pl.get('room')))
             if cid not in self.world['characters']:
                 problems.append(f"placement: {pl.get('who')!r} is not a person in the world")
@@ -281,6 +291,8 @@ class SceneCompiler:
             if not re.fullmatch(r'[a-z_]{2,20}', verb):
                 problems.append(f'{where}: verb {a.get("verb")!r} is not a verb')
                 return None
+            if not a.get('object') and a.get('detail'):   # "go" + "up the plank gangway": the detail is what it acts on
+                a = dict(a, object=a['detail'], detail=None)
             obj = self.resolve(a.get('object'), names, open_, props) if a.get('object') else None
             free = None
             if a.get('object') and not obj:      # not a thing in the world ("salute the water"): the menu shows its words

@@ -913,6 +913,10 @@ class StubClient(LlmClient):
         exits = [{"from": rooms[i]['name'], "to": rooms[i + 1]['name'], "label": "onward", "back_label": "back"} for i in range(n - 1)]
         objects = [{"name": f"{r['name']} thing {k + 1}", "room": r['name'], "description": "stub: worth a look",
                     "portable": k == 0, "story": k == 1} for r in rooms for k in range(4)]
+        if os.environ.get('STUB_DUP_ROOM'):   # the live failure: each place made its own mooring line, and the cat
+            objects += [{"name": "the mooring line", "room": rooms[0]['name'], "description": "stub: rope", "portable": True}]
+            objects += [{"name": x, "room": rooms[0]['name'], "description": "stub: a person as a thing"}
+                        for x in (pk.get('people_here') or [])[:1]]
         return {"notes": "stub", "rooms": rooms, "exits": exits, "objects": objects}
 
     def p_s6b2m(self, p):
@@ -967,7 +971,9 @@ class StubClient(LlmClient):
         actions = [act(f"rev.{n['id']}", 'find it out', reveals=[n['id']]) for n in pk.get('nodes') or [] if n.get('kind') == 'revelation']
         actions += [act('chore', 'help with a chore'),
                     act('salute', 'salute the water', verb='salute', object='the water', detail=None, label='the water')]
-        actions += [act(f"go.{e['to']}", f"go on to {e['to']}", leads_to=e['to']) for e in pk.get('leaving') or []]
+        # a way on as the live run wrote one: a verb and a detail, no object
+        actions += [act(f"go.{e['to']}", f"go on to {e['to']}", leads_to=e['to'], verb='go', object=None,
+                        detail=f"up the way to {e['to']}", label=None) for e in pk.get('leaving') or []]
         return {"notes": "stub", "opening": f"stub: the scene {sid} begins", "start_room": rooms[0]['name'],
                 "placement": [{"who": x, "room": rooms[0]['name']} for x in people], "room_text": [],
                 "moments": moments, "actions": actions,

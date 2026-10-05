@@ -292,6 +292,7 @@ class WorldBuilder:
         built = [r['name'] for r in self.world['rooms'].values()]
         packet = {'location': {'name': loc.get('name'), 'kind': loc.get('kind'), 'why': loc.get('why')},
                   'rooms_wanted': self.room_budget(lid), 'other_locations': others, 'rooms_already_built': built,
+                  'things_already_made': sorted({o['name'] for o in self.world['objects'].values()}),
                   'scenes': self.scenes_with(location=lid),
                   'people_here': sorted({self.who(c) for sc in self.plan['scenes'] if lid in sc['where']
                                          for c in sc['who'] if c in self.chars})}
@@ -363,9 +364,13 @@ class WorldBuilder:
             a, b = by_name.get(norm(e.get('from'))), by_name.get(norm(e.get('to')))
             if a and b:
                 self.link(a, b, e.get('label'), e.get('back_label'))
+        made = {norm(o['name']) for o in self.world['objects'].values()}
         for o in as_list(answer.get('objects')):
             if not isinstance(o, dict) or not o.get('name'):
                 continue
+            if norm(o['name']) in made or self.resolve(o['name']):   # one thing per name; a person is not a thing
+                continue
+            made.add(norm(o['name']))
             oid = slug(o['name'], taken)
             taken.add(oid)
             self.world['objects'][oid] = {
