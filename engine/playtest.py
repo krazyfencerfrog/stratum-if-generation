@@ -645,6 +645,7 @@ SEEK_CHOICE = 0.6   # a seeker answers an offered choice this often
 SEEK_WAY = 0.5      # takes the way on, when it is here, this often
 SEEK_WALK = 0.7     # otherwise walks toward it this often (else looks around)
 SEEK_FINISH = 0.8   # seekers who finish, at least
+STYLE_SEEK = 0.5    # a styled player with nothing its way plays on like a seeker this often
 
 
 def chooser(story, style):
@@ -668,11 +669,15 @@ def chooser(story, style):
             effects = []
         return [(e['move'], e.get('dir')) for e in effects if 'move' in e and (not target or e['move'] == target)]
 
+    seek = seeker(story)
+
     def choose(opts, rng, tried, eng=None):
         toward = [o for o in opts if any(d == direction for _, d in moves(o))]
         if toward:
             return rng.choice(toward)
         neutral = [o for o in opts if not moves(o)] or opts
+        if eng is not None and rng.random() < STYLE_SEEK:   # nothing pulls its way: get on with the story
+            return seek(neutral, rng, tried, eng)
         fresh = [o for o in neutral if o['id'] not in tried]
         if fresh and rng.random() < CURIOSITY:
             return rng.choice(fresh)
