@@ -180,6 +180,81 @@ and then the craft points to look for in our output.
 
 ## Results
 
-(To fill in when the runs finish: per story, the pipeline's premise and
-main line read against the sheet, point by point; the judge's scores for
-both; and a list of what the pipeline systematically misses.)
+First pass 2026-10-05, four of five stories (code cba46c3; Lady with the Dog
+failed on a one-off GPU library error and is queued to run again). Scores
+are the 4e judge's six axes; agency is not comparable (the human stories are
+linear), so the second total leaves it out.
+
+| story | pipeline | human | pipeline w/o agency | human w/o agency |
+|---|---|---|---|---|
+| Canterville Ghost | 21 | 24 | 17 | 20 |
+| Monkey's Paw | 23 | 28 | 19 | 24 |
+| Speckled Band | 22 | 20 | 19 | 18 |
+| Man Who Would Be King | 28 | 24 | 23 | 21 |
+
+The judge prefers the human outline twice and ours twice. Read against the
+sheets, ours misses the core of all four, including the two it scored
+higher, so **the judge cannot see the qualities below and its totals should
+be discounted** for this kind of question. Ours also runs long: 76-87 words
+a node against 45-51 for the human outlines, with 2-16 repeated phrases
+against none.
+
+### Point by point
+
+**Canterville** (the closest). The comic inversion is there as a premise
+mechanism (1, yes): the family critiques the ghost's full show from the
+sofa and leaves him "looking hurt". A child is set apart early and the
+protagonist turns the tone ("the senior resident", 4, partly). Missing: no
+running gag becomes a device (the dish rota recurs but does nothing, 2);
+no prophecy or plant pays off (3); the ending explains instead of
+withholding (5); the ghost has no name, no history and no suffering, so
+there is nothing to pity, and Wilde's turn needs pity.
+
+**Monkey's Paw** (the furthest). The rule is vague: the paw "wants a want"
+and "makes small things true in crooked ways", where the story's power is an
+exact sum paid exactly (1, no). No jokes to come back as horror (2, no).
+Nothing terrible happens offstage or on: the paw is burned and "the want you
+had kept is gone" (3, no). The family is gone: the cast is one soldier who
+falls asleep, so the companion cannot become the danger (4, no). Small cast
+and one room (5), but dread without any event.
+
+**Speckled Band.** Physical clues in rooms exist and are odd in describable
+ways: a thread mark on a key bow, a whistle in a ring box, a silk fibre (1,
+yes). No red herring (2, no). The antagonist is present from the first node
+but polite, never shown to be dangerous (3, no). No motive at all, let alone
+one proved by a document (4, no). The climax is a demonstration followed
+by the villain leaving the room; nothing recoils on him (5, no). The
+mechanism (smothering through a keyhole by thread) would not survive a
+reader's second look.
+
+**Man Who Would Be King.** A contract is everywhere, but its terms are
+whose name is on it, burned or sealed: paperwork, not rules of conduct
+whose breaking is the plot (1, no). The rise is ceremony (ford a river,
+burn a name), not craft (2, no). The partner's breaking point is never
+named; the conflict is billing (3, no). No frame (4, no). And no fall: the
+ending is a shared kingdom on its first morning, so there is no bridge and
+nothing to forgive (5, no). This is the judge's favourite (28/30).
+
+### What the pipeline systematically misses
+
+1. **The cost lands nowhere.** Every human story here kills or breaks
+   someone (Herbert, Dravot, Roylott, the ghost's rest bought with
+   Virginia's silence). Our endings are hollow or ambiguous states ("almost
+   relief but not quite", a shared crown). No line pays an irreversible
+   price.
+2. **Nothing planted early pays off late.** The human stories run on
+   setups: the first man's third wish, the window verse, the contract's
+   terms, the jokes. Ours introduce and use things in the same node.
+3. **Rules are vague where they should be exact**: magic, contracts and
+   mechanisms are described by mood ("crooked", "hungry") instead of terms
+   that can be obeyed to the letter.
+4. **Antagonists are present but not dangerous**: no early scene shows
+   what they will do (the bent poker).
+5. **The cast shrinks or loses the person the story turns on** (the
+   Whites' family; the ghost's history). The premise keeps the frame and
+   drops the relationship.
+6. **Paperwork** still turns up where the kernel names a document (the
+   contract became a story about signatures).
+
+These are design-level gaps for the premise (3.5a/3.5v) and the line plans
+(4a/4c/4p), not prompt polish; candidate checks are in the backlog.

@@ -127,6 +127,20 @@ Plan:
 
 ## Next
 
+### What the reference stories show [solo, then GPU]
+docs/reference_stories.md, Results (2026-10-05, four of five). The judge
+cannot see these, so they need checks of their own:
+- a cost that lands: at least one line ends with an irreversible loss (a
+  death, a break), named in the premise's ending worlds;
+- plants and payoffs: the premise names one or two setups (a rule, an
+  object, a joke) introduced early and paid off at the crisis; the line
+  plans place both;
+- rules with terms: magic, contracts and mechanisms stated as terms that
+  can be obeyed to the letter, not moods;
+- the antagonist's danger shown early, in a scene;
+- the relationship the kernel turns on kept in the cast.
+Then re-run the five references and compare.
+
 ### Later stages: after the first generated package [GPU, then solo]
 Stages A, B, C and D are built and ran live on kernel35_f5 (2026-10-04; the
 package is stratum-compare/staged/stories/kernel35_f5/kernel35_f5_package.json,
