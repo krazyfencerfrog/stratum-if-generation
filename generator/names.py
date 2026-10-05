@@ -164,11 +164,38 @@ NOT_FLESH = re.compile(r"\b(stone|iron|bronze|brass|clockwork|wooden|bone|skelet
                        r"spectral|ghostly|mechanical|crystal|clay)\b", re.I)
 
 
+# the dead who were people: a ghost with a sex once had a name ("the ghost in period costume", m)
+GHOST = re.compile(r"\b(ghost|wraith|specter|spectre|phantom|shade|revenant|apparition)\b", re.I)
+
+
+def dead_person(seed):
+    role = str(seed.get('role') or '')
+    return (seed_gender(seed) in ('m', 'f')
+            and bool(GHOST.fullmatch(head_noun(role)) or re.search(r'\b(spectral|ghostly)\b', role, re.I))
+            and not NOT_FLESH.search(re.sub(r'\b(spectral|ghostly)\b', '', role, flags=re.I)))
+
+
 def wants_a_name(seed):
     return (isinstance(seed, dict) and seed.get('role') and seed.get('kind') != 'crowd'
-            and not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
-            and not NOT_FLESH.search(str(seed['role']))
+            and (dead_person(seed) or (not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
+                                       and not NOT_FLESH.search(str(seed['role']))))
             and re.sub(r'^(the|a|an)\s+', '', str(seed['role']).strip().lower()) not in ('protagonist', 'you', 'player'))
+
+
+# when the dead lived, for a ghost's name in a story set now
+ERAS = [('medieval', re.compile(r'\b(1[0-6]th[- ]century|1[0-5]\d\ds|medieval|tudor|elizabethan|crusad\w*|knights?)\b', re.I)),
+        ('regency', re.compile(r'\b(17th|18th)[- ]century|\b1[67]\d\ds\b|\b(georgian|regency|cavalier|puritan|centuries)\b', re.I)),
+        ('victorian', re.compile(r'\b19th[- ]century|\b18\d\ds\b|\b(victorian|edwardian)\b', re.I)),
+        ('period', re.compile(r'\b19[0-6]0s\b|\b(1920s|wartime|prohibition)\b', re.I))]
+
+
+def seed_pool(seed, pool_name):
+    """The pool a seed's name is drawn from: the story's, except for a ghost
+    in a story set now, whose name belongs to when it lived."""
+    if not (dead_person(seed) and split_pool(pool_name or 'modern')[0] == 'modern'):
+        return pool_name
+    text = ' '.join(str(seed.get(k) or '') for k in ('role',) + SEED_OWN_FIELDS)
+    return next((pool for pool, rx in ERAS if rx.search(text)), pool_name)
 
 
 GENDERS = {'f': 'f', 'female': 'f', 'woman': 'f', 'girl': 'f', 'm': 'm', 'male': 'm', 'man': 'm', 'boy': 'm',
@@ -322,6 +349,6 @@ def assign_names(seeds, story_id, texts, pool_name=None, reserved=()):
         if wants_a_name(s) and not s.get('name'):
             own = [s.get(k) for k in SEED_OWN_FIELDS if s.get(k)]
             gender = seed_gender(s) or gender_hint(str(s['role']), texts, own)
-            s['name'] = pick(story_id, str(s['role']), pool_name, gender, taken)
+            s['name'] = pick(story_id, str(s['role']), seed_pool(s, pool_name), gender, taken)
             taken.append(s['name'])
     return pool_name

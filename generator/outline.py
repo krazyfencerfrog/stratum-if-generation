@@ -1243,10 +1243,11 @@ class OutlineBuilder:
                 continue        # "you" is not a character in the register
             if not self.match(c['label'], self.characters, 'label'):
                 cid = self.add_character(c, source=line['id'])
-                seed = {'role': c['label'], 'kind': self.characters[cid]['kind']}
+                seed = {'role': c['label'], 'kind': self.characters[cid]['kind'], 'gender': c.get('gender'),
+                        'wants': c.get('wants')}
                 if names.wants_a_name(seed):
                     self.characters[cid]['name'] = names.pick(
-                        self.gen.story_id, c['label'], self.premise.get('name_pool') or 'modern',
+                        self.gen.story_id, c['label'], names.seed_pool(seed, self.premise.get('name_pool') or 'modern'),
                         names.seed_gender(c) or names.gender_hint(c['label'], [str(c.get('wants') or ''), str(c.get('why') or '')]),
                         [x['name'] for x in self.characters.values() if x.get('name')])
         for x in fill['nodes']:

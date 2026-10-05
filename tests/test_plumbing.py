@@ -967,6 +967,16 @@ def cast_names_come_from_python():
           'gender hints should read the seed\'s own fields and only the sentences that name the role')
     check(not names.wants_a_name({'role': 'the dragon', 'kind': 'individual'})
           and not names.wants_a_name({'role': 'the protagonist', 'kind': 'individual'}), 'a dragon or "you" was named')
+    ghost = {'role': 'the ghost in period costume', 'kind': 'individual', 'gender': 'm',
+             'holds': 'the authority of three centuries of tenure'}
+    check(names.wants_a_name(ghost) and names.wants_a_name({'role': 'the ghostly lady', 'kind': 'individual', 'gender': 'f'})
+          and not names.wants_a_name({'role': 'the ghost', 'kind': 'individual'})
+          and not names.wants_a_name({'role': 'the forest spirit', 'kind': 'individual', 'gender': 'f'})
+          and not names.wants_a_name({'role': 'the ghost ship', 'kind': 'individual', 'gender': 'f'}),
+          'a ghost who was a person should be named; a sexless ghost, a spirit or a ship not')
+    check(names.seed_pool(ghost, 'modern:british') == 'regency' and names.seed_pool(ghost, 'fantasy') == 'fantasy'
+          and names.seed_pool({'role': 'the drowned captain', 'gender': 'm'}, 'modern') == 'modern',
+          "a ghost in a story set now is named for when it lived")
     check(names.pool_for(open(os.path.join(KERNELS, 'kernel31.txt')).read()) == 'fantasy'
           and names.pool_for(open(os.path.join(KERNELS, 'kernel17.txt')).read()) == 'period', 'genre pools')
     story = open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.md')).read()
