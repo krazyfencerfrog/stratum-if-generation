@@ -127,14 +127,20 @@ Plan:
 
 ## Next
 
-### Later stages design [you, interactively]
-Stage A designed and BUILT (2026-10-04, `generator/arcs.py`; first live run
-on kernel35_f5 queued after the premise A/B). The engine design and core,
-terminal player and playtest simulator are built (`engine/`). Next: read the
-live stage A output and fix the prompts; then design stages B, C and D at the
-same level, with D's check being the engine validator plus playtest. Open for
-A: whether some outline forks should become pattern triggers; the "Python as
-planner, model as writer" variant of A2.
+### Later stages: after the first generated package [GPU, then solo]
+Stages A, B, C and D are built and ran live on kernel35_f5 (2026-10-04; the
+package is stratum-compare/staged/stories/kernel35_f5/kernel35_f5_package.json,
+playable, every ending reachable). That run used stage A before the seesaw
+fix and stage B before the duplicate-room and topic fixes, so its world has
+twin rooms and 50-64 topics a person. Next:
+- a clean re-run, stage A then B then D, on kernel35_f5 (about 3.5 hours of
+  GPU) to see every fix of 2026-10-04 in one story [GPU];
+- a stage D repair call fed by the playtest's findings (MENU, STUCK, ways on
+  hard to find), like the outline loop's repair [solo, then GPU];
+- the prose stage design (later_stages.md §6) [you];
+- per-scene exploration samples entry states (8 a scene, by arc state and
+  flags); a STUCK found from a sampled entry could, rarely, come from what the
+  sampled player happened to carry; watch for it.
 
 ### Premise A/B: DONE 2026-10-04 (stratum-compare/ab_premise)
 Three 3.4-3.5 replays of kernel35 each on Fable's 4651810 and on b67f48a
@@ -195,6 +201,17 @@ number the player is shown or must watch, and rule systems the engine lacks.
   a kill.
 
 ## Done
+- 2026-10-04 (evening): the first live stages B, C and D (kernel35_f5), and what
+  they turned up, fixed: duplicate rooms when locations are parts of one place
+  (7c22c7d); topics labelled with whole sentences, roles missing, namesakes
+  (ab97299); 50-64 topics a person, now the objects tied to them (c318999);
+  undirected variants and abstract targets costing retries (f0eb785); takes
+  that took nothing, ways on and moments behind fetching things, rooms out of
+  reach (f160cec, 4f42c0a, 93cdefb); one thing per name (a0d928a); a batch in
+  a code copy locking its own GPU lock file (e9665e8). Engine: one key press
+  per choice (33bacf3), new markers, topic groups, brief revisits (702cd28),
+  the menu checked by the playtest (26a406c), exploration scene by scene and
+  seeking players (cf02e3d).
 - 2026-10-04: code review of main.py/outline.py and fixes: a finished premise loop
   replays as saved (no model calls from new checks); rejected attempts' outputs kept;
   the run summary prints on a crash; line ids count lines (no gap after a dropped

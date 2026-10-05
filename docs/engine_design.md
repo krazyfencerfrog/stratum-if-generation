@@ -444,6 +444,14 @@ for reference.
   exactly once, no level showing two entries alike or one unlabelled, no
   level wider than 29 (the terminal player's keys). The terminal player
   takes one key press per choice.
+- **Exploration scene by scene (2026-10-04):** a story of more than three
+  scenes is explored one scene at a time, each from the states the scenes
+  before it are left in (up to 8, spread by arc state and flags), so the
+  cost grows with a scene's size, not the story's. A state's identity
+  leaves out what cannot change what happens: objects no interaction of the
+  scene needs at hand, one-time interactions without effects, seen() and
+  visited() that only gate what a topic says. `seek` and `seek:branch`
+  players play the story (answer choices, head for the way on).
 - **Planned with stage B (2026-10-04, superseded by the entry above):** a `seen` state
   (people present in rooms the player enters, objects seen or examined;
   `seen('x')` in conditions) so conversations about anything encountered

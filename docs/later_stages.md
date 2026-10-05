@@ -581,6 +581,26 @@ options that are moral labels rather than acts), node repair from a finding
 list. The open-exit problem the old node build had is gone by construction:
 scene exits come from the outline's edges.
 
+### First live run (2026-10-04, kernel35_f5)
+
+Stage B built 13 rooms, 75 objects and 4 people in 92 minutes; stage D
+compiled 15 scenes in about 2 hours. What it taught:
+- Locations can be parts of one place (the stern deck, the wheelhouse, the
+  cabin of one boat); each place call rebuilt the whole boat. Place calls
+  now see what is built, and stage C joins any rooms a scene cannot walk
+  between.
+- The validator must not cost a retry for what code can settle: a variant
+  naming a state with no direction now means moved(state); an action on
+  something that is not a thing (the water) is free text.
+- The model writes actions without knowing where things lie, so a way on, a
+  branch or a moment's option that needs a thing from another room hides the
+  story behind a fetch quest. Those never wait on an object at hand now; a
+  take the scene writes gives the thing.
+- The whole-story playtest could not see past scene 2, which is why scenes
+  are now explored one at a time, and the menu itself is checked.
+- Conversation breadth needs a limit: everyone commenting on every object is
+  filler. A person is asked about the things tied to them.
+
 ## 6. Prose
 
 After D: the text the player reads, written into the package's text
