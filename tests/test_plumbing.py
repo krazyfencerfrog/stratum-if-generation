@@ -185,6 +185,21 @@ def bad_turn_form_costs_a_retry_not_a_round():
 
 
 @test
+def a_premise_names_its_price_setups_and_rules():
+    run('price', env={'STUB_NO_PRICE': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('price') if c['step'] == 's3_5a']
+    check(len(attempts) == 2 and 'price' in (attempts[0].get('error') or ''), f'3.5a attempts: {attempts}')
+    premise = load('price', 's3_5_premise_accepted.json')
+    check((premise.get('price') or {}).get('why_final') and premise.get('setups') and premise.get('rules')
+          and premise['opposition'].get('shown_by'), f"the premise lost a craft field: {sorted(premise)}")
+    check(load('price', 's3_5_loop.json')['repair_rounds_used'] == 0, 'a missing price cost a repair round')
+    import main as pipeline
+    gaps = dict(pipeline.StoryGenerator.craft_problems({'setups': [{'plant': 'a bell', 'payoff': ''}],
+                                                         'rules': [{'thing': 'the paw', 'terms': ''}]}))
+    check({'price', 'setups[0]', 'rules[0]', 'opposition.shown_by'} <= set(gaps), f'craft checks: {gaps}')
+
+
+@test
 def hidden_truth_and_cast_edges():
     run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
     premise = load('gap', 's3_5_premise_accepted.json')

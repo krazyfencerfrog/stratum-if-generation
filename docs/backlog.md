@@ -127,19 +127,29 @@ Plan:
 
 ## Next
 
-### What the reference stories show [solo, then GPU]
-docs/reference_stories.md, Results (2026-10-05, four of five). The judge
-cannot see these, so they need checks of their own:
-- a cost that lands: at least one line ends with an irreversible loss (a
-  death, a break), named in the premise's ending worlds;
-- plants and payoffs: the premise names one or two setups (a rule, an
-  object, a joke) introduced early and paid off at the crisis; the line
-  plans place both;
-- rules with terms: magic, contracts and mechanisms stated as terms that
-  can be obeyed to the letter, not moods;
-- the antagonist's danger shown early, in a scene;
-- the relationship the kernel turns on kept in the cast.
-Then re-run the five references and compare.
+### Craft the reference stories show: IN PROGRESS 2026-10-05 [solo, then GPU]
+docs/reference_stories.md, Results (four of five). The causes are mostly in
+the design: 3-0c models how the player can LOSE, and with nothing asking for
+what a story COSTS, "failure: none" became "no cost" (Kipling: "failure
+none", so no fall). The schema has no field for a setup and its payoff, or
+for a rule's terms. The prompts shape the texture; Python cannot catch what
+the schema does not hold, and the 4e judge cannot see any of it.
+1. The premise names its PRICE (what is lost for good, who pays, why it
+   cannot be undone), separate from the failure model and scaled to genre
+   (a comedy's price can be a way of life ended, not a death); 3.5v checks
+   it; at least one line's ending pays it (Python).
+2. SETUPS: one or two things planted early (a rule, an object, a joke, a
+   warning) and paid at the crisis; the nodes mark where each is planted
+   and paid; Python checks the order on every line that pays it.
+3. RULES with terms: any magic, contract or mechanism stated as terms that
+   can be obeyed to the letter; 3.5v rejects a mood.
+4. The opposition's danger SHOWN in an early scene (opposition.shown_by).
+5. Trace why the Monkey's Paw lost the family (cast step 3.5c?): keep the
+   relationship the kernel turns on.
+6. The 4e judge asks what is paid and where it was set up.
+7. Prompt texture: examples showing all of it; shorter summaries (ours 76-87
+   words a node, the human outlines 45-51).
+8. Re-run the five references and read them against the sheets again.
 
 ### Later stages: after the first generated package [GPU, then solo]
 Stages A, B, C and D are built and ran live on kernel35_f5 (2026-10-04; the

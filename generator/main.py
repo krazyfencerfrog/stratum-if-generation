@@ -113,7 +113,7 @@ TURN_FORMS = tuple(schemas.TURN_FORMS)      # one list, in schemas.py
 COMPLICATION_BUDGET = {'minimal': 2, 'moderate': 3, 'generous': 4}
 COMPLICATION_TEXT = {'minimal': 'exactly 2', 'moderate': '2 or 3', 'generous': '3 or 4'}
 PREMISE_KEYS = ('protagonist', 'arena', 'pressure', 'opposition', 'events', 'hidden_truth', 'mediation', 'turns',
-                'complications', 'cast_seeds')
+                'complications', 'cast_seeds', 'price', 'setups', 'rules')
 EVENT_WHEN = ('early', 'middle', 'late')
 
 # Files a story directory from before this schema would contain. Phase-3
@@ -679,6 +679,16 @@ class StoryGenerator:
 
     # ------------------------------------------------------------------ validators
 
+    @classmethod
+    def engine_validator(cls, parsed):
+        """3.5a: the structure must hold; a missing price, setup, rule terms
+        or shown_by costs one informed retry (and, if still missing, becomes
+        a computed finding for the repair loop), never the run."""
+        cls.validate_engine(parsed)
+        craft = cls.craft_problems(parsed)
+        if craft:
+            raise SoftReject('; '.join(f'{where}: {problem}' for where, problem in craft))
+
     @staticmethod
     def validate_engine(parsed):
         problems = []
@@ -724,8 +734,44 @@ class StoryGenerator:
                 problems.append(f'mediation.{pole} must be an object with pole, what_you_must_do and cost')
         if isinstance(med.get('levers'), str):
             med['levers'] = [med['levers']]
+        for key, fields in (('setups', ('plant', 'payoff')), ('rules', ('thing', 'terms'))):
+            items = parsed.get(key)
+            items = items if isinstance(items, list) else ([items] if isinstance(items, dict) else [])
+            parsed[key] = [x for x in items if isinstance(x, dict) and any(str(x.get(f) or '').strip() for f in fields)]
+        if parsed.get('price') in ('', [], 'null', 'none', {}):
+            parsed['price'] = None
         if problems:
             raise ValueError('; '.join(problems))
+
+    @staticmethod
+    def craft_problems(premise):
+        """What the reference stories showed ours missing, as far as a count
+        can see it: a price, setups with payoffs, rules with terms, the
+        opposition's danger shown. Whether each is any good is 3.5v's."""
+        out = []
+        price = premise.get('price') if isinstance(premise.get('price'), dict) else {}
+        if not str(price.get('what') or '').strip() or not str(price.get('why_final') or '').strip():
+            out.append(('price', 'the premise names no price: what the story takes for good on at least one way it can '
+                                 'go, who pays it, and why it cannot be undone (scaled to the genre; not a way to lose)'))
+        setups = premise.get('setups') or []
+        if not setups:
+            out.append(('setups', 'the premise plants no setup: one or two things seen early in passing that come back '
+                                  'at the crisis and decide or change it'))
+        elif len(setups) > 2:
+            out.append(('setups', f'{len(setups)} setups; plant one or two'))
+        for i, x in enumerate(setups):
+            if not str(x.get('plant') or '').strip() or not str(x.get('payoff') or '').strip():
+                out.append((f'setups[{i}]', 'a setup needs both its plant (what is seen early) and its payoff (what it '
+                                            'does at the crisis)'))
+        for i, x in enumerate(premise.get('rules') or []):
+            if not str(x.get('terms') or '').strip():
+                out.append((f'rules[{i}]', f'the rule for {x.get("thing") or "a thing"} states no terms that can be '
+                                           f'obeyed to the letter'))
+        opp = premise.get('opposition') if isinstance(premise.get('opposition'), dict) else {}
+        if not str(opp.get('shown_by') or '').strip():
+            out.append(('opposition.shown_by', 'the opposition is never shown at work: name one early moment in which '
+                                               'it does something that shows what it is capable of'))
+        return out
 
     @staticmethod
     def validate_turns(parsed, check_forms=True):
@@ -856,9 +902,12 @@ class StoryGenerator:
         """The premise downstream reads: the three builds side by side, with
         each seed's matters_to_turns looked up from the turns."""
         premise = {'enrichment_budget': {'level': budget}}
-        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'events', 'hidden_truth', 'mediation'):
+        for key in ('protagonist', 'arena', 'pressure', 'opposition', 'events', 'hidden_truth', 'mediation',
+                    'price', 'setups', 'rules'):
             premise[key] = engine.get(key)
         premise['events'] = premise.get('events') or []
+        premise['setups'] = premise.get('setups') or []
+        premise['rules'] = premise.get('rules') or []
         premise['turns'] = turns.get('turns')
         premise['complications'] = turns.get('complications') or []
         premise['cast_seeds'] = cast.get('cast_seeds') or []
@@ -955,7 +1004,7 @@ class StoryGenerator:
             '$$PROMISES$$': self.promises_block(),
             '$$ENRICHMENT_BUDGET$$': budget,
             '$$KERNEL$$': self.kernel,
-        }, validator=self.with_echo_check(self.validate_engine, ('mediation', 'pressure', 'opposition', 'events')),
+        }, validator=self.with_echo_check(self.engine_validator, ('mediation', 'pressure', 'opposition', 'events')),
             klass='build', schema=schemas.ENGINE)
         turns = self.run_prompt('s3_5b', 'turns', {
             '$$BRIEF_LINES$$': table,
@@ -1027,6 +1076,8 @@ class StoryGenerator:
                                    'audience came for (one of the listed set pieces, or one of your own), with the world '
                                    'acting, and says so in set_piece')
 
+        for where, problem in self.craft_problems(premise):
+            add(where, problem)
         prot = premise.get('protagonist') or {}
         cannot = str(prot.get('cannot_do') or '').strip()
         if not cannot or cannot.lower() in ('nothing', 'none', 'n/a'):
@@ -1117,6 +1168,17 @@ class StoryGenerator:
                    'turns before the last two have local goals of their own rather than the decision axis in another '
                    'form (unless the Kernel itself makes the decision recur). If they do, quote the later turn.'),
         ]
+        items += [
+            ('E7', 'price.what is something lost for good (a life, a body, a bond, a way of life, a place), not a '
+                   'mood or a setback, and price.why_final says why it cannot be undone or bought back.'),
+            ('E8', 'each setup\'s plant is something concrete the player sees or hears early, in passing, and its '
+                   'payoff decides or changes the crisis; no setup is used in the scene it appears in.'),
+            ('E10', 'opposition.shown_by is something the opposition DOES early that shows what it is capable of, '
+                    'not a description of it.'),
+        ]
+        if premise.get('rules'):
+            items.append(('E9', 'each rule\'s terms can be obeyed to the letter (what, how many, on what condition, '
+                                'with what exception), not a mood.'))
         for t in premise.get('turns') or []:
             if isinstance(t, dict):
                 items.append((f"T{t.get('id')}", f"turn {t.get('id')} is not the decision axis handed over as a pick: each of its "

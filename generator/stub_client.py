@@ -404,7 +404,9 @@ class StubClient(LlmClient):
             "pressure": {"description": "The core's margin falls each hour; every sector still breathing costs it.",
                          "clock_or_stock": "core margin (stock), licensed by 3-0c resource_depletion", "serves": "3-0c.failure_triggers"},
             "opposition": {"who_or_what": "the sector council", "wants": "no sector vented, whatever the core costs",
-                           "means": "it holds the override codes and can lock the AI out of the valves", "serves": "3c.core_thematic_axis"},
+                           "means": "it holds the override codes and can lock the AI out of the valves",
+                           "shown_by": "in the first hour the council locks you out of the nursery valves and posts a guard at the hatch",
+                           "serves": "3c.core_thematic_axis"},
             "events": [] if env_int('STUB_NO_EVENTS', 0) else list(self.EVENTS),
             "mediation": {
                 "question": "Is the ship its people or its core?",
@@ -415,6 +417,13 @@ class StubClient(LlmClient):
                 "serves": "3-0a.primary_decision_axis"},
             # STUB_GAP=1: the brief has an epistemic gap; =2 the engine forgets to state it (a computed finding)
             "hidden_truth": self.HIDDEN if env_int('STUB_GAP', 0) == 1 else None,
+            # STUB_NO_PRICE=1: the engine forgets its price until told (one soft retry)
+            "price": None if env_int('STUB_NO_PRICE', 0) and RETRY_MARKER not in p else
+                     {"what": "the outer sector's people", "who_pays": "the outer sector",
+                      "why_final": "on the line where it is vented, nobody in it survives the cold", "serves": "3b.primary_affect"},
+            "setups": [{"plant": "a drone notices frost on the hydroponics feed valve in the first hour",
+                        "payoff": "at the crisis the frosted valve is the one manual route that still opens"}],
+            "rules": [{"thing": "the override codes", "terms": "a code vents one sector, once, and only with two council voices"}],
         }
 
     def p_s3_5b(self, p):

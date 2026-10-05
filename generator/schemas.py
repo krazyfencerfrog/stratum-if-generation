@@ -81,10 +81,13 @@ ENGINE = obj(
     protagonist=obj(who=S, history=S, wants=S, need=S, can_do=S, cannot_do=S, ties=arr(obj(who=S, what=S)), open=S, gender=enum(['f', 'm', 'n']), serves=S),
     arena=obj(description=S, serves=S),
     pressure=obj(description=S, clock_or_stock=S, serves=S),
-    opposition=obj(who_or_what=S, wants=S, means=S, serves=S),
+    opposition=obj(who_or_what=S, wants=S, means=S, shown_by=S, serves=S),
     events=arr(obj(what=S, when=enum(['early', 'middle', 'late']), serves=S)),
     hidden_truth=nullable(obj(truth=S, who_knows=S, what_it_changes=S, serves=S)),
     mediation=obj(question=S, to_reach_pole_a=POLE, to_reach_pole_b=POLE, levers=arr(S), serves=S),
+    price=obj(what=S, who_pays=S, why_final=S, serves=S),
+    setups=arr(obj(plant=S, payoff=S)),
+    rules=arr(obj(thing=S, terms=S)),
 )
 
 TURNS = obj(
