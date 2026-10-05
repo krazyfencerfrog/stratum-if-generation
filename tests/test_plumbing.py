@@ -614,6 +614,10 @@ def stages_c_and_d_compile_a_playable_package():
     moments = [m for sc in package['scenes'].values() for m in sc.get('moments') or []]
     check(moments and all(m['options'] for m in moments), 'no moments compiled')
     check(any(m['required'] and m.get('neutral') for m in moments), 'no required moment with a neutral option')
+    ways = [it for sc in package['scenes'].values() for it in sc['interactions']
+            if any(str(e.get('set', '')).startswith('go_') for e in it.get('effects') or [])]
+    check(ways and all(it.get('reach') == 'any' for it in ways if not it.get('weight')),
+          'a default way on depends on having its object at hand')
     free = [it for sc in package['scenes'].values() for it in sc['interactions'] if it.get('object_label') == 'the water']
     check(free, 'an action on something that is not a thing (the water) did not compile as free text')
     moves = [e for sc in package['scenes'].values() for it in sc['interactions'] for e in it.get('effects') or [] if 'move' in e]

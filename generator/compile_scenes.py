@@ -387,6 +387,15 @@ class SceneCompiler:
             exits.append({'to': to, 'when': f'flags.go_{sid}__{to}', 'kind': e['kind']})
         order = {'accumulated': 0, 'branch': 1, 'ending': 2, 'default': 3}
         exits.sort(key=lambda x: order.get(x['kind'], 3))
+        things = set(self.world['objects']) | set(new_objects)
+        for it in interactions:
+            if it['verb'] == 'take' and it.get('object') in things \
+                    and not any(e.get('give') == it['object'] for e in it.get('effects') or []):
+                it.setdefault('effects', []).append({'give': it['object']})   # a take the scene writes still takes
+                it['once'] = True
+            way = next((e for e in it.get('effects') or [] if str(e.get('set', '')).startswith(f'go_{sid}__')), None)
+            if way and leading.get(way['set'].split('__', 1)[1], {}).get('kind') in ('default', 'ending'):
+                it['reach'] = 'any'     # the way on is findable from every state: never behind fetching a thing
 
         events = [{'id': f'{sid}.enter', 'when': 'true', 'effects': [{'set': f"done_{sc['major']}"}]}]
         for k, ev in enumerate(as_list(answer.get('events')), 1):
