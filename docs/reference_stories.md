@@ -180,8 +180,8 @@ and then the craft points to look for in our output.
 
 ## Results
 
-First pass 2026-10-05, four of five stories (code cba46c3; Lady with the Dog
-failed on a one-off GPU library error and is queued to run again). Scores
+First pass 2026-10-05, all five stories (code cba46c3; Lady with the Dog ran
+again after a one-off GPU library error). Scores
 are the 4e judge's six axes; agency is not comparable (the human stories are
 linear), so the second total leaves it out.
 
@@ -191,8 +191,9 @@ linear), so the second total leaves it out.
 | Monkey's Paw | 23 | 28 | 19 | 24 |
 | Speckled Band | 22 | 20 | 19 | 18 |
 | Man Who Would Be King | 28 | 24 | 23 | 21 |
+| Lady with the Dog | 27 | 22 | 22 | 20 |
 
-The judge prefers the human outline twice and ours twice. Read against the
+The judge prefers the human outline twice and ours three times. Read against the
 sheets, ours misses the core of all four, including the two it scored
 higher, so **the judge cannot see the qualities below and its totals should
 be discounted** for this kind of question. Ours also runs long: 76-87 words
@@ -234,6 +235,17 @@ burn a name), not craft (2, no). The partner's breaking point is never
 named; the conflict is billing (3, no). No frame (4, no). And no fall: the
 ending is a shared kingdom on its first morning, so there is no bridge and
 nothing to forgive (5, no). This is the judge's favourite (28/30).
+
+**Lady with the Dog.** Small exact images do some of the work (rain on
+the bench, a coat laid over the dog, the flat grey beach at low tide; 1,
+partly), and the protagonist's view is stated early (2, stated but barely
+reversed). But the whole arc happens inside one seaside week: there is no
+absence, no Moscow winter, no affair that will not fade, no going to S.,
+which is the story. The turning point is something said (a name, in every
+node), where Chekhov's is something he cannot stop doing (3, no). The
+husband is a present opposition where Chekhov's is barely a person. The
+dog was given a human name by the name generator (fixed). The judge
+preferred ours, 27 to 22.
 
 ### What the pipeline systematically misses
 
