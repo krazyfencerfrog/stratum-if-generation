@@ -129,6 +129,9 @@ RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 KIN = re.compile(r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|child(?:ren)?|kids?|mother|father|"
                  r"mum|mom|dad|parents?|brother|sister|siblings?|grand(?:mother|father|son|daughter|parents?)|"
                  r"uncle|aunt|cousin|nephew|niece|fianc[ée]e?|lover|girlfriend|boyfriend|best friend)\b", re.I)
+# a role that names a group (one that needs someone to speak for it), not one being
+GROUP_WORD = re.compile(r"\b(?:\w+[^s\W]s|crew|family|families|crowd|council|staff|people|folk|mob|guests?|"
+                        r"household|village|town|court|congregation|gang|band|company|guild|army|troop|police)\b", re.I)
 MENU_VERB = re.compile(r"\byou (?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\b|"
                        r"\b(?:choose|decide|elect|opt) (?:to|whether|between)\b", re.I)
 
@@ -863,7 +866,9 @@ class StoryGenerator:
                 if s['kind'] == 'crowd':
                     reps = [o for o in seeds if o['kind'] == 'individual'
                             and norm(o.get('speaks_for')) == norm(s['role'])]
-                    if not reps:
+                    if not reps and not GROUP_WORD.search(str(s['role'])):
+                        s['kind'], s['speaks_for'] = 'individual', None   # one being ("the cat") is not a crowd
+                    elif not reps:
                         problems.append(f'crowd "{s["role"]}" has no individual seed whose speaks_for names it')
             if problems:
                 raise ValueError('; '.join(problems))
