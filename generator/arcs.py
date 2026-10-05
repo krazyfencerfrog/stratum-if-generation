@@ -396,13 +396,20 @@ class ArcBuilder:
         for prot_line in self.order:
             if prot_line not in (parsed.get('protagonist') or {}):
                 soft.append(f'protagonist: no arc for line {prot_line}')
+        kept = []                 # a pair no player can see in order is dropped (one retry to mend it), never the run
         for s in as_list(parsed.get('setups')):
+            if not isinstance(s, dict):
+                continue
             a, b = s.get('setup'), s.get('payoff')
             if a not in self.nodes or b not in self.nodes:
-                problems.append(f'setup/payoff names an unknown node: {a!r} -> {b!r}')
+                soft.append(f'setup/payoff names an unknown node: {a!r} -> {b!r}')
             elif not any(a in self.lines[l]['path'] and b in self.lines[l]['path']
                          and self.lines[l]['path'].index(a) < self.lines[l]['path'].index(b) for l in self.order):
-                problems.append(f'setup {a} does not come before payoff {b} on any line')
+                soft.append(f'setup {a} does not come before payoff {b} on any line (a line that pays it must pass '
+                            f'through the setup first)')
+            else:
+                kept.append(s)
+        parsed['setups'] = kept
         for sh in as_list(parsed.get('pattern_shifts')):
             sh['state'] = str(sh.get('state') or '').strip().lower()
             sh['direction'] = str(sh.get('direction') or '').strip().lower()
