@@ -50,7 +50,7 @@ Each field carries a serves tag naming the brief field it satisfies by id ("3-0a
 protagonist: who "you" are when the story opens: role, immediate circumstance, what you want, what you can do directly, and what you CANNOT do without the world's cooperation. cannot_do is where the obstacle lives; it must be real and specific. "You" is a defined person the player can still steer: give them
  - history: how you came to be here, concretely, in one or two sentences (who left you this, who you lost, what you walked away from);
  - need: what the want sits on: what getting it would fix, or fail to fix, in your life;
- - ties: what each person the story turns on is to YOU, from your side, one clause each ("Lazlo: your late wife's brother, the last of her family who still calls you");
+ - ties: what each PERSON the story turns on is to YOU, from your side, one clause each ("Lazlo: your late wife's brother, the last of her family who still calls you"). People, never places or things. When the Kernel gives "you" a family, a partner, a crew or a friend, they are people the story turns on: say who they are (your wife and your grown son, not "your family");
  - open: what is left to the player, in one clause: how "you" feel about all this, and which way you could grow (forgive or not, stay or go);
  - gender: "f" or "m" ("n" only when "you" are not a person: an AI, a ship). The Kernel's words decide when they say; otherwise choose what serves the story, and write the history to match.
 Never a name: a later step names "you" with the cast. Serves 3-0b.protagonist_identity.

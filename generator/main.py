@@ -125,6 +125,10 @@ RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 
 # A way through written as a menu pick: the question is not the verb.
+# people the Kernel ties "you" to by kin or bond: when it names them, the premise keeps them as people
+KIN = re.compile(r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|child(?:ren)?|kids?|mother|father|"
+                 r"mum|mom|dad|parents?|brother|sister|siblings?|grand(?:mother|father|son|daughter|parents?)|"
+                 r"uncle|aunt|cousin|nephew|niece|fianc[ée]e?|lover|girlfriend|boyfriend|best friend)\b", re.I)
 MENU_VERB = re.compile(r"\byou (?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\b|"
                        r"\b(?:choose|decide|elect|opt) (?:to|whether|between)\b", re.I)
 
@@ -1078,6 +1082,22 @@ class StoryGenerator:
 
         for where, problem in self.craft_problems(premise):
             add(where, problem)
+        ties = [t for t in (premise.get('protagonist') or {}).get('ties') or [] if isinstance(t, dict) and t.get('who')]
+        kin = sorted({m.group(0).lower() for m in KIN.finditer(self.kernel or '')})
+        roles = [str(t.get('who')) for t in ties] + [str(sd.get('role')) for sd in premise.get('cast_seeds') or []
+                                                     if isinstance(sd, dict)]
+        if kin and not any(KIN.search(r) for r in roles):
+            add('protagonist.ties', f"the Kernel names {', '.join(kin)}, but no tie or cast seed is one of them: the "
+                                    f"relationship the Kernel turns on is gone. Say who they are, as people, in ties, and "
+                                    f"involve them in the turns")
+        involved = {norm(r) for t in premise.get('turns') or [] if isinstance(t, dict) for r in t.get('involves') or []}
+        opposition = norm((premise.get('opposition') or {}).get('who_or_what'))
+        for t in ties:
+            who = norm(t.get('who'))
+            if KIN.search(str(t.get('who'))) and who not in involved and who != opposition \
+                    and not any(who in r or r in who for r in involved if r):
+                add('turns', f'"you" are tied to {t.get("who")}, but no turn involves them: a tie the story never '
+                             f'tests is a name in a list', str(t.get('who')))
         prot = premise.get('protagonist') or {}
         cannot = str(prot.get('cannot_do') or '').strip()
         if not cannot or cannot.lower() in ('nothing', 'none', 'n/a'):
