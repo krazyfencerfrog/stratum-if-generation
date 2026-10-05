@@ -15,7 +15,7 @@ can examine themselves and THINK about things; you write what they find.
    with a description when examined.
  - think: three to six topics: your history, each tie that matters (the
    people the story turns on, from your side), your need, the open question.
-   For each, a label for the menu ("Mira", "selling the boat"), known_after
+   For each, a label for the menu ("Mira", "the move north"), known_after
    (null from the start; a node id for a thought you can only have after
    something happens), and what you think, as variants: by state (what you
    think of someone changes as their arc moves) or after a node, with a
