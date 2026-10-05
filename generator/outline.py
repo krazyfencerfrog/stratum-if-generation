@@ -117,6 +117,9 @@ class OutlineBuilder:
         self.turns = [t for t in self.premise.get('turns') or [] if isinstance(t, dict)]
         self.turn_ids = [t.get('id') for t in self.turns]
         self.events = [e for e in as_list(self.premise.get('events')) if isinstance(e, dict) and e.get('what')]
+        self.setups = [x for x in as_list(self.premise.get('setups')) if isinstance(x, dict) and x.get('plant')]
+        price = self.premise.get('price')
+        self.price = price if isinstance(price, dict) and str(price.get('what') or '').strip() else None
 
         self.lines = {}
         self.line_order = []
@@ -168,7 +171,7 @@ class OutlineBuilder:
         return {
             'protagonist': pick(p.get('protagonist'), 'name', 'gender', 'who', 'history', 'wants', 'need', 'can_do', 'cannot_do', 'ties', 'open'),
             'pressure': (p.get('pressure') or {}).get('description'),
-            'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means'),
+            'opposition': pick(p.get('opposition'), 'who_or_what', 'wants', 'means', 'shown_by'),
             'events': [f"{i}. ({e.get('when')}) {e.get('what')}" for i, e in enumerate(self.events, 1)],
             'hidden_truth': p.get('hidden_truth') or None,
             'cast': cast,
@@ -183,6 +186,11 @@ class OutlineBuilder:
                                 for i, w in enumerate(as_list(t.get('ways_through')), 1) if isinstance(w, dict)],
                        'involves': t.get('involves')} for t in self.turns],
             'complications': [c.get('description') for c in as_list(p.get('complications')) if isinstance(c, dict)],
+            **({'price': pick(self.price, 'what', 'who_pays', 'why_final')} if self.price else {}),
+            **({'setups': [f"{i}. plant: {x.get('plant')}; payoff: {x.get('payoff')}"
+                           for i, x in enumerate(self.setups, 1)]} if self.setups else {}),
+            **({'rules': [f"{x.get('thing')}: {x.get('terms')}" for x in as_list(p.get('rules')) if isinstance(x, dict)]}
+               if p.get('rules') else {}),
         }
 
     def framework_block(self):
@@ -445,8 +453,34 @@ class OutlineBuilder:
             elif ev is not None:
                 seen_events.add(ev)
             e['event'] = ev
+            for key in ('plants', 'pays'):      # setup numbers; a number that is no setup is dropped, not argued over
+                vals = e.get(key) if isinstance(e.get(key), list) else ([e.get(key)] if e.get(key) is not None else [])
+                e[key] = sorted({v for v in (to_int(x) for x in vals) if v is not None and 1 <= v <= len(self.setups)})
             if not str(e.get('adapted') or '').strip():
                 problems.append(f'{label}[{i}].adapted is empty')
+
+    def setup_complaints(self, entries, before=(), whole=True):
+        """Setups on one line: each paid in an entry after the one that
+        plants it (the shared part of the path, `before`, counts as earlier);
+        with `whole`, every setup is planted and paid on this line."""
+        if not self.setups:
+            return []
+        planted = {k for nid in before for k in self.nodes[nid].get('plants') or []}
+        paid, out = set(), []
+        for e in entries:
+            for k in e.get('pays') or []:
+                if k not in planted:
+                    out.append(f"setup {k} is paid in the entry at beat {e.get('beat')} but planted in no entry before it")
+                paid.add(k)
+            planted |= set(e.get('plants') or [])
+        if whole:
+            for k in range(1, len(self.setups) + 1):
+                if k not in planted:
+                    out.append(f'setup {k} is never planted (plants: [{k}] in an early entry, shown in passing)')
+                elif k not in paid:
+                    out.append(f'setup {k} is planted but never paid (pays: [{k}] in the entry where it decides or '
+                               f'changes the crisis)')
+        return out
 
     @staticmethod
     def check_through_line(parsed, problems, need=('title', 'motivation', 'strategy')):
@@ -486,6 +520,7 @@ class OutlineBuilder:
             value = value if isinstance(value, list) else ([value] if isinstance(value, str) and value.strip() else [])
             ending[key] = [str(v).strip() for v in value if str(v or '').strip() and str(v).strip().lower() not in ('none', 'null', 'nobody', 'no one')]
         ending['changed'] = str(ending.get('changed') or '').strip()
+        ending['pays_price'] = ending.get('pays_price') in (True, 'true', 'True', 'yes', 1)
         return ending
 
     def ending_strangers(self, ending):
@@ -584,6 +619,10 @@ class OutlineBuilder:
             strangers = self.ending_strangers(parsed.get('ending') or {})
             if strangers:
                 soft.append(self.strangers_complaint("the ending's", strangers))
+            soft += self.setup_complaints(entries)
+            if self.price and self.max_iterations <= 1 and not (parsed.get('ending') or {}).get('pays_price'):
+                soft.append(f"this story has one line, so its ending must pay the premise's price ({self.price.get('what')}): "
+                            f"make it happen in the ending and set pays_price true")
             if soft:
                 raise SoftReject('; '.join(soft))
 
@@ -622,12 +661,13 @@ class OutlineBuilder:
         ending = OutlineBuilder.normalize_ending(dict(ending or {}))
         return {'title': ending.get('title'), 'summary': ending.get('summary'), 'node': node_id,
                 'answer': ending.get('answer'), 'standing': ending.get('standing'), 'lost': ending.get('lost'),
-                'changed': ending.get('changed')}
+                'changed': ending.get('changed'), 'pays_price': ending.get('pays_price', False)}
 
     def new_node(self, nid, line_id, iteration, entry):
         self.nodes[nid] = {
             'id': nid, 'line': line_id, 'iteration': iteration,
             'beat': entry['beat'], 'turn': entry.get('turn'), 'way': entry.get('way'), 'event': entry.get('event'),
+            'plants': list(entry.get('plants') or []), 'pays': list(entry.get('pays') or []),
             'adapted': str(entry.get('adapted') or '').strip(),
             'title': '', 'summary': '', 'image': '', 'where': [], 'who': [],
             'is_ending': False, 'lines': [line_id],
@@ -821,6 +861,10 @@ class OutlineBuilder:
             if problems:
                 raise ValueError('; '.join(problems))
             parsed['seeds'] = seeds
+            if self.price and not (main.get('ending') or {}).get('pays_price') \
+                    and not any((sd.get('ending') or {}).get('pays_price') for sd in seeds):
+                soft.append(f"no line pays the premise's price ({self.price.get('what')}): the main line's ending does "
+                            f"not, so one seed's ending must (set its pays_price true and make the loss happen there)")
             if not linear and len(path) >= 4 and len(seeds) >= 2:
                 half = [sd for sd in seeds if sd.get('diverges_at') in path and path.index(sd['diverges_at']) + 1 <= len(path) / 2]
                 if not half:
@@ -979,6 +1023,7 @@ class OutlineBuilder:
             strangers = self.ending_strangers(parsed.get('ending') or {}) if isinstance(parsed.get('ending'), dict) else []
             if strangers:
                 soft.append(self.strangers_complaint("the ending's", strangers))
+            soft += self.setup_complaints(entries, before=prefix, whole=False)
             if soft:
                 raise SoftReject('; '.join(soft))
 
@@ -1060,6 +1105,10 @@ class OutlineBuilder:
                                  'the_way_this_line_takes': (f"{way.get('way')} (cost: {way.get('cost')})"
                                                              if isinstance(way, dict) else 'its own; see the plan'),
                                  'involves': t.get('involves')}
+            for k in node.get('plants') or []:
+                entry.setdefault('plant_here', []).append(self.setups[k - 1].get('plant'))
+            for k in node.get('pays') or []:
+                entry.setdefault('pay_off_here', []).append(self.setups[k - 1].get('payoff'))
             if node['is_ending']:
                 entry['this_is_the_ending'] = (line.get('ending') or {}).get('summary')
             nodes.append(entry)

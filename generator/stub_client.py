@@ -577,6 +577,8 @@ class StubClient(LlmClient):
                 while queue:      # more turns than middle beats: double up on the last one
                     turn = queue.pop(0)
                     entries.append({"beat": b['id'], "turn": turn, "way": 1, "event": None, "adapted": f"stub: {b['id']} again, playing turn {turn}"})
+        if premise.get('setups') and len(entries) >= 2:     # plant early, pay at the end
+            entries[0]['plants'], entries[-2]['pays'] = [1], [1]
         if sloppy and entries:
             name = {'opening_crisis': 'Opening crisis', 'setup': 'Setup'}.get(entries[0]['beat'])
             if name:
@@ -590,7 +592,7 @@ class StubClient(LlmClient):
                                  "strategy": "reroute rather than vent", "turning_point": "the council's offer"},
                 "ending": {"title": "the strained collective", "summary": "everyone breathes, barely",
                            "answer": "pole_b", "standing": ["the nursery warden", "the hydroponics foreman"], "lost": [],
-                           "changed": "the ship is cold and lit by strips"},
+                           "changed": "the ship is cold and lit by strips", "pays_price": bool(premise.get('price'))},
                 "beats": entries, "skipped_beats": []}
 
     PLACES = [("the core status bay", "a control space", "where the margin is read"),

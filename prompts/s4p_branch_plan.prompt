@@ -39,6 +39,9 @@ WHAT A SEED IS
                role label
      changed:  one clause: what stands or is destroyed in the world that
                was not so on the main line
+     pays_price: true when this ending is where the engine's price is
+               paid. If the main line's ending does not pay it, one
+               seed's ending must.
  - why_different: one sentence per existing line and per earlier seed:
    how this ending differs in KIND from it.
 
@@ -89,7 +92,7 @@ part early.
       "motivation": "...", "strategy": "...",
       "diverges_at": "node id", "trigger": "...", "trigger_kind": "act | accumulated", "way": null,
       "ending": { "title": "...", "summary": "...", "answer": "pole_a | pole_b | mixed | neither",
-                  "standing": ["role label"], "lost": ["role label"], "changed": "..." },
+                  "standing": ["role label"], "lost": ["role label"], "changed": "...", "pays_price": false },
       "why_different": "..."
     }
   ]
@@ -129,21 +132,21 @@ Output:
       "motivation": "The crane gets the nephew out in a minute and the agent has his photograph of the cracked lid. You come to want the dig finished at any price, because the find is already half his and the rain is not waiting.",
       "strategy": "Take the agent's money and his crew, keep the foreman's men on by paying them out of it, and get the find to the station before the council can organize.",
       "diverges_at": "N02", "trigger": "you let the agent swing his crane over the trench to get the nephew out", "trigger_kind": "act", "way": 2,
-      "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come to the station.", "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's, damaged; the village has seen nothing" },
+      "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come to the station.", "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's, damaged; the village has seen nothing", "pays_price": false },
       "why_different": "T1 keeps the find and loses the student; this line loses the find and the student both and keeps the foreman only by his nephew's debt: the other answer, with the dig run by the agent from the second crisis on."
     },
     {
       "motivation": "You come to want the student's name on the record more than the village's claim, because she broke her arm in the trench for a find the foreman had been hiding from everyone, you included.",
       "strategy": "Let her lead the agent's crew down the trench to lift it, and answer the council at the station with the day book that shows what the foreman knew.",
       "diverges_at": "N03", "trigger": "you let the student lead the agent's crew down the trench to lift it", "trigger_kind": "act", "way": 2,
-      "ending": { "title": "Her Name on the Case", "summary": "The find goes on the train with the student beside it in the goods van, her name to go on its case. The foreman and his men have walked off the hill, the council turns its back on you at the station, and the second burial is left open to the rain.", "answer": "pole_a", "standing": ["the student"], "lost": ["the foreman", "the foreman's mother"], "changed": "the upper burial is destroyed by the rain; the village will not have you back" },
+      "ending": { "title": "Her Name on the Case", "summary": "The find goes on the train with the student beside it in the goods van, her name to go on its case. The foreman and his men have walked off the hill, the council turns its back on you at the station, and the second burial is left open to the rain.", "answer": "pole_a", "standing": ["the student"], "lost": ["the foreman", "the foreman's mother"], "changed": "the upper burial is destroyed by the rain; the village will not have you back", "pays_price": false },
       "why_different": "Seed 1 loses the student and keeps the foreman; this line is the reverse, and the village is lost with him. T1 keeps the find; this does not."
     },
     {
       "motivation": "Once the foreman and the student have both read the day book, you come to want the find raised by the people it was hidden from and the people who found it together, whatever the sponsor does afterwards.",
       "strategy": "Show them both the day book, raise the find by lamplight with every hand on the hill, and meet the council at the station with the student at your side.",
       "diverges_at": "N03", "trigger": "you showed the foreman and the student the last dig's day book together before the lift", "trigger_kind": "act", "way": 3,
-      "ending": { "title": "Every Hand on the Hill", "summary": "The find stands whole in the village church with the student's drawings pinned beside it and the foreman's mother keeping the key. The sponsor has pulled next season and the agent's wire has named you a thief, and both of them stayed.", "answer": "pole_b", "standing": ["the foreman", "the student", "the foreman's mother"], "lost": ["the sponsor's agent"], "changed": "the dig has no sponsor; the find is whole and shown" },
+      "ending": { "title": "Every Hand on the Hill", "summary": "The find stands whole in the village church with the student's drawings pinned beside it and the foreman's mother keeping the key. The sponsor has pulled next season and the agent's wire has named you a thief, and both of them stayed.", "answer": "pole_b", "standing": ["the foreman", "the student", "the foreman's mother"], "lost": ["the sponsor's agent"], "changed": "the dig has no sponsor; the find is whole and shown", "pays_price": false },
       "why_different": "The same answer as T1 but a different world: the student stays, the find is whole, and the price is next season instead of a companion."
     }
   ]

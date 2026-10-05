@@ -86,6 +86,10 @@ entry has the same shape as on the main line:
  - event: the engine's event that lands in this entry, or null. An event
    the shared part of the path has already placed stays placed; one it
    has not is this line's to land, and to land differently.
+ - plants / pays: the numbers of the engine's setups this entry plants
+   or pays off, or []. A setup paid on this line is planted earlier on
+   it (the shared part of the path counts); a line may pay a setup the
+   main line planted, and pay it differently.
  - adapted: one or two sentences: what happens here on THIS line, who
    does what to whom, and what is different afterwards. Specific to this
    premise; a sentence that could be pasted into another story is not
@@ -94,7 +98,8 @@ entry has the same shape as on the main line:
 ending and rejoins_at: the line ENDS. Normally its last new entry is its
 own ending (rejoins_at null; "ending" gives its title, summary, and its
 world: answer, standing, lost, changed, in the same form as the main
-line's). When the seed carries an ending world, land in it; where the
+line's, and pays_price: true when this ending is where the engine's price
+is paid). When the seed carries an ending world, land in it; where the
 line, worked out, cannot, say in "why" where it moved and why. It may
 instead rejoin an existing node further on (rejoins_at is that node's id)
 and play out from there exactly as the existing story does. Rejoin only
@@ -145,8 +150,8 @@ after:
   "why": "...",
   "through_line": { "title": "...", "motivation": "...", "strategy": "...", "turning_point": "...", "differs_from": "..." },
   "divergence": { "diverges_at": "node id", "trigger": "...", "trigger_kind": "act | accumulated", "way": null, "instead_of": "...", "opportunity": null, "shift": "..." },
-  "ending": { "title": "...", "summary": "...", "answer": "pole_a | pole_b | mixed | neither", "standing": ["role label"], "lost": ["role label"], "changed": "..." },
-  "beats": [ { "beat": "beat id", "turn": null, "way": null, "event": null, "adapted": "..." } ],
+  "ending": { "title": "...", "summary": "...", "answer": "pole_a | pole_b | mixed | neither", "standing": ["role label"], "lost": ["role label"], "changed": "...", "pays_price": false },
+  "beats": [ { "beat": "beat id", "turn": null, "way": null, "event": null, "plants": [], "pays": [], "adapted": "..." } ],
   "skipped_beats": [ { "beat": "beat id", "reason": "..." } ],
   "rejoins_at": null
 }
@@ -203,11 +208,11 @@ Output:
     "shift": "The nephew is out alive in a minute, by the agent's machine, and the foreman's men have seen whose hand it was. The crane's foot has cracked the find's lid, the agent has his photograph, and from here the dig runs on his pay book."
   },
   "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come down to the station.",
-              "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's and damaged; the village never saw it" },
+              "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's and damaged; the village never saw it", "pays_price": false },
   "beats": [
-    { "beat": "third_crisis", "turn": 3, "way": 2, "event": null, "adapted": "The agent's hired crew is on the hill by morning and the foreman's men stand back from the trench until you tell them the agent's money is their pay. You let the student lead the agent's crew down the trench, her arm in its sling; the men go down for the agent's wages, and the foreman watches you give the order and says nothing." },
-    { "beat": "climax", "turn": 4, "way": 2, "event": 2, "adapted": "The sponsor's crate is on the platform before the find is clean, and the council is on the road with the foreman's mother at the front. You help the agent's crew nail down the crate's lid and the student climbs into the goods van beside it; the foreman has not come down from the hill, and his mother turns back when she sees your hands on the crate." },
-    { "beat": "aftermath", "turn": null, "way": null, "event": null, "adapted": "The train is gone with the find and the student, and the agent's photograph of the cracked lid will be on the sponsor's desk before you are. The foreman's men are paid to the day; the village church has an empty table where the council meant to put the find, and nobody on the hill asks when you are leaving." }
+    { "beat": "third_crisis", "turn": 3, "way": 2, "event": null, "plants": [], "pays": [], "adapted": "The agent's hired crew is on the hill by morning and the foreman's men stand back from the trench until you tell them the agent's money is their pay. You let the student lead the agent's crew down the trench, her arm in its sling; the men go down for the agent's wages, and the foreman watches you give the order and says nothing." },
+    { "beat": "climax", "turn": 4, "way": 2, "event": 2, "plants": [], "pays": [], "adapted": "The sponsor's crate is on the platform before the find is clean, and the council is on the road with the foreman's mother at the front. You help the agent's crew nail down the crate's lid and the student climbs into the goods van beside it; the foreman has not come down from the hill, and his mother turns back when she sees your hands on the crate." },
+    { "beat": "aftermath", "turn": null, "way": null, "event": null, "plants": [], "pays": [], "adapted": "The train is gone with the find and the student, and the agent's photograph of the cracked lid will be on the sponsor's desk before you are. The foreman's men are paid to the day; the village church has an empty table where the council meant to put the find, and nobody on the hill asks when you are leaving." }
   ],
   "skipped_beats": [],
   "rejoins_at": null

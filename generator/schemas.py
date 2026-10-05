@@ -124,11 +124,11 @@ def story_form(framework_ids, modifier_ids):
 
 # ---------------------------------------------------------------- step 4
 
-BEAT_ENTRY = obj(beat=S, turn=INT_OR_NULL, way=INT_OR_NULL, event=INT_OR_NULL, adapted=S)
+BEAT_ENTRY = obj(beat=S, turn=INT_OR_NULL, way=INT_OR_NULL, event=INT_OR_NULL, plants=arr(I), pays=arr(I), adapted=S)
 SKIPPED = arr(obj(beat=S, reason=S))
 ANSWERS = ['pole_a', 'pole_b', 'mixed', 'neither']
 # the world an ending leaves, in a form two endings can be compared by
-ENDING = obj(title=S, summary=S, answer=enum(ANSWERS), standing=arr(S), lost=arr(S), changed=S)
+ENDING = obj(title=S, summary=S, answer=enum(ANSWERS), standing=arr(S), lost=arr(S), changed=S, pays_price=B)
 
 MAIN_LINE = obj(
     through_line=obj(title=S, motivation=S, strategy=S, turning_point=S),

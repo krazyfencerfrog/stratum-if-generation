@@ -81,7 +81,11 @@ OTHER RULES
      one before left things. "already_told" is what came before the first
      node you fill; do not retell it.
  12. A node marked this_is_the_ending lands the ending as given.
- 13. THE QUESTION IS NOT THE VERB: say what you bring about and what it
+ 13. A node with plant_here shows that thing in passing, as part of what
+     happens, never flagged as important (the spotlight someone thumps to
+     keep lit while the scene is about something else). A node with
+     pay_off_here makes the planted thing decide or change what happens.
+ 14. THE QUESTION IS NOT THE VERB: say what you bring about and what it
      costs; never "you choose" or "you decide between".
 
 OUTPUT FORMAT (JSON)

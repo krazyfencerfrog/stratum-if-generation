@@ -200,6 +200,26 @@ def a_premise_names_its_price_setups_and_rules():
 
 
 @test
+def setups_are_planted_before_they_are_paid():
+    run('setups')
+    story = load('setups', 'story.json')
+    main = story['lines'][story['line_order'][0]]
+    planted = [n for n in main['path'] if 1 in (story['nodes'][n].get('plants') or [])]
+    paid = [n for n in main['path'] if 1 in (story['nodes'][n].get('pays') or [])]
+    check(planted and paid and main['path'].index(planted[0]) < main['path'].index(paid[0]),
+          f'setup 1 on the main line: planted {planted}, paid {paid}')
+    check('plant_here' in load('setups', 's4b_i1_raw_input_prompt.txt'), "4b was not told what to plant")
+    check(main['ending'].get('pays_price'), "the stub main line's ending should pay the price")
+    import outline
+    b = outline.OutlineBuilder.__new__(outline.OutlineBuilder)
+    b.setups, b.nodes = [{'plant': 'a bell', 'payoff': 'it rings'}], {'N01': {'plants': [1]}}
+    check(b.setup_complaints([{'beat': 'x', 'pays': [1]}]) and not b.setup_complaints([{'beat': 'x', 'pays': [1]}], before=['N01']),
+          'a setup paid before it is planted must be a complaint, and one planted on the shared path must not')
+    check(b.setup_complaints([{'beat': 'x', 'plants': [1]}]) and not b.setup_complaints([{'beat': 'x', 'plants': [1]}], whole=False),
+          'a main line that never pays its setup must be a complaint')
+
+
+@test
 def hidden_truth_and_cast_edges():
     run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
     premise = load('gap', 's3_5_premise_accepted.json')

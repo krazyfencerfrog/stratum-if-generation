@@ -105,6 +105,17 @@ def metrics(story, promises=None):
     out['ending_worlds_stated_share'] = round(sum(1 for l in order if (lines[l].get('ending') or {}).get('answer')) / len(order), 2) if order else 0
 
     # the premise: forms, set pieces, events
+    # craft the reference stories showed missing (docs/reference_stories.md)
+    out['price_named'] = bool((premise.get('price') or {}).get('what'))
+    out['price_paid'] = any((lines[l].get('ending') or {}).get('pays_price') for l in order)
+    setups = premise.get('setups') or []
+    main_nodes = [nodes[n] for n in path if n in nodes]
+    planted = [k for k in range(1, len(setups) + 1) if any(k in (nd.get('plants') or []) for nd in main_nodes)]
+    paid = [k for k in planted if any(k in (nd.get('pays') or []) for nd in main_nodes)]
+    out['setups'] = len(setups)
+    out['setups_paid_on_main'] = len(paid)
+    out['rules_with_terms'] = sum(1 for r in premise.get('rules') or [] if (r or {}).get('terms'))
+    out['opposition_shown'] = bool((premise.get('opposition') or {}).get('shown_by'))
     out['turn_forms'] = [t.get('form') for t in turns]
     out['set_piece_turns'] = [t.get('id') for t in turns if t.get('set_piece')]
     sp_turns = set(out['set_piece_turns'])
