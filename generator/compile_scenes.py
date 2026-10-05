@@ -505,7 +505,7 @@ class SceneCompiler:
             return report
         out = io.StringIO()
         result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
-                                     styled_runs=10 if quick else None)
+                                     styled_runs=10 if quick else None, scene_states=1500 if quick else None)
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue()}
         return report
 

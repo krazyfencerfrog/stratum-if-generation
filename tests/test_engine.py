@@ -400,7 +400,53 @@ def playtest_checks_what_the_menu_shows():
     eng.options = lambda: real() + [dict(o, object_label=None, detail_label=None) for o in many]
     eng.menu = lambda: {'label': None, 'children': [{'label': f'w{k}', 'id': o['id']} for k, o in enumerate(many)]}
     problems = playtest.menu_problems(eng)
-    check(any('more than' in p for p in problems) and any('not in the menu' in p for p in problems), f'{problems}')
+    check(any('more entries than' in p for p in problems) and any('not in the menu' in p for p in problems), f'{problems}')
+
+
+@test
+def playtest_explores_scene_by_scene():
+    story = Story(demo_data())
+    whole = playtest.explore(story)
+    result = playtest.explore_scenes(story)
+    errors, _ = playtest.scene_findings(story, result)
+    check(not errors and set(result['scenes']) == {'S01', 'S02'}, f'scene-by-scene exploration of the demo: {errors}')
+    check(set(result['endings']['END_DEMO']) == set(whole['endings']['END_DEMO']),
+          'scene by scene found other resolution combinations than the whole-story search')
+    path = next(iter(result['endings']['END_DEMO'].values()))
+    eng = Engine(story)
+    eng.start(seed=1)
+    labels = {}
+    for label in path:            # the walkthrough replays: every step is on the menu when it is reached
+        labels = {eng.label_of(o): o['id'] for o in eng.options()}
+        check(label in labels, f'walkthrough step {label!r} is not offered')
+        eng.act(labels[label])
+    check(eng.state.ending == 'END_DEMO', 'the walkthrough does not end the story')
+    # the stuck state from the test below, found within its scene
+    data = demo_data()
+    s2 = data['scenes']['S02']['interactions']
+    next(i for i in s2 if i['id'] == 'S02.jump')['effects'] = [{'take': 'bow_line'}, {'set': 'jumped'}]
+    for it in s2:
+        if it['id'] != 'S02.jump':
+            it['when'] = 'not flags.reported and not flags.jumped'
+    story = Story(data)
+    errors, _ = playtest.scene_findings(story, playtest.explore_scenes(story))
+    check(any(e.startswith('STUCK') and 'S02' in e and 'jump for it' in e for e in errors), f'stuck state missed: {errors}')
+    out = io.StringIO()
+    report = playtest.run(story, runs=20, styled_runs=10, out=out, by_scene=True)
+    check('explored scene by scene' in out.getvalue() and any(e.startswith('STUCK') for e in report['errors']),
+          out.getvalue()[:400])
+
+
+@test
+def seekers_play_the_story_not_the_menu():
+    story = Story(demo_data())
+    for style in ('seek', 'seek:branch'):
+        p = playtest.play(story, style, runs=30)
+        check(not p['unfinished'] and p['endings']['END_DEMO'] == 30, f'{style}: {p}')
+    random_play = playtest.play(story, 'random', runs=30)
+    seek = playtest.play(story, 'seek', runs=30)
+    check(seek['mean_actions'] < random_play['mean_actions'], f"seekers wander as much as random play: "
+          f"{seek['mean_actions']} vs {random_play['mean_actions']}")
 
 
 @test
