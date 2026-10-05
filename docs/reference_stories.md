@@ -257,4 +257,18 @@ nothing to forgive (5, no). This is the judge's favourite (28/30).
    contract became a story about signatures).
 
 These are design-level gaps for the premise (3.5a/3.5v) and the line plans
-(4a/4c/4p), not prompt polish; candidate checks are in the backlog.
+(4a/4c/4p), not prompt polish.
+
+### What was changed (2026-10-05)
+
+The cause of 1 was in the design: 3-0c models how the player can lose, and
+with nothing asking what a story costs, "failure: none" became "no cost"
+(Kipling's kernel: failure presence none, so no fall). The premise now
+names a price, separate from the failure model and scaled to genre, and
+some line's ending must pay it; setups are planted in an early beat entry
+and paid in a later one (checked in Python); rules carry terms; the
+opposition is shown at work early; ties are people and a Kernel's family
+stays in the cast (the Monkey's Paw lost the family at 3.5a: ties named
+"the cottage", turns involved only the soldier, the cast is seeded from
+the turns); the judge must name what is lost, the plant and its payoff;
+summaries are capped at 70 words. Re-run queued (stratum-compare/refs2).

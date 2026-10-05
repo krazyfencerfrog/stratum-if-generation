@@ -127,7 +127,10 @@ Plan:
 
 ## Next
 
-### Craft the reference stories show: IN PROGRESS 2026-10-05 [solo, then GPU]
+### Craft the reference stories show: BUILT 2026-10-05, verifying [GPU]
+Items 1-7 below are built (04a8435, 536646b, 0ee676a, 4562de9, 2424bb0);
+item 8, the re-run of the five references, is queued
+(stratum-compare/refs2).
 docs/reference_stories.md, Results (four of five). The causes are mostly in
 the design: 3-0c models how the player can LOSE, and with nothing asking for
 what a story COSTS, "failure: none" became "no cost" (Kipling: "failure
