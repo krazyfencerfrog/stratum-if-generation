@@ -57,7 +57,7 @@ def gpu_lock_path(root=ROOT):
 
 GPU_LOCK = os.environ.get('STRATUM_GPU_LOCK') or gpu_lock_path()
 TRANSIENT = ('idle timeout', 'could not reach ollama', 'failed mid-stream', 'ended before the call finished',
-             'an error was encountered while running the model')   # a ROCm library that failed to load, once
+             'an error was encountered while running the model', 'tensilelibrary')   # a ROCm library that failed to load
 RETRIES = 1
 
 
