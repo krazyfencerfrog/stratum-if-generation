@@ -104,6 +104,9 @@ def to_int(value):
     return int(number) if number == int(number) else None
 
 
+SUMMARY_LIMIT = 80      # words; the human reference outlines run 45-51, ours ran 76-87
+
+
 class OutlineBuilder:
 
     def __init__(self, gen, max_iterations=4, branching='plan'):
@@ -1214,6 +1217,11 @@ class OutlineBuilder:
                                   'direction for the writer, not story text: ' + '; '.join(
                                       f'{nid}: {who}, "{p}"' for nid, who, p in voices[:5])
                                   + '. Show it in what they say or do')
+            long = [(x['id'], len(str(x.get('summary') or '').split())) for x in got
+                    if len(str(x.get('summary') or '').split()) > SUMMARY_LIMIT]
+            if long:
+                complaints.append(f'these summaries run past {SUMMARY_LIMIT} words: ' + ', '.join(f'{nid} ({w})' for nid, w in long)
+                                  + '. Keep what happens and what it changes; cut the description around it')
             if complaints:
                 raise SoftReject(' Also, '.join(complaints))
 
