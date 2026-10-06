@@ -270,6 +270,8 @@ class Engine:
         src = opt['source']
         if opt['verb'] in NEWS:
             st.heard.add(opt['id'])
+        if opt['verb'] == 'talk' and opt.get('object') in s.characters:
+            st.introduced.add(opt['object'])     # a first conversation is an introduction
         if src and src[0] == 'interaction':
             it = src[1]
             self.queue.append(pick_text(it.get('text'), st, it['id']))

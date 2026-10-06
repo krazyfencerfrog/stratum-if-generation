@@ -192,6 +192,13 @@ OUTLINE_JUDGE = obj(
 PICK = obj(winner=enum(['1', '2', 'same']), why=S, quote=S)
 COMPARE = obj(cost=PICK, setups=PICK, opposition=PICK, turn=PICK, picture=PICK, play=PICK)
 
+# ---------------------------------------------------------------- the prose stage (prose.py)
+
+STYLE = obj(tradition=S, person_tense=S, register=S, rhythm=S, voices=arr(obj(who=S, speech=S)), images=arr(S),
+            avoid=arr(S), length=S, sample=S)
+STYLE_CHECK = obj(note=S, delivers=B, problems=arr(S))
+PROSE_EDIT = obj(texts=arr(obj(id=S, text=S)), images_used=arr(S))
+
 # ---------------------------------------------------------------- stage A (arcs.py)
 
 ARC_CAST = obj(cast=arr(obj(who=S, note=S, tier=enum(['supporting', 'functional']))))
@@ -268,7 +275,8 @@ ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
     'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
-    'OUTLINE_JUDGE': OUTLINE_JUDGE, 'COMPARE': COMPARE, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
+    'OUTLINE_JUDGE': OUTLINE_JUDGE, 'COMPARE': COMPARE, 'STYLE': STYLE, 'STYLE_CHECK': STYLE_CHECK,
+    'PROSE_EDIT': PROSE_EDIT, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
 }

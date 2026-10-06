@@ -57,6 +57,10 @@ Scenario knobs (environment variables):
     STUB_KNOWN_SPEAKER=1         with STUB_NEW_CAST_ON, the crowd's voice is someone
                                  already in the cast, listed again with speaks_for
                                  (kernel7's quartermaster for the crew)
+    STUB_STYLE_FAILS=1           8v faults the first style sheet (tests the rewrite)
+    STUB_PROSE_DROP=1            8b's first answer for a person leaves one text out (tests the retry)
+    STUB_PROSE_IF=1              8b's first answer for the first scene narrates
+                                 alternatives (tests the informed retry)
     STUB_REJOIN_ON=3             the line built on this iteration rejoins the
                                  main line's ending node
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
@@ -182,6 +186,9 @@ class StubClient(LlmClient):
             ('You are step 6b2 of', 's6b2'),
             ('You are step 6b3 of', 's6b3'),
             ('You are step 7d of', 's7d'),
+            ('You are step 8a of', 's8a'),
+            ('You are step 8v of', 's8v'),
+            ('You are step 8b of', 's8b'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -984,6 +991,40 @@ class StubClient(LlmClient):
                           for label in ("your history", "the person you owe", "what you need")]}
 
     # ------------------------------------------------------------------ stage D
+
+    def p_s8a(self, p):
+        people = self.section(p, '- the people (name, role') or []
+        rewrite = 'A first style sheet was checked' in p
+        return {"tradition": "a stub tradition" + (", revised" if rewrite else ""), "person_tense": "second person, present", "register": "plain and wry",
+                "rhythm": "short sentences, a long one at a turn",
+                "voices": [{"who": x.get('name') or x.get('role'), "speech": "stub: clipped"} for x in people],
+                "images": ["rain on canvas", "a cold rope"], "avoid": ["somehow", "the weight of"],
+                "length": "short rooms, long endings",
+                "sample": "You step onto the wet deck and the rope is cold in your hand. " * 8}
+
+    def p_s8v(self, p):
+        if env_int('STUB_STYLE_FAILS', 0) and '"a stub tradition"' in p:
+            return {"note": "stub", "delivers": False, "problems": ["stub: the sample is solemn where the request asked for fun"]}
+        return {"note": "stub", "delivers": True, "problems": []}
+
+    def p_s8b(self, p):
+        """Returns every text with a stub voice; a person's first text names
+        them outright (the pass must turn the name into a code)."""
+        texts = self.section(p, '- the texts') or []
+        part = self.section(p, '- the part') or {}
+        people = {x['code']: x for x in self.section(p, '- the people, by code') or []}
+        retry = self.body(p) != p
+        out = []
+        for i, t in enumerate(texts):
+            text = f"{t['text']} (voiced)" if t['id'] != 'unnamed' else 'the stub figure in a coat'
+            if i == 0 and part.get('kind') == 'person' and (people.get(part.get('id')) or {}).get('name'):
+                text = f"{people[part['id']]['name']} looks up. " + text
+            out.append({"id": t['id'], "text": text})
+        if not retry and env_int('STUB_PROSE_DROP', 0) and part.get('kind') == 'person' and out:
+            out = out[1:]
+        if not retry and env_int('STUB_PROSE_IF', 0) and part.get('kind') == 'scene' and out:
+            out[0]['text'] = 'If it slips, you fall; if it holds, you climb.'
+        return {"texts": out, "images_used": [f"stub image {part.get('id')}"]}
 
     def p_s7d(self, p):
         pk = self.section(p, 'THIS SCENE (') or {}

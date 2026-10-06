@@ -1643,6 +1643,13 @@ class StoryGenerator:
         return package, report
 
 
+    def run_prose(self):
+        """The prose pass (generator/prose.py) over <id>_package.json: writes
+        <id>_package_prose.json, <id>_prose_style.json and <id>_prose.md."""
+        import prose
+        return prose.write(self, self.analysis.get('story'))
+
+
 # a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
 FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
 
@@ -1716,6 +1723,9 @@ if __name__ == "__main__":
     parser.add_argument("--stage-d", action="store_true",
                         help="after stage B, run stages C and D (compile the scenes into an engine package: "
                              "<id>_package.json, playable with engine/cli.py); implies --stage-a and --stage-b")
+    parser.add_argument("--prose", action="store_true",
+                        help="after stage D, the prose pass (a style sheet, then the text revised part by part in "
+                             "that voice: <id>_package_prose.json); implies --stage-d")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
@@ -1780,12 +1790,14 @@ if __name__ == "__main__":
         gen.run_outline(max_iterations=args.max_iterations)
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
         gen.run_outline_judge()
-        if args.stage_a or args.stage_b or args.stage_d:
+        if args.stage_a or args.stage_b or args.stage_d or args.prose:
             arcs_result = gen.run_arcs()
-            if args.stage_b or args.stage_d:
+            if args.stage_b or args.stage_d or args.prose:
                 world_result = gen.run_world(arcs_result=arcs_result)
-                if args.stage_d:
+                if args.stage_d or args.prose:
                     gen.run_package(arcs_result=arcs_result, world_result=world_result)
+                    if args.prose:
+                        gen.run_prose()
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         finish(2)

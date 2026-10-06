@@ -707,7 +707,41 @@ would get wrong somewhere.
 - people written as codes, never as bare names;
 - lengths within twice the soft targets.
 
-### Building it (after the held-out results)
+### Built (2026-10-06): `generator/prose.py`, `--prose`
+
+Built as designed, with these settled while building:
+- **Names live in the prose stage, not stage B.** Labels with literal
+  names still in the text would show "the ghost captain" in the menu beside
+  "Hugh Calloway" in the text, so the pass sets them together: every named
+  person gets `unnamed` (the role, then the person call's own short
+  description) and `known` when the role is a relative or "your ...", and
+  every literal name (full, or a first or last name no one else shares) in
+  text and labels becomes a code, before the edits (the model revises text
+  that already has codes) and again after. **A first conversation is an
+  introduction** (engine/runtime.py); the `introduce` effect remains for a
+  scene that names someone earlier.
+- **One editing prompt** (`s8b_edit`) for every part, with the part's
+  guidance filled in by Python: each scene in story order, each person,
+  each location (rooms with the things in them), then the frame (the
+  opening, "you", the endings). A part over 40 texts is sent in pieces.
+  Every text is sent with an id, what it is ("what the action "talk ›
+  {C01} › say 'Later'" does") and its condition, and comes back by id:
+  the structure is untouched by construction.
+- **The style check** (`s8v`) is a cheap call; a sheet it faults is written
+  once more with the problems (`s8a_r1`).
+- **Checks** are informed retries (SoftReject): narrated alternatives, game
+  words (menu, node, variant, the player, playthrough: words that are never
+  ordinary English), craft announced ("the cost is"), more than twice the
+  soft length, and across scenes a five-word run already read that the
+  revision brought (a fact the text already had may recur). A missing text
+  or a code that names nobody is a hard retry.
+- Output: `<id>_package_prose.json` beside the package (the package is
+  kept), `<id>_prose_style.json`, `<id>_prose.md` (the sheet, its sample,
+  the size before and after, findings, the engine validator).
+- Not yet run on the live model: the first run is kernel35's package
+  (about 25 calls, 2-2.5 hours).
+
+### The build plan (done)
 
 1. Engine: `{Cxx}` rendering, `unnamed`, the `introduce` effect, the
    `introduced` set, `known()`, the validator rules (BUILT 2026-10-05).

@@ -712,6 +712,71 @@ def stage_b_builds_an_engine_world():
 
 
 @test
+def the_prose_pass_revises_text_and_keeps_structure():
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    from runtime import Engine
+    run('prose', args=['--prose'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
+                                        'STUB_STYLE_FAILS': '1', 'STUB_PROSE_DROP': '1', 'STUB_PROSE_IF': '1'})
+    before, after = load('prose', 'package.json'), load('prose', 'package_prose.json')
+
+    def skeleton(node):
+        if isinstance(node, dict):
+            return {k: ('' if k in ('text', 'label', 'detail_label', 'object_label', 'title') else skeleton(v))
+                    for k, v in node.items() if k not in ('unnamed', 'unnamed_short', 'known')}
+        if isinstance(node, list):
+            return [skeleton(v) for v in node]
+        return node
+    check(skeleton(before) == skeleton(after), 'the prose pass changed something other than text')
+    texts = []
+
+    def walk(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == 'text' and isinstance(v, str):
+                    texts.append(v)
+                else:
+                    walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+    walk(after)
+    check(texts and all('(voiced)' in t for t in texts), f'a text was not revised: {[t for t in texts if "(voiced)" not in t][:3]}')
+    named = [c['name'] for c in after['world']['characters'].values() if c.get('name')]
+    check(named and not [n for n in named for t in texts if n in t], 'a literal name was left in the text')
+    check(any('{' in t for t in texts), 'no person was written as a code')
+    strangers = [c for c in after['world']['characters'].values() if c.get('name') and not c.get('known')]
+    check(strangers and all(c['unnamed'] == 'the stub figure in a coat' for c in strangers), 'unnamed labels')
+    check(not any('If it slips' in t for t in texts), 'narrated alternatives survived the retry')
+    check(load('prose', 'prose_style.json')['tradition'] == 'a stub tradition, revised', 'the faulted style sheet was not rewritten')
+    errors, _ = engine_validate(EngineStory(after))
+    check(not errors, f'the prose package does not validate: {errors[:5]}')
+    eng = Engine(EngineStory(after))
+    view = eng.start(seed=1)
+    shown = ' '.join(view['text']) + (view['room'] or {}).get('text', '')
+    check('{' not in shown and 'voiced' in shown, f'the engine did not render the codes: {shown[:300]}')
+
+
+@test
+def prose_names_known_people_and_codes_every_name():
+    import prose
+    pkg = {'intro': [{'text': 'Emerson Whitlock meets you; Hugh waits. Calloway, Emerson and Hughes are not codes.'}],
+           'scenes': {}, 'endings': {}, 'protagonist': {},
+           'world': {'rooms': {}, 'objects': {}, 'characters': {
+               'C01': {'name': 'Emerson Whitlock', 'role': 'your brother-in-law'},
+               'C02': {'name': 'Hugh Calloway', 'role': 'the ghost captain',
+                       'topics': {'t': {'label': 'about Emerson', 'says': [{'text': "'Hugh,' he says."}]}}}}}}
+    w = prose.ProseWriter(None, pkg)
+    w.prepare_names()
+    w.convert_names()
+    c = w.pkg['world']['characters']
+    check(c['C01'].get('known') and not c['C02'].get('known') and c['C02']['unnamed'] == 'the ghost captain', f'known: {c}')
+    check(w.pkg['intro'][0]['text'] == '{C01} meets you; {C02} waits. {C02}, {C01} and Hughes are not codes.',
+          f"codes: {w.pkg['intro'][0]['text']}")
+    check(c['C02']['topics']['t']['label'] == 'about {C01}' and c['C02']['name'] == 'Hugh Calloway', 'labels coded, names kept')
+
+
+@test
 def stages_c_and_d_compile_a_playable_package():
     sys.path.insert(0, os.path.join(ROOT, 'engine'))
     from story import Story as EngineStory, validate as engine_validate

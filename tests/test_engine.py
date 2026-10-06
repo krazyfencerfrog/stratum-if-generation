@@ -374,8 +374,8 @@ def names_show_only_once_the_player_knows_them():
     lazlo = data['world']['characters']['lazlo']
     lazlo.update(unnamed='the old man in the oilskin', unnamed_short='the old man')
     lazlo['here'] = [{'text': '{lazlo} sits at the table. You nod to {lazlo}.'}]
-    lazlo['topics']['the_ledger']['effects'] = [{'introduce': 'lazlo'}]
     lazlo['topics']['the_ledger']['says'] = [{'text': "'Brandt,' he says. 'Lazlo Brandt.'"}]
+    lazlo['topics']['the_logbook']['effects'] = list(lazlo['topics']['the_logbook'].get('effects') or []) + [{'introduce': 'lazlo'}]
     story = Story(data)
     errors, _ = validate(story)
     check(not errors, f'a package with unnamed people: {errors}')
@@ -387,6 +387,7 @@ def names_show_only_once_the_player_knows_them():
     talk = next(c for c in view['menu']['children'] if c['label'] == 'Talk')
     check(talk['children'][0]['label'] == 'the old man', f"menu before the introduction: {talk['children'][0]['label']}")
     check(not evaluate("known('lazlo')", eng.state), 'known before the introduction')
+    # no effect on the ledger topic: the first conversation is the introduction
     ledger = next(i for p, i in leaves(view['menu']) if i.endswith('the_ledger'))
     view = eng.act(ledger)
     check('Lazlo Brandt sits at the table. You nod to Lazlo Brandt.' in eng.describe()['text'], f"after: {eng.describe()['text']}")
