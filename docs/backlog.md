@@ -164,7 +164,7 @@ twin rooms and 50-64 topics a person. Next:
   GPU) to see every fix of 2026-10-04 in one story [GPU];
 - a stage D repair call fed by the playtest's findings (MENU, STUCK, ways on
   hard to find), like the outline loop's repair [solo, then GPU];
-- the prose stage design (later_stages.md §6) [you];
+- the prose stage: DESIGNED 2026-10-05 with the user (later_stages.md §6); build after the held-out check [solo];
 - per-scene exploration samples entry states (8 a scene, by arc state and
   flags); a STUCK found from a sampled entry could, rarely, come from what the
   sampled player happened to carry; watch for it.
