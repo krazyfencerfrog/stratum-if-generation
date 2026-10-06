@@ -489,11 +489,14 @@ class StubClient(LlmClient):
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
         broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
+        # =2 breaks a constraint read in the Kernel (an inferred one left standing is a note, not a halt)
+        block = self.body(p)[self.body(p).rfind('--- LIST 2: CONSTRAINTS ---'):]
+        explicit = next((m.group(1) for m in re.finditer(r'^\s*(\d+)\.\s.*\[constraint\]', block, re.M)), None)
         hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         return {
             "clauses": [{"n": int(n), "note": "stub: nothing incompatible", "contradiction": False, "quote": ""} for n in clauses],
-            "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and i == 0,
-                             "quote": "stub quote" if broken and i == 0 else ""} for i, n in enumerate(constraints)],
+            "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and n == explicit,
+                             "quote": "stub quote" if broken and n == explicit else ""} for n in constraints],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
                        for e in engine],
             "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "permitted": False}]

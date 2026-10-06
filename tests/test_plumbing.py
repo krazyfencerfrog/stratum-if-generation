@@ -253,6 +253,11 @@ def premise_halt():
     loop = load('craftnote', 's3_5_loop.json')
     check(not loop['still_failing'] and loop['accepted_with'] and loop['accepted_with'][0]['source'] == 'engine check',
           f'a craft note should be kept and the run go on: {loop.get("accepted_with")}')
+    import main as gen_main
+    check(gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3-0b.epistemic_gap [constraint, inferred]: present false'})
+          and not gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3b.tone [constraint]: descriptors tense'})
+          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner'}),
+          'an inferred constraint left standing is a note; the Kernel and explicit constraints still halt')
     # a run saved before this rule, halted on craft notes only, replays as accepted
     loop['still_failing'] = True
     del loop['accepted_with']

@@ -99,6 +99,15 @@ DEFAULT_RATING = 'UNRATED'
 DEFAULT_MAX_REPAIRS = 2
 SOFT_PREMISE_FINDINGS = ('engine check',)   # craft notes from the audit: kept, never a halt, after the last repair
 
+
+def soft_premise_finding(f):
+    """A finding left after the last repair that is kept as a note, not a
+    halt: a craft note, or one against a constraint phase 3 inferred rather
+    than read in the Kernel (its own guess). Against the Kernel's words, an
+    explicit constraint, or a computed check, the run stops."""
+    return f.get('source') in SOFT_PREMISE_FINDINGS or (
+        f.get('source') == 'brief constraint' and '[constraint, inferred]' in str(f.get('where') or ''))
+
 PLACEHOLDER_RE = re.compile(r'\$\$[A-Z0-9_]+\$\$')
 
 SHAPE_TIERS = {
@@ -1303,7 +1312,7 @@ class StoryGenerator:
         if loop_record and accepted:
             record = json.loads(loop_record)
             last = (record.get('rounds') or [{}])[-1].get('findings') or []
-            if record.get('still_failing') and any(f.get('source') not in SOFT_PREMISE_FINDINGS for f in last):
+            if record.get('still_failing') and not all(soft_premise_finding(f) for f in last):
                 raise PipelineHalt(
                     f"s3_5 premise: the saved loop ended with findings still standing; inspect "
                     f"{self.story_file_path('s3_5_loop.json')}, then delete the s3_5* files to re-run the loop.")
@@ -1359,7 +1368,7 @@ class StoryGenerator:
         # the audit finds something new each round; craft notes it still has
         # after the last are kept as notes, while a premise that contradicts
         # the Kernel or the brief, or fails a computed check, stops the run
-        hard = [f for f in findings if f.get('source') not in SOFT_PREMISE_FINDINGS]
+        hard = [f for f in findings if not soft_premise_finding(f)]
         self.save_story_json('s3_5_loop.json', {
             'accepted_source': rounds[-1]['source'],
             'accepted_copy': 's3_5_premise_accepted.json',
