@@ -769,9 +769,25 @@ class StubClient(LlmClient):
         return {"assessment": "stub: the main line answers one way; these are the others", "seeds": seeds}
 
     def p_s4e(self, p):
-        return {"reading": "stub: a competent outline", "scores": {a: {"note": f"stub {a}", "score": 3} for a in
-                ('plot', 'people', 'reveals', 'agency', 'specificity', 'genre')},
-                "best_thing": "stub: the second node", "worst_thing": "stub: the endings", "would_play": True}
+        """Reads the outline it is given: the first node's first words planted,
+        the last node's paying off, a loss quoted from the last node, one
+        invented quote (unverified), and an announced cost if there is one."""
+        text = p.split('- the outline', 1)[-1]
+        nodes = re.findall(r'^- (\w+) \([^)]*\) [^:]*: (.+?)(?: IMAGE: .*)?$', text, re.M)
+        quote = lambda s: ' '.join(s.split()[:6])
+        out = {"reading": "stub: an outline", "lost": [], "plants": [], "opposition_at_work": None, "reversal": None,
+               "errands": [], "abstractions": [{"node": "N01", "quote": "the weight of the unspoken ledger of grief"}],
+               "announced": [], "best_thing": "stub: the second node", "worst_thing": "stub: the endings", "would_play": True}
+        if len(nodes) >= 2:
+            (first, a), (last, b) = nodes[0], nodes[-1]
+            out["plants"] = [{"plant_node": first, "plant_quote": quote(a), "payoff_node": last, "payoff_quote": quote(b),
+                              "what_it_does": "stub"}]
+            out["lost"] = [{"what": "stub", "kind": "person", "line": "T1", "node": last, "quote": quote(b)}]
+            out["opposition_at_work"] = {"node": nodes[1][0], "quote": quote(nodes[1][1]), "what_it_does": "stub"}
+        m = re.search(r'^- (\w+) \([^)]*\) [^:]*: .*?(the cost is[^.;]*)', text, re.M)
+        if m:
+            out["announced"] = [{"node": m.group(1), "quote": m.group(2)}]
+        return out
 
     # ------------------------------------------------------------------ stage A
 

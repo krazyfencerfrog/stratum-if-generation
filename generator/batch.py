@@ -32,6 +32,8 @@ import sys
 import time
 from contextlib import contextmanager
 
+import evaluate
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(THIS_DIR)
 STORIES = os.path.join(ROOT, 'stories')
@@ -250,7 +252,7 @@ def metrics_for(sid):
         m = e.get('metrics') or {}
         out.update({'lines': m.get('lines'), 'nodes': m.get('nodes'), 'forks': m.get('fork_positions'),
                     'early': m.get('forks_in_first_half'), 'worlds': f"{m.get('distinct_ending_worlds')}/{m.get('endings')}",
-                    'judge': sum(v.get('score', 0) for v in ((e.get('judge') or {}).get('scores') or {}).values()) or None})
+                    'judge': evaluate.judge_brief(e.get('judge')) if e.get('judge') else None})
     story = os.path.join(d, f'{sid}_story.json')
     if os.path.isfile(story):
         try:

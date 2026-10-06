@@ -1,5 +1,5 @@
 """Computed metrics over a finished outline, and the packet for the one
-cheap judge call (4e) that scores it.
+cheap judge call (4e) that reads it.
 
 Nothing here decides anything in the pipeline; it measures. The metrics
 are the things we kept finding by reading outlines (docs/fable_request_5.txt):
@@ -7,12 +7,17 @@ forks that all come late, endings that differ only in who pays, one phrase
 repeated through every node, a dragon story with no dragon in it,
 companions whose standing never changes. Each is a count or a lookup over
 the story document, so it can be compared across runs and across variants
-(generator/ab.py). The judge call is the same local model grading its own
-work: a weak signal, kept because it is cheap and comparable.
+(generator/ab.py). The judge call is the same local model reading its own
+work, so it does not score (its 1-5 totals tracked surface polish and noise,
+and credited outlines that announce their craft: docs/reference_stories.md):
+it reports what is lost and what kind of thing it is, plants and payoffs,
+the opposition at work, a reversal, errands, abstractions and announced
+craft, each with a quote that Python checks against the outline.
 
     metrics(story, promises)  -> dict of numbers and short lists
     judge_digest(story)       -> the compact text the 4e prompt reads
-    validate_judge(parsed)    -> normalizes the 4e answer (raises on a bad one)
+    judge_validator(story)    -> checks the 4e answer's quotes, adds 'facts'
+    judge_brief(judge)        -> one short line of the facts (or an old total)
     summary_lines(result)     -> a few lines for the console
     table(results)            -> side-by-side rows for ab.py
 """
@@ -234,34 +239,143 @@ def judge_digest(story):
     return '\n'.join(out)
 
 
-JUDGE_AXES = ('plot', 'people', 'reveals', 'agency', 'specificity', 'genre')
+JUDGE_AXES = ('plot', 'people', 'reveals', 'agency', 'specificity', 'genre')     # the old scoring judge
+LOSS_KINDS = ('person', 'body', 'bond', 'thing', 'place', 'way_of_life', 'feeling')   # most to least concrete
+JUDGE_LISTS = ('errands', 'abstractions', 'announced')
+QUOTE_SHARE = 0.8             # a quote's words that must stand in the node it names
 
 
-def validate_judge(parsed):
-    if not isinstance(parsed, dict) or not isinstance(parsed.get('scores'), dict):
-        raise ValueError('expected an object with "scores"')
-    problems = []
-    for axis in JUDGE_AXES:
-        entry = parsed['scores'].get(axis)
-        if isinstance(entry, (int, float)):
-            entry = {'note': '', 'score': entry}
-        if not isinstance(entry, dict):
-            problems.append(f'scores.{axis} is missing')
-            continue
-        try:
-            score = int(round(float(entry.get('score'))))
-        except (TypeError, ValueError):
-            problems.append(f'scores.{axis}.score is not a number')
-            continue
-        entry['score'] = max(1, min(5, score))
-        entry['note'] = str(entry.get('note') or '').strip()
-        parsed['scores'][axis] = entry
-    if problems:
-        raise ValueError('; '.join(problems))
-    parsed['total'] = sum(parsed['scores'][a]['score'] for a in JUDGE_AXES)
-    parsed['would_play'] = str(parsed.get('would_play')).strip().lower() in ('true', 'yes', '1')
-    for key in ('reading', 'best_thing', 'worst_thing'):
-        parsed[key] = str(parsed.get(key) or '').strip()
+def _plain(text):
+    return ' '.join(re.findall(r"[a-z0-9']+", str(text or '').lower().replace('’', "'")))
+
+
+def node_texts(story):
+    """Node id -> the text a quote may come from: title, summary, image, and
+    for a line's last node its ending."""
+    nodes = story.get('nodes') or {}
+    out = {nid: _plain(' '.join(str(n.get(k) or '') for k in ('title', 'summary', 'image'))) for nid, n in nodes.items()}
+    for lid, line in (story.get('lines') or {}).items():
+        e = line.get('ending') or {}
+        last = e.get('node') or ((line.get('path') or [None])[-1])
+        text = _plain(' '.join(str(e.get(k) or '') for k in ('title', 'summary')))
+        if last:
+            out[last] = (out.get(last, '') + ' ' + text).strip()
+        out[lid] = text
+    return out
+
+
+def _quote_in(quote, text):
+    q = _plain(quote)
+    if not q or not text:
+        return False
+    if q in text:
+        return True
+    want = [w for w in q.split() if len(w) > 2]
+    have = set(text.split())
+    return len(want) >= 3 and sum(w in have for w in want) / len(want) >= QUOTE_SHARE
+
+
+def judge_validator(story):
+    """The 4e validator for one outline: every finding must quote the node it
+    names (a quote found in another node moves the finding there; one found
+    nowhere is kept but marked unverified and not counted), a plant must pay
+    off later on the same line, and a loss must be one of LOSS_KINDS. Adds
+    'facts', the counts the reports compare. Most quotes failing costs one
+    informed retry."""
+    from errors import SoftReject
+    texts = node_texts(story)
+    lines = story.get('lines') or {}
+    paths = [list(l.get('path') or []) for l in lines.values()]
+    ending_node = {lid: (l.get('ending') or {}).get('node') or ((l.get('path') or [None])[-1]) for lid, l in lines.items()}
+
+    def place(item, node_key='node', quote_key='quote'):
+        node = str(item.get(node_key) or '').strip()
+        node = ending_node.get(node, node)            # a line id for its ending
+        quote = item.get(quote_key)
+        if _quote_in(quote, texts.get(node, '')):
+            item[node_key] = node
+            return True
+        for nid, text in texts.items():
+            if nid in story.get('nodes', {}) and _quote_in(quote, text):
+                item[node_key] = nid
+                return True
+        item[node_key] = node
+        return False
+
+    def before(a, b):
+        return any(a in p and b in p and p.index(a) < p.index(b) for p in paths)
+
+    def validate(parsed):
+        if not isinstance(parsed, dict):
+            raise ValueError('expected a JSON object')
+        checked = failed = 0
+        lost = []
+        for x in as_dicts(parsed.get('lost')):
+            kind = str(x.get('kind') or '').strip().lower().replace(' ', '_')
+            x['kind'] = kind if kind in LOSS_KINDS else 'feeling'
+            x['verified'] = place(x)
+            checked, failed = checked + 1, failed + (not x['verified'])
+            lost.append(x)
+        plants = []
+        for x in as_dicts(parsed.get('plants')):
+            ok_plant = place(x, 'plant_node', 'plant_quote')
+            ok_pay = place(x, 'payoff_node', 'payoff_quote')
+            x['verified'] = ok_plant and ok_pay and x['plant_node'] != x['payoff_node'] \
+                and before(x['plant_node'], x['payoff_node'])
+            checked, failed = checked + 2, failed + (not ok_plant) + (not ok_pay)
+            plants.append(x)
+        single = {}
+        for key in ('opposition_at_work', 'reversal'):
+            x = parsed.get(key)
+            if isinstance(x, dict) and str(x.get('quote') or '').strip():
+                x['verified'] = place(x)
+                checked, failed = checked + 1, failed + (not x['verified'])
+                single[key] = x
+            else:
+                single[key] = None
+        listed = {}
+        for key in JUDGE_LISTS:
+            listed[key] = []
+            for x in as_dicts(parsed.get(key)):
+                x['verified'] = place(x)
+                checked, failed = checked + 1, failed + (not x['verified'])
+                listed[key].append(x)
+        if checked >= 4 and failed > checked / 2:
+            raise SoftReject(f'{failed} of {checked} quotes are not in the node they name (or anywhere in the outline); '
+                             f'copy each quote exactly from the outline, a few words to a sentence')
+        parsed.update(lost=lost, plants=plants, **single, **listed)
+        parsed['would_play'] = str(parsed.get('would_play')).strip().lower() in ('true', 'yes', '1')
+        for key in ('reading', 'best_thing', 'worst_thing'):
+            parsed[key] = str(parsed.get(key) or '').strip()
+        real = [x for x in lost if x['verified']]
+        worst = min(real, key=lambda x: LOSS_KINDS.index(x['kind'])) if real else None
+        parsed['facts'] = {
+            'loss': worst['kind'] if worst else None, 'loss_node': worst['node'] if worst else None,
+            'concrete_losses': sum(1 for x in real if x['kind'] != 'feeling'),
+            'plants_paid': sum(1 for x in plants if x['verified']),
+            'opposition_at_work': bool(single['opposition_at_work'] and single['opposition_at_work']['verified']),
+            'reversal': bool(single['reversal'] and single['reversal']['verified']),
+            **{key: sum(1 for x in listed[key] if x['verified']) for key in JUDGE_LISTS},
+            'unverified': failed,
+        }
+    return validate
+
+
+def as_dicts(value):
+    return [x for x in (value if isinstance(value, list) else []) if isinstance(x, dict)]
+
+
+def judge_brief(judge):
+    """The judge in one short line: the facts, or an old scoring judge's total."""
+    if not judge:
+        return '-'
+    f = judge.get('facts')
+    if f is None:
+        return f"{judge.get('total', '-')}/30 (old judge)"
+    return (f"loss {f['loss'] or 'none'}{(' ' + f['loss_node']) if f.get('loss_node') else ''}; "
+            f"plants {f['plants_paid']}; opposition {'yes' if f['opposition_at_work'] else 'no'}; "
+            f"reversal {'yes' if f['reversal'] else 'no'}; errands {f['errands']}; abstract {f['abstractions']}; "
+            f"announced {f['announced']}")
 
 
 # ---------------------------------------------------------------- reporting
@@ -272,6 +386,10 @@ KEY_COLUMNS = [
     ('repeated_phrase_count', 'tics'), ('repeated_situations', 'retold'), ('summaries_in_target_share', 'sized'),
     ('paperwork_share', 'paper'),
 ]
+
+
+JUDGE_COLUMNS = [('loss', 'loss'), ('plants_paid', 'plants'), ('opposition_at_work', 'opposed'),
+                 ('reversal', 'reversal'), ('errands', 'errands'), ('abstractions', 'abstract'), ('announced', 'announced')]
 
 
 def summary_lines(result):
@@ -287,8 +405,7 @@ def summary_lines(result):
                  f"({m.get('summaries_in_target_share')} in {SUMMARY_WORDS[0]}-{SUMMARY_WORDS[1]})")
     j = result.get('judge')
     if j:
-        scores = ' '.join(f"{a} {j['scores'][a]['score']}" for a in JUDGE_AXES if a in j.get('scores', {}))
-        out.append(f"  judge: {j.get('total')}/30 ({scores}); would play: {j.get('would_play')}")
+        out.append(f"  judge: {judge_brief(j)}; would play: {j.get('would_play')}")
         out.append(f"  best: {j.get('best_thing')}")
         out.append(f"  worst: {j.get('worst_thing')}")
     return out
@@ -300,7 +417,8 @@ def table(results):
     rows = [['metric'] + labels]
     for key, short in KEY_COLUMNS:
         rows.append([short] + [str((r.get('metrics') or {}).get(key)) for r in results.values()])
-    rows.append(['judge'] + [str((r.get('judge') or {}).get('total', '-')) for r in results.values()])
+    for key, short in JUDGE_COLUMNS:
+        rows.append([short] + [str(((r.get('judge') or {}).get('facts') or {}).get(key, '-')) for r in results.values()])
     rows.append(['minutes'] + [str(r.get('minutes', '-')) for r in results.values()])
     widths = [max(len(row[i]) for row in rows) for i in range(len(labels) + 1)]
     return '\n'.join('  '.join(cell.ljust(widths[i]) for i, cell in enumerate(row)) for row in rows)

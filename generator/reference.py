@@ -28,7 +28,6 @@ import schemas
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 REFS = os.path.join(THIS_DIR, '..', 'tests', 'kernels', 'reference')
 STORIES = os.path.join(THIS_DIR, '..', 'stories')
-AXES = schemas.JUDGE_AXES
 
 
 def ref_ids():
@@ -64,7 +63,7 @@ def judge(story_id):
             '$$TONE$$': gen.tone_line(),
             '$$PROMISES$$': gen.promises_block(),
             '$$OUTLINE$$': evaluate.judge_digest(human),
-        }, prompt_file='s4e_outline_judge.prompt', validator=evaluate.validate_judge, klass='classify',
+        }, prompt_file='s4e_outline_judge.prompt', validator=evaluate.judge_validator(human), klass='classify',
         schema=schemas.OUTLINE_JUDGE)}
     gen.save_story_json('human_eval.json', result)
     for line in evaluate.summary_lines(result):
@@ -74,18 +73,16 @@ def judge(story_id):
 
 def report():
     keys = ('nodes', 'summary_words_mean', 'repeated_phrase_count', 'retold_nodes')
-    print(f"{'story':<28} {'who':<9} " + ' '.join(f'{a[:5]:>5}' for a in AXES) + '  '
-          + ' '.join(f'{k[:12]:>12}' for k in keys))
+    print(f"{'story':<28} {'who':<9} {'judge':<88} " + ' '.join(f'{k[:12]:>12}' for k in keys))
     for sid in ref_ids():
         for who, suffix in (('pipeline', 'eval.json'), ('human', 'human_eval.json')):
             ev = load(os.path.join(STORIES, sid, f'{sid}_{suffix}'))
             if not ev:
                 print(f'{sid:<28} {who:<9} (not run)')
                 continue
-            scores = (ev.get('judge') or {}).get('scores') or {}
             m = ev.get('metrics') or {}
-            print(f'{sid:<28} {who:<9} ' + ' '.join(f"{(scores.get(a) or {}).get('score', '-'):>5}" for a in AXES)
-                  + '  ' + ' '.join(f'{str(m.get(k, "-")):>12}' for k in keys))
+            print(f'{sid:<28} {who:<9} {evaluate.judge_brief(ev.get("judge")):<88} '
+                  + ' '.join(f'{str(m.get(k, "-")):>12}' for k in keys))
     return 0
 
 

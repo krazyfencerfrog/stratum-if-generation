@@ -173,9 +173,17 @@ DIVERGENCE = obj(
 
 JUDGE_AXES = ['plot', 'people', 'reveals', 'agency', 'specificity', 'genre']
 
+FOUND = obj(node=S, quote=S)
 OUTLINE_JUDGE = obj(
     reading=S,
-    scores=obj(**{axis: obj(note=S, score=I) for axis in JUDGE_AXES}),
+    lost=arr(obj(what=S, kind=enum(['person', 'body', 'bond', 'thing', 'place', 'way_of_life', 'feeling']),
+                 line=S, node=S, quote=S)),
+    plants=arr(obj(plant_node=S, plant_quote=S, payoff_node=S, payoff_quote=S, what_it_does=S)),
+    opposition_at_work=nullable(obj(node=S, quote=S, what_it_does=S)),
+    reversal=nullable(obj(node=S, quote=S, what_it_changes=S)),
+    errands=arr(FOUND),
+    abstractions=arr(FOUND),
+    announced=arr(FOUND),
     best_thing=S,
     worst_thing=S,
     would_play=B,

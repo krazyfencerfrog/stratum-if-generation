@@ -1541,12 +1541,13 @@ class StoryGenerator:
 
     def run_outline_judge(self):
         """Computed metrics over the finished outline (evaluate.py), plus one
-        thinking-off call that scores it on six axes and names the best and
-        worst thing in it. Written to <id>_eval.json; report.py and ab.py
-        read it. The judge is the same local model grading its own work, so
-        its numbers are a weak signal, kept because they are cheap and
-        comparable across runs. --no-outline-judge skips the call; the
-        metrics are always computed."""
+        thinking-off call that READS it: what is lost and what kind of thing,
+        plants and payoffs, the opposition at work, a reversal, errands,
+        abstractions and announced craft, each quoted and checked against the
+        outline, and the best and worst thing in it. No scores: the old 1-5
+        totals tracked polish and noise. Written to <id>_eval.json; report.py
+        and ab.py read it. --no-outline-judge skips the call; the metrics are
+        always computed."""
         story = self.analysis.get('story')
         if not story:
             path = Path(self.story_file_path('story.json'))
@@ -1560,7 +1561,7 @@ class StoryGenerator:
                 '$$TONE$$': self.tone_line(),
                 '$$PROMISES$$': self.promises_block(),
                 '$$OUTLINE$$': evaluate.judge_digest(story),
-            }, prompt_file='s4e_outline_judge.prompt', validator=evaluate.validate_judge, klass='classify',
+            }, prompt_file='s4e_outline_judge.prompt', validator=evaluate.judge_validator(story), klass='classify',
                 schema=schemas.OUTLINE_JUDGE)
         self.save_story_json('eval.json', result)
         for line in evaluate.summary_lines(result):

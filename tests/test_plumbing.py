@@ -375,6 +375,38 @@ def rejoin_new_cast_and_nothing():
 
 
 @test
+def the_judge_reports_checked_facts():
+    import evaluate
+    from errors import SoftReject
+    story = {'nodes': {'N01': {'title': 'Lantern', 'summary': 'Your aunt oils the stuck weathervane so it tells the truth.'},
+                       'N02': {'title': 'Frost', 'summary': 'The weathervane swings north and you cover the orchard; the cost is your sleep.'},
+                       'T2N01': {'title': 'Gone', 'summary': 'Your aunt boards the last train and does not look back.'}},
+             'lines': {'T1': {'path': ['N01', 'N02'], 'ending': {'summary': 'The orchard lives.'}},
+                       'T2': {'path': ['N01', 'T2N01'], 'ending': {'summary': 'The house is empty.'}}}}
+    v = evaluate.judge_validator(story)
+    answer = {'lost': [{'kind': 'person', 'node': 'N02', 'quote': 'boards the last train and does not look back'},
+                       {'kind': 'regret', 'node': 'N02', 'quote': 'the cost is your sleep'}],
+              'plants': [{'plant_node': 'N01', 'plant_quote': 'oils the stuck weathervane', 'payoff_node': 'N02',
+                          'payoff_quote': 'the weathervane swings north'},
+                         {'plant_node': 'N02', 'plant_quote': 'you cover the orchard', 'payoff_node': 'N01',
+                          'payoff_quote': 'oils the stuck weathervane'}],
+              'reversal': None, 'announced': [{'node': 'N02', 'quote': 'the cost is your sleep'}], 'would_play': 'yes'}
+    v(answer)
+    f = answer['facts']
+    check(answer['lost'][0]['node'] == 'T2N01' and answer['lost'][1]['kind'] == 'feeling', f"quote moved, kind closed: {answer['lost']}")
+    check(f['loss'] == 'person' and f['plants_paid'] == 1 and f['announced'] == 1 and not f['reversal'] and answer['would_play'],
+          f'facts: {f}')
+    made_up = {'lost': [{'kind': 'person', 'node': 'N01', 'quote': f'a line that is nowhere at all {i}'} for i in range(4)]}
+    try:
+        v(made_up)
+        check(False, 'mostly invented quotes should cost a retry')
+    except SoftReject:
+        pass
+    check(evaluate.judge_brief({'total': 24, 'scores': {}}) == '24/30 (old judge)'
+          and evaluate.judge_brief(answer).startswith('loss person T2N01; plants 1'), 'judge_brief')
+
+
+@test
 def judge_mode_seeds_one_line_at_a_time():
     run('judge', args=['--branching=judge'], env={'STUB_STOP_AFTER': '3'})
     story = assert_story_ok('judge', min_lines=3)
@@ -401,8 +433,12 @@ def branch_plan_designs_every_divergence():
     md = load('basic', 'story.md')
     check('## Branch plan' in md and 'world left:' in md and 'Image:' in md and '## Events the world brings about' in md, 'story.md is missing the new sections')
     ev = load('basic', 'eval.json')
-    check(ev['metrics']['ending_distinctness'] == 1.0 and ev['metrics']['forks_in_first_half'] >= 1 and ev['judge']['total'] == 18,
-          f"eval metrics: {ev['metrics']}")
+    check(ev['metrics']['ending_distinctness'] == 1.0 and ev['metrics']['forks_in_first_half'] >= 1, f"eval metrics: {ev['metrics']}")
+    # the judge reports facts, each quote checked against the outline: no scores
+    f = ev['judge']['facts']
+    check('scores' not in ev['judge'] and f['plants_paid'] == 1 and f['loss'] == 'person' and f['opposition_at_work']
+          and f['abstractions'] == 0 and f['unverified'] == 1, f'judge facts: {f}')
+    check(not ev['judge']['abstractions'][0]['verified'], 'an invented quote should be marked unverified')
     check(not [c for c in cs if c['step'] == 's4e' and c['mode'] != 'no_think'], 'the outline judge should run with thinking off')
     # the plan's soft rules: all-late forks and duplicate worlds are re-asked once, then accepted
     run('plan_late', env={'STUB_PLAN_LATE': '1'})

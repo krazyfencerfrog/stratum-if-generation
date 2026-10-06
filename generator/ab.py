@@ -165,10 +165,16 @@ def compare(kernels, variants):
             vals = [(r.get('metrics') or {}).get(key) for r in rs]
             vals = [x for x in vals if isinstance(x, (int, float))]
             agg[key] = round(sum(vals) / len(vals), 2) if vals else None
-        judges = [(r.get('judge') or {}).get('total') for r in rs if (r.get('judge') or {}).get('total')]
+        facts = [(r.get('judge') or {}).get('facts') for r in rs if (r.get('judge') or {}).get('facts')]
+        mean = {}
+        if facts:
+            mean['loss'] = f"{sum(1 for f in facts if f['loss'] not in (None, 'feeling'))}/{len(facts)} concrete"
+            for key in ('plants_paid', 'errands', 'abstractions', 'announced'):
+                mean[key] = round(sum(f[key] for f in facts) / len(facts), 1)
+            for key in ('opposition_at_work', 'reversal'):
+                mean[key] = f"{sum(1 for f in facts if f[key])}/{len(facts)}"
         mins = [r.get('minutes') for r in rs if isinstance(r.get('minutes'), (int, float))]
-        rows[f'{v} (n={len(rs)})'] = {'metrics': agg,
-                                      'judge': {'total': round(sum(judges) / len(judges), 1)} if judges else None,
+        rows[f'{v} (n={len(rs)})'] = {'metrics': agg, 'judge': {'facts': mean} if facts else None,
                                       'minutes': round(sum(mins) / len(mins), 1) if mins else '-'}
     if rows:
         print(evaluate.table(rows))
