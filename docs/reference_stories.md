@@ -284,3 +284,72 @@ stays in the cast (the Monkey's Paw lost the family at 3.5a: ties named
 "the cottage", turns involved only the soldier, the cast is seeded from
 the turns); the judge must name what is lost, the plant and its payoff;
 summaries are capped at 70 words. Re-run queued (stratum-compare/refs2).
+
+## Second pass (2026-10-05, code c1faf1b)
+
+Each story's saved phase 3 replayed, so the runs differ from the first pass
+only from 3.4 on: the price, setups, rules, ties and judge changes above.
+The human outlines were judged again by the changed judge.
+
+| story | pipeline before | pipeline now | human now |
+|---|---|---|---|
+| Canterville Ghost | 21 | 24 | 19 |
+| Monkey's Paw | 23 | 21 (does not count, see below) | 23 |
+| Speckled Band | 22 | 24 | 26 |
+| Man Who Would Be King | 28 | 17 | 19 |
+| Lady with the Dog | 27 | 25 | 24 |
+
+Every story now names a price and pays it on at least one line, and plants
+two setups paid on the main line (one for the Paw); summaries are 64-69
+words a node (76-87 before). Against the sheets:
+
+**Monkey's Paw.** The family is back (a sister), and the price lands: after
+the second wish she is well and looks at you "as if you are a person who
+once mattered and no longer does". The rule is exact ("exactly three wishes,
+each named specifically, granted technically true but emotionally wrong"),
+**but the 3.5a rules example was the Paw itself** ("three wishes; each is
+granted exactly as worded", against "the paw is hungry"), so that gain may
+be copying. The example was replaced (f11c434) and the Paw is being re-run;
+until then this row does not count. Still missing: jokes that return as
+horror, the worst thing offstage.
+
+**Canterville.** Both setups work as a running gag turned plot device: the
+empty chair by the library fire and the Quiet Hours sign, planted at the
+first dinner and paid when the family leaves the chair and hangs the sign
+as a sincere rule (2 partly, 3 yes). The ghost had no name ("the ghost in
+period costume" in 7 nodes), so still no history and nothing to pity;
+ghosts who were people are now named (835a5a8). The ending still explains.
+
+**Speckled Band.** One good physical clue (a hairline crack in the pane
+that whistles when the wind finds it; 1, yes). But the hidden truth is an
+accident (a draft and a heart spasm), so there is no villain, no menace, no
+motive and nothing to recoil (3, 4, 5 no), and the price follows oddly from
+it (the engagement is broken because the house kept the room sealed).
+
+**Man Who Would Be King** (the drop). The rule is the contract, but its
+terms are what happens to the paper (cut in halves, cannot be burned), not
+what the signers may not do, which is Kipling's (no women, no liquor; 1,
+no); paperwork is back to 0.9. The price is abstract ("the right of one of
+you to walk away"); the judge: "dry and procedural", no glory. A death does
+come on one line (the partner's body pays the kingdom's first debt). The
+first attempt halted at 3.5v with the question's poles swapped; the fresh
+loop passed.
+
+**Lady with the Dog.** The dog works (a bridge between your hands, then
+gone: the collar in your pocket, the judge's best image), but the second
+setup was a message (your wife has the hotel hold your letters), and
+letters, tickets and phones filled every node (paperwork 1.0). Setups are
+now things to notice, not messages (c3f1d79). The price is a feeling ("the
+old self"). It is still one seaside week: 3e capped the span at hours to
+days on genre association, though the Kernel asks for something that
+changes your life with no easy way out (left for the user to decide).
+
+**What this pass shows.** The cost and the setups now exist in every story,
+and two of them are real craft (the Paw's sister, Canterville's chair and
+sign). What is still missing is mostly upstream of the outline: a hidden
+truth with a culprit (Band), rules of conduct rather than paper mechanics
+(King), a span longer than the setting (Lady), the opposition as danger.
+The judge's totals moved in both directions and still do not track these.
+A held-out check on four kernels never run or tuned on (6, 7, 36, 40) is
+queued in stratum-compare/heldout, with the Paw re-run.
+
