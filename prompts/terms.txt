@@ -1,0 +1,33 @@
+# Shared definitions. A prompt says $$TERM_<NAME>$$ and gets the section
+# below whole (StoryGenerator.load_prompt). One meaning, written once: when
+# a definition changes here, every step that uses it changes with it.
+# Lines starting with # are notes for whoever edits this file.
+
+=== PRICE ===
+LOSING AND THE PRICE are different things.
+ - A way to lose is the game ending in the PLAYER's defeat. Only the failure model's triggers may cause one, and a failure presence of "none" means the player cannot lose.
+ - The price is what the story costs its people on a way it can go, and it is never a way to lose: a death, a body hurt, a bond broken past mending, a home or a way of life ended, a crown or a fortune given up, what befalls whoever breaks an oath, a bargain or a contract. A story the player cannot lose still pays a price.
+ - The world can hurt. The opposition and the pressure can wreck, injure, take and kill, inside the transgression ceiling, whatever the failure model says: that is pressure and price the story carries forward, not a way to lose.
+
+=== ENGINE ===
+THE ENGINE has rooms and exits; things to examine, take, use and give; people to talk to about topics, whose stance changes with what they hear and see; a clock; and hidden state it keeps of what has happened and shows only through what happens. A relationship that warms or cools with what you do, and opens or closes things because of it (she sails with you only if you have stood by her), is hidden state too.
+A SYSTEM THE ENGINE LACKS is one of exactly two things:
+ - a number the player is shown or must watch: a score, a meter, a percentage, hit points, a reputation;
+ - rules the engine cannot run: combat, skill or dice checks, puzzle minigames, trading or an economy.
+Everything else is fiction the engine can hold: an object, a document, a relationship, a deadline, a debt, the terms of a magic or a contract.
+A clock or a stock the engine tracks, which the player can run out of, needs a licence: one of the failure model's triggers, or the Kernel's own words. Without one, that pressure is told through events.
+
+=== PICTURE ===
+SOMETHING A READER CAN PICTURE is a person, a place, a physical thing (one that can break, burn, be carried off, hidden or fought over), a body (hurt, tired, in danger), the weather, an event, or something someone says or does: things a reader can see and the engine can put in a room. A document, a fee or a signature is a thing too, but a weak one: it belongs only where the story is about it (a will in a murder, a treaty in a court), never as the default way to make something concrete. A coined abstraction ("the river's grudge", "the debt of the border") is not something a reader can picture: a later step cannot place it and every step after repeats it. A strange thing (a magic, a curse, a technology) is said once in physical words: what it is and what it does when used.
+
+=== RULES ===
+THE TERMS of a magic, a curse, a bargain, an oath or a contract are what the people bound by it must and must not do, and on what condition, stated so they can be obeyed to the letter ("neither of us touches drink until we are crowned"; "the river carries one crossing for each coin dropped at the ford"), never a mood ("the river is jealous") and never what happens to the paper it is written on (signed, sealed, cut, filed). What befalls whoever breaks the terms is said apart from them (if_broken), and it is the story's price, never a way for the player to lose.
+
+=== BEINGS ===
+WHAT A CAST MEMBER IS (being):
+ - "person": a living human, or a people of the story's world who talk and are named like people (an elf, a dwarf);
+ - "dead": a person who has died and is still present as a ghost, a spirit or a revenant; they keep the name they had when they lived;
+ - "animal": a living animal, however clever (the cat, the old hound, the mare); it is called by its role or by a pet's name, never a person's;
+ - "creature": a being of the story's world that is neither a person nor an animal (a dragon, a fae thing, a demon);
+ - "thing": a made thing that acts or speaks (an AI, a ship, a sword that talks, a statue).
+A group is still a crowd (kind) whatever it is made of; being says what its members are.

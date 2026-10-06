@@ -1,0 +1,189 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "which prize to take and how to fight for it",
+      "description": "When a ship, convoy, or naval encounter presents itself, choose whether to attack, board, flee, parley, or loot, and how aggressively to push the crew, with the royal navy and possible mutiny shaping the risk.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "pirate captain",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "soft",
+      "binding": "default"
+    },
+    "3-0c.failure_triggers": {
+      "types": [
+        "incapacitation_or_death"
+      ],
+      "binding": "default"
+    },
+    "3-0c.failure_cost": {
+      "value": "narrative_setback",
+      "binding": "default"
+    },
+    "3-0c.failure_scope": {
+      "value": "pervasive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "piratical exhilaration",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "sustained",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "defiant pride",
+        "mutinous tension"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "brash",
+        "lively"
+      ],
+      "binding": "default"
+    },
+    "3b.somatic_address": {
+      "level": 3,
+      "channels": [
+        "combat strain",
+        "shipboard motion",
+        "adrenaline/fear-response"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.transgression": {
+      "ceiling": 3,
+      "floor": 2,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "personal freedom",
+      "pole_b": "established order",
+      "binding": "default"
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "bold action",
+        "cautious planning",
+        "crew consensus"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "triumphant pirate victory",
+      "worst_case": "mutiny and ruin",
+      "binding": "default"
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "not_indicated",
+      "floor": "not_indicated",
+      "types": [],
+      "interactive": "not_applicable",
+      "binding": "default"
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "default"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "weeks_to_months",
+      "floor": "weeks_to_months",
+      "binding": "default"
+    },
+    "3f.setting_structure": {
+      "ceiling": "clustered",
+      "floor": "clustered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_scale": {
+      "ceiling": "room_or_building",
+      "floor": "room_or_building",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 4,
+      "max": 6,
+      "binding": "default"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "loot/inventory",
+        "crew loyalty/mutiny risk",
+        "naval encounter state"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [
+      {
+        "id": "C3",
+        "verdict": "conflict",
+        "summary": "The primary decision is a tactical prize-and-engagement choice, not a direct choice between personal freedom and established order.",
+        "winner": "3-0a.primary_decision_axis",
+        "resolution": "prefer_a"
+      }
+    ],
+    "unresolved": []
+  },
+  "enrichment_budget": "moderate"
+}

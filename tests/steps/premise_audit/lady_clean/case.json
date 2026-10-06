@@ -1,0 +1,20 @@
+{
+ "about": "The Lady premise as accepted, clean on its last audit: a control.",
+ "origin": "refs2/stories/ref_lady_with_the_dog: accepted premise",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "kernel clause",
+   "where": "",
+   "quote": "",
+   "why": "nothing contradicts the Kernel"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "",
+   "quote": "",
+   "why": "no system or loss"
+  }
+ ]
+}

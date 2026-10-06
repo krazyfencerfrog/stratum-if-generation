@@ -1,0 +1,294 @@
+{
+ "enrichment_budget": {
+  "level": "minimal"
+ },
+ "protagonist": {
+  "who": "You are a married man near forty, used to keeping women at a distance, who has come to a seaside resort for a short holiday and intends to leave without changing anything.",
+  "history": "You have had enough affairs to make them feel like weather, and you left the last one behind in a city you no longer visit; your wife knows the shape of your absences but not the names.",
+  "wants": "to get through the holiday quietly and leave with your life exactly as you brought it",
+  "need": "to find out whether you can still be wanted by someone without turning them into a thing you can set down",
+  "can_do": "walk the promenade, sit on the bench, talk to the dog, answer the phone, take the hotel room, choose what to say or not say",
+  "cannot_do": "make the woman stop walking the dog, make your wife stop managing your return, or make the weather and the tide wait for you",
+  "ties": [
+   {
+    "who": "the young married woman with the small white dog",
+    "what": "the stranger whose dog gives you an excuse to stop walking and look at something other than the sea"
+   },
+   {
+    "who": "your wife",
+    "what": "the person who has arranged your holiday, your ticket, and the quiet terms of your return"
+   }
+  ],
+  "open": "whether you let the meeting remain a small, harmless thing or let it become the thing that changes your life",
+  "gender": "m",
+  "serves": "3-0b.protagonist_identity",
+  "name": "Avery Sterling"
+ },
+ "arena": {
+  "description": "A small seaside resort: a long promenade, a public beach, a hotel with a room overlooking the water, and the station that ends the holiday.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The holiday is ending and the weather is turning: a cold front moves in, the sea rises, and the rooms begin to be checked out, so every meeting happens in less time and in worse weather.",
+  "clock_or_stock": "none tracked; the end of the stay is told through events, notices, and the weather, because 3-0c names no failure",
+  "serves": "3e.timeline_structure"
+ },
+ "opposition": {
+  "who_or_what": "the two marriages, administered by your wife and the woman's unseen husband",
+  "wants": "that the holiday stay as it was arranged and that no one be told what has happened on the promenade",
+  "means": "your wife controls the ticket, the hotel room, and the phone; the woman's husband is the name she does not speak and the life she is married into",
+  "shown_by": "on the first evening the hotel clerk says your wife has called to move your checkout and to hold any letters from her until you ask; later, the woman folds an unopened letter from her husband into her coat",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "The rain comes down on the promenade; the woman offers her umbrella, and the dog stands between you, shivering.",
+   "when": "early",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "what": "The hotel gives the woman a quiet room overlooking the beach for the night; the dog is left in the lobby, and the first real conversation happens without it.",
+   "when": "middle",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "what": "At the end of the holiday, the woman walks the dog on the beach at dawn, and you see her from the shingle and know the stranger is gone.",
+   "when": "late",
+   "serves": "3b.primary_affect"
+  }
+ ],
+ "hidden_truth": null,
+ "mediation": {
+  "question": "Do you let the meeting with the woman remain a small, harmless thing you can leave on the promenade, or do you let it become the thing that changes your life?",
+  "to_reach_pole_a": {
+   "pole": "self-protective detachment: the affair stays a holiday",
+   "what_you_must_do": "keep the meetings at the distance of the dog, answer your wife's calls, take the ticket, and leave before the storm",
+   "cost": "the thing that changes your life stays unchosen, and you return to the marriage with the knowledge that you could have been wanted but did not let it in"
+  },
+  "to_reach_pole_b": {
+   "pole": "vulnerable commitment: the affair becomes a life",
+   "what_you_must_do": "let the dog be the excuse to touch, share the umbrella, go to the quiet room, and let your wife know you are not coming home as you were",
+   "cost": "the marriage cannot be the same, and you lose the easy self-protection that made your affairs feel like weather"
+  },
+  "levers": [
+   "the small white dog",
+   "the single umbrella",
+   "the hotel room overlooking the beach",
+   "the phone at the hotel",
+   "your wife's letter",
+   "the woman's unopened letter from her husband",
+   "the ticket to the station"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "price": {
+  "what": "the old self, the ability to have affairs and think little of the women in them",
+  "who_pays": "you",
+  "why_final": "once you let the meeting become the thing that changes your life, you cannot go back to being a man who keeps women at a distance",
+  "serves": "3c.core_thematic_axis"
+ },
+ "setups": [
+  {
+   "plant": "the dog is a small white dog, and it is the only thing that gives you an excuse to stop walking and look at something other than the sea",
+   "payoff": "at the crisis, the dog is the living bridge that lets your hands touch without seeming to mean it, and then it is gone, and you have to choose what to do with your hands"
+  },
+  {
+   "plant": "your wife has called the hotel to move your checkout and to hold any letters from her until you ask",
+   "payoff": "at the crisis, the phone is the thing that forces you to choose between safety and truth, and the letter is the thing that makes the choice real"
+  }
+ ],
+ "rules": [],
+ "turns": [
+  {
+   "id": 1,
+   "situation": "The rain comes down on the promenade, and the woman offers her umbrella while the small white dog waits at her heel, shivering.",
+   "what_you_must_do": "get to the hotel before the rain closes the promenade",
+   "ways_through": [
+    {
+     "way": "you take the umbrella she offers and walk to the hotel under it, the umbrella’s pole keeping your shoulders apart and the dog on her side of the promenade",
+     "cost": "the hotel clerk says your wife has called to move your checkout a day earlier and to hold any letters from her until you ask"
+    },
+    {
+     "way": "you let her lead you to the bench under the arcade and wait out the rain separately, only taking her hand for a second to steady the umbrella’s pole",
+     "cost": "the woman’s coat stays dry and yours soaks through, and she leaves before the rain stops without saying her name"
+    },
+    {
+     "way": "you give her your coat and walk back to the hotel alone, leaving her under the umbrella",
+     "cost": "she is dry, but your coat is still on her when you reach the hotel and you have to decide whether to ask for it back"
+    }
+   ],
+   "involves": [
+    "the young married woman",
+    "your wife",
+    "the hotel clerk"
+   ],
+   "form": "endure",
+   "set_piece": "the two of them walking the promenade in the rain, sharing a single umbrella that keeps their shoulders apart, the small white dog shivering at her heel",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "id": 2,
+   "situation": "The next morning the cold front is already in the sea, and the woman folds an unopened letter from her husband into her coat before she walks the dog past the bench where you are sitting.",
+   "what_you_must_do": "find out why the woman keeps the letter unopened",
+   "ways_through": [
+    {
+     "way": "it comes out from the woman, once you ask whether the letter is from her husband, that she has not opened it because she is not ready to answer it",
+     "cost": "she tells you her husband’s name, and you now know the one name you must never say aloud in her presence"
+    },
+    {
+     "way": "you find it yourself, in the crease of the letter’s edge, where the return address is a clinic in a town you have never heard of",
+     "cost": "the woman sees you holding the letter and asks, in a voice that is not angry, whether you think she is a stranger to you"
+    }
+   ],
+   "involves": [
+    "the young married woman",
+    "the woman’s husband"
+   ],
+   "form": "discover",
+   "set_piece": null,
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 3,
+   "situation": "The hotel gives the woman a quiet room overlooking the beach for the night, and the dog is left in the lobby, and the first real conversation happens without it.",
+   "what_you_must_do": "get the woman to say what she has not said on the promenade",
+   "ways_through": [
+    {
+     "way": "you ask her to open the letter from her husband while you are in the room, and she opens it and reads it aloud to you, and the sea is visible through the window",
+     "cost": "the letter is from a hospital, and you now know the shape of the life she is married into"
+    },
+    {
+     "way": "you tell her your wife’s name and say that you are not coming home as you were, and the woman puts her hand on the dog’s collar in the lobby and does not let go",
+     "cost": "the woman’s husband’s name is still not spoken, but the letter from him is now open on the table between you"
+    },
+    {
+     "way": "you leave the letter unopened and say that the dog is the only thing you came for, and the woman takes the ticket to the station from your hand and puts it in her coat",
+     "cost": "the stranger is still the stranger, but the ticket is no longer yours"
+    }
+   ],
+   "involves": [
+    "the young married woman",
+    "the woman’s husband",
+    "your wife"
+   ],
+   "form": "persuade",
+   "set_piece": "a quiet room in the resort hotel where the air is still and the sea is visible through the window, and the first real conversation happens without the dog",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 4,
+   "situation": "At the end of the holiday, the woman walks the dog on the beach at dawn, and you see her from the shingle and know the stranger is gone.",
+   "what_you_must_do": "choose what to do with your hands before the train leaves",
+   "ways_through": [
+    {
+     "way": "you walk down to the shingle and put your hand on the dog’s collar, and the woman does not pull away, and you give her your address and tell her to write when the letter is answered",
+     "cost": "the marriage cannot be the same, and you lose the easy self-protection that made your affairs feel like weather"
+    },
+    {
+     "way": "you stay on the shingle and let the dog pass, and the woman’s hand stays on the collar, and you take the ticket your wife has left on the desk and board the train before dawn",
+     "cost": "the thing that changes your life stays unchosen, and you return to the marriage with the knowledge that you could have been wanted but did not let it in"
+    },
+    {
+     "way": "you call the hotel and ask the clerk to give the woman the letter from her husband, and the woman opens it on the beach and reads it, and you watch from the shingle and do not go down",
+     "cost": "the letter is answered, but the dog is gone, and you have to choose what to do with your hands without it"
+    }
+   ],
+   "involves": [
+    "the young married woman",
+    "your wife",
+    "the woman’s husband"
+   ],
+   "form": "choose_whom",
+   "set_piece": "the protagonist watching the woman and her dog from a distance across the beach, realizing he can no longer pretend he doesn’t know her",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The hotel clerk has been holding the letters from your wife since the first evening, and the stack is now thick enough to see the return address of a clinic in a town you have never heard of.",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "description": "The small white dog has gone missing from the lobby on the last morning, and the woman is walking the beach without it, and the collar is still in your pocket.",
+   "serves": "3b.primary_affect"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the young married woman",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "f",
+   "wants": "to be seen as a person rather than a wife, without breaking the quiet life she has built",
+   "holds": "the small white dog, which gives her an excuse to be on the promenade, and the unopened letter from her husband, which she carries as a weight",
+   "edge": "is married to a man she does not speak of, and yet finds herself wanting to be wanted by a stranger who is also married",
+   "tie": "is bound to the protagonist by the dog, which creates a small, harmless connection that neither wants to break",
+   "voice": "speaks in short, careful sentences, as if she is measuring her words: 'The dog likes you. I think that means something.'",
+   "breaking_point": "leaves the protagonist the moment she feels the connection is becoming too real, and the letter in her coat is opened",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Willa Darcy"
+  },
+  {
+   "role": "your wife",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "f",
+   "wants": "to ensure the protagonist returns home with his life exactly as he brought it, and to maintain the quiet terms of their marriage",
+   "holds": "the ticket to the station, the hotel room, and the phone, which she uses to manage the protagonist's return",
+   "edge": "knows the shape of the protagonist's absences but not the names, and yet feels the weight of his return",
+   "tie": "is bound to the protagonist by their marriage, and by the fact that she arranged his holiday",
+   "voice": "speaks in a calm, measured way, as if she is reciting a script: 'I've moved your checkout. I'll hold your letters until you ask.'",
+   "breaking_point": "leaves the protagonist the moment he fails to answer her calls, and the ticket is not taken",
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    3,
+    4
+   ],
+   "name": "Rowan Vance"
+  },
+  {
+   "role": "the hotel clerk",
+   "kind": "individual",
+   "speaks_for": "the hotel",
+   "gender": "m",
+   "wants": "to keep the hotel running smoothly, and to ensure that the guests' needs are met without causing a scene",
+   "holds": "the keys to the hotel rooms, and the phone, which he uses to communicate with the guests",
+   "edge": "is aware of the protagonist's wife's calls, and the woman's quiet room, but does not say anything",
+   "tie": "is bound to the protagonist by his role as a guest, and to the woman by her quiet room",
+   "voice": "speaks in a polite, professional way, as if he is reading from a list: 'Your wife has called. I've moved your checkout. I'll hold your letters until you ask.'",
+   "breaking_point": "leaves the protagonist the moment the hotel is in danger of being closed, and the quiet room is no longer available",
+   "opposition": false,
+   "matters_to_turns": [
+    1
+   ],
+   "name": "Jude Pemberton"
+  },
+  {
+   "role": "the woman’s husband",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to maintain the quiet life he has built with his wife, and to ensure that she does not change her mind",
+   "holds": "the unopened letter, which he has written to his wife, and the life they have built together",
+   "edge": "is married to a woman he does not speak of, and yet feels the weight of her absence",
+   "tie": "is bound to the woman by their marriage, and by the fact that he wrote the letter she is carrying",
+   "voice": "speaks in a calm, measured way, as if he is reciting a script: 'I've written you a letter. I'll hold it until you ask.'",
+   "breaking_point": "leaves the woman the moment she opens the letter, and the life they have built is no longer quiet",
+   "opposition": true,
+   "matters_to_turns": [
+    2,
+    3,
+    4
+   ],
+   "name": "Callum Marchetti"
+  }
+ ],
+ "name_pool": "romance"
+}

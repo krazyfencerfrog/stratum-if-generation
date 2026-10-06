@@ -11,14 +11,13 @@ The brief below lists every extracted judgment, one per line, as "field id [bind
  - free: nothing is known. Fill it.
 Where a cross-check line names a better-evidenced field, that field binds and the other does not. EXPLICIT BEATS GENRE DEFAULT, ALWAYS: when the Kernel rules something out that the genre would supply, the Kernel wins silently and completely.
 One exception to "a default may be replaced": the failure model (the 3-0c fields) bounds how the PLAYER can lose, whatever its binding class. You may make it more particular (give its trigger a concrete form); you may never add a way to lose it does not name.
-What the failure model does NOT bound is how dangerous the world is. A dragon can burn a village, the water can drown a room, the opposition can wreck, injure, take and kill, inside the transgression ceiling, whatever 3-0c says, because what they do is pressure and cost the story carries forward, not a new way for the story to end in the player's defeat. A Kernel that sets up a threat (a dragon, a storm, an army, a failing ship) gets a threat that acts. "Only relational_collapse" means the player loses only by losing people; it does not mean nothing else in the world is dangerous.
-And the failure model does not bound what the story COSTS. Losing is the player's defeat; the price is what the story takes for good whichever way it goes, and good stories pay one: a death, a bond broken past mending, a way of life ended. A failure presence of "none" means the player cannot lose, never that nothing can be lost.
+$$TERM_PRICE$$
 How to read the setting fields: 3f.setting_structure "single" means one overarching place (a ship, a dungeon, a manor, a city block), which may hold many rooms and areas; it does not shrink the story to one room unless the Kernel says one room. setting_scale says how large that place is.
 A binding marked "constraint, inferred" is one phase 3 worked out from the Kernel's details rather than read in its words. It still may not be contradicted; it is a floor the details forced, not a ceiling the user drew, so it never argues against giving the genre what it plainly promises.
 
 --- THE PROMISES ---
 
-Below the brief you are given the GENRE PROMISES: what a reader who asked for this kind of story expects and the Kernel left unsaid (the creature met, the set pieces, how the tone is produced, the roles the genre needs), and what the Kernel rules out. Promises are DEFAULTS, one rank below a brief default: the Kernel's words beat them, every brief constraint beats them, and where they fit they are the material the audience came for. Build them in: the arena holds the set pieces; the opposition, the pressure or the events deliver them; an obligatory role becomes the opposition or a lever that a person holds. A dragon story has a dragon in it, met face to face; a comedy has someone ridiculous. When the promises say "none", build from the brief alone.
+Below the brief you are given the GENRE PROMISES: what a reader who asked for this kind of story expects and the Kernel left unsaid (the creature met, the set pieces, how the tone is produced, the roles the genre needs), and what the Kernel rules out. Promises are DEFAULTS, one rank below a brief default: the Kernel's words beat them, every brief constraint beats them, and where they fit they are the material the audience came for. Build them in: the arena holds the set pieces; the opposition, the pressure or the events deliver them; an obligatory role becomes the opposition or a lever that a person holds. A sea-monster story has the monster in it, met face to face; a comedy has someone ridiculous. When the promises say "none", build from the brief alone.
 
 --- THE STORY'S OWN WORDS ---
 
@@ -32,14 +31,15 @@ So, even when the Kernel says the protagonist can do the decisive thing directly
 
 --- EVERYTHING MUST BE SOMETHING A READER CAN PICTURE ---
 
-Every lever, threat, cost and act you name must be a person, a place, a physical thing (one that can break, burn, be carried off, hidden or fought over), a body (hurt, tired, in danger), the weather, an event, or something someone says or does: things a reader can see and the engine can put in a room. A document, a fee or a signature is a thing too, but a weak one: use it only where the story is about it (a will in a murder, a treaty in a court), never as the default way to make something concrete. A story that turns on papers being signed is a story told at a desk. Do not coin abstractions and then build on them ("the dragon's wake", "the old name carries the road", "the debt of the border"): a later step cannot place them, the player cannot picture them, and every step after this one will repeat them. If the story needs a strange thing (a magic, a curse, a technology), say once, in physical words, what it is and what it does when used ("the dragon's true name, cut into the altar stone: whoever speaks it at the pass can make the dragon sleep, and forgets it as they say it").
+Every lever, threat, cost and act you name is something a reader can picture.
+$$TERM_PICTURE$$
+For example: "the loom in the weaver's attic: whatever is woven on it after dark is true by morning, and every line costs a thread of the weaver's own hair". A story that turns on papers being signed is a story told at a desk.
 If the tone is comic, build the comedy into the situation: what the people and things want, and the absurd lengths they go to for it. An adjective ("a funny sword") is not comedy.
 
 --- WHAT YOU MAY AND MAY NOT INVENT ---
 
-The engine's primitives are always available and are not "new mechanics": rooms and exits; objects to examine, take, use, give; characters to talk to about topics, whose stance changes with what they hear and see; a clock; flags and counters that record what happened. A relationship that warms or cools with what you do, and opens or closes things because of it (she sails with you only if you have stood by her), is a primitive too: the engine keeps it as a state and shows it through what the person says and does, never as a number. Build freely with those. The one restriction is on the story's PRESSURE: a clock or a stock that the engine tracks and the player can run out of needs a licence, from one of 3-0c's triggers or from the Kernel's own words. Without one, the pressure is told through events.
-
-What you may not invent is a different kind of game or a failure the extraction ruled out: no combat or skill-check systems, no puzzle minigames, no economy or reputation score the player watches, and no losing condition beyond what 3-0c names (if failure presence is "none", nothing here can be lost at; if it names one trigger, that trigger and no other). The test: would the engine need a system it does not have, or a way to lose that 3-0c did not extract? Then rewrite it as fiction over the primitives.
+$$TERM_ENGINE$$
+Build freely with what the engine has. What you may not invent is a system it lacks, or a way to lose the failure model does not name (if failure presence is "none", nothing here can be lost at; if it names one trigger, that trigger and no other). The test: would the engine need a system it does not have, or a way to lose that 3-0c did not extract? Then rewrite it as fiction over what the engine has.
 
 Not yours, because a later step owns them: proper names for people and places (name by ROLE: "the reporter who covers the council"); room interiors and their furnishings (a lever may be an object; what else is in the room is not yours); the order of events; prose.
 
@@ -61,7 +61,7 @@ pressure: what forces the situation to a head and keeps it moving (a breakdown, 
 
 opposition: the force with its own agenda standing between the protagonist and the want: a person, a faction, an institution, or a system that someone administers. It has a want of its own (not "to stop you"), means (what it can actually do to the protagonist), and shown_by: one early moment in which it does something that shows what it is capable of (it bends a poker into a knot and leaves it on the table), so its danger is seen before it is needed. If the Kernel gives the protagonist no external opponent, the opposition is the people whose cooperation the protagonist needs and cannot command. Serves 3c.core_thematic_axis or 3-0a.
 
-events: two or three things that HAPPEN whatever "you" do: the opposition carrying out its plan, the pressure reaching a stage, the world acting (the dragon burns the river bridge; the rival show's parade comes down the high street; the water reaches the second landing). Each is a picturable happening with a rough place in the story (early, middle, late). Events are not turns: a turn is a situation the player must act in; an event is what arrives and makes the next situation worse. They are what gives the story a middle that is not the player's own errands, and they are where the set pieces usually live. Serves the field each advances.
+events: two or three things that HAPPEN whatever "you" do: the opposition carrying out its plan, the pressure reaching a stage, the world acting (the flood takes the river bridge; the rival show's parade comes down the high street; the water reaches the second landing). Each is a picturable happening with a rough place in the story (early, middle, late). Events are not turns: a turn is a situation the player must act in; an event is what arrives and makes the next situation worse. They are what gives the story a middle that is not the player's own errands, and they are where the set pieces usually live. Serves the field each advances.
 
 hidden_truth: what the story knows that "you" do not, when the brief has an epistemic gap (3-0b.epistemic_gap present true): the truth itself, stated plainly and concretely (not "her own reasons" but what the reasons ARE), who knows it, and what changes when it comes out. A truth that is merely "a secret" is not stated. When 3-0b.epistemic_gap is present false, hidden_truth is null: a constraint that there is no hidden truth binds. Serves 3-0b.epistemic_gap.
 
@@ -69,7 +69,8 @@ price: what this story takes for good, on at least one way it can go: the thing 
 
 setups: one or two things planted early that come back at the crisis and decide or change it: a rule stated in the first scene and obeyed to the letter at the end, an object that seems like furniture until it is the only thing that works, a joke that returns as dread, a warning nobody heeds. For each: the plant (what the player sees or hears early, concrete and in passing, not flagged as important) and the payoff (what it does at the crisis). A setup used in the scene it appears in is not a setup. Plant what the player can notice in a room (an object, a habit, a body, a remark), not a message: a letter, a call or a notice only delivers news, and once planted it carries papers into every scene after.
 
-rules: the terms of any magic, curse, bargain, contract or mechanism the story runs on, stated so they can be obeyed to the letter ("the river carries one crossing for each coin dropped at the ford; a stolen coin drowns its owner, not the one who drops it; nothing carried across can be carried back"), never as a mood ("the river is jealous"). The terms of a contract, an oath or a bargain are what the people bound by it must and must not do, and what befalls whoever breaks them ("neither of us touches drink until we are crowned"), never what happens to the paper it is written on (signed, cut, sealed, filed). Empty when the story runs on none.
+rules: one entry for each magic, curse, bargain, oath, contract or mechanism the story runs on: the thing, its terms, and if_broken. Empty when the story runs on none.
+$$TERM_RULES$$
 
 mediation: the load-bearing field. Restate the decision axis as the question at stake. Then, for each pole, what the player has to DO in the world to bring it about, and what it costs. Then the levers: the people, objects, facts, and authorities that stand between the protagonist and either answer. Each lever will be placed somewhere or embodied by someone later, so name them as things that can exist. Serves 3-0a.primary_decision_axis.
 
@@ -93,7 +94,7 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
   },
   "price": {"what": string, "who_pays": string, "why_final": string, "serves": string},
   "setups": [{"plant": string, "payoff": string}],
-  "rules": [{"thing": string, "terms": string}]
+  "rules": [{"thing": string, "terms": string, "if_broken": string}]
 }
 
 --- CALIBRATION EXAMPLES ---
@@ -153,7 +154,7 @@ Output:
   },
   "price": {"what": "the quartet itself", "who_pays": "all four of you", "why_final": "on at least one way the week goes, the four walk out of the hall separately and never play together again", "serves": "3c.core_thematic_axis"},
   "setups": [{"plant": "between movements the cellist keeps his bow hand in his jacket pocket and jokes about the cold", "payoff": "in the slow movement at the competition the bow skids, and the one you stood with is the one who covers it"}],
-  "rules": [{"thing": "the competition's entry", "terms": "only the four players named at entry may play; if one walks out before the first round, the quartet does not play at all"}]
+  "rules": [{"thing": "the competition's entry", "terms": "only the four players named at entry may play, and all four must play every round", "if_broken": "if one walks out before the first round, the quartet does not play at all"}]
 }
 
 --- THE BRIEF ---

@@ -98,7 +98,7 @@ after:
     { "id": "N01", "title": "...", "summary": "...", "image": "...", "where": ["place name"], "who": ["character label"] }
   ],
   "new_locations": [ { "name": "...", "kind": "...", "why": "..." } ],
-  "new_characters": [ { "label": "...", "kind": "individual | crowd", "speaks_for": null, "gender": "f | m | n", "wants": "...", "holds": "...", "why": "..." } ]
+  "new_characters": [ { "label": "...", "kind": "individual | crowd", "being": "person | dead | animal | creature | thing", "speaks_for": null, "gender": "f | m | n", "wants": "...", "holds": "...", "why": "..." } ]
 }
 
 new_locations and new_characters are empty lists when nothing is added.

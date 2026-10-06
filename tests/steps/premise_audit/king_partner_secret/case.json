@@ -1,0 +1,13 @@
+{
+ "about": "Epistemic gap absent (inferred); a complication has the partner secretly carrying half the seal. A reversal, not the story's central hidden truth.",
+ "origin": "tonight/king/stories/ref_man_who_would_be_king: the premise audited in round 2",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0b.epistemic_gap",
+   "quote": "",
+   "why": "a secret that drives one reversal is not a central gap"
+  }
+ ]
+}

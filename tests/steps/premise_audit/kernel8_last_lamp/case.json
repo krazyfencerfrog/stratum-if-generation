@@ -1,0 +1,20 @@
+{
+ "about": "Failure model none; the book's last page is due by the last lamp. A deadline used as pressure.",
+ "origin": "fable5/stories/kernel8_f5: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "way to lose",
+   "quote": "",
+   "why": "a deadline is pressure"
+  },
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0c",
+   "quote": "",
+   "why": "the same"
+  }
+ ]
+}

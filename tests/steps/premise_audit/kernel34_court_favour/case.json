@@ -1,0 +1,20 @@
+{
+ "about": "Court intrigue whose levers are relationships that can be won or spent; the audit itself said they were licensed and still reported them.",
+ "origin": "fable5/stories/kernel34_f5: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "number the player",
+   "quote": "",
+   "why": "relationships are hidden state"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "rules the engine",
+   "quote": "",
+   "why": "the same"
+  }
+ ]
+}

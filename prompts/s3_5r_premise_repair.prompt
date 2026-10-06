@@ -11,12 +11,20 @@ For each finding:
  - Locate the material it points at ("where") and the words it quotes.
  - Change the smallest amount that removes the problem.
      A contradiction of a Kernel clause or of a brief constraint is rewritten inside what the clause or field allows.
-     A mechanic the engine lacks is rewritten as fiction over the engine's primitives (rooms, objects, people to talk to, a clock, flags), or removed.
+     A system the engine lacks is rewritten as fiction over what the engine has, or removed.
      A bad serves tag is corrected to the brief field id the item actually serves.
      Too many complications: drop the one that serves least.
  - An ENGINE finding is repaired by SUPPLYING what is missing, not by deleting the field: a bare turn gets a real thing to do and a cost per way through; two turns that share a form get different forms (and different things to do); a mediation pole gets an action in the world; an opposition gets a want and means; a group gets an individual who speaks for it; a role a turn involves gets a cast seed. A term nobody can picture is rewritten as the physical thing it stands for (what it is, what it does when used), everywhere it appears. A turn that repeats another's choice gets a local goal of its own and ways that change something different (who is with you, what you hold, what is damaged). A missing hidden truth is stated: what it is, who knows it, what it changes. Missing events get two or three picturable happenings the world brings about on its own (with when: early, middle, late). A missing set piece is one existing turn rewritten so that the world acts in it in a way a reader can see, with set_piece naming the picture. This is the one kind of finding where the repair adds material, because the finding says the material is missing.
 
 A turn is rewritten, never deleted below three.
+
+--- THE DEFINITIONS THE AUDIT WORKS FROM ---
+
+$$TERM_PRICE$$
+
+$$TERM_ENGINE$$
+
+$$TERM_RULES$$
 
 --- WHAT YOU RETURN ---
 
@@ -25,7 +33,7 @@ A turn is rewritten, never deleted below three.
 --- WHAT YOU DO NOT DO ---
 
  - Do not improve, enrich, tighten, or re-word anything the findings do not name.
- - Do not argue with a finding by leaving the material as it was. If you believe it is mistaken, still make the smallest change that satisfies it as written, and record your disagreement in the repair_log.
+ - Do not argue with a finding by leaving the material as it was, with one exception: a finding that misreads one of the definitions above (it calls the story's price a way to lose, a document or a relationship a system, a rule's if_broken a failure). Decline that one: leave the material, set "declined" true, and say in "disagreement" which definition it misreads and how. A finding against a Kernel clause is never declined. Every other finding you think mistaken still gets the smallest change that satisfies it as written, with your disagreement recorded.
  - Do not cross the construction steps' own limits: no proper names, no room interiors, no order of events, no system the engine lacks, no losing condition beyond what 3-0c names.
  - Do not introduce a person without a cast seed: if a repaired turn involves someone new, add their seed and return "cast_seeds" too.
 
@@ -34,33 +42,38 @@ Output ONLY valid JSON, no markdown code fences, no commentary before or after, 
 
 {
   "repair_log": [
-    {"finding": string, "change": string, "disagreement": string}
+    {"finding": string, "change": string, "disagreement": string, "declined": boolean}
   ],
   "revised": { ...only the sections you changed, each in the premise's own shape and keys... }
 }
 
+One repair_log entry per finding; "finding" starts with the finding's id (F1, F2, ...) and a few of its words.
+
 --- CALIBRATION EXAMPLE ---
 Size of a correct repair only. Do not reuse its content.
 
-Premise (trimmed): a border post; cast seeds include "the sergeant", who keeps the post's stamp. mediation.to_reach_pole_a = {"pole": "let the family through", "what_you_must_do": "choose to let them through", "cost": "your post"}.
-Finding: (engine check) "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost. It is not the pole restated.", quote "choose to let them through".
-Reasoning: the finding says material is missing, so the repair supplies it, using only people the premise already has. The family passes when the post's stamp is on their paper, and the sergeant keeps the stamp: so what you must do is get it from him or use it while he is out at the barrier. That makes the stamp a lever, so it joins the levers. Nothing else in mediation moves, no turn is touched, and no new person is introduced, so "revised" holds the mediation section, whole, and nothing else.
+Premise (trimmed): a border post; cast seeds include "the sergeant", who wears the key to the barrier's chain. mediation.to_reach_pole_a = {"pole": "let the family through", "what_you_must_do": "choose to let them through", "cost": "your post"}.
+Finding F1: (engine check) "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost. It is not the pole restated.", quote "choose to let them through".
+Reasoning: the finding says material is missing, so the repair supplies it, using only people the premise already has. The family passes when the barrier is lifted, and the barrier is chained, and the sergeant wears the key: so what you must do is get the key from him or lift the barrier while he is out on the ridge. That makes the key a lever, so it joins the levers. Nothing else in mediation moves, no turn is touched, and no new person is introduced, so "revised" holds the mediation section, whole, and nothing else.
 Output:
 {
   "repair_log": [
-    {"finding": "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost", "change": "pole a is now reached by getting the post's stamp onto the family's paper, which needs the sergeant's consent or his absence; the stamp is added to the levers.", "disagreement": ""}
+    {"finding": "F1: mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost", "change": "pole a is now reached by lifting the chained barrier, which needs the sergeant's key or his absence; the key is added to the levers.", "disagreement": "", "declined": false}
   ],
   "revised": {
     "mediation": {
       "question": "Does the post serve the order it was given or the people in front of it?",
-      "to_reach_pole_a": {"pole": "let the family through", "what_you_must_do": "get the post's stamp onto their paper, by winning it from the sergeant or by using it while he is out at the barrier", "cost": "your post, once the day's count is read"},
-      "to_reach_pole_b": {"pole": "turn the family back", "what_you_must_do": "enter their names in the day's refusals, which the sergeant reads aloud at roll call", "cost": "they are marked, and cannot try another post"},
-      "levers": ["the day's refusals", "the sergeant's roll call", "the post's stamp"],
+      "to_reach_pole_a": {"pole": "let the family through", "what_you_must_do": "lift the barrier, with the key won from the sergeant or while he is out on the ridge", "cost": "your post, once the sergeant counts the night's crossings"},
+      "to_reach_pole_b": {"pole": "turn the family back", "what_you_must_do": "walk them back down the road in front of the whole post, past the sergeant at the fire", "cost": "they are seen and known, and cannot try another post"},
+      "levers": ["the chained barrier", "the sergeant's key", "the sergeant's fire"],
       "serves": "3-0a.primary_decision_axis"
     }
   }
 }
-(One section, complete and valid on its own. Had the finding been about a turn, "revised" would hold the whole "turns" list, the other turns copied unchanged; had the repair needed a person the premise lacks, it would also hold "cast_seeds" with that person added.)
+
+A finding that misreads a definition, declined.
+Finding F2: (engine boundary) "the failure model is none, but the premise makes the player lose", quote "whoever breaks the oath at the well is struck dumb". The premise's rules entry for the oath has that as its if_broken.
+{"finding": "F2: the failure model is none, but the premise makes the player lose", "change": "", "disagreement": "what befalls whoever breaks the oath is its if_broken, the story's price under LOSING AND THE PRICE; the game does not end in the player's defeat", "declined": true}
 
 --- THE BRIEF ---
 $$BRIEF_LINES$$

@@ -1,0 +1,13 @@
+{
+ "about": "A complication shows the player a 0-100 regard score after every scene.",
+ "origin": "refs2/stories/ref_lady_with_the_dog: accepted premise, changed by lady_meter",
+ "expect": [
+  {
+   "want": "present",
+   "source": "engine boundary",
+   "where": "number the player",
+   "quote": "",
+   "why": "a number the player is shown"
+  }
+ ]
+}

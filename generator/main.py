@@ -54,6 +54,7 @@ import world as world_stage
 import compile_scenes
 import example_guard
 import names
+import terms
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -97,16 +98,53 @@ BUDGET_RULE = ('weighted constraint_share (explicit 1.0, strong_inference 0.5) '
 
 DEFAULT_RATING = 'UNRATED'
 DEFAULT_MAX_REPAIRS = 2
-SOFT_PREMISE_FINDINGS = ('engine check',)   # craft notes from the audit: kept, never a halt, after the last repair
+# What may stop the run once the repairs are spent: a computed check (a
+# fact) and a contradiction of the Kernel's own words whose quote is really
+# in the premise. Every other audit finding is a judgment, and after the
+# last repair a judgment is kept as a note: in the saved runs to 2026-10-06
+# the audit's quotes were real (41 of 43) and every final-round halt was a
+# real quote misread, so a halt bought a lost run, never a better story.
+HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
 
 
 def soft_premise_finding(f):
     """A finding left after the last repair that is kept as a note, not a
-    halt: a craft note, or one against a constraint phase 3 inferred rather
-    than read in the Kernel (its own guess). Against the Kernel's words, an
-    explicit constraint, or a computed check, the run stops."""
-    return f.get('source') in SOFT_PREMISE_FINDINGS or (
-        f.get('source') == 'brief constraint' and '[constraint, inferred]' in str(f.get('where') or ''))
+    halt: anything but a computed check or a verified Kernel contradiction."""
+    return f.get('source') not in HARD_PREMISE_SOURCES or f.get('verified') is False
+
+
+def repairable(f):
+    """What the repair is asked to act on: not a finding whose quote is not
+    in the premise (there is nothing there to change), and not one the
+    repair declined last round as a misread of a shared definition."""
+    return f.get('verified') is not False and not f.get('disputed')
+
+
+def declined_ids(repair, findings):
+    """The ids (F1, F2, ...) of the findings a repair declined as misreading
+    a shared definition. A computed check or a Kernel contradiction cannot
+    be declined, however the repair marks it."""
+    hard = {f['id'] for f in findings if f.get('source') in HARD_PREMISE_SOURCES}
+    out = set()
+    for e in (repair or {}).get('repair_log') or []:
+        if isinstance(e, dict) and as_bool(e.get('declined'), False):
+            out |= {f'F{d}' for d in re.findall(r'\bF(\d+)\b', str(e.get('finding') or ''))}
+    return out - hard
+
+
+def plain(text):
+    return re.sub(r'[^a-z0-9]+', ' ', str(text or '').lower().replace('\u2019', "'")).strip()
+
+
+def quote_in(quote, text):
+    q = plain(quote)
+    return bool(q) and q in plain(text)
+
+
+def finding_key(f):
+    """The same finding in two rounds: the item it is against, and for the
+    open search (whose 'where' is only its kind) the words it quotes."""
+    return (f.get('source'), str(f.get('where') or ''), plain(f.get('quote')) if f.get('source') == 'engine boundary' else '')
 
 PLACEHOLDER_RE = re.compile(r'\$\$[A-Z0-9_]+\$\$')
 
@@ -161,7 +199,7 @@ def get_client():
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
-                 branching='plan', outline_judge=True):
+                 branching='plan', outline_judge=True, stories_root=None):
         self.story_id = story_id
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
@@ -173,7 +211,7 @@ class StoryGenerator:
         self.branching = branching           # 'plan' (4p designs every divergence) or 'judge' (4d, one seed per iteration)
         self.outline_judge = outline_judge   # --no-outline-judge skips 4e
 
-        self.story_path_str = os.path.join(THIS_DIR, "..", "stories", self.story_id)
+        self.story_path_str = os.path.join(stories_root or os.path.join(THIS_DIR, "..", "stories"), self.story_id)
         self.story_path = Path(self.story_path_str)
         self.story_path.mkdir(parents=True, exist_ok=True)
         self.check_schema_stamp()
@@ -218,7 +256,7 @@ class StoryGenerator:
             value = f.read()
         if not value:
             raise ValueError(f"prompt {file_name} not found (or empty) in prompt directory {PROMPT_DIR}")
-        return value
+        return terms.expand(value)
 
     def check_schema_stamp(self):
         """Every story directory is stamped with the schema version that
@@ -903,6 +941,11 @@ class StoryGenerator:
                 raise ValueError('each cast seed needs a role')
             s['role'] = wanted.get(norm(s['role']), str(s['role']).strip())
             s['kind'] = 'crowd' if str(s.get('kind') or '').strip().lower() == 'crowd' else 'individual'
+            being = str(s.get('being') or '').strip().lower()
+            if being in schemas.BEINGS:
+                s['being'] = being
+            else:
+                s.pop('being', None)        # names.py falls back to reading the role
             s['speaks_for'] = str(s['speaks_for']).strip() if isinstance(s.get('speaks_for'), str) and s['speaks_for'].strip().lower() not in ('', 'null', 'none') else None
             for key in ('voice', 'breaking_point'):
                 v = s.get(key)
@@ -1282,12 +1325,22 @@ class StoryGenerator:
             if isinstance(e, dict) and not as_bool(e.get('holds'), default=True):
                 findings.append({'source': 'engine check', 'where': check_text.get(str(e.get('id')), str(e.get('id'))),
                                  'problem': str(e.get('note') or 'the check does not hold'), 'quote': str(e.get('quote') or '')})
+        # what the story pays is the price by construction, whatever the audit calls it
+        price_text = ' '.join([self.to_json(premise.get('price') or {})] + [
+            str(r.get('if_broken') or '') for r in premise.get('rules') or [] if isinstance(r, dict)])
         for e in answer.get('mechanics') or []:
-            # the auditor may argue itself out of an entry in its note (kernel34: "...but these are licensed");
-            # its own verdict on the entry decides
-            if isinstance(e, dict) and str(e.get('material') or '').strip() and not as_bool(e.get('permitted'), False):
-                findings.append({'source': 'engine boundary', 'where': 'a system the engine lacks, or a way to lose 3-0c does not name',
+            if not isinstance(e, dict) or not str(e.get('material') or '').strip():
+                continue
+            kind = mechanic_kind(e)
+            if kind == 'loss' and quote_in(e.get('material'), price_text):
+                kind = 'fiction'
+            if kind != 'fiction':
+                findings.append({'source': 'engine boundary', 'where': BOUNDARY_WHERE[kind],
                                  'problem': str(e.get('note') or ''), 'quote': str(e.get('material'))})
+        premise_text = self.to_json(premise)
+        for f in findings:
+            if f['source'] != 'computed':
+                f['verified'] = quote_in(f.get('quote'), premise_text)
         return findings
 
     # ------------------------------------------------------------------ 3.5: the loop
@@ -1325,10 +1378,12 @@ class StoryGenerator:
 
         findings = self.verify_premise(premise, 0)
         rounds = [{'round': 0, 'source': 's3_5_premise.json', 'findings': findings}]
+        declined = set()                    # finding_key()s the repair declined as misreading a definition
         n = 0
-        while findings and n < self.max_repairs:
+        while [f for f in findings if repairable(f)] and n < self.max_repairs:
             n += 1
             current = premise
+            to_repair = [dict(f, id=f'F{i}') for i, f in enumerate((f for f in findings if repairable(f)), 1)]
 
             def repair_validator(parsed, current=current):
                 if not isinstance(parsed, dict) or not isinstance(parsed.get('revised'), dict):
@@ -1336,7 +1391,7 @@ class StoryGenerator:
                 # a model that echoes the whole premise back includes keys that
                 # are not sections (the budget); they are ignored, not an error
                 parsed['revised'] = {k: v for k, v in parsed['revised'].items() if k in PREMISE_KEYS}
-                if not parsed['revised']:
+                if not parsed['revised'] and not all(f['id'] in declined_ids(parsed, to_repair) for f in to_repair):
                     raise ValueError(f'"revised" holds none of the sections {list(PREMISE_KEYS)}; return the ones you changed')
                 merged = self.merge_premise(current, parsed['revised'])
                 self.validate_engine(merged)
@@ -1353,21 +1408,26 @@ class StoryGenerator:
             repaired = self.run_prompt(f's3_5r{n}', 'premise_repair', {
                 '$$BRIEF_LINES$$': brief_table,
                 '$$PREMISE_JSON$$': self.to_json(premise),
-                '$$FINDINGS_JSON$$': self.to_json(findings),
+                '$$FINDINGS_JSON$$': self.to_json([{k: v for k, v in f.items() if k not in ('verified', 'disputed')}
+                                                   for f in to_repair]),
                 '$$KERNEL$$': self.kernel,
             }, prompt_file='s3_5r_premise_repair.prompt', validator=repair_validator, klass='build',
                 schema=schemas.PREMISE_REPAIR)
             premise = self.name_cast(self.merge_premise(premise, repaired['revised']))
+            declined |= {finding_key(f) for f in to_repair if f['id'] in declined_ids(repaired, to_repair)}
             findings = self.verify_premise(premise, n)
+            for f in findings:
+                if finding_key(f) in declined:
+                    f['disputed'] = True
             rounds.append({'round': n, 'source': f's3_5r{n}_premise_repair.json#revised',
                            'changed': sorted(repaired['revised'].keys()),
                            'repair_log': repaired.get('repair_log', []), 'findings': findings})
 
         self.analysis['s3_5_premise'] = premise
         self.save_story_json('s3_5_premise_accepted.json', premise)
-        # the audit finds something new each round; craft notes it still has
+        # the audit finds something new each round; judgments it still has
         # after the last are kept as notes, while a premise that contradicts
-        # the Kernel or the brief, or fails a computed check, stops the run
+        # the Kernel's words, or fails a computed check, stops the run
         hard = [f for f in findings if not soft_premise_finding(f)]
         self.save_story_json('s3_5_loop.json', {
             'accepted_source': rounds[-1]['source'],
@@ -1380,7 +1440,7 @@ class StoryGenerator:
         })
         if hard:
             raise PipelineHalt(
-                f"s3_5 premise: {len(hard)} finding(s) against the Kernel, the brief or a computed check still stand "
+                f"s3_5 premise: {len(hard)} finding(s) against the Kernel's words or a computed check still stand "
                 f"after {n} repair round(s). Inspect "
                 f"{self.story_file_path('s3_5_loop.json')}, fix the prompt or the material, then delete the "
                 f"s3_5* files to re-run the loop."
@@ -1661,6 +1721,20 @@ class StoryGenerator:
 
 # a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
 FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
+
+
+BOUNDARY_WHERE = {'number': 'a number the player is shown or must watch',
+                  'system': 'rules the engine cannot run',
+                  'loss': 'a way to lose the failure model (3-0c) does not name'}
+
+
+def mechanic_kind(entry):
+    """3.5v's kind for a search entry. An audit saved before kinds carried
+    a permitted flag: permitted is fiction, anything else a system."""
+    kind = str(entry.get('kind') or '').strip().lower()
+    if kind in schemas.MECHANIC_KINDS:
+        return kind
+    return 'fiction' if as_bool(entry.get('permitted'), False) else 'system'
 
 
 def as_bool(value, default=False):

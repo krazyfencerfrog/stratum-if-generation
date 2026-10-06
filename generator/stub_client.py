@@ -23,7 +23,12 @@ Scenario knobs (environment variables):
     STUB_PREMISE_HARD_ROUNDS=1   3.5b invents a score the engine lacks and
                                  3.5v reports it this many times (tests 3.5r)
     STUB_PREMISE_ALWAYS_HARD=1   3.5v always finds a craft note (E1): kept, the run goes on;
-                                 =2 it always finds a brief constraint broken (tests the halt)
+                                 =2 it always finds a brief constraint broken (a judgment: kept as a note);
+                                 =3 a Kernel clause contradicted, quoting the premise (tests the halt);
+                                 =4 the same, quoting words the premise does not have (a note)
+    STUB_PREMISE_LOSS=1          3.5v always reports a way to lose quoting a complication; 3.5r
+                                 declines it as the price (tests a declined finding);
+                                 =2 the loss it reports quotes the price (dropped by construction)
     STUB_REPAIR_BREAKS=1         3.5r's first answer also rewrites a turn as a
                                  menu pick under an unknown form (tests the
                                  repair validator); =2 its retry does too
@@ -435,7 +440,8 @@ class StubClient(LlmClient):
                       "why_final": "on the line where it is vented, nobody in it survives the cold", "serves": "3b.primary_affect"},
             "setups": [{"plant": "a drone notices frost on the hydroponics feed valve in the first hour",
                         "payoff": "at the crisis the frosted valve is the one manual route that still opens"}],
-            "rules": [{"thing": "the override codes", "terms": "a code vents one sector, once, and only with two council voices"}],
+            "rules": [{"thing": "the override codes", "terms": "a code vents one sector, once, and only with two council voices",
+                       "if_broken": "a code used with one voice locks every vent on the ring for a day"}],
         }
 
     def p_s3_5b(self, p):
@@ -474,7 +480,7 @@ class StubClient(LlmClient):
         seeds = []
         for r in roles:
             kind, speaks, wants, holds, opp, bp = known.get(r, ("individual", None, "stub want", "stub holding", False, None))
-            seeds.append({"role": r, "kind": kind, "speaks_for": speaks, "wants": wants, "holds": holds,
+            seeds.append({"role": r, "kind": kind, "being": "person", "speaks_for": speaks, "wants": wants, "holds": holds,
                           "edge": None if kind == "crowd" else f"stub edge of {r}", "tie": f"stub tie of {r}",
                           "voice": None if kind == "crowd" else f"stub voice of {r}: 'stub line'",
                           "breaking_point": bp, "opposition": opp, "gender": "n" if kind == "crowd" else ("f" if "warden" in r else "m")})
@@ -489,18 +495,27 @@ class StubClient(LlmClient):
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
         broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
+        clause = env_int('STUB_PREMISE_ALWAYS_HARD', 0) in (3, 4)
+        clause_quote = (str((material.get('arena') or {}).get('description') or '')
+                        if env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 3 else 'the lighthouse keeper rings the bell')
+        loss = env_int('STUB_PREMISE_LOSS', 0)
+        loss_quote = (str((material.get('price') or {}).get('what') or '') if loss == 2 else
+                      str(((material.get('complications') or [{}])[-1] or {}).get('description') or ''))
         # =2 breaks a constraint read in the Kernel (an inferred one left standing is a note, not a halt)
         block = self.body(p)[self.body(p).rfind('--- LIST 2: CONSTRAINTS ---'):]
         explicit = next((m.group(1) for m in re.finditer(r'^\s*(\d+)\.\s.*\[constraint\]', block, re.M)), None)
         hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         return {
-            "clauses": [{"n": int(n), "note": "stub: nothing incompatible", "contradiction": False, "quote": ""} for n in clauses],
+            "clauses": [{"n": int(n), "note": "stub: the arena breaks it" if clause and n == clauses[0] else "stub: nothing incompatible",
+                         "contradiction": clause and n == clauses[0], "quote": clause_quote if clause and n == clauses[0] else ""}
+                        for n in clauses],
             "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and n == explicit,
                              "quote": "stub quote" if broken and n == explicit else ""} for n in constraints],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
                        for e in engine],
-            "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "permitted": False}]
-                          if hard else []),
+            "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "kind": "number"}]
+                          if hard else []) + ([{"material": loss_quote, "note": "stub: the player loses", "kind": "loss"}] if loss else [])
+                         + [{"material": "the override codes", "note": "stub: an object in the story", "kind": "fiction"}],
         }
 
     HIDDEN = {"truth": "the council speaker has been venting the nursery's reserve into her own sector for a month",
@@ -527,8 +542,15 @@ class StubClient(LlmClient):
             turns = revised.get('turns') or self.p_s3_5b(p)['turns']
             turns[1]['set_piece'] = "the drone's camera feed from inside the venting ring"
             revised['turns'] = turns
-        return {"repair_log": [{"finding": self.VIOLATION, "change": "replaced the score with a rerouting complication", "disagreement": ""}],
-                "revised": revised}
+        findings = self.section(p, '--- FINDINGS (fix these, and only these) ---') or []
+        log = [{"finding": f"{f.get('id')}: {f.get('problem')}", "change": "stub change", "disagreement": "", "declined": False}
+               for f in findings if isinstance(f, dict)]
+        for e, f in zip(log, findings):
+            if f.get('problem') == 'stub: the player loses':
+                e.update(change="", declined=True, disagreement="it is the price, under LOSING AND THE PRICE")
+        if log and all(e['declined'] for e in log) and revised == {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}:
+            revised = {}
+        return {"repair_log": log, "revised": revised}
 
     # ------------------------------------------------------------------ 3.8
 
@@ -643,7 +665,7 @@ class StubClient(LlmClient):
                           "where": [place[0].upper() if sloppy else place[0]], "who": who})
         if extra and nodes:
             new_characters = [
-                {"label": "the drone technician", "kind": "individual", "speaks_for": "the dock crew", "gender": "f", "wants": "her drones back", "holds": "the drone cradles", "why": "stub: someone has to launch the drone"},
+                {"label": "the drone technician", "kind": "individual", "being": "person", "speaks_for": "the dock crew", "gender": "f", "wants": "her drones back", "holds": "the drone cradles", "why": "stub: someone has to launch the drone"},
                 {"label": "the dock crew", "kind": "crowd", "speaks_for": None, "wants": "overtime", "holds": "the dock", "why": "stub"},
             ]
             new_locations.append({"name": "the drone dock", "kind": "a work deck", "why": "where drones are launched"})

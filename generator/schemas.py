@@ -75,6 +75,11 @@ PROMISES = obj(
 
 # ---------------------------------------------------------------- 3.5
 
+# what a cast member is (prompts/terms.txt BEINGS); names.py names only people and the dead
+BEINGS = ['person', 'dead', 'animal', 'creature', 'thing']
+# what 3.5v's search found; only the first three go to the repair
+MECHANIC_KINDS = ['number', 'system', 'loss', 'fiction']
+
 POLE = obj(pole=S, what_you_must_do=S, cost=S)
 
 ENGINE = obj(
@@ -87,7 +92,7 @@ ENGINE = obj(
     mediation=obj(question=S, to_reach_pole_a=POLE, to_reach_pole_b=POLE, levers=arr(S), serves=S),
     price=obj(what=S, who_pays=S, why_final=S, serves=S),
     setups=arr(obj(plant=S, payoff=S)),
-    rules=arr(obj(thing=S, terms=S)),
+    rules=arr(obj(thing=S, terms=S, if_broken=S)),
 )
 
 TURNS = obj(
@@ -98,7 +103,7 @@ TURNS = obj(
 
 CAST = obj(
     notes=S,
-    cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL,
+    cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), being=enum(BEINGS), speaks_for=STR_OR_NULL,
                        gender=enum(['f', 'm', 'n']), wants=S, holds=S, edge=STR_OR_NULL, tie=S, voice=STR_OR_NULL,
                        breaking_point=STR_OR_NULL, opposition=B)),
 )
@@ -107,11 +112,11 @@ PREMISE_CHECK = obj(
     clauses=arr(obj(n=I, note=S, contradiction=B, quote=S)),
     constraints=arr(obj(n=I, note=S, violated=B, quote=S)),
     engine=arr(obj(id=S, note=S, holds=B, quote=S)),
-    mechanics=arr(obj(material=S, note=S, permitted=B)),
+    mechanics=arr(obj(material=S, note=S, kind=enum(MECHANIC_KINDS))),
 )
 
 PREMISE_REPAIR = obj(
-    repair_log=arr(obj(finding=S, change=S, disagreement=S)),
+    repair_log=arr(obj(finding=S, change=S, disagreement=S, declined=B)),
     revised={'type': 'object'},
 )
 
@@ -139,7 +144,7 @@ MAIN_LINE = obj(
 LINE_NODES = obj(
     nodes=arr(obj(id=S, title=S, summary=S, image=S, where=arr(S), who=arr(S))),
     new_locations=arr(obj(name=S, kind=S, why=S)),
-    new_characters=arr(obj(label=S, kind=enum(['individual', 'crowd']), speaks_for=STR_OR_NULL, gender=enum(['f', 'm', 'n']),
+    new_characters=arr(obj(label=S, kind=enum(['individual', 'crowd']), being=enum(BEINGS), speaks_for=STR_OR_NULL, gender=enum(['f', 'm', 'n']),
                            wants=S, holds=S, why=S)),
 )
 

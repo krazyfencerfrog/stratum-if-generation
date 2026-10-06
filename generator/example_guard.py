@@ -17,6 +17,8 @@ above MIN_HITS is a copy.
 import os
 import re
 
+import terms
+
 N = 4
 MIN_HITS = 8      # clean outputs score 0-3 (borrowed stock phrasing); a copied premise scored 280
 WORD = re.compile(r"[a-z0-9']+")
@@ -76,7 +78,7 @@ def example_phrases(prompt_files):
         examples, instructions = set(), set()
         for pf in prompt_files:
             with open(os.path.join(PROMPT_DIR, pf), encoding='utf-8') as f:
-                ins, ex = split_prompt(f.read())
+                ins, ex = split_prompt(terms.expand(f.read()))
             examples |= ngrams(ex)
             instructions |= ngrams(ins)
         _cache[key] = examples - instructions

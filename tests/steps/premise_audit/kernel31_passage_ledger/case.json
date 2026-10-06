@@ -1,0 +1,20 @@
+{
+ "about": "A merchant's ledger of what the party owes for passage: a document in the story, read as an economy.",
+ "origin": "fable5/stories/kernel31_f5: the premise audited in round 1",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "rules the engine",
+   "quote": "",
+   "why": "a ledger is a thing, not an economy the engine runs"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "number the player",
+   "quote": "",
+   "why": "no number is shown"
+  }
+ ]
+}

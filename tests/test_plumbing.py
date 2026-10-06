@@ -243,27 +243,55 @@ def hidden_truth_and_cast_edges():
 
 @test
 def premise_halt():
-    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '2'}, expect=2)
+    # a Kernel clause contradicted, with a quote that is really in the premise, stops the run
+    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '3'}, expect=2)
     check('PIPELINE HALTED' in out, 'no halt message')
-    check(load('halt', 's3_5_loop.json')['still_failing'], 'loop.json should record the standing finding')
+    loop = load('halt', 's3_5_loop.json')
+    check(loop['still_failing'] and loop['rounds'][-1]['findings'][0]['verified'], 'loop.json should record the standing finding, verified')
     check(not os.path.exists(os.path.join(story_dir('halt'), f'{PREFIX}halt_story.json')), 'the outline ran on a failed premise')
-    # a craft note the audit still has after the last repair is kept, not a halt (held-out check, 2026-10-06:
-    # the audit found something new each round and halted two of five kernels on notes)
-    run('craftnote', env={'STUB_PREMISE_ALWAYS_HARD': '1'})
-    loop = load('craftnote', 's3_5_loop.json')
-    check(not loop['still_failing'] and loop['accepted_with'] and loop['accepted_with'][0]['source'] == 'engine check',
-          f'a craft note should be kept and the run go on: {loop.get("accepted_with")}')
+    # the same contradiction quoting words the premise does not have is a note, and nothing is sent to repair
+    run('halt_unquoted', env={'STUB_PREMISE_ALWAYS_HARD': '4'})
+    loop = load('halt_unquoted', 's3_5_loop.json')
+    check(not loop['still_failing'] and loop['repair_rounds_used'] == 0 and loop['accepted_with'][0]['verified'] is False,
+          f'an unverified quote should be a note with no repair round: {loop}')
+    # judgments left after the last repair are kept as notes (2026-10-06: every final-round halt in the saved
+    # runs was a real quote misread): a craft note, and a brief constraint read in the Kernel
+    for name, knob, source in (('craftnote', '1', 'engine check'), ('constraint_note', '2', 'brief constraint')):
+        run(name, env={'STUB_PREMISE_ALWAYS_HARD': knob})
+        loop = load(name, 's3_5_loop.json')
+        check(not loop['still_failing'] and loop['accepted_with'] and loop['accepted_with'][0]['source'] == source,
+              f'{name}: the finding should be kept and the run go on: {loop.get("accepted_with")}')
     import main as gen_main
-    check(gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3-0b.epistemic_gap [constraint, inferred]: present false'})
-          and not gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3b.tone [constraint]: descriptors tense'})
-          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner'}),
-          'an inferred constraint left standing is a note; the Kernel and explicit constraints still halt')
-    # a run saved before this rule, halted on craft notes only, replays as accepted
+    check(gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3b.tone [constraint]: descriptors tense'})
+          and gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner', 'verified': False})
+          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner', 'verified': True})
+          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner'})
+          and not gen_main.soft_premise_finding({'source': 'computed', 'where': 'events'}),
+          'only a computed check or a verified Kernel contradiction halts')
+    # a run saved before this rule, halted on notes only, replays as accepted
+    loop = load('craftnote', 's3_5_loop.json')
     loop['still_failing'] = True
     del loop['accepted_with']
     with open(os.path.join(story_dir('craftnote'), f'{PREFIX}craftnote_s3_5_loop.json'), 'w') as f:
         json.dump(loop, f)
     run('craftnote')
+
+
+@test
+def premise_price_is_not_a_loss():
+    # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
+    # not repaired again, and it ends as a note
+    run('declined', env={'STUB_PREMISE_LOSS': '1'})
+    loop = load('declined', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 1 and not loop['still_failing'], f'one round, then accepted: {loop["repair_rounds_used"]}')
+    check(loop['rounds'][1]['repair_log'][0]['declined'] and loop['accepted_with'][0].get('disputed'),
+          f'the declined finding should come back disputed: {loop["accepted_with"]}')
+    prompt = load('declined', 's3_5r1_raw_input_prompt.txt')
+    check('"id": "F1"' in prompt and 'LOSING AND THE PRICE' in prompt, 'the repair should see numbered findings and the shared terms')
+    # a loss that quotes the price itself is the price by construction: never a finding
+    run('price_loss', env={'STUB_PREMISE_LOSS': '2'})
+    loop = load('price_loss', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 0 and not loop['rounds'][0]['findings'], f'the price is not a loss: {loop["rounds"][0]}')
 
 
 @test
@@ -1097,6 +1125,64 @@ def example_copies_are_caught():
     kernel = open(os.path.join(KERNELS, 'kernel1.txt')).read()
     hits = example_guard.copied_phrases(premise, pf, [kernel])
     check(len(hits) < example_guard.MIN_HITS, f'the stub premise was flagged as a copy: {hits[:5]}')
+
+
+@test
+def steptest_scores_saved_cases():
+    import tempfile
+    import steptest
+    before = os.environ.get('STRATUM_CLIENT')
+    os.environ['STRATUM_CLIENT'] = 'stub'
+    try:
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()) as out:
+            steptest.main(['--cases', 'lady_clean,lady_regard_meter', '--tag', 't', '--out', tmp])
+            summary = json.load(open(os.path.join(tmp, 't', 'summary.json')))
+    finally:
+        if before is None:
+            del os.environ['STRATUM_CLIENT']
+        else:
+            os.environ['STRATUM_CLIENT'] = before
+    res = summary['results']
+    check(all(e['held'] for e in res['lady_clean'][0]['score']), 'the stub audit raises nothing on the clean control')
+    check(not res['lady_regard_meter'][0]['score'][0]['held'] and 'misses 1/1' in out.getvalue(),
+          'a missed true positive is reported as a miss')
+    check(steptest.matches({'source': 'kernel clause', 'where': 'married man', 'quote': ''},
+                           {'source': 'kernel clause', 'where': 'You are a married man near forty', 'quote': 'x'}),
+          'an expectation matches by source and words')
+    for name in os.listdir(steptest.CASES):
+        case = steptest.load_case(name)
+        check(case['case']['expect'] and case['premise'].get('protagonist'), f'{name}: a case needs expectations and a premise')
+
+
+@test
+def shared_terms_reach_every_prompt():
+    import terms
+    used = set()
+    for path in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt')):
+        text = open(path, encoding='utf-8').read()
+        used |= set(terms.TERM.findall(text))
+        out = terms.expand(text)
+        check('$$TERM_' not in out, f'{os.path.basename(path)}: a term was left unexpanded')
+    defined = set(terms.load())
+    check(used <= defined and defined <= used, f'terms used but not defined {used - defined}, defined but unused {defined - used}')
+    check('LOSING AND THE PRICE' in terms.expand('$$TERM_PRICE$$'), 'the PRICE section should expand whole')
+    try:
+        terms.expand('$$TERM_NOPE$$')
+        check(False, 'an unknown term should raise')
+    except ValueError:
+        pass
+
+
+@test
+def being_decides_who_is_named():
+    import names
+    check(names.wants_a_name({'role': 'the night porter', 'being': 'person'}), 'a person is named')
+    check(not names.wants_a_name({'role': 'the night porter', 'being': 'animal'}), 'an animal keeps its role, whatever its role says')
+    check(names.wants_a_name({'role': 'the grey lady', 'being': 'dead'}) and names.dead_person({'role': 'the grey lady', 'being': 'dead'}),
+          'the dead are named, for when they lived')
+    check(not names.wants_a_name({'role': 'the brass automaton', 'being': 'thing'}), 'a thing keeps its role')
+    check(not names.wants_a_name({'role': 'the old hound'}) and names.wants_a_name({'role': 'the ferryman'}),
+          'a seed without being is read from its role, as before')
 
 
 @test

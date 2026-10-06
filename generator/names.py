@@ -15,6 +15,8 @@ import random
 import re
 from pathlib import Path
 
+from schemas import BEINGS
+
 POOLS = json.loads((Path(__file__).resolve().parent.parent / 'config' / 'names.json').read_text(encoding='utf-8'))
 
 # what the model reaches for when it names people itself; kept out of every pool
@@ -169,6 +171,8 @@ GHOST = re.compile(r"\b(ghost|wraith|specter|spectre|phantom|shade|revenant|appa
 
 
 def dead_person(seed):
+    if seed.get('being') in BEINGS:          # the cast step said what this is
+        return seed['being'] == 'dead'
     role = str(seed.get('role') or '')
     return (seed_gender(seed) in ('m', 'f')
             and bool(GHOST.fullmatch(head_noun(role)) or re.search(r'\b(spectral|ghostly)\b', role, re.I))
@@ -176,9 +180,17 @@ def dead_person(seed):
 
 
 def wants_a_name(seed):
-    return (isinstance(seed, dict) and seed.get('role') and seed.get('kind') != 'crowd'
-            and (dead_person(seed) or (not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
-                                       and not NOT_FLESH.search(str(seed['role']))))
+    """A person or one of the dead gets a name; an animal, a creature or a
+    thing keeps its role. The cast step's being decides; a seed without one
+    (older files, a step that does not ask) is read from its role."""
+    if not (isinstance(seed, dict) and seed.get('role') and seed.get('kind') != 'crowd'):
+        return False
+    if seed.get('being') in BEINGS:
+        person = seed['being'] in ('person', 'dead')
+    else:
+        person = dead_person(seed) or (not NOT_A_PERSON.fullmatch(head_noun(seed['role']))
+                                       and not NOT_FLESH.search(str(seed['role'])))
+    return (person
             and re.sub(r'^(the|a|an)\s+', '', str(seed['role']).strip().lower()) not in ('protagonist', 'you', 'player'))
 
 

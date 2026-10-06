@@ -1,0 +1,13 @@
+{
+ "about": "Epistemic gap absent (inferred); a complication gives the first mate a secret bargain with the frigate. A reversal, not a central gap.",
+ "origin": "heldout/stories/kernel7: the premise audited in round 1",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0b.epistemic_gap",
+   "quote": "",
+   "why": "a reversal is not a central gap"
+  }
+ ]
+}

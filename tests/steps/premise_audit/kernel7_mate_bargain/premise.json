@@ -1,0 +1,299 @@
+{
+ "enrichment_budget": {
+  "level": "moderate"
+ },
+ "protagonist": {
+  "who": "You are the pirate captain of a fast brig, with a crew hungry for prize and a royal frigate bearing down on your wake.",
+  "history": "You took the ship from a dying smuggler and won your first fight by cutting the admiral's signal line, and the crew has followed you ever since because you have kept coming back with gold.",
+  "wants": "to take the richest prize the frigate is protecting and keep your crew free to spend it",
+  "need": "to prove that your word is worth more than the crown's rope, without paying for it in men you cannot replace",
+  "can_do": "give the order, set the course, choose the prize, lead the boarding party, and stand at the helm when the ship fights back",
+  "cannot_do": "fight the whole frigate alone, hold a man who has made up his mind to mutiny, or keep the ship sound when the wind, the water, and the cannonballs all vote against you",
+  "ties": [
+   {
+    "who": "the first mate",
+    "what": "the man who learned the rigging under you and now watches your risk-taking with the patience of a man counting his share"
+   },
+   {
+    "who": "the quartermaster",
+    "what": "the old hand who keeps the rum, the powder, and the crew's bad jokes, and whose nod decides whether the deck follows your order"
+   },
+   {
+    "who": "the frigate's captain",
+    "what": "the professional who could have been your mirror if the crown had not put a chain on him"
+   }
+  ],
+  "open": "whether you take the prize by force, by parley, by loot, or by running, and whether the crew is still yours when it is done",
+  "gender": "m",
+  "serves": "3-0b.protagonist_identity",
+  "name": "Bartholomew Gale"
+ },
+ "arena": {
+  "description": "A pirate brig and the royal frigate she has run down in a narrow, wind-scoured channel, the whole arena their decks, the rigging between them, the holds below, and the open water only a few yards off the gunwales.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The frigate is firing and gaining, and every broadside makes the choice between boarding, parley, looting, or running more expensive; the crew's willingness to keep fighting is being tested by each splash on deck and each man who goes down.",
+  "clock_or_stock": "none tracked: the approach is told through the broadsides, the wind, the rigging, and who is still standing, because 3-0c licenses only incapacitation_or_death",
+  "serves": "3-0c.failure_triggers"
+ },
+ "opposition": {
+  "who_or_what": "the royal frigate and her captain, backed by your first mate's quiet vote of no confidence in your risk",
+  "wants": "to take your ship, hang you, and make the prize safe for the crown, or at least to make sure your gamble does not get the crew killed for a captain's pride",
+  "means": "a full broadside, a boarding party, the reach of her guns, and the first mate's hand on the helm and the crew's ear",
+  "shown_by": "the frigate fires a shot across your bow that shreds the jib, and your first mate does not ask whether to answer; he simply moves a man to the wheel and says, in a voice meant for the deck, that the wind is on you",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "The frigate opens with a broadside, and a cannonball strikes the water close enough to splash the main deck, the crew's breath holding in unison as the spray comes over the gunwales.",
+   "when": "early",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "what": "The squall tears the topsails and the frigate's men start up the rigging, ropes swaying violently while musket balls snap the air between the two ships.",
+   "when": "middle",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "what": "The storm reaches its eye and the helm fights the hand, the first mate shouting orders drowned by the wind, then the grey light comes and the crew counts the dead and the loot on the slick foredeck.",
+   "when": "late",
+   "serves": "3-0c.failure_triggers"
+  }
+ ],
+ "hidden_truth": null,
+ "mediation": {
+  "question": "Which prize do you take, and how do you fight for it?",
+  "to_reach_pole_a": {
+   "pole": "take the prize by force: board the frigate or her protected ship and take what is there",
+   "what_you_must_do": "push the crew into the boarding, hold the gap between decks, and answer the frigate's cutlasses and pistols with your own men before the broadside finishes the ship",
+   "cost": "the men you send up the rigging and over the gunwale are the ones you may not get back, and the first mate's resentment becomes a vote against you"
+  },
+  "to_reach_pole_b": {
+   "pole": "take the prize by parley, loot, or running: get what can be carried and keep the ship free",
+   "what_you_must_do": "talk the crew into a faster, quieter choice, get the loot into the hold before the frigate's boarding party can stop you, and keep the helm steady enough to clear the channel",
+   "cost": "you leave behind the richer prize and the chance to make the crown pay, and the crew hears that your caution is a kind of cowardice"
+  },
+  "levers": [
+   "the first mate's hand on the helm",
+   "the quartermaster's rum barrel and powder key",
+   "the frigate's broadside and boarding party",
+   "the prize ship's hold and the loot inside it",
+   "the gap between the two ships and the rigging that spans it"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "price": {
+  "what": "the first mate's life, or the ship's loyalty, depending on how the boarding ends",
+  "who_pays": "you and the crew",
+  "why_final": "if he dies, the man who learned the rigging under you is buried at sea and his resentment is answered by death; if he lives and the crew turns, you keep your life but lose the ship that made you a captain",
+  "serves": "3c.core_thematic_axis"
+ },
+ "setups": [
+  {
+   "plant": "the first mate keeps checking the powder room hatch and the rum barrel, his eyes darting to the captain's cabin door as if the door might open on its own",
+   "payoff": "during the boarding he opens the hatch to let the frigate's men up, or to keep your own men from taking a shot they cannot afford, and the crew sees which side his hands are on"
+  },
+  {
+   "plant": "a coil of rope on the foredeck is coiled wrong, left-handed, because the wind has been wrong all morning",
+   "payoff": "in the rigging climb it either slips at the worst moment or holds when the frigate's men are hanging from it, and the deck remembers the coil"
+  }
+ ],
+ "rules": [
+  {
+   "thing": "the pirate's article on prize",
+   "terms": "every man who touches the prize gets a share; a man who deserts before the board is paid gets no share; the captain's share is double, and if the captain is taken, the crew may vote to hang him"
+  },
+  {
+   "thing": "the frigate's boarding rule",
+   "terms": "the frigate fires one broadside before she boards; if the pirate ship answers with a broadside of her own, the frigate's men go up under a hail of musket fire; if she does not answer, the frigate's men go up under a hail of cannonballs"
+  }
+ ],
+ "turns": [
+  {
+   "id": 1,
+   "situation": "The frigate opens with a broadside, and a cannonball strikes the water close enough to splash the main deck; the crew holds its breath as the spray comes over the gunwales.",
+   "what_you_must_do": "answer the frigate's first broadside before the next one reaches your hull",
+   "ways_through": [
+    {
+     "way": "you answer with your own broadside, because the quartermaster brings powder to the guns and the first mate points the bow into the frigate's wake",
+     "cost": "the frigate's next shot splinters the foremast and kills a gunner at the starboard gun"
+    },
+    {
+     "way": "you answer by darkening the ship and running into the squall's lee, because the first mate takes the wheel and the quartermaster spikes the guns",
+     "cost": "the crew hears you are not taking the prize, and the first mate's resentment is on the deck"
+    },
+    {
+     "way": "you answer by sending two men up to cut the frigate's signal halyard, because you promised them first draw and they are already at the shrouds",
+     "cost": "a musket ball kills one of the climbers, and the frigate's captain orders her men to the rigging"
+    }
+   ],
+   "involves": [
+    "the first mate",
+    "the quartermaster",
+    "the frigate's captain"
+   ],
+   "form": "endure",
+   "set_piece": "the first cannonball hitting the water close enough to splash the deck, the crew's breath holding in unison",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "id": 2,
+   "situation": "The squall tears the topsails, and the frigate's men start up the rigging between the two ships, ropes swaying violently while musket balls snap the air nearby.",
+   "what_you_must_do": "stop the frigate's boarding party from getting a man onto the prize ship's rail before your own men do",
+   "ways_through": [
+    {
+     "way": "you foul the gap with the left-handed coil, because the first mate's boarding party climbs the shrouds and the quartermaster's men throw the coil across the prize's rail",
+     "cost": "the first mate's hand is cut on the coil, and the crew sees his blood on the rope"
+    },
+    {
+     "way": "you cut the rigging from below, because the quartermaster's men swing up with axes and the left-handed coil holds the gap",
+     "cost": "a man slips from the coil and goes over the gunwale, and the frigate's boarding party still reaches the prize ship's rail"
+    },
+    {
+     "way": "you drag the prize's anchor chain across the gap, because the quartermaster's men haul it up from below and the first mate holds it fast",
+     "cost": "the chain tears the prize's rail and cuts a man's hand, and the frigate's captain orders her men to follow it up"
+    }
+   ],
+   "involves": [
+    "the first mate",
+    "the quartermaster",
+    "the frigate's captain"
+   ],
+   "form": "sabotage",
+   "set_piece": "the chaotic climb up the rigging of the enemy ship, ropes swaying violently while musket balls snap the air nearby",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "id": 3,
+   "situation": "The storm reaches its eye, the helm fights the hand, and the first mate shouts orders that are drowned out by the wind.",
+   "what_you_must_do": "choose whose hands hold the helm through the eye without losing the ship's loyalty",
+   "ways_through": [
+    {
+     "way": "you stand at the helm yourself, because you tie your hands to the wheel and answer the frigate's captain's gunnery with your own",
+     "cost": "your hands are cut to the bone, and the first mate says, in front of the crew, that you should have let him steer"
+    },
+    {
+     "way": "you let the first mate take the wheel, because his hands know the rigging and the quartermaster's men hold the braces",
+     "cost": "his resentment becomes open, and the crew sees which side his hands are on"
+    },
+    {
+     "way": "you lash the wheel and let the quartermaster's men hold it, because the old man keeps the deck laughing while the frigate's guns speak",
+     "cost": "the mast strains against the lashings, and the ship begins to leak in the hold"
+    }
+   ],
+   "involves": [
+    "the first mate",
+    "the quartermaster",
+    "the frigate's captain"
+   ],
+   "form": "choose_whom",
+   "set_piece": "the captain standing at the helm in the eye of a storm, the wheel spinning wildly, while the first mate shouts orders that are drowned out by the wind",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 4,
+   "situation": "The grey light comes, the deck is slick with rain and blood, and the crew counts the dead and the loot on the foredeck while the frigate's boarding party is still at the rail.",
+   "what_you_must_do": "settle which prize leaves the channel in your hold before the frigate's boarding party can stop it",
+   "ways_through": [
+    {
+     "way": "you take the frigate's protected prize by boarding, because you send the boarding party up the rigging and the first mate holds the gap between decks",
+     "cost": "the first mate is cut down on the frigate's deck, and the crew loses the man who learned the rigging under you"
+    },
+    {
+     "way": "you take the loot in your own hold and run, because the quartermaster spikes the guns and you clear the channel under the frigate's stern",
+     "cost": "you leave the richer prize behind, and the crew hears that your caution is a kind of cowardice"
+    },
+    {
+     "way": "you trade your hold's loot for the frigate's captain's word, because you stand parley with the first mate's hand on the hatch and the quartermaster's rum barrel open",
+     "cost": "the frigate's captain takes the prize's manifest, and your ship sails with the crown's mark on her hull"
+    }
+   ],
+   "involves": [
+    "the first mate",
+    "the quartermaster",
+    "the frigate's captain"
+   ],
+   "form": "confront",
+   "set_piece": "the quiet aftermath of a battle, the deck slick with rain and blood, the crew counting the dead and the loot under a grey sky",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The first mate has been keeping the powder key under his coat, and the crew has heard him promise the frigate's captain a safe passage if the brig's guns stay cold.",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "description": "The prize ship's hold is chained to the frigate's anchor, so taking the loot means dragging the frigate's chain across your own deck.",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "description": "The left-handed coil on the foredeck is the only line strong enough to span the gap, and it will slip if a man tries to dress it in the squall.",
+   "serves": "3-0c.failure_triggers"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the first mate",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to ensure the crew survives the gamble and returns to port with their shares intact",
+   "holds": "the helm, the crew's trust in his judgment, and the knowledge of the ship's limits",
+   "edge": "resents your risk-taking but trusts your hands more than his own, so he steers you into danger while calculating the cost",
+   "tie": "learned the rigging under you and has watched your luck run thin",
+   "voice": "speaks in short, declarative facts that sound like warnings: 'Wind's on the port bow. If you want to die, do it quietly.'",
+   "breaking_point": "takes the helm and turns the ship away from the prize if you order a boarding action without checking the wind first",
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Nicholas Davis"
+  },
+  {
+   "role": "the quartermaster",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to keep the rum flowing and the powder dry so the men stay loud and loyal",
+   "holds": "the rum barrel, the powder key, and the crew's bad jokes",
+   "edge": "knows exactly when the crew is ready to break and hides it behind a grin, serving you the truth mixed with enough poison to keep you guessing",
+   "tie": "keeps your bad habits and your good ones, and his nod decides whether the deck follows your order",
+   "voice": "talks to the crew like he's talking to a drunk uncle, with a mix of affection and exasperation: 'Drink up, boys. The devil's thirsty and he's got a bill to pay.'",
+   "breaking_point": "locks the rum barrel and stands guard if you order the men to board without a full cask of rum in the hold",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Obadiah Blackthorn"
+  },
+  {
+   "role": "the frigate's captain",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to take your ship, hang you, and make the prize safe for the crown",
+   "holds": "the full broadside, the boarding party, and the authority of the law",
+   "edge": "could have been your mirror if the crown had not put a chain on him, and fights you with the same precision he uses to keep his own men alive",
+   "tie": "professional respect for your skill, which makes him hate you for making his job harder",
+   "voice": "speaks with the calm of a man who has never had to shout to be heard: 'I admire the speed of your brig. It will make the hanging more interesting.'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Sam Salt"
+  }
+ ],
+ "name_pool": "age_of_sail"
+}

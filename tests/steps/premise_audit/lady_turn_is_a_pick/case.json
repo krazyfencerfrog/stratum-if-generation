@@ -1,0 +1,13 @@
+{
+ "about": "Turn 2 is the decision axis as two buttons: love her, or do not.",
+ "origin": "refs2/stories/ref_lady_with_the_dog: accepted premise, changed by lady_pick",
+ "expect": [
+  {
+   "want": "present",
+   "source": "engine check",
+   "where": "turn 2",
+   "quote": "",
+   "why": "the turn is a pick"
+  }
+ ]
+}

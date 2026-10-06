@@ -1,0 +1,198 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "how to advance or hold back the affair with the young married woman",
+      "description": "At each seaside encounter, choose a concrete step toward or away from her—remain a stranger, repeat the meeting, deepen the intimacy, or acknowledge the relationship—while both parties are married.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [
+        {
+          "label": "what to do about the marriage as the affair deepens",
+          "relation": "nested"
+        }
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_landscape": {
+      "shape": "layered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "married man near forty",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "none",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_cost": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "romantic longing",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "dread"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "understated",
+        "atmospheric"
+      ],
+      "binding": "constraint"
+    },
+    "3b.somatic_address": {
+      "level": 1,
+      "channels": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.transgression": {
+      "ceiling": 4,
+      "floor": 3,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "self-protective detachment",
+      "pole_b": "vulnerable commitment",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "quiet discretion",
+        "open honesty",
+        "practical compromise"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "transformative, hard-won love",
+      "worst_case": "hollow compromise, lingering regret",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "invited",
+      "floor": "invited",
+      "types": [
+        "flashback"
+      ],
+      "interactive": "interactive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "default"
+    },
+    "3f.setting_structure": {
+      "ceiling": "clustered",
+      "floor": "clustered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_scale": {
+      "ceiling": "city_or_region",
+      "floor": "city_or_region",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 4,
+      "max": 6,
+      "binding": "default"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "romance progression",
+        "marital/disclosure status"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [
+      {
+        "id": "C9",
+        "verdict": "conflict",
+        "summary": "The inferred interactive flashbacks into past affairs would require decisions that do not appear in 3-0a, which only tracks the current affair and its marital consequences.",
+        "winner": "neither",
+        "resolution": "unresolved"
+      }
+    ],
+    "unresolved": [
+      "C9: reconcile 3d's interactive flashback excursions with 3-0a's current-affair decision axes"
+    ]
+  },
+  "enrichment_budget": "minimal"
+}

@@ -185,7 +185,8 @@ class OutlineBuilder:
             **({'price': pick(self.price, 'what', 'who_pays', 'why_final')} if self.price else {}),
             **({'setups': [f"{i}. plant: {x.get('plant')}; payoff: {x.get('payoff')}"
                            for i, x in enumerate(self.setups, 1)]} if self.setups else {}),
-            **({'rules': [f"{x.get('thing')}: {x.get('terms')}" for x in as_list(p.get('rules')) if isinstance(x, dict)]}
+            **({'rules': [f"{x.get('thing')}: {x.get('terms')}" + (f"; if broken: {x['if_broken']}" if x.get('if_broken') else '')
+                           for x in as_list(p.get('rules')) if isinstance(x, dict)]}
                if p.get('rules') else {}),
         }
 
@@ -234,7 +235,8 @@ class OutlineBuilder:
     def register_premise_cast(self):
         for seed in as_list(self.premise.get('cast_seeds')):
             if isinstance(seed, dict) and seed.get('role'):
-                self.add_character({'label': seed['role'], 'kind': seed.get('kind'), 'speaks_for': seed.get('speaks_for'),
+                self.add_character({'label': seed['role'], 'kind': seed.get('kind'), 'being': seed.get('being'),
+                                    'speaks_for': seed.get('speaks_for'),
                                     'wants': seed.get('wants'), 'holds': seed.get('holds'),
                                     'edge': seed.get('edge'), 'tie': seed.get('tie'), 'name': seed.get('name'),
                                     'voice': seed.get('voice'), 'breaking_point': seed.get('breaking_point'),
@@ -246,6 +248,7 @@ class OutlineBuilder:
         self.characters[cid] = {
             'id': cid, 'label': str(c.get('label')).strip(),
             'kind': 'crowd' if str(c.get('kind') or '').lower() == 'crowd' else 'individual',
+            **({'being': str(c['being']).lower()} if str(c.get('being') or '').lower() in schemas.BEINGS else {}),
             'speaks_for': c.get('speaks_for') or None, 'wants': c.get('wants') or '', 'holds': c.get('holds') or '',
             'edge': c.get('edge') or '', 'tie': c.get('tie') or '',
             'voice': c.get('voice') or '', 'breaking_point': c.get('breaking_point') or '',
@@ -1245,7 +1248,7 @@ class OutlineBuilder:
             if not have:
                 cid = self.add_character(c, source=line['id'])
                 seed = {'role': c['label'], 'kind': self.characters[cid]['kind'], 'gender': c.get('gender'),
-                        'wants': c.get('wants')}
+                        'wants': c.get('wants'), 'being': self.characters[cid].get('being')}
                 if names.wants_a_name(seed):
                     self.characters[cid]['name'] = names.pick(
                         self.gen.story_id, c['label'], names.seed_pool(seed, self.premise.get('name_pool') or 'modern'),

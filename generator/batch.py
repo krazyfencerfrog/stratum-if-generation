@@ -102,9 +102,9 @@ def update(path, fn):
 # ---------------------------------------------------------------- jobs
 
 def kernel_ids(spec):
-    if spec in ('eval', 'quick'):
-        name = 'EVAL_SET.txt' if spec == 'eval' else 'EVAL_QUICK.txt'
-        with open(os.path.join(KERNELS, name), encoding='utf-8') as f:
+    sets = {'eval': 'EVAL_SET.txt', 'quick': 'EVAL_QUICK.txt', 'heldout': 'HELDOUT.txt'}
+    if spec in sets:
+        with open(os.path.join(KERNELS, sets[spec]), encoding='utf-8') as f:
             return f.read().split()
     return [k.strip() for k in spec.split(',') if k.strip()]
 
@@ -296,7 +296,7 @@ def main(argv=None):
     sub = ap.add_subparsers(dest='cmd', required=True)
     a = sub.add_parser('add', help='queue jobs')
     a.add_argument('kernels', nargs='?', default='', help='comma-separated kernel ids')
-    a.add_argument('--set', choices=['eval', 'quick'], help='every kernel in EVAL_SET.txt or EVAL_QUICK.txt')
+    a.add_argument('--set', choices=['eval', 'quick', 'heldout'], help='every kernel in EVAL_SET.txt, EVAL_QUICK.txt or HELDOUT.txt')
     a.add_argument('--variant', help='replay 3.4 on from stories/<kernel> into stories/<kernel>_<variant>')
     a.add_argument('flags', nargs=argparse.REMAINDER, help='after --: flags for main.py')
     r = sub.add_parser('run', help='run the queue')
