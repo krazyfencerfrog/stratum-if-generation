@@ -398,3 +398,32 @@ So far the price, setups and rules hold on stories nothing was tuned for;
 the open question is how often a run finishes, which the fixes address and
 a re-run of the three will show.
 
+**Re-run of the three (2026-10-06, code 6845e7a): all finished.** The Paw
+and kernel40 replayed their premises as accepted with one craft note each
+kept; kernel7's crew took the quartermaster as its voice. Five of five
+held-out jobs now produce an outline.
+
+| kernel | price paid | setups paid on main | rules with terms | paperwork |
+|---|---|---|---|---|
+| Monkey's Paw (neutral rules example) | yes | 2 of 2 | 2 | 0.11 |
+| 7, pirates | yes | 2 of 2 | 2 | 0.00 |
+| 40, frontier | yes | 2 of 2 | 2 | 0.80 |
+
+- **The Paw's exact rule survives the neutral example**: "three wishes,
+  one per chance, each comes true in the smallest literal way that
+  satisfies the wording; a wish cannot be unmade, only prevented by
+  burning the paw before it is named". The family is there (a spouse) and
+  the price is the same kind as before (safe, but no longer knows you). So
+  the first pass's gain was not copying; it counts. The setups are weak
+  (the soldier's eyes rolling back; a click that is not there).
+- **kernel7**: the first mate checks the powder hatch from the first node
+  and opens it to the frigate's men at the boarding, in front of the crew;
+  he is buried at sea. The pirate articles have exact terms (a double share
+  for the captain; the crew may vote to hang him). No paperwork.
+- **kernel40**: the founder dies in the baron's office when the sheriff
+  draws to stop the signing, and the town votes around his body. But
+  paperwork is 0.8 (a contract, a fountain pen, a ledger, a deed) and its
+  rule is a land claim on paper. With the King (0.9), this is the second
+  story where a kernel that names a legal thing (water rights, a contract)
+  turns its rules into paper mechanics.
+
