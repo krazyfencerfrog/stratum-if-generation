@@ -723,7 +723,7 @@ def the_prose_pass_revises_text_and_keeps_structure():
     def skeleton(node):
         if isinstance(node, dict):
             return {k: ('' if k in ('text', 'label', 'detail_label', 'object_label', 'title') else skeleton(v))
-                    for k, v in node.items() if k not in ('unnamed', 'unnamed_short', 'known')}
+                    for k, v in node.items() if k not in ('unnamed', 'unnamed_short', 'known', 'recap')}
         if isinstance(node, list):
             return [skeleton(v) for v in node]
         return node
@@ -749,6 +749,8 @@ def the_prose_pass_revises_text_and_keeps_structure():
     check(strangers and all(c['unnamed'] == 'the stub figure in a coat' for c in strangers), 'unnamed labels')
     check(not any('If it slips' in t for t in texts), 'narrated alternatives survived the retry')
     check(load('prose', 'prose_style.json')['tradition'] == 'a stub tradition, revised', 'the faulted style sheet was not rewritten')
+    check(all(sc.get('recap') and '(voiced)' in sc['recap'][0]['text'] for sc in after['scenes'].values()),
+          'every scene should have a journal entry')
     errors, _ = engine_validate(EngineStory(after))
     check(not errors, f'the prose package does not validate: {errors[:5]}')
     eng = Engine(EngineStory(after))

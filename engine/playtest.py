@@ -43,6 +43,7 @@ import sys
 from collections import Counter, deque
 
 from expressions import evaluate, parse
+from menukeys import KEYS
 from runtime import FREE, Engine, leaves
 from story import Story, ending_groups, validate
 
@@ -260,7 +261,7 @@ def time_taking(eng):
 
 # ---------------------------------------------------------------- exhaustive exploration
 
-MAX_CHOICES = 29          # entries one menu level can show: the keys the terminal player has (cli.KEYS)
+MAX_CHOICES = len(KEYS)   # entries one menu level can show: the keys a front end picks them with (menukeys.py)
 
 
 def menu_problems(eng):

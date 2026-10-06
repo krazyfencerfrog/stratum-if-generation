@@ -290,6 +290,7 @@ def validate(story):
             if r not in rooms:
                 errors.append(f'{where}: places {cid} in {r!r}, not one of its rooms')
         check_variants(f'{where} opening', sc.get('opening'))
+        check_variants(f'{where} recap', sc.get('recap'))
         for r, variants in (sc.get('room_text') or {}).items():
             if r not in rooms:
                 errors.append(f'{where}: room_text for {r!r}, not one of its rooms')

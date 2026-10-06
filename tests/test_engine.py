@@ -664,6 +664,153 @@ def terminal_player_runs_a_script():
           and 'talk:lazlo:the_ledger' in ids(eng), f'going back through history failed:\n{text}')
 
 
+# ---------------------------------------------------------------- the paned interface (tui.py)
+
+def tui_session(seed=1):
+    from ui.session import Session
+    s = Session(Engine(Story(demo_data())), save_path=os.path.join(tempfile.mkdtemp(), 'tui.save'))
+    s.start(seed=seed)
+    return s
+
+
+def to_entry(session, label):
+    i = [c['label'] for c in session.items()].index(label)
+    session.select(i)
+    session.enter()
+
+
+@test
+def tui_session_menu_acting_and_time():
+    s = tui_session()
+    check(s.path() == [] and s.items() and s.preview() == s.items()[0]['label'], 'the menu starts at its root')
+    s.move(-1)
+    check(s.level()['index'] == len(s.items()) - 1, 'up from the top wraps to the bottom')
+    to_entry(s, 'Go')
+    check(s.path() == ['Go'] and s.back() and s.path() == [], 'into a submenu and back')
+    to_entry(s, 'Go')
+    s.enter()
+    check(len(s.pages) == 2 and s.pages[1][0]['kind'] == 'choice' and any(e['kind'] == 'room' for e in s.pages[1]),
+          f'acting adds a page with the choice and the new room: {s.pages[1][:2]}')
+    check(s.path() == [] and s.fresh, 'after acting the menu returns to its root and the story opens at the new text')
+    to_entry(s, 'Look')
+    check(len(s.pages) == 2 and len(s.engine.history) == 2, 'Look adds to the page; no time passes')
+    s.unwind()
+    check(len(s.pages) == 1 and not s.warn and s.message.startswith('Unwound'), f'unwind trims the pages: {s.message}')
+    s.unwind()
+    check(s.warn, 'unwinding past the beginning is reported')
+    to_entry(s, 'Go'); s.enter()
+    to_entry(s, 'Think'); s.enter()
+    s.save()
+    check(os.path.isfile(s.save_path), 'saved')
+    s.rewind_to(0)
+    check(len(s.pages) == 1, 'rewind to the beginning')
+    s.load()
+    check(len(s.pages) == len(s.engine.history) == 3 and not s.warn, f'load rebuilds the pages: {s.message}')
+    j = s.journal()
+    check(('current', '1. Before Dawn  (now)') in j and any(k == 'section' and t == 'People' for k, t in j), f'journal: {j}')
+    here = s.here()
+    check(here['title'] and here['chapter'] == 'Before Dawn' and here['carrying'], f'here: {here}')
+    check(not s.pick_key('z') and s.pick_key('1'), 'menu keys pick entries that exist')
+
+
+@test
+def tui_draws_every_pane_at_any_size():
+    from ui.app import App
+    from ui.surface import MemorySurface
+    s = tui_session()
+    wide = App(s, MemorySurface(30, 110))
+    wide.draw()
+    text = wide.surface.text()
+    for want in ('The Captain Will Not Leave', 'What do you do?', '┌─ Here', 'Story', 'Before dawn, the canal', 'q quit'):
+        check(want in text, f'the wide layout lacks {want!r}')
+    y, x = wide.surface.find('1 Look')
+    check(wide.surface.style_at(y, x + 2) == 'selected', 'the selected entry is highlighted')
+    narrow = App(s, MemorySurface(24, 64))
+    narrow.draw()
+    check('What do you do?' in narrow.surface.text() and '┌─ Here' not in narrow.surface.text(), 'narrow: menu below, no side panel')
+    tiny = App(s, MemorySurface(10, 40))
+    tiny.draw()
+    check('make it at least' in tiny.surface.text(), 'a terminal too small says so')
+    for key, title in (('j', 'The story so far'), ('h', 'History: go back'), ('?', 'Help'), ('q', 'Quit?')):
+        wide.handle(key)
+        wide.draw()
+        check(title in wide.surface.text(), f'{key} did not open {title!r}')
+        wide.handle('esc')
+    wide.handle('tab')
+    wide.draw()
+    check('┌─ Here' not in wide.surface.text(), 'Tab hides the side panel')
+
+
+@test
+def tui_keys_mouse_and_the_end():
+    from ui.app import App
+    from ui.surface import MemorySurface
+    s = tui_session()
+    app = App(s, MemorySurface(30, 110))
+    app.draw()
+    first_go = [c['label'] for c in s.items()].index('Go')
+    row = next(y for y, i in app.menu_hits.items() if i == first_go)
+    app.handle(('mouse', row, app.rects['menu'].x + 3, 'click'))
+    check(s.level()['index'] == first_go and s.path() == [], 'a click selects')
+    app.handle(('mouse', row, app.rects['menu'].x + 3, 'click'))
+    check(s.path() == ['Go'], 'a second click opens')
+    app.handle('left')
+    app.handle('pgup')
+    check(s.scroll > 0, 'PgUp scrolls the story back')
+    app.handle('end')
+    check(s.scroll == 0, 'End returns to the latest')
+    app.handle('#')
+    check(s.warn, 'a key that is no choice is reported')
+    app.handle('h'); app.handle('up'); app.handle('enter')
+    check(s.overlay is None, 'Enter on the current point closes history')
+    # play to an ending with the explorer's walkthrough, then n starts again
+    result = playtest.explore(s.engine.story)
+    end = next(iter(next(iter(result['endings'].values())).values()))
+    s.start(seed=1)
+    for label in playtest.path_to(result, end):
+        oid = next(o['id'] for o in s.engine.options() if s.engine.label_of(o) == label)
+        check(s.act(oid) is not None, f'walkthrough step {label}: {s.message}')
+    check(s.ended, 'the walkthrough did not reach an ending')
+    app.draw()
+    check('The end' in app.surface.text() and 'n  play again' in app.surface.text(), 'the end pane')
+    app.handle('n')
+    check(not s.ended and len(s.pages) == 1, 'n plays again')
+    app.handle('q'); app.handle('y')
+    check(not app.running, 'q then y quits')
+
+
+@test
+def tui_runs_under_curses():
+    import pty
+    import select
+    import struct
+    import fcntl
+    import termios
+    save = os.path.join(tempfile.mkdtemp(), 'pty.save')
+    pid, fd = pty.fork()
+    if pid == 0:
+        os.environ['TERM'] = 'xterm-256color'
+        os.chdir(ENGINE)
+        os.execvp(sys.executable, [sys.executable, 'tui.py', DEMO, '--save', save, '--keys',
+                                   'down,down,enter,enter,j,pgdn,esc,h,up,esc,?,esc,tab,u,s,l,q,y'])
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack('HHHH', 30, 100, 0, 0))
+    out, status, end = b'', None, time.time() + 30
+    while time.time() < end:
+        if select.select([fd], [], [], 0.2)[0]:
+            try:
+                out += os.read(fd, 65536)
+            except OSError:
+                pass
+        done, st = os.waitpid(pid, os.WNOHANG)
+        if done:
+            status = st
+            break
+    if status is None:
+        os.kill(pid, 9)
+    check(status == 0, f'tui.py under curses exited with {status}: {out[-400:]!r}')
+    check(b'Quit?' in out and os.path.isfile(save), 'the curses run did not draw the quit prompt or save')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

@@ -4,8 +4,9 @@
 The menu stands in for the radial UI: the root shows the verbs; one key
 press (1-9, then letters) drills down to objects and details. Keys that are
 always there: u unwind one action, h history (what you did, and a way back
-to any point), s save, l load, q quit; b (or backspace, esc) goes back a
-level. At a real terminal a key acts at once; piped input reads lines.
+to any point), j journal (the story so far), s save, l load, q quit; b (or
+backspace, esc) goes back a level. tui.py is the paned interface; this is
+the plain one, and the one scripts and the playtest drive. At a real terminal a key acts at once; piped input reads lines.
 
     python cli.py examples/kernel35_demo.json
     python cli.py story.json --check              # validate only
@@ -19,12 +20,12 @@ import select
 import sys
 import textwrap
 
+from menukeys import KEYS
+from recap import journal, journal_lines
 from runtime import Engine, EngineError, SaveMismatch
 from story import Story, validate
 
 WIDTH = 78
-RESERVED = 'bhlqsu'
-KEYS = '123456789' + ''.join(c for c in 'abcdefghijklmnopqrstuvwxyz' if c not in RESERVED)
 BACK_KEYS = ('b', '\x7f', '\x08', '\x1b')
 
 
@@ -74,7 +75,20 @@ def show_level(node, path, out):
         mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
         new = ' •' if child.get('new') else ''                      # not yet examined, asked or thought
         print(f'  {key}. {child["label"]}{more}{new}{mark}', file=out)
-    print('  ' + ('[b] prev menu  ' if path else '') + '[u] unwind  [h] history  [s] save  [l] load  [q] quit', file=out)
+    print('  ' + ('[b] prev menu  ' if path else '') + '[u] unwind  [h] history  [j] journal  [s] save  [l] load  [q] quit',
+          file=out)
+
+
+def show_journal(engine, out):
+    print(file=out)
+    for kind, text in journal_lines(journal(engine)):
+        if kind in ('title', 'section'):
+            print(f'  == {text} ==' if kind == 'title' else f'\n  {text}', file=out)
+        elif kind in ('chapter', 'current', 'ending'):
+            print(f'\n  {text}', file=out)
+        else:
+            print(textwrap.fill(text, WIDTH, initial_indent='     ', subsequent_indent='     '), file=out)
+    print(file=out)
 
 
 def history(engine, ask, out):
@@ -156,6 +170,9 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
                     view = rewound
                     break
                 continue
+            if choice == 'j':
+                show_journal(engine, out)
+                continue
             if choice == 's':
                 engine.save(save_path)
                 print(f'(saved to {save_path})', file=out)
@@ -171,7 +188,7 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
             if not choice:
                 continue
             if choice not in KEYS[:len(node['children'])]:
-                print('  (pick an option\'s key, or b, u, h, s, l, q)', file=out)
+                print('  (pick an option\'s key, or b, u, h, j, s, l, q)', file=out)
                 continue
             child = node['children'][KEYS.index(choice)]
             if 'id' in child:

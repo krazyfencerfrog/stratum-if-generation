@@ -474,3 +474,37 @@ for reference.
   `weight: "major"` on line-changing interactions for the front end to show
   or not. See later_stages.md §5.
 
+## 12. Front ends (2026-10-06)
+
+Two, over the same engine:
+- **`cli.py`**, the plain one: menu levels printed, one key per pick. The
+  fallback (a pipe, a script, a terminal without curses) and the one the
+  plumbing tests drive.
+- **`tui.py`**, the paned one (`engine/ui/`): the story scrolls on the left
+  (the newest page bright, earlier ones muted, a chapter card at each new
+  scene, the choice that led to each page), the menu on the right (below on
+  a narrow terminal) with a breadcrumb title, the selected entry
+  highlighted, the full path of what Enter would do at its foot, and a
+  "Here" panel (the room, who and what is in it, what you carry). Arrows
+  move (→ or Enter opens or does, ← goes back), an entry's key picks it, the
+  mouse clicks entries and the wheel scrolls. Overlays: the journal (j),
+  history with rewind to any point (h), help (?), quit (q, asks).
+  `--keys` plays key names instead of the keyboard.
+
+Both share `menukeys.py` (the keys a level is picked with: 1-9 then letters,
+minus b h j l q s u; the playtest's menu check caps a level at that many)
+and `recap.py`, **the journal**: one chapter per scene played, in order,
+with its summary (the scene's `recap`, written by the prose stage, else the
+first sentence of its opening) and the choices that mattered there (a
+moment's answer, anything marked major), then everyone met (by the name you
+know them by) and what you carry. History entries now record the scene an
+action happened in and the scene it led to, its weight, and whether it
+answered a moment.
+
+The paned interface is layered so it can grow: `text` (display widths,
+wrapping), `surface` (curses or a grid in memory; widgets draw in named
+styles, and THEME maps styles to colours in one place), `session` (all the
+state, no curses: tested directly), `layout` (pane rectangles by terminal
+size; a new pane is an entry there and a widget), `widgets`, and `app`
+(keys arrive as names, so scripts, tests and curses share one path).
+

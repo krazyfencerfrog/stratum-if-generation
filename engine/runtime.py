@@ -71,7 +71,8 @@ class Engine:
         self._note_seen()
         self.timeline = [st.clone()]
         view = self.view()
-        self.history = [{'label': '(the beginning)', 'text': view['text'], 'turn': 0}]
+        self.history = [{'label': '(the beginning)', 'text': view['text'], 'turn': 0, 'scene': st.scene,
+                         'scene_after': st.scene}]
         return view
 
     # ------------------------------------------------------------ what can be done
@@ -248,11 +249,21 @@ class Engine:
         if opt['verb'] in FREE:
             self.queue.append(self._free_text(opt))
             return self.view(show_room=opt['verb'] == 'look', full=True)
+        src = opt['source']
+        answered = bool(src and src[0] == 'interaction' and self.moment_of(src[1]['id']))
+        label = self.label_of(opt)
         moved_room, scene_before = self.perform(opt)
         self.timeline.append(st.clone())
         view = self.view(show_room=moved_room or st.scene != scene_before)
         text = view['text'] or ([f"You are in {view['room']['name']}."] if view.get('room') else [])
-        self.history.append({'label': self.label_of(opt), 'text': text, 'turn': st.turns})
+        entry = {'label': label, 'text': text, 'turn': st.turns, 'scene': scene_before, 'scene_after': st.scene}
+        if opt.get('weight'):
+            entry['weight'] = opt['weight']
+        if answered:
+            entry['answered'] = True                  # the answer to a moment: a choice the journal keeps
+        if st.ending:
+            entry['ending'] = st.ending
+        self.history.append(entry)
         return view
 
     def perform(self, opt, reseed=True):

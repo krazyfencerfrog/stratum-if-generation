@@ -35,7 +35,7 @@ from errors import SoftReject
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 
-TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8}
+TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8, 'recap': 40}
 CHUNK = 40                    # texts per call: a person with every state and subject is split
 MECHANICS = re.compile(r"\b(menus?|nodes?|variants?|the player|playthroughs?)\b", re.I)   # never ordinary English
 ALTERNATIVES = re.compile(r"\bif\b[^.!?]*[;,]\s*(?:and |but |or )?if\b", re.I)
@@ -47,7 +47,8 @@ REPEAT_N = 5                  # a run of this many words shared with an earlier 
 GUIDANCE = {
     'scene': "THIS PART is one scene: its opening (the first thing read on arrival: put the player in the room and "
              "the moment, with who is here), what each of its actions does (the response to choosing it), how its "
-             "rooms read during it, the events that happen on their own, and the nudges if the player idles.",
+             "rooms read during it, the events that happen on their own, the nudges if the player idles, and its "
+             "journal entry ('recap': what the scene put before the player, for the story-so-far page).",
     'person': "THIS PART is one person: how they look (by their state), the line the room shows them by ('here'), "
               "and what they say on each subject, in their own voice. 'unnamed' is how the player sees them before "
               "learning their name: a short phrase, three to eight words, starting with 'the' or 'a', what you would "
@@ -335,6 +336,14 @@ class ProseWriter:
                 items.append({'id': 'unnamed', 'what': 'how the player sees them before learning their name',
                               'text': c.get('unnamed') or c.get('role') or ''})
                 kinds['unnamed'], originals['unnamed'] = 'unnamed', items[-1]['text']
+        if kind == 'scene' and unit['first']:
+            sid = unit['of']
+            node = (self.story.get('nodes') or {}).get(sid[2:] if sid.startswith('S_') else sid) or {}
+            items.append({'id': 'recap', 'what': "the journal entry for this scene: what it put before the player, as "
+                          "they will remember it afterwards (who was there, what pressed), one or two sentences, past "
+                          "tense, second person; never what they chose, which the journal lists on its own",
+                          'text': node.get('summary') or self.pkg['scenes'][sid].get('title') or ''})
+            kinds['recap'], originals['recap'] = 'recap', items[-1]['text']
         ids = [x['id'] for x in items]
         earlier = ' ' + ' '.join(self.read_so_far) + ' ' if kind == 'scene' else ''
 
@@ -357,6 +366,8 @@ class ProseWriter:
                     if not 2 <= len(words(t)) <= 10 or CODE.search(t):
                         soft.append(f"unnamed: '{t}' should be a short phrase, three to eight words, no name or code")
                     continue
+                if k == 'recap' and not 8 <= len(words(t)) <= 70:
+                    soft.append(f'recap: {len(words(t))} words; one or two sentences')
                 if ALTERNATIVES.search(t):
                     soft.append(f'{i}: narrates alternatives ("{ALTERNATIVES.search(t).group(0)}"); say what happens')
                 if MECHANICS.search(t):
@@ -397,6 +408,8 @@ class ProseWriter:
             set_at(self.pkg, path, texts[f't{i + 1}'])
         if 'unnamed' in texts:
             self.chars[unit['of']]['unnamed'] = texts['unnamed']
+        if 'recap' in texts:
+            self.pkg['scenes'][unit['of']]['recap'] = [{'text': texts['recap']}]
         self.spent += [x for x in answer.get('images_used') or [] if x not in self.spent]
         self.read_so_far += [' '.join(words(CODE.sub(' ', texts[f't{i + 1}']))) for i in range(len(paths))]
         if kind == 'scene' and unit['first']:
