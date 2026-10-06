@@ -143,6 +143,16 @@ Lazlo says about the loan depends on his nerve). A topic may have effects
 (asking moves a state, sets a flag). Where a character is depends on the
 scene (§4.4), not on the character.
 
+**Names by what you know (2026-10-05).** Text names a person by code,
+`{lazlo}`, and the engine renders it when the view is built: the name once
+the player knows it, before that the character's `unnamed` label ("the old
+man in the oilskin"; `unnamed_short`, "the old man", in menus and lists),
+capitalised where it opens a sentence. The effect `{"introduce": "lazlo"}`
+teaches the name, the state keeps an `introduced` set, and `known('lazlo')`
+reads it. A character with no `unnamed` label, or `known: true` (a
+brother-in-law), is known from the start, so a package without labels
+plays as before. The validator rejects a code that names no character.
+
 ### 4.4 Scenes
 
 ```json

@@ -190,6 +190,7 @@ class Normalizer:
         self.all_scoped = set().union(*self.scoped.values()) if self.scoped else set()
         self.live_flags = behavioural_flags(story)
         self.objects, self.inert = relevant_objects(story), inert_interactions(story)
+        self.uses_known = 'known(' in json.dumps(story.data)    # names change only text unless a condition asks
 
     def __call__(self, st):
         st.turns = min(st.turns, self.caps['turns'])
@@ -221,6 +222,8 @@ class Normalizer:
         d['used'] = sorted(set(d['used']) - self.inert)
         if not self.uses_visited:
             d['visited'] = []
+        if not self.uses_known:
+            d['introduced'] = []
         return json.dumps(d, sort_keys=True)
 
 

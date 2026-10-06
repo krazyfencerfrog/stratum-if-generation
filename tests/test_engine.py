@@ -369,6 +369,42 @@ def menu_marks_what_is_new_groups_topics_and_rooms_go_brief():
 
 
 @test
+def names_show_only_once_the_player_knows_them():
+    data = demo_data()
+    lazlo = data['world']['characters']['lazlo']
+    lazlo.update(unnamed='the old man in the oilskin', unnamed_short='the old man')
+    lazlo['here'] = [{'text': '{lazlo} sits at the table. You nod to {lazlo}.'}]
+    lazlo['topics']['the_ledger']['effects'] = [{'introduce': 'lazlo'}]
+    lazlo['topics']['the_ledger']['says'] = [{'text': "'Brandt,' he says. 'Lazlo Brandt.'"}]
+    story = Story(data)
+    errors, _ = validate(story)
+    check(not errors, f'a package with unnamed people: {errors}')
+    eng = Engine(story)
+    eng.start(seed=1)
+    view = eng.act('go:cabin')
+    check(view['room']['text'].count('The old man in the oilskin sits at the table. You nod to the old man in the oilskin.') == 1,
+          f"text before the introduction: {view['room']['text']}")
+    talk = next(c for c in view['menu']['children'] if c['label'] == 'Talk')
+    check(talk['children'][0]['label'] == 'the old man', f"menu before the introduction: {talk['children'][0]['label']}")
+    check(not evaluate("known('lazlo')", eng.state), 'known before the introduction')
+    ledger = next(i for p, i in leaves(view['menu']) if i.endswith('the_ledger'))
+    view = eng.act(ledger)
+    check('Lazlo Brandt sits at the table. You nod to Lazlo Brandt.' in eng.describe()['text'], f"after: {eng.describe()['text']}")
+    talk = next(c for c in view['menu']['children'] if c['label'] == 'Talk')
+    check(talk['children'][0]['label'] == 'Lazlo Brandt' and evaluate("known('lazlo')", eng.state), 'menu after the introduction')
+    eng.rewind()
+    check(not evaluate("known('lazlo')", eng.state), 'rewind kept the introduction')
+    st = Engine(Story(demo_data()))
+    st.start(seed=1)
+    check(evaluate("known('lazlo')", st.state), 'a person with no unnamed label is known from the start')
+    bad = demo_data()
+    bad['world']['characters']['lazlo']['here'] = [{'text': '{nobody} waves.'}]
+    bad['world']['characters']['lazlo']['unnamed_short'] = 'x'
+    errors, _ = validate(Story(bad))
+    check(any('{nobody}' in e for e in errors) and any('unnamed_short without unnamed' in e for e in errors), f'validator: {errors}')
+
+
+@test
 def playtest_explores_the_demo():
     story = Story(demo_data())
     result = playtest.explore(story)

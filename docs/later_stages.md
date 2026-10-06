@@ -684,11 +684,14 @@ Text refers to a person by a code, `{C02}`, and the engine renders it:
 the character's `unnamed` label ("the old man in the captain's coat"; a
 short form, "the captain", for menus) until the player has been
 introduced, then the name ("Hugh"). Menus follow the same rule ("Talk ›
-the captain" becomes "Talk › Hugh"). An interaction can carry
-`introduces: [C02]`; the state keeps an `introduced` set (as it keeps
-`heard`); a character the protagonist already knows (a brother-in-law)
-starts introduced. The validator rejects a code that names no character
-and a person with no `unnamed` label. This replaces asking any prompt to
+the captain" becomes "Talk › Hugh"). The effect `{"introduce": "C02"}`
+(on an interaction, topic, event or moment option) teaches the name; the
+state keeps an `introduced` set (as it keeps `heard`), and `known('C02')`
+reads it. A character the protagonist already knows (a brother-in-law) is
+`known: true`; one with no `unnamed` label is known from the start too, so
+older packages play as before. The validator rejects a code that names no
+character. BUILT in the engine 2026-10-05 (engine_design.md §4.3); stages B
+and D do not write codes or labels yet. This replaces asking any prompt to
 track who the player knows, which a scene reached in several states
 would get wrong somewhere.
 
@@ -706,10 +709,11 @@ would get wrong somewhere.
 
 ### Building it (after the held-out results)
 
-1. Engine: `{Cxx}` rendering, `unnamed`, `introduces`, the `introduced`
-   set, the validator rules; stage B gives every person an `unnamed`
-   label and stage D marks introductions (the first talk, or the moment
-   the outline names them).
+1. Engine: `{Cxx}` rendering, `unnamed`, the `introduce` effect, the
+   `introduced` set, `known()`, the validator rules (BUILT 2026-10-05).
+   Then stage B gives every person an `unnamed` label and `known` where
+   the protagonist knows them, and stage D marks introductions (the first
+   talk, or the moment the outline names them).
 2. The style sheet call and its checks.
 3. The scene, character and location passes and their checks; the stub
    and tests for each.

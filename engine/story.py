@@ -8,6 +8,7 @@ reads is set somewhere, every scene and ending is reachable from the start.
 """
 
 import hashlib
+import re
 import json
 import random
 
@@ -20,7 +21,8 @@ CORE_VERBS = {
     'show': 'Show', 'use': 'Use', 'think': 'Think', 'wait': 'Wait', 'inventory': 'Inventory',
 }
 VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
-EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room')
+EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce')
+CODE = re.compile(r'\{([A-Za-z_]\w*)\}')     # a person in text: {C02}, rendered by what the player knows
 
 
 class StoryError(ValueError):
@@ -74,13 +76,41 @@ class Story:
         with open(path, encoding='utf-8') as f:
             return Story(json.load(f))
 
-    def name_of(self, thing):
+    def name_of(self, thing, state=None, short=True):
+        """A thing's name. A character with an `unnamed` label goes by it
+        (its short form in menus) until the player is introduced, when a
+        state is given."""
         if thing == 'you':
             return 'yourself'
+        if thing in self.characters and state is not None and not self.known(thing, state):
+            ch = self.characters[thing]
+            return (ch.get('unnamed_short') if short else None) or ch['unnamed']
         for table in (self.objects, self.characters, self.rooms):
             if thing in table:
                 return table[thing].get('name') or thing
         return thing
+
+    def known(self, cid, state):
+        """Whether the player knows this person's name: introduced in play,
+        marked known from the start, or never given an unnamed label."""
+        ch = self.characters.get(cid) or {}
+        return cid in state.introduced or bool(ch.get('known')) or not ch.get('unnamed')
+
+    def render(self, text, state):
+        """Text with each {Cxx} replaced by the name the player knows the
+        person by; an unnamed label opening a sentence is capitalised."""
+        if not text or '{' not in text:
+            return text
+
+        def one(m):
+            if m.group(1) not in self.characters:
+                return m.group(0)
+            name = self.name_of(m.group(1), state, short=False)
+            before = text[:m.start()].rstrip(' \'"‘“')
+            if not before or before[-1] in '.!?:—':
+                name = name[:1].upper() + name[1:]
+            return name
+        return CODE.sub(one, text)
 
     def verb_rank(self, verb):
         return VERB_ORDER.index(verb) if verb in VERB_ORDER else VERB_ORDER.index('wait') - 0.5
@@ -161,6 +191,21 @@ def validate(story):
                 errors.append(f"{where}: place to unknown location {eff.get('to')!r}")
             elif k == 'room' and v not in s.rooms:
                 errors.append(f'{where}: moves the player to unknown room {v!r}')
+            elif k == 'introduce' and v not in s.characters:
+                errors.append(f'{where}: introduces unknown character {v!r}')
+
+    # people in text are codes that name characters
+    def codes(x):
+        if isinstance(x, str):
+            yield from CODE.findall(x)
+        elif isinstance(x, dict):
+            for v in x.values():
+                yield from codes(v)
+        elif isinstance(x, list):
+            for v in x:
+                yield from codes(v)
+    for code in sorted(set(codes(s.data)) - set(s.characters)):
+        errors.append(f'text names {{{code}}}, which is not a character')
 
     # start
     if s.start.get('scene') not in s.scenes:
@@ -208,6 +253,11 @@ def validate(story):
         if oid in s.rooms or oid in s.characters:
             errors.append(f'object {oid}: id also used by a room or character')
     for cid, ch in s.characters.items():
+        for key in ('unnamed', 'unnamed_short'):
+            if key in ch and not (isinstance(ch[key], str) and ch[key].strip()):
+                errors.append(f'character {cid}: {key} must be a non-empty string')
+        if 'unnamed_short' in ch and 'unnamed' not in ch:
+            errors.append(f'character {cid}: unnamed_short without unnamed')
         check_variants(f'character {cid} description', ch.get('description'))
         check_variants(f'character {cid} here', ch.get('here'))
         if not ch.get('description'):

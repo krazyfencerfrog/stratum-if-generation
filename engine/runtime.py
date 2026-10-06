@@ -58,6 +58,7 @@ class Engine:
         self.state = st
         st.flags = dict(s.data.get('initial_flags') or {})
         st.stats = dict(s.data.get('initial_stats') or {})
+        st.introduced = {cid for cid, ch in s.characters.items() if ch.get('known') or not ch.get('unnamed')}
         for name in s.states:
             st.arcs[name] = {'up': 0, 'down': 0}
         st.locations = {oid: o.get('location') for oid, o in s.objects.items()}
@@ -117,8 +118,8 @@ class Engine:
         def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None,
                 group=None):
             into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail,
-                         'object_label': obj_label or (s.name_of(obj) if obj else None),
-                         'detail_label': detail_label or (s.name_of(detail) if detail else None),
+                         'object_label': s.render(obj_label, st) or (s.name_of(obj, st) if obj else None),
+                         'detail_label': s.render(detail_label, st) or (s.name_of(detail, st) if detail else None),
                          'source': source, 'weight': weight, 'group': group,
                          'new': verb in NEWS and oid not in st.heard})
 
@@ -307,7 +308,7 @@ class Engine:
             thing = opt['object']
             table = s.objects if thing in s.objects else s.characters
             self.queue.append(pick_text(table[thing].get('description'), st, thing)
-                              or f'Nothing about {s.name_of(thing)} stands out.')
+                              or f'Nothing about {s.name_of(thing, st, short=False)} stands out.')
         elif opt['verb'] == 'take':
             obj = s.objects[opt['object']]
             st.locations[opt['object']] = 'player'
@@ -362,6 +363,8 @@ class Engine:
             elif 'room' in eff:
                 st.room = eff['room']
                 st.visited.add(st.room)
+            elif 'introduce' in eff:
+                st.introduced.add(eff['introduce'])
 
     def _fire_events(self):
         st = self.state
@@ -519,20 +522,20 @@ class Engine:
         layers += post
         for cid in self.present():
             ch = s.characters[cid]
-            here = pick_text(ch.get('here'), st, cid) or f"{ch.get('name', cid)} is here."
+            here = pick_text(ch.get('here'), st, cid) or f"{{{cid}}} is here."
             layers.append(here)
         listed = [s.name_of(o) for o in self.visible_objects()
                   if st.locations.get(o) == st.room and s.objects[o].get('listed', s.objects[o].get('portable', False))]
         if listed:
             layers.append(f'You can see {_join(listed)}.')
-        return {'name': room.get('name', st.room), 'text': ' '.join(x for x in layers if x)}
+        return {'name': room.get('name', st.room), 'text': s.render(' '.join(x for x in layers if x), st)}
 
     def view(self, show_room=True, full=False):
         st = self.state
-        out = {'text': [t for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
+        out = {'text': [self.story.render(t, st) for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
                'ending': st.ending, 'room': None, 'menu': None}
         if st.ending:
-            out['ending_title'] = self.story.endings[st.ending].get('title')
+            out['ending_title'] = self.story.render(self.story.endings[st.ending].get('title'), st)
             return out
         out['room'] = self.describe(full) if show_room else None
         out['menu'] = self.menu()
