@@ -407,6 +407,27 @@ def the_judge_reports_checked_facts():
 
 
 @test
+def compare_counts_a_win_only_both_ways_round():
+    run('cmpa', args=['--max-iterations=3'])
+    run('cmpb', args=['--max-iterations=1'])
+    e = dict(os.environ, STRATUM_CLIENT='stub')
+    proc = subprocess.run([sys.executable, 'compare.py', f'{PREFIX}cmpa', f'{PREFIX}cmpb'], cwd=GEN, env=e,
+                          capture_output=True, text=True)
+    check(proc.returncode == 0, f'compare.py failed: {proc.stderr[-800:]}')
+    saved = glob.glob(os.path.join(story_dir('cmpa'), f'{PREFIX}cmpa_compare_*.json'))
+    check(len(saved) == 1, f'compare result not saved: {saved}')
+    v = json.load(open(saved[0]))['verdicts']
+    # the stub favours outline 1 on cost and play (a position bias): split; picture goes to the longer both ways
+    check(v['cost'] == 'split' and v['play'] == 'split' and v['setups'] == 'same' and v['picture'] == 'A', f'verdicts: {v}')
+    # against a human reference, main lines only
+    proc = subprocess.run([sys.executable, 'compare.py', f'{PREFIX}cmpa', 'ref:ref_canterville', '--main-line'], cwd=GEN,
+                          env=e, capture_output=True, text=True)
+    check(proc.returncode == 0 and 'main lines' in proc.stdout, f'compare against a reference: {proc.stderr[-800:]}')
+    stats = json.load(open(os.path.join(story_dir('cmpa'), f'{PREFIX}cmpa_run_stats.json')))
+    used_prompts.update(c['prompt_file'] for c in stats.get('calls', []) if c.get('prompt_file'))
+
+
+@test
 def judge_mode_seeds_one_line_at_a_time():
     run('judge', args=['--branching=judge'], env={'STUB_STOP_AFTER': '3'})
     story = assert_story_ok('judge', min_lines=3)

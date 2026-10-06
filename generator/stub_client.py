@@ -171,6 +171,7 @@ class StubClient(LlmClient):
             ('You are step 4d', 's4d'),
             ('You are step 4p', 's4p'),
             ('You are step 4e', 's4e'),
+            ('You are step 4f', 's4f'),
             ('You are step 5a0', 's5a0'),
             ('You are step 5a1', 's5a1'),
             ('You are step 5a2', 's5a2'),
@@ -788,6 +789,18 @@ class StubClient(LlmClient):
         if m:
             out["announced"] = [{"node": m.group(1), "quote": m.group(2)}]
         return out
+
+    def p_s4f(self, p):
+        """A reader with a position bias: outline 1 wins cost and play
+        whichever it is; picture goes to the longer outline (the same either
+        way round); setups are the same."""
+        text = p.split('- OUTLINE 1', 1)[-1]
+        one, two = text.split('- OUTLINE 2', 1)
+        longer = '1' if len(one) >= len(two) else '2'
+        first_words = lambda t: ' '.join(re.findall(r'^- \w+ \([^)]*\) [^:]*: (.+)$', t, re.M)[0].split()[:5])
+        pick = lambda w: {"winner": w, "why": "stub", "quote": "" if w == 'same' else first_words(one if w == '1' else two)}
+        return {"cost": pick('1'), "setups": pick('same'), "opposition": pick('1'), "turn": pick('1'),
+                "picture": pick(longer), "play": pick('1')}
 
     # ------------------------------------------------------------------ stage A
 
