@@ -622,11 +622,99 @@ in 19 to 24 actions. What it taught:
 
 ## 6. Prose
 
-After D: the text the player reads, written into the package's text
-fields (room and character descriptions, what characters say, interaction
-text, scene openings, endings). D and B write short functional placeholders;
-the prose stage rewrites them in the story's voice, scene by scene, with
-the tone line and the cast's voices. Not designed further yet.
+After D: the text the player reads. Designed 2026-10-05 with the user.
+
+**What it is: an editing pass, not a writing pass.** Stages B and D already
+write real prose (the clean kernel35 package: 522 text fields, about 15,000
+words, much of it good: "the mooring line creaks like a man settling into
+his seat"). What it lacks is one voice and freedom from a handful of
+recurring faults, seen in that package:
+- narrating alternatives instead of an outcome ("If it slips, Emerson
+  sees a movable boat...; if it bites your palm, Hugh's correction
+  stands...");
+- names the player has not learned (the first opening calls the ghost
+  "Hugh Calloway");
+- endings that state the theme ("It has cost Emerson's trust and your
+  clean ownership") instead of showing it;
+- the same image opening scene after scene (rain on the canopy, five
+  times);
+- mechanical leftovers (an action labelled "let the cat" with no object);
+- each call's own register: nothing holds one voice across 30 calls.
+
+### Decisions (2026-10-05, with the user)
+
+- **Edit in place; the structure is frozen.** The prose stage rewrites
+  only text fields (descriptions, here-lines, says, interaction text,
+  openings, room text, events, nudges, endings and resolutions, the intro,
+  "you"). Python checks that every id, condition, effect and label key is
+  unchanged, so the package still validates and the playtest still holds;
+  a call that touches anything else is rejected.
+- **The voice is per story.** One call builds a STYLE SHEET from the
+  story's kernel, tone line, genre promises (3.4) and cast voices: tense
+  and person (second person, present unless the brief says otherwise),
+  register, sentence length and rhythm, each character's speech, the
+  story's recurring images (and which are spent), words to avoid, and the
+  tradition the story belongs to when one fits ("a comic English ghost
+  story"), as a target. It ends with a SAMPLE PARAGRAPH in that voice:
+  every prose call gets the sheet and the sample, because an example holds
+  a voice better than rules. No human step: the sheet is checked by Python
+  (fields present, the sample in the right tense and person, no mechanics
+  words, no names outside the cast) and by one cheap check call (does the
+  sample deliver the tone line and the promises?), with one repair round,
+  as the premise is.
+- **Length: soft targets, longer where it pays.** About 60 words for a
+  room, one to three sentences for an action's response, about 90 for a
+  scene opening, about 150 for an ending. Python flags only text far past
+  them (about twice); the sheet says where length earns its place
+  (revelations, big choices, the opening after a turn, endings). Never
+  terser than today.
+- **Order: scene by scene, in story order**, each call given a running
+  digest of what the player has already read (images used, lines spoken,
+  what each person has said they want), so later scenes call back instead
+  of repeating. Then one call per character (every state of a person in
+  one voice), then rooms and objects by location. About 20-25 calls,
+  2-2.5 hours per story on the local model.
+- **Written ahead of time, never live**: a local 27B model is too slow to
+  write each turn, and live text could not be playtested.
+- **Names are the engine's job** (below), not the prose's.
+
+### Names: the engine shows what you know
+
+Text refers to a person by a code, `{C02}`, and the engine renders it:
+the character's `unnamed` label ("the old man in the captain's coat"; a
+short form, "the captain", for menus) until the player has been
+introduced, then the name ("Hugh"). Menus follow the same rule ("Talk ›
+the captain" becomes "Talk › Hugh"). An interaction can carry
+`introduces: [C02]`; the state keeps an `introduced` set (as it keeps
+`heard`); a character the protagonist already knows (a brother-in-law)
+starts introduced. The validator rejects a code that names no character
+and a person with no `unnamed` label. This replaces asking any prompt to
+track who the player knows, which a scene reached in several states
+would get wrong somewhere.
+
+### Checks (Python, on every prose call)
+
+- structure unchanged (ids, conditions, effects, keys);
+- no narrated alternatives ("if ...; if ..." in one response);
+- endings and resolutions do not name the cost or the theme in abstract
+  words ("it has cost", "trust", "the price");
+- no phrase of four or more words repeated across scenes, and no opening
+  image the digest marks as spent;
+- no mechanics words (state, flag, option, menu, scene, node);
+- people written as codes, never as bare names;
+- lengths within twice the soft targets.
+
+### Building it (after the held-out results)
+
+1. Engine: `{Cxx}` rendering, `unnamed`, `introduces`, the `introduced`
+   set, the validator rules; stage B gives every person an `unnamed`
+   label and stage D marks introductions (the first talk, or the moment
+   the outline names them).
+2. The style sheet call and its checks.
+3. The scene, character and location passes and their checks; the stub
+   and tests for each.
+4. One live run on kernel35 and one held-out kernel, read against the
+   faults above.
 
 ## 7. What to build first
 
