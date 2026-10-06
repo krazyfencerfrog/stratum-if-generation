@@ -427,3 +427,37 @@ held-out jobs now produce an outline.
   story where a kernel that names a legal thing (water rights, a contract)
   turns its rules into paper mechanics.
 
+## Judge validation (2026-10-06, code c283ba3)
+
+The reading judge (4e, quoted facts) and the side-by-side comparison
+(4f, both orders) on the outlines above: our five reference outlines and
+the four held-out kernels, the human outlines, and ours against each human
+outline, main lines only.
+
+**The comparison sees what matters.** Over five stories and six questions
+(cost, setups, opposition, turn, picture, play) the human outline won 28
+of 30, every win holding with the outlines in both orders; 2 were splits
+and ours won none. Its reasons are the sheets' craft points: the son's
+death paid as the exact compensation (the Paw's turn), the bent poker (the
+Band's menace), the contract's terms broken at the crisis (the King), the
+woman who does not fade in Moscow (the Lady). One caution: the model knows
+these stories (it said Canterville "leans on Wilde's beats"), so fame may
+help the classics; the fair test is two pipeline outlines, which is what
+it is for.
+
+**The reading judge's facts discriminate weakly.**
+
+| fact | ours (5 refs + 4 held-out) | human (5) | useful? |
+|---|---|---|---|
+| loss kind | person in all 9 | person 3, feeling 2 | no: a branching outline has a person lost somewhere |
+| plants paid | 2-3 | 2-3 | no |
+| reversal | none found in any | none found in any | broken: it missed the Paw's and the King's, which 4f named |
+| announced | 1-4 (mean 1.9) | 0-2 (mean 0.8) | yes |
+| abstractions | 1-6 (mean 3.4) | 2-5 (mean 2.6) | some |
+
+Its best and worst notes stay good ("'takes his right to walk away' states
+the cost as a legal abstraction"). So: decisions between versions go to
+compare.py; the reading judge is a cheap diagnostic (announced craft and
+abstractions, plus its notes), not a measure of quality; its reversal
+question needs rework before anything reads it.
+
