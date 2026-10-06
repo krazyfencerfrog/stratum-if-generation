@@ -353,3 +353,48 @@ The judge's totals moved in both directions and still do not track these.
 A held-out check on four kernels never run or tuned on (6, 7, 36, 40) is
 queued in stratum-compare/heldout, with the Paw re-run.
 
+## Held-out check (2026-10-06, code f11c434)
+
+Four kernels never run or tuned on (6 cozy, 7 pirates, 36 lodge horror, 40
+frontier), with the prompt examples taken from no test kernel, plus the
+Monkey's Paw re-run on the neutral rules example.
+
+**Robustness: two of five finished.** The Paw and kernel40 halted at the
+premise: the audit found something new each round ("wish-chances is an
+abstract count", "the setup is used in the turn it is planted") and any
+finding left after two repairs stopped the run; the craft checks added on
+2026-10-05 made the checklist longer, so the halts became more frequent
+(three of the last eight premises, with the King's). kernel7 failed in the
+outline on a Python bug: the quartermaster, already in the cast, was named
+as the voice of a new crowd and the check ignored it. Both fixed (6845e7a):
+craft notes left after the last repair are kept, not a halt (a premise
+that contradicts the Kernel or the brief still halts); a known individual
+can take on a crowd's voice. The three are not yet re-run.
+
+**Quality where it finished: the craft generalises.**
+
+| kernel | judge | price paid | setups paid on main | rules with terms | paperwork |
+|---|---|---|---|---|---|
+| 6, cozy bakery | 26 | yes | 1 of 1 | 3 | 0.00 |
+| 36, lodge horror | 22 | yes | 2 of 2 | 3 | 0.11 |
+
+- kernel6: the price is scaled to the genre (the last of the season's
+  singing flour goes to the village; the oven is quiet till spring), the
+  rules are exact and charming (the flour rises only if you hum the last
+  note; open the oven mid-lullaby and the batch cools), the notched rolling
+  pin is planted and paid. One abstract node ("the Quiet Supper's rule
+  stays open").
+- kernel36: the strongest outline the pipeline has made. Exact rules (it
+  speaks only in voices it has taken, slightly wrong in rhythm; it cannot
+  cross unless a living hand opens a door), a death that costs (the
+  injured friend dies, and at dawn his voice answers from the tree line),
+  and both setups land (a joke New Year's voice memo returns as a frozen
+  phone recording a living friend; the "self-locking" door turns by
+  itself). The judge scored it 22, under the cozy story: more evidence its
+  totals do not track this. The cast is four friends where the Kernel
+  says six.
+
+So far the price, setups and rules hold on stories nothing was tuned for;
+the open question is how often a run finishes, which the fixes address and
+a re-run of the three will show.
+
