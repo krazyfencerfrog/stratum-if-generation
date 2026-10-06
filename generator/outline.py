@@ -1164,9 +1164,13 @@ class OutlineBuilder:
             parsed['new_characters'] = new_chars
             trial = dict(self.characters)
             for i, c in enumerate(new_chars):
-                if not self.match(c['label'], trial, 'label'):
+                have = self.match(c['label'], trial, 'label')
+                if not have:
                     trial[f'new{i}'] = {'label': c['label'], 'speaks_for': c.get('speaks_for'),
                                         'kind': 'crowd' if str(c.get('kind') or '').lower() == 'crowd' else 'individual'}
+                elif c.get('speaks_for') and not trial[have].get('speaks_for') and trial[have].get('kind') != 'crowd':
+                    # someone already in the register now speaks for a new crowd
+                    trial[have] = dict(trial[have], speaks_for=c['speaks_for'])
             problems = []
             for c in new_chars:
                 if str(c.get('kind') or '').lower() == 'crowd' and not self.representatives(c['label'], trial):
@@ -1234,7 +1238,11 @@ class OutlineBuilder:
         for c in fill.get('new_characters') or []:
             if norm(c.get('label')) in ('protagonist', 'the protagonist', 'you', 'yourself'):
                 continue        # "you" is not a character in the register
-            if not self.match(c['label'], self.characters, 'label'):
+            have = self.match(c['label'], self.characters, 'label')
+            if have and c.get('speaks_for') and not self.characters[have].get('speaks_for') \
+                    and self.characters[have].get('kind') != 'crowd':
+                self.characters[have]['speaks_for'] = c['speaks_for']
+            if not have:
                 cid = self.add_character(c, source=line['id'])
                 seed = {'role': c['label'], 'kind': self.characters[cid]['kind'], 'gender': c.get('gender'),
                         'wants': c.get('wants')}

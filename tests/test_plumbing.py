@@ -243,10 +243,22 @@ def hidden_truth_and_cast_edges():
 
 @test
 def premise_halt():
-    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '1'}, expect=2)
+    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '2'}, expect=2)
     check('PIPELINE HALTED' in out, 'no halt message')
     check(load('halt', 's3_5_loop.json')['still_failing'], 'loop.json should record the standing finding')
     check(not os.path.exists(os.path.join(story_dir('halt'), f'{PREFIX}halt_story.json')), 'the outline ran on a failed premise')
+    # a craft note the audit still has after the last repair is kept, not a halt (held-out check, 2026-10-06:
+    # the audit found something new each round and halted two of five kernels on notes)
+    run('craftnote', env={'STUB_PREMISE_ALWAYS_HARD': '1'})
+    loop = load('craftnote', 's3_5_loop.json')
+    check(not loop['still_failing'] and loop['accepted_with'] and loop['accepted_with'][0]['source'] == 'engine check',
+          f'a craft note should be kept and the run go on: {loop.get("accepted_with")}')
+    # a run saved before this rule, halted on craft notes only, replays as accepted
+    loop['still_failing'] = True
+    del loop['accepted_with']
+    with open(os.path.join(story_dir('craftnote'), f'{PREFIX}craftnote_s3_5_loop.json'), 'w') as f:
+        json.dump(loop, f)
+    run('craftnote')
 
 
 @test
@@ -353,6 +365,13 @@ def rejoin_new_cast_and_nothing():
     check(any(story['characters'][c]['label'] == 'the drone technician' for c in crowd_node['who']), 'a crowd was left without its voice')
     check(any('without a voice' in w for w in story['warnings']), 'the auto-added representative was not reported')
     check('the drone dock' in {l['name'] for l in story['locations'].values()}, 'the new location was not registered')
+    # the crowd's voice is someone already in the cast (kernel7: the quartermaster for the crew)
+    run('voice', args=['--max-iterations=2'], env={'STUB_NEW_CAST_ON': '2', 'STUB_KNOWN_SPEAKER': '1'})
+    story = assert_story_ok('voice', min_lines=2)
+    crew = next(cid for cid, c in story['characters'].items() if c['label'] == 'the dock crew')
+    check(any(c.get('speaks_for') and c.get('kind') != 'crowd' and c['speaks_for'] == 'the dock crew'
+              for c in story['characters'].values()), 'a known character did not take on the crowd\'s voice')
+    check(crew, 'the crowd was not registered')
 
 
 @test

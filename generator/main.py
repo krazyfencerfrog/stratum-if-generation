@@ -97,6 +97,7 @@ BUDGET_RULE = ('weighted constraint_share (explicit 1.0, strong_inference 0.5) '
 
 DEFAULT_RATING = 'UNRATED'
 DEFAULT_MAX_REPAIRS = 2
+SOFT_PREMISE_FINDINGS = ('engine check',)   # craft notes from the audit: kept, never a halt, after the last repair
 
 PLACEHOLDER_RE = re.compile(r'\$\$[A-Z0-9_]+\$\$')
 
@@ -1301,7 +1302,8 @@ class StoryGenerator:
         accepted = self.load_story_file('s3_5_premise_accepted.json')
         if loop_record and accepted:
             record = json.loads(loop_record)
-            if record.get('still_failing'):
+            last = (record.get('rounds') or [{}])[-1].get('findings') or []
+            if record.get('still_failing') and any(f.get('source') not in SOFT_PREMISE_FINDINGS for f in last):
                 raise PipelineHalt(
                     f"s3_5 premise: the saved loop ended with findings still standing; inspect "
                     f"{self.story_file_path('s3_5_loop.json')}, then delete the s3_5* files to re-run the loop.")
@@ -1354,17 +1356,23 @@ class StoryGenerator:
 
         self.analysis['s3_5_premise'] = premise
         self.save_story_json('s3_5_premise_accepted.json', premise)
+        # the audit finds something new each round; craft notes it still has
+        # after the last are kept as notes, while a premise that contradicts
+        # the Kernel or the brief, or fails a computed check, stops the run
+        hard = [f for f in findings if f.get('source') not in SOFT_PREMISE_FINDINGS]
         self.save_story_json('s3_5_loop.json', {
             'accepted_source': rounds[-1]['source'],
             'accepted_copy': 's3_5_premise_accepted.json',
             'repair_rounds_used': n,
             'max_repairs': self.max_repairs,
-            'still_failing': bool(findings),
+            'still_failing': bool(hard),
+            'accepted_with': [f for f in findings if f not in hard],
             'rounds': rounds,
         })
-        if findings:
+        if hard:
             raise PipelineHalt(
-                f"s3_5 premise: {len(findings)} finding(s) still stand after {n} repair round(s). Inspect "
+                f"s3_5 premise: {len(hard)} finding(s) against the Kernel, the brief or a computed check still stand "
+                f"after {n} repair round(s). Inspect "
                 f"{self.story_file_path('s3_5_loop.json')}, fix the prompt or the material, then delete the "
                 f"s3_5* files to re-run the loop."
             )

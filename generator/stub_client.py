@@ -22,7 +22,8 @@ Scenario knobs (environment variables):
 
     STUB_PREMISE_HARD_ROUNDS=1   3.5b invents a score the engine lacks and
                                  3.5v reports it this many times (tests 3.5r)
-    STUB_PREMISE_ALWAYS_HARD=1   3.5v never comes back clean (tests the halt)
+    STUB_PREMISE_ALWAYS_HARD=1   3.5v always finds a craft note (E1): kept, the run goes on;
+                                 =2 it always finds a brief constraint broken (tests the halt)
     STUB_REPAIR_BREAKS=1         3.5r's first answer also rewrites a turn as a
                                  menu pick under an unknown form (tests the
                                  repair validator); =2 its retry does too
@@ -53,6 +54,9 @@ Scenario knobs (environment variables):
                                  (only when the call allows force_answer)
     STUB_NEW_CAST_ON=2           the line built on this iteration registers a
                                  new character, a new crowd and a new place
+    STUB_KNOWN_SPEAKER=1         with STUB_NEW_CAST_ON, the crowd's voice is someone
+                                 already in the cast, listed again with speaks_for
+                                 (kernel7's quartermaster for the crew)
     STUB_REJOIN_ON=3             the line built on this iteration rejoins the
                                  main line's ending node
     STUB_NOTHING_ON=4            4c reports nothing_worth_building on this
@@ -476,10 +480,12 @@ class StubClient(LlmClient):
         material = self.section(p, '--- THE PREMISE TO AUDIT ---') or {}
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
+        broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
         hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         return {
             "clauses": [{"n": int(n), "note": "stub: nothing incompatible", "contradiction": False, "quote": ""} for n in clauses],
-            "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": False, "quote": ""} for n in constraints],
+            "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and i == 0,
+                             "quote": "stub quote" if broken and i == 0 else ""} for i, n in enumerate(constraints)],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
                        for e in engine],
             "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "permitted": False}]
@@ -632,6 +638,10 @@ class StubClient(LlmClient):
             new_locations.append({"name": "the drone dock", "kind": "a work deck", "why": "where drones are launched"})
             nodes[0]['where'] = ["the drone dock"]
             nodes[0]['who'] = ["the dock crew"]     # a crowd alone: the driver adds its voice
+            free = [c['label'] for c in register.get('characters') or [] if c.get('kind') != 'crowd' and not c.get('speaks_for')]
+            if os.environ.get('STUB_KNOWN_SPEAKER') and free:
+                new_characters[0] = {"label": free[0], "kind": "individual", "speaks_for": "the dock crew",
+                                     "wants": "stub", "holds": "stub", "why": "stub: already here, speaks for the crew"}
         return {"nodes": nodes, "new_locations": new_locations, "new_characters": new_characters}
 
     def p_s4d(self, p):
