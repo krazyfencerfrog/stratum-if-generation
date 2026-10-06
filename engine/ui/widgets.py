@@ -7,6 +7,7 @@ from menukeys import KEYS
 from . import text as T
 from .layout import Rect
 
+MEASURE = 88                  # the widest the story is set, however wide the pane: lines past this are hard to read
 BOX = {'tl': '┌', 'tr': '┐', 'bl': '└', 'br': '┘', 'h': '─', 'v': '│'}
 JOURNAL_STYLES = {'title': 'heading', 'chapter': 'title', 'current': 'current', 'summary': 'normal', 'choice': 'choice',
                   'section': 'heading', 'item': 'normal', 'ending': 'mark'}
@@ -93,6 +94,8 @@ def story_lines(pages, cells):
 
 def story(surface, r, session):
     inner = box(surface, r, 'Story')
+    if inner.w > MEASURE:
+        inner = inner._replace(x=inner.x + (inner.w - MEASURE) // 2, w=MEASURE)
     lines, newest = story_lines(session.pages, inner.w)
     limit = max(0, len(lines) - inner.h)
     if session.fresh:                      # just acted: open at the start of what is new, if it does not all fit

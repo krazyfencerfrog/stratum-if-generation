@@ -61,6 +61,7 @@ class App:
             return self.running
         if key == 'resize':
             return self.running
+        s.note('')                          # a message lasts until the next key
         if s.overlay:
             self.overlay_key(key)
             return self.running
