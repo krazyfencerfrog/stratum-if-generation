@@ -129,8 +129,9 @@ def basic_run_and_resume():
     check(set(grid['rows']) == set(story['lines']), 'the grid does not have one row per line')
     check(all(c['mode'] == 'no_think' for c in calls('basic') if c['step'] in ('s2', 's3_5c', 's3_8')),
           'a classify-class call ran with thinking on')
-    check(all(c['mode'] == 'think' and c['klass'] == 'audit' for c in calls('basic') if c['step'] == 's3_5v'),
+    check(all(c['mode'] == 'think' and c['klass'] == 'audit' for c in calls('basic') if c['step'] in ('s3_5v', 's3_5k')),
           'the premise audit should run with thinking on, in the audit class')
+    check([c for c in calls('basic') if c['step'] == 's3_5k'], 'the Kernel-clause check did not run')
     check(all(c['mode'] == 'think' for c in calls('basic') if c['step'] in ('s3_5a', 's4a', 's4b', 's4c', 's4d')),
           'a build-class call ran with thinking off')
     n_calls = len(calls('basic'))
@@ -1198,7 +1199,11 @@ def steptest_scores_saved_cases():
         with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()) as out:
             steptest.main(['--cases', 'lady_clean,lady_regard_meter', '--tag', 't', '--out', tmp])
             summary = json.load(open(os.path.join(tmp, 't', 'summary.json')))
+            os.environ['STUB_PREMISE_ALWAYS_HARD'] = '3'
+            steptest.main(['--cases', 'lady_clean', '--tag', 'stray', '--out', tmp])
+            stray = json.load(open(os.path.join(tmp, 'stray', 'summary.json')))['results']['lady_clean'][0]['score']
     finally:
+        os.environ.pop('STUB_PREMISE_ALWAYS_HARD', None)
         if before is None:
             del os.environ['STRATUM_CLIENT']
         else:
@@ -1207,10 +1212,12 @@ def steptest_scores_saved_cases():
     check(all(e['held'] for e in res['lady_clean'][0]['score']), 'the stub audit raises nothing on the clean control')
     check(not res['lady_regard_meter'][0]['score'][0]['held'] and 'misses 1/1' in out.getvalue(),
           'a missed true positive is reported as a miss')
+    check([e for e in stray if e['where'] == '(any other clause)' and not e['held']],
+          'a Kernel contradiction no case expects is not counted as a false alarm')
     check(steptest.matches({'source': 'kernel clause', 'where': 'married man', 'quote': ''},
                            {'source': 'kernel clause', 'where': 'You are a married man near forty', 'quote': 'x'}),
           'an expectation matches by source and words')
-    for name in os.listdir(steptest.CASES):
+    for name in steptest.case_names():
         case = steptest.load_case(name)
         check(case['case']['expect'] and case['premise'].get('protagonist'), f'{name}: a case needs expectations and a premise')
 
@@ -1748,7 +1755,8 @@ def ollama_client_against_fake_server():
 
         # a stream that just stops is a transport failure carrying the fragment, not an answer
         try:
-            client.run_prompt(json.dumps({'thinking_bytes': 200, 'response': '{"a": 10', 'no_done': True}))
+            with contextlib.redirect_stderr(notes):
+                client.run_prompt(json.dumps({'thinking_bytes': 200, 'response': '{"a": 10', 'no_done': True}))
             check(False, 'a stream with no done object was accepted')
         except LlmCallError as e:
             check('ended before the call finished' in str(e) and e.response == '{"a": 10' and len(e.thinking) == 200, f'truncated stream: {e}')
@@ -1777,7 +1785,8 @@ def ollama_client_against_fake_server():
 
         dead = OllamaClient(host='http://127.0.0.1:9', model='fake', echo=False, idle_timeout=2, crash_wait=0)
         try:
-            dead.run_prompt('x')
+            with contextlib.redirect_stderr(notes):
+                dead.run_prompt('x')
             check(False, 'an unreachable server did not raise')
         except LlmCallError as e:
             check('could not reach ollama' in str(e), f'unexpected error: {e}')
@@ -1804,7 +1813,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5v', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)

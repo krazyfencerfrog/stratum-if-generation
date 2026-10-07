@@ -170,7 +170,7 @@ EVENT_WHEN = ('early', 'middle', 'late')
 
 # Files a story directory from before this schema would contain. Phase-3
 # outputs (and step 2's) have not changed shape and may be kept.
-STALE_FILE_RE = re.compile(r'_(s3_4_|s3_5_|s3_5v_|s3_5r\d|s3_6_|s3_7_|s3_75|s4a_|s4b_|s4c_|s4d_|s4p_|s4e_|s4_story)')
+STALE_FILE_RE = re.compile(r'_(s3_4_|s3_5_|s3_5v_|s3_5k_|s3_5r\d|s3_6_|s3_7_|s3_75|s4a_|s4b_|s4c_|s4d_|s4p_|s4e_|s4_story)')
 STAMP_FILE = 'pipeline.json'
 
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
@@ -1309,10 +1309,41 @@ class StoryGenerator:
                                                  f"ways_through is something to do that costs something, not a pole to select."))
         return items
 
+    def check_kernel_clauses(self, premise, round_no, clauses):
+        """3.5k: does the premise contradict a clause of the Kernel? Its own
+        call because it is the one audit finding that halts a run, and inside
+        the full audit (an answer of 5-7 KB, thinking cut at its limit every
+        time) it read "sent north with a party" as keeping "along the way you
+        gather a party" in 2 of 3 runs. Each clause's specifics are written
+        out (who, when, how many, what it rules out) beside the premise's
+        words on them before the verdict."""
+        def validate(parsed):
+            if not isinstance(parsed, dict) or not isinstance(parsed.get('clauses'), list):
+                raise ValueError('expected {"clauses": [...]}')
+            have = {str(e.get('n')).strip() for e in parsed['clauses'] if isinstance(e, dict)}
+            missing = [n for n, _ in clauses if str(n) not in have]
+            if missing:
+                raise ValueError(f'clauses has no entry for {missing}')
+
+        prefix = 's3_5k' + (f'_r{round_no}' if round_no else '')
+        answer = self.run_prompt(prefix, 'kernel_check', {
+            '$$CLAUSES$$': '\n'.join(f' {n}. {c}' for n, c in clauses),
+            '$$PREMISE_JSON$$': self.to_json(premise),
+            '$$KERNEL$$': self.kernel,
+        }, prompt_file='s3_5k_kernel_check.prompt', validator=validate, klass='audit',
+            schema=schemas.KERNEL_CHECK)
+        clause_text = {str(n): c for n, c in clauses}
+        premise_text = self.to_json(premise)
+        return [{'source': 'kernel clause', 'where': clause_text.get(str(e.get('n')), str(e.get('n'))),
+                 'problem': str(e.get('note') or 'the material contradicts this clause'), 'quote': str(e.get('quote') or ''),
+                 'verified': quote_in(e.get('quote'), premise_text)}
+                for e in answer.get('clauses') or [] if isinstance(e, dict) and as_bool(e.get('contradiction'))]
+
     def verify_premise(self, premise, round_no):
-        """Computed checks plus the 3.5v audit. Returns the normalized
-        finding list; an empty list is a clean verdict. The verdict is
-        computed from the model's per-item answers, not asked for."""
+        """Computed checks, the 3.5k Kernel check and the 3.5v audit.
+        Returns the normalized finding list; an empty list is a clean
+        verdict. The verdict is computed from the model's per-item answers,
+        not asked for."""
         brief = self.analysis.get('s3_brief')
         clauses = kernel_clauses(self.kernel)
         constraints = constraint_fields(brief)
@@ -1322,8 +1353,7 @@ class StoryGenerator:
             if not isinstance(parsed, dict):
                 raise ValueError('expected a JSON object')
             problems = []
-            for key, wanted, idkey in (('clauses', [n for n, _ in clauses], 'n'),
-                                       ('constraints', [n for n, _, _ in constraints], 'n'),
+            for key, wanted, idkey in (('constraints', [n for n, _, _ in constraints], 'n'),
                                        ('engine', [i for i, _ in checklist], 'id')):
                 got = parsed.get(key)
                 if not isinstance(got, list):
@@ -1343,7 +1373,6 @@ class StoryGenerator:
 
         prefix = 's3_5v' + (f'_r{round_no}' if round_no else '')
         answer = self.run_prompt(prefix, 'premise_check', {
-            '$$CLAUSES$$': '\n'.join(f' {n}. {c}' for n, c in clauses),
             '$$CONSTRAINTS$$': '\n'.join(f' {n}. {line}' for n, _, line in constraints) or ' (the brief has no constraint-class field)',
             '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {text}' for i, text in checklist),
             '$$FAILURE_MODEL$$': brief_lines(brief, only=('3-0c',)),
@@ -1352,15 +1381,9 @@ class StoryGenerator:
         }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='audit',
             schema=schemas.PREMISE_CHECK)
 
-        findings = self.premise_computed_findings(premise)
-        clause_text = {str(n): c for n, c in clauses}
+        findings = self.premise_computed_findings(premise) + self.check_kernel_clauses(premise, round_no, clauses)
         constraint_text = {str(n): (fid, line) for n, fid, line in constraints}
         check_text = {i: text for i, text in checklist}
-        for e in answer.get('clauses') or []:
-            if isinstance(e, dict) and as_bool(e.get('contradiction')):
-                findings.append({'source': 'kernel clause', 'where': clause_text.get(str(e.get('n')), str(e.get('n'))),
-                                 'problem': str(e.get('note') or 'the material contradicts this clause'),
-                                 'quote': str(e.get('quote') or '')})
         for e in answer.get('constraints') or []:
             if isinstance(e, dict) and as_bool(e.get('violated')):
                 fid, line = constraint_text.get(str(e.get('n')), (str(e.get('n')), ''))
@@ -1395,6 +1418,7 @@ class StoryGenerator:
         """Build (3.5a/b/c) -> verify (computed + 3.5v) -> repair (3.5r)
         while findings stand, up to --max-repairs rounds. Files:
           s3_5_premise.json            the build as assembled
+          s3_5k[_r<n>]_kernel_check    the Kernel-clause answers per round
           s3_5v[_r<n>]_premise_check   the audit's answers per round
           s3_5r<n>_premise_repair      {"repair_log", "revised": changed sections}
           s3_5_premise_accepted.json   what downstream reads

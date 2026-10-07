@@ -1,0 +1,239 @@
+{
+ "enrichment_budget": {
+  "level": "minimal"
+ },
+ "protagonist": {
+  "who": "You are the living owner of a decrepit canal boat, the person who inherited it and has a sale to finish before the lock water changes.",
+  "wants": "to get the boat under way to the next wharf and sell it before the brother-in-law's money runs out.",
+  "can_do": "talk to the ghost, your niece and the brother-in-law, handle the mooring lines, the throttle, the sale papers, and the brother-in-law's wallet, and choose which of the ghost's terms to pay, obey, or dodge.",
+  "cannot_do": "make the ghost stop being captain by inheritance, force the brother-in-law to stop checking his watch and demanding money, or move the boat while the ghost is at the helm or the lock chain is in his hand.",
+  "serves": "3-0b.protagonist_identity"
+ },
+ "arena": {
+  "description": "A decrepit canal boat moored at a lock gate, with a cabin, a wheel, a deck, and a porthole, the whole story's footprint.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The lock gate is slowly opening and the water level is changing, so the boat cannot stay where it is; the brother-in-law's buyer will only come to the next wharf, and his money is in a wallet that gets thinner every time the ghost demands a term.",
+  "clock_or_stock": "none tracked; the pressure is told through the lock water, the buyer's schedule, and the brother-in-law's dwindling wallet, because 3-0c names no failure trigger.",
+  "serves": "3-0c.failure_triggers"
+ },
+ "opposition": {
+  "who_or_what": "the ghost captain, a figure in period dress holding a logbook and a spyglass",
+  "wants": "to be acknowledged as master of the boat and to take it under his own terms to the next wharf, not sold as a scrap.",
+  "means": "he blocks the helm and the throttle, makes the boat groan, appears in the dark corners of the cabin, and manipulates the lock gate and the water level.",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "The cabin table sets itself for a dinner that is not there, with the ghost sitting at the head and the brother-in-law pacing nervously in the kitchen behind them.",
+   "when": "early",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "what": "The ghost stands at the prow, arms crossed, while the brother-in-law tries to explain that possession is nine-tenths of the law, and the boat groans like a dying whale.",
+   "when": "middle",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "what": "The mooring lines snap not with a thud but with a shriek, sending the boat lurching forward while the player clings to a porthole and the brother-in-law clings to his wallet.",
+   "when": "late",
+   "serves": "3e.timeline_structure"
+  }
+ ],
+ "hidden_truth": null,
+ "mediation": {
+  "question": "Does the boat move by the dead captain's terms, or by the living owner's claim?",
+  "to_reach_pole_a": {
+   "pole": "authority of the dead: let the ghost's captaincy command the boat",
+   "what_you_must_do": "satisfy the ghost's specific captain's term: pour a cup of strong tea into the lock chain and sign the captain's logbook in the dead man's hand, using the ghost's own pen, while the brother-in-law pays the departure tithe from his wallet.",
+   "cost": "the brother-in-law's money and safety, and your own ownership, because you become a steward under the ghost's command instead of the master of the boat."
+  },
+  "to_reach_pole_b": {
+   "pole": "agency of the living: assert ownership and sell the boat",
+   "what_you_must_do": "use the sale contract, the boat's key, and the brother-in-law's wallet to prove ownership and force the boat under way without the ghost's approval, even if that means defying his terms at the helm or the lock gate.",
+   "cost": "the brother-in-law's safety and the ghost's anger, because the boat may move but under strain, and the sale may come out frightened and costly."
+  },
+  "levers": [
+   "the ghost's logbook",
+   "the ghost's spyglass",
+   "the helm and throttle",
+   "the mooring lines",
+   "the lock gate",
+   "the brother-in-law's wallet",
+   "the sale contract",
+   "the boat's key"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "turns": [
+  {
+   "id": 1,
+   "situation": "The cabin table sets itself for a dinner that is not there, the ghost captain sits at the head with his logbook and spyglass, and the brother-in-law paces behind the kitchen checking his pocket watch.",
+   "what_you_must_do": "find out what the ghost wants before the boat will move",
+   "ways_through": [
+    {
+     "way": "you learn the term from the ghost, because you sit at the foot of the table and let him pour you a cup of tea that is not there",
+     "cost": "the cabin smells of saltwater, and the brother-in-law’s pocket watch falls into a puddle that was not there"
+    },
+    {
+     "way": "you learn the term from the logbook, because you take the logbook from the ghost’s hand and read the last entry",
+     "cost": "the ghost makes the wheel turn a quarter turn by itself, and the brother-in-law’s wallet falls open on the deck"
+    }
+   ],
+   "involves": [
+    "the ghost captain",
+    "the brother-in-law"
+   ],
+   "form": "discover",
+   "set_piece": "the cabin table set for a dinner that is not there, the ghost at the head, the brother-in-law pacing nervously in the kitchen behind them",
+   "serves": "3c.secondary_thematic_axis"
+  },
+  {
+   "id": 2,
+   "situation": "The ghost stands at the prow, arms crossed, while the brother-in-law tries to explain that possession is nine-tenths of the law, and the boat groans like a dying whale.",
+   "what_you_must_do": "get the ghost to step back from the prow so the wheel can be reached",
+   "ways_through": [
+    {
+     "way": "the ghost steps back, because you read his logbook entry aloud and call him captain in the sale papers",
+     "cost": "the sale papers now say steward instead of owner, and the brother-in-law’s wallet is thinner by the departure tithe"
+    },
+    {
+     "way": "the ghost steps back, because you let the brother-in-law offer the boat’s key as a charter fee",
+     "cost": "the key is in the ghost’s pocket, and the brother-in-law’s phone is in the lock water"
+    }
+   ],
+   "involves": [
+    "the ghost captain",
+    "the brother-in-law"
+   ],
+   "form": "persuade",
+   "set_piece": "the ghost standing at the prow, arms crossed, while the brother-in-law explains possession is nine-tenths of the law and the boat groans like a dying whale",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "id": 3,
+   "situation": "The mooring lines snap not with a thud but with a shriek, sending the boat lurching forward while you cling to a porthole and the brother-in-law clings to his wallet.",
+   "what_you_must_do": "get the boat through the lock gate before the lock chain stops it",
+   "ways_through": [
+    {
+     "way": "the boat goes through, because you let the ghost take the helm and pay his tithe from the brother-in-law’s wallet",
+     "cost": "the brother-in-law’s wallet is empty, and the sale contract is in the ghost’s logbook"
+    },
+    {
+     "way": "the boat goes through, because you cut the remaining line and throw the boat’s key into the lock chain as the owner’s claim",
+     "cost": "the key is gone, and the brother-in-law is soaked to the waist"
+    }
+   ],
+   "involves": [
+    "the ghost captain",
+    "the brother-in-law"
+   ],
+   "form": "endure",
+   "set_piece": "the mooring lines snapping with a shriek, the boat lurching forward, the player clinging to a porthole and the brother-in-law clinging to his wallet",
+   "serves": "3e.timeline_structure"
+  },
+  {
+   "id": 4,
+   "situation": "The boat is at the next wharf, the buyer is waiting, and the ghost captain stands at the helm with his logbook while the brother-in-law holds the sale contract and his wallet.",
+   "what_you_must_do": "settle who owns the boat before the buyer signs",
+   "ways_through": [
+    {
+     "way": "the boat is sold as yours, because you sign the sale contract in your own hand and hand the buyer the key",
+     "cost": "the ghost’s logbook records you as steward, and the brother-in-law’s safety is gone with the buyer’s money"
+    },
+    {
+     "way": "the boat is sold under the ghost’s captaincy, because you sign the sale contract in the dead man’s hand and the brother-in-law pays the tithe",
+     "cost": "your ownership is gone, and the brother-in-law’s wallet is empty"
+    }
+   ],
+   "involves": [
+    "the ghost captain",
+    "the brother-in-law",
+    "the buyer"
+   ],
+   "form": "confront",
+   "set_piece": null,
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The brother-in-law’s sale contract has a clause that the sale is final only if the boat is under way, so his demand to sell now depends on answering the ghost’s refusal.",
+   "serves": "3-0a.secondary_decision_axes"
+  },
+  {
+   "description": "The logbook in the ghost’s hand is the boat’s title, and the last entry is the brother-in-law’s signature, which means he has already paid the ghost’s tithe from his wallet.",
+   "serves": "3c.core_thematic_axis"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the ghost captain",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to be acknowledged as the master of the boat and to take it to the next wharf under his own terms, not sold as scrap",
+   "holds": "the helm, the throttle, the logbook, and the power to make the boat groan or the water rise",
+   "edge": "insists on period-correct formality and nautical protocol even while manifesting in a decaying modern vessel",
+   "tie": "was the previous captain and holds the boat's allegiance by inheritance, viewing the protagonist as an uninvited steward",
+   "voice": "speaks in stiff, outdated nautical command, ignoring modern logic: 'The tea is cold. The logbook is wet. You are both embarrassing me.'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Lukas Brennan"
+  },
+  {
+   "role": "the brother-in-law",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to retrieve the money from the sale before the boat's supernatural state makes it unsellable or dangerous",
+   "holds": "the wallet, the sale contract, and the only living perspective on the protagonist's sanity",
+   "edge": "wants the money more than he wants to be safe, yet his practicality is constantly undermined by his terror of the ghost",
+   "tie": "came to help the protagonist sell the boat and owes them a debt of familial obligation he is actively trying to minimize",
+   "voice": "talks in escalating practical solutions and financial anxieties, using business jargon to deflect fear: 'If we can just get the signature, I can write off the... well, the haunting, as a loss.'",
+   "breaking_point": "runs for the shore the moment the ghost touches the throttle or the water level rises without warning",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Ari Petrov"
+  },
+  {
+   "role": "the buyer",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to purchase the boat at the agreed price without any complications that might lower the value or delay the transaction",
+   "holds": "the money for the sale and the legal title to the boat once the contract is signed",
+   "edge": "is willing to pay the price but is deeply skeptical of the protagonist's explanations for the boat's condition",
+   "tie": "is a stranger to the protagonist and the brother-in-law, bound only by the pending contract",
+   "voice": "speaks in calm, transactional reassurances that mask growing unease: 'A little creak is character. A lot of creak is structural. I'm just here to buy the creak.'",
+   "breaking_point": "walks away from the deal if the ghost makes a sound that cannot be explained as wind or water",
+   "opposition": false,
+   "matters_to_turns": [
+    4
+   ],
+   "name": "Malik Iyer"
+  },
+  {
+   "role": "your niece",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to keep the boat in the family",
+   "holds": "the only key to the engine hatch",
+   "edge": "she has lived aboard since spring and knows the ghost's moods",
+   "tie": "your late uncle's granddaughter, who came aboard with you",
+   "voice": "quick and dry: 'He only shouts when he's frightened, you know.'",
+   "breaking_point": null,
+   "opposition": false
+  }
+ ],
+ "name_pool": "modern"
+}

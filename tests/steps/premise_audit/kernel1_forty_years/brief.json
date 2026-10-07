@@ -1,0 +1,165 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "vent an inhabited sector's oxygen or preserve it and risk the core",
+      "description": "When the failing ship needs air for the core, choose whether to depressurize a specific occupied sector, sacrificing its residents, or keep it pressurized and gamble on an alternative.",
+      "binding": "constraint"
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint"
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint"
+    },
+    "3-0b.protagonist_identity": {
+      "type": "systemic_entity",
+      "role": "generational ship AI",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint"
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint"
+    },
+    "3-0c.failure_presence": {
+      "value": "soft",
+      "binding": "constraint"
+    },
+    "3-0c.failure_triggers": {
+      "types": [
+        "resource_depletion"
+      ],
+      "binding": "constraint"
+    },
+    "3-0c.failure_cost": {
+      "value": "narrative_setback",
+      "binding": "constraint"
+    },
+    "3-0c.failure_scope": {
+      "value": "pervasive",
+      "binding": "constraint"
+    },
+    "3b.primary_affect": {
+      "label": "dread",
+      "binding": "constraint"
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "constraint"
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "moral guilt"
+      ],
+      "binding": "constraint"
+    },
+    "3b.tone": {
+      "descriptors": [
+        "claustrophobic",
+        "tense",
+        "clinical"
+      ],
+      "binding": "constraint"
+    },
+    "3b.somatic_address": {
+      "level": 3,
+      "channels": [
+        "oxygen/life-support strain",
+        "sensor overload",
+        "hull/systemic strain"
+      ],
+      "binding": "constraint"
+    },
+    "3b.transgression": {
+      "ceiling": 5,
+      "floor": 2,
+      "binding": "constraint"
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "survival of the fittest",
+      "pole_b": "collective empathy",
+      "binding": "constraint"
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "transparent triage",
+        "concealed triage",
+        "population-wide rationing"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "hard-won collective survival",
+      "worst_case": "hollow utilitarian survival",
+      "binding": "constraint"
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "not_indicated",
+      "floor": "not_indicated",
+      "types": [],
+      "interactive": "not_applicable",
+      "binding": "default"
+    },
+    "3e.timeline_structure": {
+      "category": "single_moment",
+      "binding": "constraint"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "constraint"
+    },
+    "3f.setting_structure": {
+      "ceiling": "single",
+      "floor": "single",
+      "binding": "constraint"
+    },
+    "3f.setting_scale": {
+      "ceiling": "city_or_region",
+      "floor": "city_or_region",
+      "binding": "constraint"
+    },
+    "3g.target_ending_count": {
+      "min": 3,
+      "max": 5,
+      "binding": "constraint"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint"
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "oxygen/core resource levels",
+        "sector survival/pressure state"
+      ],
+      "binding": "constraint"
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "minimal"
+}

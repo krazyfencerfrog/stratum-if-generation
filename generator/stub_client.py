@@ -170,6 +170,7 @@ class StubClient(LlmClient):
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
             ('You are a fidelity auditor', 's3_5v'),
+            ('You are a Kernel fidelity checker', 's3_5k'),
             ('You are the repair step for the premise', 's3_5r'),
             ('craft-spine construction step', 's3_75'),
             ('repair step for the craft spine', 's3_75r'),
@@ -495,29 +496,33 @@ class StubClient(LlmClient):
                           "breaking_point": bp, "opposition": opp, "gender": "n" if kind == "crowd" else ("f" if "warden" in r else "m")})
         return {"notes": "stub", "cast_seeds": seeds}
 
+    def p_s3_5k(self, p):
+        clauses = self.listed(p, '--- KERNEL CLAUSES ---')
+        material = self.section(p, '--- THE PREMISE TO CHECK ---') or {}
+        clause = env_int('STUB_PREMISE_ALWAYS_HARD', 0) in (3, 4)
+        clause_quote = (str((material.get('arena') or {}).get('description') or '')
+                        if env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 3 else 'the lighthouse keeper rings the bell')
+        return {"clauses": [{"n": int(n), "requires": "stub: what the clause commits to", "premise_says": "",
+                             "note": "stub: the arena breaks it" if clause and n == clauses[0] else "stub: nothing incompatible",
+                             "contradiction": clause and n == clauses[0], "quote": clause_quote if clause and n == clauses[0] else ""}
+                            for n in clauses]}
+
     def p_s3_5v(self, p):
         self.premise_verifies += 1
-        clauses = self.listed(p, '--- LIST 1: KERNEL CLAUSES ---')
-        constraints = self.listed(p, '--- LIST 2: CONSTRAINTS ---')
-        engine = self.listed(p, '--- LIST 3: ENGINE CHECKS ---')
+        constraints = self.listed(p, '--- LIST 1: CONSTRAINTS ---')
+        engine = self.listed(p, '--- LIST 2: ENGINE CHECKS ---')
         material = self.section(p, '--- THE PREMISE TO AUDIT ---') or {}
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
         broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
-        clause = env_int('STUB_PREMISE_ALWAYS_HARD', 0) in (3, 4)
-        clause_quote = (str((material.get('arena') or {}).get('description') or '')
-                        if env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 3 else 'the lighthouse keeper rings the bell')
         loss = env_int('STUB_PREMISE_LOSS', 0)
         loss_quote = (str((material.get('price') or {}).get('what') or '') if loss == 2 else
                       str(((material.get('complications') or [{}])[-1] or {}).get('description') or ''))
         # =2 breaks a constraint read in the Kernel (an inferred one left standing is a note, not a halt)
-        block = self.body(p)[self.body(p).rfind('--- LIST 2: CONSTRAINTS ---'):]
+        block = self.body(p)[self.body(p).rfind('--- LIST 1: CONSTRAINTS ---'):]
         explicit = next((m.group(1) for m in re.finditer(r'^\s*(\d+)\.\s.*\[constraint\]', block, re.M)), None)
         hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         return {
-            "clauses": [{"n": int(n), "note": "stub: the arena breaks it" if clause and n == clauses[0] else "stub: nothing incompatible",
-                         "contradiction": clause and n == clauses[0], "quote": clause_quote if clause and n == clauses[0] else ""}
-                        for n in clauses],
             "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and n == explicit,
                              "quote": "stub quote" if broken and n == explicit else ""} for n in constraints],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}

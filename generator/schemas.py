@@ -108,8 +108,9 @@ CAST = obj(
                        breaking_point=STR_OR_NULL, opposition=B)),
 )
 
+KERNEL_CHECK = obj(clauses=arr(obj(n=I, requires=S, premise_says=S, note=S, contradiction=B, quote=S)))
+
 PREMISE_CHECK = obj(
-    clauses=arr(obj(n=I, note=S, contradiction=B, quote=S)),
     constraints=arr(obj(n=I, note=S, violated=B, quote=S)),
     engine=arr(obj(id=S, note=S, holds=B, quote=S)),
     mechanics=arr(obj(material=S, note=S, kind=enum(MECHANIC_KINDS))),
@@ -278,7 +279,7 @@ SCENE = obj(
 
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
-    'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
+    'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
     'LINE_NODES': LINE_NODES, 'NEXT_LINE': NEXT_LINE, 'BRANCH_PLAN': BRANCH_PLAN, 'DIVERGENCE': DIVERGENCE,
     'OUTLINE_JUDGE': OUTLINE_JUDGE, 'COMPARE': COMPARE, 'STYLE': STYLE, 'STYLE_CHECK': STYLE_CHECK,
     'PROSE_EDIT': PROSE_EDIT, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
