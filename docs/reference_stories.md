@@ -461,3 +461,31 @@ compare.py; the reading judge is a cheap diagnostic (announced craft and
 abstractions, plus its notes), not a measure of quality; its reversal
 question needs rework before anything reads it.
 
+
+## Paperwork across kernels (2026-10-07, code 395645b)
+
+The paper rule (`generator/paper.py`, f3d32e9) is one rule for every kernel: at most a quarter of a step's items on
+paper (two more when the Kernel itself names a document), counted at 3.5a, 3.5b, the premise audit and 4b. It was
+tested on three kernels besides the King, chosen because their kernels name no paper at all (the King's names a
+contract; a fix aimed at it would have been a kernel patch). Outlines only, each against its earlier run; kernel37
+(held-out, never run) from scratch. `stratum-compare/global1/` holds the runs and `paper_compare.py`.
+
+| story | paperwork share before | now | premise paper items before / now | the paper checks fired |
+|---|---|---|---|---|
+| the King (Kernel: "sign a contract") | 0.89 | 0.62 | 13/30 / 7/30 | 3.5b, 4b |
+| Lady with the Dog | 1.00 (letters, tickets) | 0.00 | 15/30 / 3/32 | never |
+| kernel40 (frontier town) | 0.80 (ledger, deed, contract) | 0.12 | 22/30 / 4/30 | 3.5a (rule terms), 3.5b, 4b |
+| kernel37 (heist, held out) | (first run) | 0.08 | - / 0/29 | never |
+| Kipling's own outline | 0.25 | | | |
+
+All four judge readings now find a person lost (three) or a bond (the King before), a reversal in the three new
+runs, the opposition at work, and two or three setups paid. kernel37 needed no premise repair and halted nowhere.
+
+What it shows: the pull toward paper is the model's (the Lady and kernel40 kernels name none, and their premises
+were half paper), and counting it where story material is written works without any kernel-specific instruction.
+Lady's drop came with the check never firing, so it belongs to everything since its earlier run (the shared
+definitions, the repaired examples), and one run each is one sample. Two things to watch: the King's remaining
+paper is the Kernel's own contract, used as a signing scene rather than as conduct (Kipling's contract is central
+too, but as terms broken by a body), and the rule counts words, so renamed paper ("the brand book", "the
+measurement book" in kernel40) passes it; if that grows, count what an item does (signed, filed, recorded) rather
+than what it is called.
