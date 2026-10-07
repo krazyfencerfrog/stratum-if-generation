@@ -814,6 +814,12 @@ def the_prose_pass_revises_text_and_keeps_structure():
             return [skeleton(v) for v in node]
         return node
     check(skeleton(before) == skeleton(after), 'the prose pass changed something other than text')
+    # a resumed run replays every saved edit (the validator reads back the form it saved)
+    os.remove(os.path.join(story_dir('prose'), f'{PREFIX}prose_package_prose.json'))
+    n_calls = len(calls('prose'))
+    run('prose', args=['--prose'], fresh=False, env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
+    check(load('prose', 'package_prose.json') == after and len(calls('prose')) == n_calls,
+          'a resumed prose pass did not replay its saved edits')
     texts = []
 
     def walk(node):

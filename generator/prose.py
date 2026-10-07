@@ -362,7 +362,11 @@ class ProseWriter:
         def validate(parsed):
             if not isinstance(parsed, dict):
                 raise ValueError('expected a JSON object')
-            got = {str(t.get('id')): str(t.get('text') or '').strip() for t in as_list(parsed.get('texts')) if isinstance(t, dict)}
+            texts = parsed.get('texts')
+            if isinstance(texts, dict):      # the form this validator saves, read back on a resumed run
+                got = {str(k): str(v or '').strip() for k, v in texts.items()}
+            else:
+                got = {str(t.get('id')): str(t.get('text') or '').strip() for t in as_list(texts) if isinstance(t, dict)}
             missing = [i for i in ids if not got.get(i)]
             if missing:
                 raise ValueError(f'texts missing or empty: {missing[:12]}; return every id you were given, revised')
