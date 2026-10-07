@@ -293,6 +293,13 @@ def contract_terms_are_conduct_not_paper():
 
 
 @test
+def theme_poles_have_no_order():
+    from brief import field_line
+    line = field_line('3c.core_thematic_axis', {'pole_a': 'ambition', 'pole_b': 'loyalty', 'binding': 'constraint'})
+    check(line == '3c.core_thematic_axis [constraint]: between ambition and loyalty (in either order)' and 'pole_a' not in line, line)
+
+
+@test
 def premise_price_is_not_a_loss():
     # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
     # not repaired again, and it ends as a note

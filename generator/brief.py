@@ -241,7 +241,11 @@ def field_line(field_id, entry):
     """One brief field as text: '3b.tone [constraint]: descriptors claustrophobic, tense'.
     A constraint phase 3 inferred rather than read is marked '[constraint, inferred]'."""
     entry = entry or {}
-    parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k not in ('binding', 'inferred')]
+    parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k not in ('binding', 'inferred', 'pole_a', 'pole_b')]
+    if 'pole_a' in entry and 'pole_b' in entry:
+        # the theme's two poles, unordered: written as pole_a/pole_b they collided with the premise's own
+        # mediation.to_reach_pole_a/b, and the audit reported the premise's order as a contradiction (2026-10-07)
+        parts.insert(0, f"between {_flat(entry['pole_a'])} and {_flat(entry['pole_b'])} (in either order)")
     binding = entry.get('binding', 'free') + (', inferred' if entry.get('inferred') else '')
     if binding == 'free':
         # phase 3 must put SOMETHING in a field the Kernel says nothing about;
