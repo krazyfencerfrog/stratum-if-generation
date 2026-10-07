@@ -809,6 +809,15 @@ def prose_names_known_people_and_codes_every_name():
     check(w.pkg['intro'][0]['text'] == '{C01} meets you; {C02} waits. {C02}, {C01} and Hughes are not codes.',
           f"codes: {w.pkg['intro'][0]['text']}")
     check(c['C02']['topics']['t']['label'] == 'about {C01}' and c['C02']['name'] == 'Hugh Calloway', 'labels coded, names kept')
+    # a being that keeps its role in the name field is not a name: "the cat" once made every "the" a code
+    pkg = {'intro': [{'text': 'The cat sleeps by the stove; the cat and Odile Marchetti wait.'}], 'scenes': {}, 'endings': {},
+           'protagonist': {}, 'world': {'rooms': {}, 'objects': {}, 'characters': {
+               'C01': {'name': 'the cat', 'role': 'the cat'}, 'C02': {'name': 'Odile Marchetti', 'role': 'the dancer'}}}}
+    w = prose.ProseWriter(None, pkg)
+    w.prepare_names()
+    w.convert_names()
+    check(w.pkg['intro'][0]['text'] == 'The cat sleeps by the stove; the cat and {C02} wait.' and
+          'unnamed' not in w.pkg['world']['characters']['C01'], f"a role is not a name: {w.pkg['intro'][0]['text']}")
 
 
 @test

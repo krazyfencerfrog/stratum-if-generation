@@ -42,6 +42,22 @@ ALTERNATIVES = re.compile(r"\bif\b[^.!?]*[;,]\s*(?:and |but |or )?if\b", re.I)
 ANNOUNCED = re.compile(r"\b(the cost (?:is|was)|it (?:has|had) cost|the price|pays? off)\b", re.I)
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')
 NAME_KEYS = ('text', 'label', 'detail_label', 'object_label', 'title')   # where a literal name becomes a code
+
+
+def proper_name(name):
+    """A name names.py gave a person, not a role kept in the name field
+    ("the cat"): no leading article, and some word capitalized. On
+    2026-10-06 "the cat" was taken for a first and last name and every
+    "the" in kernel35's package became the cat's code."""
+    words = str(name or '').split()
+    return bool(words) and words[0].lower() not in ('the', 'a', 'an', 'your') and any(w[:1].isupper() for w in words)
+
+
+def name_parts(name):
+    """The first and last word of a proper name, where each could stand
+    alone for the person: capitalized and longer than two letters."""
+    bits = str(name).split()
+    return [b for b in ((bits[0], bits[-1]) if len(bits) > 1 else ()) if b[:1].isupper() and len(b) > 2]
 REPEAT_N = 5                  # a run of this many words shared with an earlier part is a repeat
 
 GUIDANCE = {
@@ -126,7 +142,7 @@ class ProseWriter:
         role until introduced; a relative or a "your ..." is known."""
         from main import KIN
         for cid, c in self.chars.items():
-            if not c.get('name') or c.get('unnamed'):
+            if not proper_name(c.get('name')) or c.get('unnamed'):
                 continue
             role = str(c.get('role') or '').strip()
             if role.lower().startswith('your ') or KIN.search(role):
@@ -136,19 +152,15 @@ class ProseWriter:
     def convert_names(self):
         """Every literal name in text and labels becomes the person's code:
         the full name, and the first or last name where no one else shares it."""
-        named = {cid: c['name'] for cid, c in self.chars.items() if c.get('name')}
+        named = {cid: c['name'] for cid, c in self.chars.items() if proper_name(c.get('name'))}
         parts = {}
         for cid, name in named.items():
-            bits = name.split()
-            for b in (bits[0], bits[-1]) if len(bits) > 1 else ():
+            for b in name_parts(name):
                 parts.setdefault(b, set()).add(cid)
         forms = []
         for cid, name in named.items():
             forms.append((name, cid))
-            bits = name.split()
-            for b in (bits[0], bits[-1]) if len(bits) > 1 else ():
-                if len(parts[b]) == 1 and len(b) > 2:
-                    forms.append((b, cid))
+            forms += [(b, cid) for b in name_parts(name) if len(parts[b]) == 1]
         forms.sort(key=lambda f: -len(f[0]))
         if not forms:
             return
