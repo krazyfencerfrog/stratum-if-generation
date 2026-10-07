@@ -255,8 +255,9 @@ class OllamaClient(LlmClient):
             except LlmCallError as e:
                 if retry == self.crash_retries or not self.is_crash(e):
                     raise
-                print(f'\n[ollama failed: {str(e)[:300]}; retrying the call in {self.crash_wait} s '
-                      f'({retry + 1} of {self.crash_retries})]', flush=True)
+                if self.echo:
+                    print(f'\n[ollama failed: {str(e)[:300]}; retrying the call in {self.crash_wait} s '
+                          f'({retry + 1} of {self.crash_retries})]', flush=True)
                 print(f'NOTE: ollama failed ({str(e)[:200]}); retrying the call ({retry + 1} of {self.crash_retries}).',
                       file=sys.stderr)
                 time.sleep(self.crash_wait)
