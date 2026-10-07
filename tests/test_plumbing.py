@@ -1533,6 +1533,7 @@ class FakeOllama(BaseHTTPRequestHandler):
     raw_prompts = []
     disconnects = 0
     reject_think = False
+    crashes = 0
 
     def log_message(self, *a):
         pass
@@ -1595,8 +1596,16 @@ class FakeOllama(BaseHTTPRequestHandler):
         chunks += [{'response': response[i:i + 40]} for i in range(0, len(response), 40)]
         if d.get('raw_chunks'):
             chunks = [{'response': c} for c in d['raw_chunks']]
+        if FakeOllama.crashes:
+            # the model runner dies part way: the server reports it in the stream
+            FakeOllama.crashes -= 1
+            chunks = chunks[:2] + [{'error': 'an error was encountered while running the model: error: '
+                                             'Could not load "TensileLibrary_lazy_gfx1201.dat"'}]
         try:
             for c in chunks:
+                if 'error' in c:
+                    self.wfile.write((json.dumps(c) + '\n').encode())
+                    return
                 if d.get('delay'):
                     time.sleep(d['delay'])
                 self.wfile.write((json.dumps(dict(c, done=False)) + '\n').encode())
@@ -1617,7 +1626,7 @@ def ollama_client_against_fake_server():
     threading.Thread(target=server.serve_forever, daemon=True).start()
     host = f'http://127.0.0.1:{server.server_port}'
     try:
-        client = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, max_duration=30, options={'num_ctx': 32768})
+        client = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, max_duration=30, options={'num_ctx': 32768}, crash_wait=0)
         schema = {'type': 'object'}
 
         thinking, response = client.run_prompt(json.dumps({'thinking_bytes': 500, 'response': '{"a": 1}'}),
@@ -1710,7 +1719,7 @@ def ollama_client_against_fake_server():
 
         # a server that does not know the model as a thinking model: think:false is refused once,
         # then the soft switch is used and the parameter is never sent again
-        soft = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5)
+        soft = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, crash_wait=0)
         FakeOllama.reject_think = True
         with contextlib.redirect_stderr(notes):
             thinking, response = soft.run_prompt(json.dumps({'response': '{"a": 5}'}), think=False, format=schema)
@@ -1744,15 +1753,29 @@ def ollama_client_against_fake_server():
         except LlmCallError as e:
             check('ended before the call finished' in str(e) and e.response == '{"a": 10' and len(e.thinking) == 200, f'truncated stream: {e}')
 
+        # a crashed model runner costs a retry, not the call; one that keeps crashing is an error
+        with contextlib.redirect_stderr(notes):
+            FakeOllama.crashes = 1
+            thinking, response = client.run_prompt(json.dumps({'response': '{"a": 11}'}))
+            check(response == '{"a": 11}' and client.last_call.get('crash_retries') == 1, f'runner crash not retried: {client.last_call}')
+            FakeOllama.crashes = 3
+            try:
+                client.run_prompt(json.dumps({'response': '{"a": 12}'}))
+                check(False, 'a runner that keeps crashing was not reported')
+            except LlmCallError as e:
+                check('TensileLibrary' in str(e) and FakeOllama.crashes == 0, f'crash retries: {e}, {FakeOllama.crashes} left')
+            FakeOllama.crashes = 0
+        check('retrying the call' in notes.getvalue(), 'the crash retry was silent')
+
         # a 400 that is not about think or format is an error, and does not switch thinking off
-        other = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5)
+        other = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, crash_wait=0)
         try:
             other.run_prompt(json.dumps({'reject_all': True}), think=False)
             check(False, 'an unrelated 400 was swallowed')
         except LlmCallError:
             check(other.think_param is True, 'an unrelated 400 switched the think parameter off')
 
-        dead = OllamaClient(host='http://127.0.0.1:9', model='fake', echo=False, idle_timeout=2)
+        dead = OllamaClient(host='http://127.0.0.1:9', model='fake', echo=False, idle_timeout=2, crash_wait=0)
         try:
             dead.run_prompt('x')
             check(False, 'an unreachable server did not raise')

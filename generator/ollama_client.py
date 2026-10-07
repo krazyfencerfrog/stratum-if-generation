@@ -21,6 +21,13 @@ a thinking call once with thinking off). A transport failure raises
 LlmCallError, which carries whatever had streamed so far, so a call that
 dies mid-sentence still leaves its partial trace on disk.
 
+A failure that is the server's and not the request's (the model runner
+crashed, a ROCm library failed to load, the stream stopped, the server was
+restarting) is retried here first: crash_retries times, crash_wait seconds
+apart, the whole call from the start. Ollama starts a new runner on the next
+request, so one crash costs a minute, not the run. last_call then has
+crash_retries, the number of retries spent.
+
 think:   None sends nothing (the model's default), False sends think:false.
          A server that does not treat the model as a thinking model
          rejects that parameter (HTTP 400); the call is then repeated
@@ -80,6 +87,10 @@ CHATML_TEMPLATE = ("<|im_start|>user\n{prompt}<|im_end|>\n"
 FORCE_CLOSE = ("\n\nI have deliberated enough. I will stop here and write the final answer "
                "now, exactly in the requested output format.")
 FORCED_ANSWER_TOKENS = 6144
+# what a crashed or restarting server looks like from here (batch.py's
+# TRANSIENT list is the same idea one level up, for a whole job)
+CRASH_SIGNS = ('an error was encountered while running the model', 'tensilelibrary', 'runner process',
+               'ended before the call finished', 'failed mid-stream', 'could not reach ollama', 'idle timeout')
 
 
 class LoopDetector:
@@ -127,7 +138,8 @@ def _ollama_url(host, path):
 class OllamaClient(LlmClient):
     def __init__(self, host=DEFAULT_OLLAMA_HOST, model='my model', keep_alive='30m', idle_timeout=180,
                  max_duration=14400, echo=True, options=None, structured='no_think',
-                 no_think_suffix='/no_think', raw_template=CHATML_TEMPLATE, implicit_think=True):
+                 no_think_suffix='/no_think', raw_template=CHATML_TEMPLATE, implicit_think=True,
+                 crash_retries=2, crash_wait=30):
         self.host = host
         self.model = model
         self.keep_alive = keep_alive
@@ -156,6 +168,8 @@ class OllamaClient(LlmClient):
         # closes the block was all answer after all.
         self.implicit_think = implicit_think
         self._call_format = None
+        self.crash_retries = crash_retries
+        self.crash_wait = crash_wait
         self.last_call = {}
 
     # ------------------------------------------------------------------ request
@@ -229,7 +243,29 @@ class OllamaClient(LlmClient):
 
     # ------------------------------------------------------------------ stream
 
+    @staticmethod
+    def is_crash(e):
+        """A failure of the server rather than of this request."""
+        return (e.http_status is not None and e.http_status >= 500) or any(t in str(e).lower() for t in CRASH_SIGNS)
+
     def _stream(self, payload, limits):
+        for retry in range(self.crash_retries + 1):
+            try:
+                result = self._stream_once(payload, limits)
+            except LlmCallError as e:
+                if retry == self.crash_retries or not self.is_crash(e):
+                    raise
+                print(f'\n[ollama failed: {str(e)[:300]}; retrying the call in {self.crash_wait} s '
+                      f'({retry + 1} of {self.crash_retries})]', flush=True)
+                print(f'NOTE: ollama failed ({str(e)[:200]}); retrying the call ({retry + 1} of {self.crash_retries}).',
+                      file=sys.stderr)
+                time.sleep(self.crash_wait)
+                continue
+            if retry:
+                self.last_call['crash_retries'] = retry
+            return result
+
+    def _stream_once(self, payload, limits):
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             _ollama_url(self.host, "/api/generate"),

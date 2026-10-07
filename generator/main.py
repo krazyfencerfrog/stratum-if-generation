@@ -468,15 +468,17 @@ class StoryGenerator:
                 'output_tokens': info.get('output_tokens'),
                 'format_sent': info.get('format_sent'),
             })
+            if info.get('crash_retries'):
+                rec['crash_retries'] = info['crash_retries']
             if info.get('forced_answer'):
                 rec['forced_answer'] = True
                 rec['thinking_at_force'] = info.get('thinking_at_force')
             breaker = info.get('aborted') or ('num_predict' if info.get('done_reason') == 'length' else None)
 
             if call_error is not None:
-                # keep what streamed before the failure, then stop: a
-                # transport failure is not something a retry in this
-                # process is likely to fix
+                # keep what streamed before the failure, then stop: the
+                # client has already retried a crashed server, so what
+                # reaches here is not something another try will fix
                 self.save_story_file(f'{prefix}_raw_output_thinking_cut_{stamp}.txt', thinking)
                 self.save_story_file(f'{prefix}_raw_output_response_cut_{stamp}.txt', response)
                 rec['error'] = str(call_error)
