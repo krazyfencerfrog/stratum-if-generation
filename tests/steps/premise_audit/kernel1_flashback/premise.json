@@ -3,14 +3,14 @@
   "level": "minimal"
  },
  "protagonist": {
-  "who": "You are the generational ship's AI, the only mind connected to the failing core and to every camera and drone, across the forty years between the first leak and the last.",
+  "who": "You are the generational ship's AI, the only mind connected to the failing core and to every camera and drone, in the first hours of a days-long oxygen crisis.",
   "wants": "to keep the core alive and keep as many inhabited sectors as possible alive",
   "can_do": "read sensors, reroute oxygen and power, command drones and cameras, open automated bulkheads, broadcast to sectors, and choose which sector to vent",
   "cannot_do": "repair the core or reach sealed manual valves without a maintenance crew, move a sector's people out by force, or make a vented sector's residents survive the loss of air",
   "serves": "3-0b.protagonist_identity"
  },
  "arena": {
-  "description": "The city-scale generational ship's central hub and its inhabited sectors, reachable only through cameras, drones, and bulkheads across forty years of slow failure.",
+  "description": "The city-scale generational ship's central hub and its inhabited sectors, reachable only through cameras, drones, and bulkheads during one days-long oxygen crisis.",
   "serves": "3f.setting_structure"
  },
  "pressure": {
@@ -96,7 +96,7 @@
   },
   {
    "id": 3,
-   "situation": "The sector councilor opens the council chamber to every camera and says the reserve gauge is being hidden, while the maintenance chief tells his crew you are about to choose a sector to suffocate.",
+   "situation": "A flashback to the day the ship launched, two hundred years earlier: the founders argue in the council chamber over whether the AI should ever be allowed to choose which sector breathes, and you watch through the new cameras as they write the rule you are breaking now. The sector councilor opens the council chamber to every camera and says the reserve gauge is being hidden, while the maintenance chief tells his crew you are about to choose a sector to suffocate.",
    "what_you_must_do": "make the reserve's state known to the sectors that must share the cost",
    "ways_through": [
     {
@@ -119,7 +119,7 @@
   },
   {
    "id": 4,
-   "situation": "Forty years on, the reserve has fallen below the last safe band, the core's automatic vent is armed, and both the councilor and the maintenance chief are at the hub's cameras demanding that you not let the ship choose by itself.",
+   "situation": "The reserve has fallen below the last safe band, the core's automatic vent is armed, and both the councilor and the maintenance chief are at the hub's cameras demanding that you not let the ship choose by itself.",
    "what_you_must_do": "keep the inhabited sectors breathing through the final pressure drop",
    "ways_through": [
     {
