@@ -77,7 +77,8 @@ Scenario knobs (environment variables):
     STUB_FUNCTIONAL=1            5a0 makes every candidate functional (exercises
                                  stage B's functional batch)
     STUB_SHIFT=1                 with --stage-a, 5a1 proposes a pattern shift on
-                                 the first arc's state (tests the threshold math)
+                                 the first arc's state (tests the threshold math); =2 also
+                                 a line shift with no target (dropped after one retry)
     STUB_NO_TELLS=1              5a2's first answer for each line leaves its tells
                                  out (tests the informed retry)
     STUB_NO_EVENTS=1             3.5a names no events (a computed finding the
@@ -886,6 +887,10 @@ class StubClient(LlmClient):
         if env_int('STUB_SHIFT', 0) and arcs and main in lines and len(lines[main]['path']) >= 5:
             shifts.append({"state": arcs[0]['state']['name'], "direction": "down", "at": lines[main]['path'][-2],
                            "does": "resolution", "to": "", "why": "stub: if you broke your word every time"})
+        if env_int('STUB_SHIFT', 0) == 2 and shifts:
+            # a line shift with no target, as kernel40 wrote twice (2026-10-07)
+            shifts.append({"state": arcs[0]['state']['name'], "direction": "up", "at": lines[main]['path'][1],
+                           "does": "line", "why": "stub: if you kept your word every time"})
         main_path = lines.get(main, {}).get('path') or []
         return {"visibility_note": "stub: you notice", "state_visibility": "observed", "arcs": arcs,
                 "light_arcs": [{"who": c['who'], "starts": "stub", "moments": [{"node": main_path[0], "change": "stub"}],

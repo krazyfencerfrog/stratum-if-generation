@@ -736,6 +736,12 @@ def stage_a_expands_arcs():
     shifts = load('stageshift', 'arcs.json')['pattern_shifts']
     check(len(shifts) == 1 and shifts[0].get('when', '').startswith('pattern('), f'shift: {shifts}')
     check(shifts[0]['threshold']['random_rate'] < arcs.RANDOM_SHIFT_LIMIT, f"shift threshold: {shifts[0]['threshold']}")
+    # a line shift that names no target costs one retry and is dropped, never the run
+    run('stageshift2', args=['--stage-a'], env={'STUB_SHIFT': '2'})
+    shifts = load('stageshift2', 'arcs.json')['pattern_shifts']
+    check(len(shifts) == 1 and shifts[0]['does'] == 'resolution', f'the target-less line shift was kept: {shifts}')
+    check([f for f in os.listdir(story_dir('stageshift2')) if 's5a1' in f and 'rejected' in f],
+          'a target-less line shift was accepted without a retry')
     # missing tells are re-asked with the complaint
     run('stagetells', args=['--stage-a', '--max-iterations=1'], env={'STUB_NO_TELLS': '1'})
     rejected = [f for f in os.listdir(story_dir('stagetells')) if 's5a2' in f and 'rejected' in f]

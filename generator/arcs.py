@@ -417,12 +417,17 @@ class ArcBuilder:
                 problems.append(f"pattern shift does must be one of {SHIFT_DOES}")
             if sh.get('at') not in self.nodes:
                 problems.append(f"pattern shift at unknown node {sh.get('at')!r}")
+            # pattern shifts are optional: a line shift that goes nowhere costs one retry and is
+            # then dropped, never the run (kernel40 2026-10-07: "to" left out twice)
             if sh['does'] == 'line' and sh.get('to') not in self.nodes:
-                problems.append(f"a line shift must name the node it jumps to, not {sh.get('to')!r}")
-            if sh['does'] == 'line' and sh.get('to') in self.nodes and sh.get('at') in self.nodes:
+                soft.append(f"a line shift must name the node it jumps to, not {sh.get('to')!r} (it is dropped otherwise)")
+                sh['_drop'] = True
+            elif sh['does'] == 'line' and sh.get('at') in self.nodes:
                 if set(self.lines_through(sh['to'])) >= set(self.lines_through(sh['at'])):
-                    problems.append(f"line shift {sh['at']} -> {sh['to']}: every line through {sh['at']} already "
-                                    f"reaches {sh['to']}")
+                    soft.append(f"line shift {sh['at']} -> {sh['to']}: every line through {sh['at']} already "
+                                f"reaches {sh['to']} (it is dropped otherwise)")
+                    sh['_drop'] = True
+        parsed['pattern_shifts'] = [sh for sh in as_list(parsed.get('pattern_shifts')) if not sh.pop('_drop', False)]
         if problems:
             raise ValueError('; '.join(problems))
         if soft:
