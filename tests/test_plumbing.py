@@ -278,6 +278,21 @@ def premise_halt():
 
 
 @test
+def contract_terms_are_conduct_not_paper():
+    import main as gen_main
+    base = {'price': {'what': 'x', 'why_final': 'y'}, 'setups': [{'plant': 'a', 'payoff': 'b'}],
+            'opposition': {'shown_by': 'z'}}
+    paper = dict(base, rules=[{'thing': 'the contract', 'terms': 'the crown may be claimed only if both names are on the treaty'}])
+    conduct = dict(base, rules=[{'thing': 'the contract', 'terms': 'neither of us touches drink until we are crowned',
+                                 'if_broken': 'the one who drinks forfeits his half of the crown'}])
+    probs = gen_main.StoryGenerator.craft_problems(paper)
+    check(probs and probs[0][0] == 'rules[0]' and 'turn on paper' in probs[0][1], f'paper terms should be a craft problem: {probs}')
+    check(not gen_main.StoryGenerator.craft_problems(conduct), 'conduct terms (and an if_broken) are fine')
+    check(gen_main.soft_premise_finding({'source': 'craft', 'where': 'price'}) and gen_main.repairable({'source': 'craft'}),
+          'a craft finding goes to the repair and is a note after it, never a halt')
+
+
+@test
 def premise_price_is_not_a_loss():
     # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
     # not repaired again, and it ends as a note

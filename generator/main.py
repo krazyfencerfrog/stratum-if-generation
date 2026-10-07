@@ -105,6 +105,9 @@ DEFAULT_MAX_REPAIRS = 2
 # the audit's quotes were real (41 of 43) and every final-round halt was a
 # real quote misread, so a halt bought a lost run, never a better story.
 HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
+# what a contract's terms are about when they are about the paper, not the people bound by it
+PAPER_ACT = re.compile(r"\b(sign|signs|signed|signing|signature|countersign\w*|papers?|treaty|seals?|sealed|deeds?|"
+                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on)\b", re.I)
 
 
 def soft_premise_finding(f):
@@ -822,6 +825,13 @@ class StoryGenerator:
             if not str(x.get('terms') or '').strip():
                 out.append((f'rules[{i}]', f'the rule for {x.get("thing") or "a thing"} states no terms that can be '
                                            f'obeyed to the letter'))
+            elif PAPER_ACT.search(str(x.get('terms'))):
+                # 2026-10-07: the King's terms were still "signs a separate paper of surrender ... both names on the
+                # treaty" with the RULES definition in the prompt, and 92% of its nodes turned on papers (Kipling's 25%)
+                out.append((f'rules[{i}]', f'the terms of {x.get("thing") or "the rule"} turn on paper '
+                                           f'("{PAPER_ACT.search(str(x.get("terms"))).group(0)}"): say what the people bound '
+                                           f'by it must and must not do, in what they do with their hands and mouths '
+                                           f'and feet, and put what befalls a breaker in if_broken'))
         opp = premise.get('opposition') if isinstance(premise.get('opposition'), dict) else {}
         if not str(opp.get('shown_by') or '').strip():
             out.append(('opposition.shown_by', 'the opposition is never shown at work: name one early moment in which '
@@ -1138,8 +1148,8 @@ class StoryGenerator:
                                    'audience came for (one of the listed set pieces, or one of your own), with the world '
                                    'acting, and says so in set_piece')
 
-        for where, problem in self.craft_problems(premise):
-            add(where, problem)
+        for where, problem in self.craft_problems(premise):     # a quality the count can see: a note, never a halt
+            out.append({'source': 'craft', 'where': where, 'problem': problem, 'quote': ''})
         ties = [t for t in (premise.get('protagonist') or {}).get('ties') or [] if isinstance(t, dict) and t.get('who')]
         kin = sorted({m.group(0).lower() for m in KIN.finditer(self.kernel or '')})
         roles = [str(t.get('who')) for t in ties] + [str(sd.get('role')) for sd in premise.get('cast_seeds') or []
@@ -1339,7 +1349,7 @@ class StoryGenerator:
                                  'problem': str(e.get('note') or ''), 'quote': str(e.get('material'))})
         premise_text = self.to_json(premise)
         for f in findings:
-            if f['source'] != 'computed':
+            if f['source'] not in ('computed', 'craft'):          # Python's own findings quote what they like
                 f['verified'] = quote_in(f.get('quote'), premise_text)
         return findings
 
