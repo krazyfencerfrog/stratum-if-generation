@@ -947,6 +947,13 @@ class StoryGenerator:
                         s['kind'], s['speaks_for'] = 'individual', None   # one being ("the cat") is not a crowd
                     elif not reps:
                         problems.append(f'crowd "{s["role"]}" has no individual seed whose speaks_for names it')
+            # 2026-10-07: the King's cast copied 80 phrases of the circus example, caught only at the audit and
+            # cleaned out over two repair rounds; caught here it costs one informed retry
+            copied = example_guard.copied_phrases(parsed, ['s3_5c_cast.prompt'], [
+                self.kernel or '', json.dumps(self.analysis.get('s3_brief') or {}), json.dumps(turns)])
+            if len(copied) >= example_guard.MIN_HITS:
+                problems.append(f"the cast copies the prompt's calibration example ({len(copied)} of its phrases, e.g. "
+                                f"{'; '.join(copied[:4])}); write this story's own people")
             if problems:
                 raise ValueError('; '.join(problems))
             plotty = [s['role'] for s in seeds if norm(s['role']) not in wanted and FUNCTION_ROLE.search(str(s['role']))]

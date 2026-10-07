@@ -315,6 +315,21 @@ def paper_is_counted_at_every_step():
 
 
 @test
+def cast_copying_its_example_is_rejected():
+    import main as gen_main
+    prompt = open(os.path.join(ROOT, 'prompts', 's3_5c_cast.prompt'), encoding='utf-8').read()
+    example = json.loads(prompt[prompt.index('{', prompt.index('Output:')):prompt.index('USER INPUT FOLLOWS')].strip())
+    gen = gen_main.StoryGenerator.__new__(gen_main.StoryGenerator)
+    gen.kernel, gen.analysis = 'A heist in Macau.', {}
+    turns = [{'id': 1, 'involves': [s['role'] for s in example['cast_seeds']]}]
+    try:
+        gen.cast_validator(turns)(example)
+        check(False, 'a cast copied from the example should be rejected')
+    except ValueError as e:
+        check('copies the prompt' in str(e), str(e)[:200])
+
+
+@test
 def premise_price_is_not_a_loss():
     # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
     # not repaired again, and it ends as a note
