@@ -15,6 +15,8 @@ $$TERM_ENGINE$$
 
 $$TERM_RULES$$
 
+$$TERM_HIDDEN$$
+
 --- THREE LISTS AND ONE SEARCH ---
 
 LIST 1, KERNEL CLAUSES. The Kernel has been cut into numbered clauses below. For each one: does the premise CONTRADICT it? A contradiction is a direct incompatibility, not a difference of emphasis, and not something the premise merely leaves out. NEGATIVE CLAUSES DESERVE A SECOND LOOK ("nothing is stolen", "nobody leaves the island", "nothing supernatural"): genre convention pushes hardest against these, and they are the ones most often broken while every positive clause is honored. When contradiction is true, quote the premise's own words that do it. When it is false, quote is "".
@@ -26,7 +28,7 @@ LIST 3, ENGINE CHECKS. The numbered checks below ask whether the dramatic engine
 THE SEARCH, SYSTEMS AND LOSSES. Using the definitions above, look through the premise for anything that needs a system the engine lacks, or that ends the game in the player's defeat in a way the failure model below does not name. Give each thing you look at one kind:
  - "number": a number the player is shown or must watch;
  - "system": rules the engine cannot run;
- - "loss": a way for the PLAYER to lose that the failure model does not name, including a clock or stock the player can run out of that nothing licenses (no failure trigger, no words of the Kernel);
+ - "loss": a way for the PLAYER to lose that the failure model does not name: the game ends in their defeat, including when an unlicensed clock or stock runs out (no failure trigger, no words of the Kernel). A deadline whose passing only changes what happens and what it costs is fiction;
  - "fiction": anything else, which the engine can hold: an object, a document, a relationship, a deadline used as pressure, the story's price, a rule's terms or its if_broken.
 Write the note first, then the kind. Only number, system and loss go to the repair; fiction entries record what you checked. If there is nothing to look at, mechanics is an empty list.
 

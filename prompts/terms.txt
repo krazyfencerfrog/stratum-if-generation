@@ -15,10 +15,13 @@ A SYSTEM THE ENGINE LACKS is one of exactly two things:
  - a number the player is shown or must watch: a score, a meter, a percentage, hit points, a reputation;
  - rules the engine cannot run: combat, skill or dice checks, puzzle minigames, trading or an economy.
 Everything else is fiction the engine can hold: an object, a document, a relationship, a deadline, a debt, the terms of a magic or a contract.
-A clock or a stock the engine tracks, which the player can run out of, needs a licence: one of the failure model's triggers, or the Kernel's own words. Without one, that pressure is told through events.
+A clock or a stock whose running out ENDS THE GAME in the player's defeat needs a licence: one of the failure model's triggers, or the Kernel's own words. A deadline or a dwindling thing told through events, whose passing changes what happens and what it costs while the story goes on (the tide comes in, the money runs short, dawn drains the basin), is pressure and needs no licence.
 
 === PICTURE ===
 SOMETHING A READER CAN PICTURE is a person, a place, a physical thing (one that can break, burn, be carried off, hidden or fought over), a body (hurt, tired, in danger), the weather, an event, or something someone says or does: things a reader can see and the engine can put in a room. A document, a fee or a signature is a thing too, but a weak one: it belongs only where the story is about it (a will in a murder, a treaty in a court), never as the default way to make something concrete. A coined abstraction ("the river's grudge", "the debt of the border") is not something a reader can picture: a later step cannot place it and every step after repeats it. A strange thing (a magic, a curse, a technology) is said once in physical words: what it is and what it does when used.
+
+=== HIDDEN ===
+A HIDDEN TRUTH (an epistemic gap) is a central truth about who "you" are or what is really happening, which the whole story is built to keep from you and which changes what everything before meant when it comes out. Two things are NOT hidden truths, and a brief with no epistemic gap allows both: a secret one person keeps that drives one turn or one reversal (a betrayal planned, a key hidden, a bargain made behind your back), which is a complication; and a fact found out to get through one turn.
 
 === RULES ===
 THE TERMS of a magic, a curse, a bargain, an oath or a contract are what the people bound by it must and must not do, and on what condition, stated so they can be obeyed to the letter ("neither of us touches drink until we are crowned"; "the river carries one crossing for each coin dropped at the ford"), never a mood ("the river is jealous") and never what happens to the paper it is written on (signed, sealed, cut, filed). What befalls whoever breaks the terms is said apart from them (if_broken), and it is the story's price, never a way for the player to lose.
