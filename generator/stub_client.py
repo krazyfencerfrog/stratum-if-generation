@@ -38,6 +38,7 @@ Scenario knobs (environment variables):
                                  (a computed finding the repair must fill)
     STUB_BAD_CAST=1              3.5c's first answer leaves a crowd without a
                                  representative (tests the informed retry)
+    STUB_PAPER=1                 3.5b's first answer puts every way through on paper (tests the paper rule's retry)
     STUB_BAD_PLAN=1              4a's first answer leaves a turn unplaced
                                  (tests the informed retry)
     STUB_SLOPPY=1                answers use beat names for ids, numbers as
@@ -445,6 +446,14 @@ class StubClient(LlmClient):
         }
 
     def p_s3_5b(self, p):
+        out = self._s3_5b(p)
+        if env_int('STUB_PAPER', 0) and RETRY_MARKER not in p:
+            for t in out['turns']:
+                for w in t['ways_through']:
+                    w['way'] = 'you sign the treaty and seal it in the ledger, ' + w['way']
+        return out
+
+    def _s3_5b(self, p):
         hard = env_int('STUB_PREMISE_HARD_ROUNDS', 0) > 0
         sp = None if env_int('STUB_NO_SET_PIECE', 0) else "the drone's camera feed from inside the venting ring, frost forming on the lens"
         return {

@@ -50,6 +50,7 @@ iteration and is the one file the later stages read and annotate.
 
 import json
 import names
+import paper
 
 from brief import brief_lite, shape_targets
 from errors import SoftReject
@@ -1222,6 +1223,9 @@ class OutlineBuilder:
             if long:
                 complaints.append(f'these summaries run past {SUMMARY_LIMIT} words: ' + ', '.join(f'{nid} ({w})' for nid, w in long)
                                   + '. Keep what happens and what it changes; cut the description around it')
+            papery = paper.heavy([(x['id'], x.get('summary')) for x in got], self.gen.kernel)
+            if papery:
+                complaints.append(paper.complaint(papery, len(got), 'node summaries'))
             if complaints:
                 raise SoftReject(' Also, '.join(complaints))
 

@@ -26,6 +26,8 @@ $$TERM_ENGINE$$
 
 $$TERM_RULES$$
 
+$$TERM_PICTURE$$
+
 --- WHAT YOU RETURN ---
 
 "revised" holds ONLY the top-level sections you changed, each one whole: any of protagonist, arena, pressure, opposition, events, hidden_truth, mediation, turns, complications, cast_seeds, price, setups, rules. A section you did not need to touch is left out, and the pipeline keeps it exactly as it was. If you change one turn, return the whole "turns" list with the other turns copied unchanged.

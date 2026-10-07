@@ -300,6 +300,21 @@ def theme_poles_have_no_order():
 
 
 @test
+def paper_is_counted_at_every_step():
+    import paper
+    items = [(f'i{n}', 'a burned barn') for n in range(5)] + [(f'p{n}', 'the signed treaty') for n in range(3)]
+    check(paper.heavy(items, 'A story about a barn.') and not paper.heavy(items, 'Two men sign a contract.'),
+          'three of eight on paper is over a quarter, unless the Kernel names a document (two more allowed)')
+    check(not paper.heavy(items[:5] + items[5:7], ''), 'two of seven is within the rule')
+    # 3.5b: ways through on paper cost one informed retry
+    run('paper', env={'STUB_PAPER': '1'})
+    attempts = [c for c in calls('paper') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
+    prompt = load('paper', 's3_5b_raw_input_prompt.txt')
+    check('turn on paper' in prompt and 'treaty' in prompt, 'the retry should name the ways on paper')
+
+
+@test
 def premise_price_is_not_a_loss():
     # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
     # not repaired again, and it ends as a note

@@ -55,6 +55,7 @@ import compile_scenes
 import example_guard
 import names
 import terms
+import paper
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -902,6 +903,24 @@ class StoryGenerator:
                                  'story\'s own words (what it is, what it does when used), everywhere it appears')
         return validate
 
+    def paper_check(self, validator, items_of, what):
+        """validator, then the paper rule (paper.py) over items_of(parsed), as
+        one soft complaint with any the validator raised."""
+        def validate(parsed):
+            soft = []
+            try:
+                validator(parsed)
+            except SoftReject as e:
+                soft.append(str(e))
+            if isinstance(parsed, dict):
+                items = items_of(parsed)
+                hits = paper.heavy(items, self.kernel)
+                if hits:
+                    soft.append(paper.complaint(hits, len(items), what))
+            if soft:
+                raise SoftReject(' Also, '.join(soft))
+        return validate
+
     def cast_validator(self, turns):
         """Rejects a cast that leaves a role the turns name without a
         sketch, or a crowd without an individual who speaks for it."""
@@ -1076,7 +1095,8 @@ class StoryGenerator:
             '$$PROMISES$$': self.promises_block(),
             '$$ENRICHMENT_BUDGET$$': budget,
             '$$KERNEL$$': self.kernel,
-        }, validator=self.with_echo_check(self.engine_validator, ('mediation', 'pressure', 'opposition', 'events')),
+        }, validator=self.paper_check(self.with_echo_check(self.engine_validator, ('mediation', 'pressure', 'opposition', 'events')),
+                                      paper.engine_items, "of the engine's levers, events, pressure, opposition, setups and mediation"),
             klass='build', schema=schemas.ENGINE)
         turns = self.run_prompt('s3_5b', 'turns', {
             '$$BRIEF_LINES$$': table,
@@ -1085,7 +1105,9 @@ class StoryGenerator:
             '$$COMPLICATION_COUNT$$': COMPLICATION_TEXT.get(budget, '2 or 3'),
             '$$ENGINE_JSON$$': self.to_json(engine),
             '$$KERNEL$$': self.kernel,
-        }, validator=self.with_echo_check(self.validate_turns, ('turns',)), klass='build', schema=schemas.TURNS)
+        }, validator=self.paper_check(self.with_echo_check(self.validate_turns, ('turns',)),
+                                      lambda t: paper.way_items(t.get('turns')), 'ways through'),
+            klass='build', schema=schemas.TURNS)
         roles = []
         for t in turns['turns']:
             for r in t.get('involves') or []:
@@ -1150,6 +1172,11 @@ class StoryGenerator:
 
         for where, problem in self.craft_problems(premise):     # a quality the count can see: a note, never a halt
             out.append({'source': 'craft', 'where': where, 'problem': problem, 'quote': ''})
+        items = paper.premise_items(premise)
+        hits = paper.heavy(items, self.kernel)
+        if hits:
+            out.append({'source': 'craft', 'where': 'paper', 'problem': paper.complaint(hits, len(items), 'items of the premise'),
+                        'quote': ''})
         ties = [t for t in (premise.get('protagonist') or {}).get('ties') or [] if isinstance(t, dict) and t.get('who')]
         kin = sorted({m.group(0).lower() for m in KIN.finditer(self.kernel or '')})
         roles = [str(t.get('who')) for t in ties] + [str(sd.get('role')) for sd in premise.get('cast_seeds') or []
