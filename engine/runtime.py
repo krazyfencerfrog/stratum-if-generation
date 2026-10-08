@@ -38,6 +38,10 @@ REPEAT_SHARE = 0.6                     # a sentence whose phrases were mostly re
 DOUBLED = re.compile(r"\b(the|a|an|of|to|in|on|at|and|for|with|by|from)\s+\1\b", re.I)
 SENTENCE = re.compile(r'(?<=[.!?])\s+(?=[A-Z\'"‘“{])')
 WORD = re.compile(r"[a-z0-9']+")
+# where a here-line puts someone: "is in the cold patch by the stove", "sits at the table" (not "in his hand")
+PLACE_WORD = re.compile(r"\b(?:is|are|stands|sits|waits|lies|leans|kneels|sleeps|crouches|asleep|perched|standing|"
+                        r"sitting|waiting)\b(?:[^.,;]{0,40}?)\b(?:in|on|at|by|beside|near|under|against|inside) "
+                        r"(?:the|a|an) ((?:[\w'-]+ ){0,2}[\w'-]+)\b(?! of)")
 
 
 class EngineError(ValueError):
@@ -629,6 +633,7 @@ class Engine:
         plainly who is here, in one sentence)."""
         s, st = self.story, self.state
         others = self._other_room_names()
+        elsewhere = self._words_elsewhere()
         for v in s.characters[cid].get('here') or []:
             if isinstance(v, str):
                 v = {'text': v}
@@ -637,9 +642,28 @@ class Engine:
             text = v.get('text', '')
             if isinstance(text, list):
                 text = pick_text([v], st, cid)
-            if text and not any(p.search(text.lower()) for p in others):
+            low = text.lower() if text else ''
+            if text and not any(p.search(low) for p in others) and not any(
+                    m.group(1).split()[-1] in elsewhere for m in PLACE_WORD.finditer(low)):
                 return text
         return None
+
+    def _words_elsewhere(self):
+        """Words that name something in another room's description and
+        nowhere in this room's text or things: "the stove" is the cabin's,
+        read at the slip ("the cat is in the cold patch by the stove")."""
+        s, st = self.story, self.state
+        mine = ' '.join([str(pick_text((s.rooms.get(st.room) or {}).get('description'), st, st.room) or ''),
+                         str(pick_text((self.scene().get('room_text') or {}).get(st.room), st, 'x') or ''),
+                         str((s.rooms.get(st.room) or {}).get('name') or '')]
+                        + [str(s.objects[o].get('name') or '') for o in self.visible_objects()]).lower()
+        mine_words = set(WORD.findall(mine))
+        other = set()
+        for rid, r in s.rooms.items():
+            if rid != st.room:
+                for v in r.get('description') or []:
+                    other.update(WORD.findall(str(v.get('text') if isinstance(v, dict) else v).lower()))
+        return {w for w in other - mine_words if len(w) >= 4 and w not in STOP}
 
     def _other_room_names(self):
         """Patterns for the names of rooms other than this one ("the cabin"),
@@ -657,6 +681,16 @@ class Engine:
             head = core.split()[-1]         # "in the office" for the clean office, read in the square
             if len(head) >= 4 and head not in mine.split():
                 out.append(re.compile(r"\b(in|inside|into) (the |a |an |his |her |their )?([\w']+ )?" + re.escape(head) + r'\b'))
+        here = {re.sub(r"^(the|a|an)\s+", '', str(s.objects[o].get('name') or '').lower()) for o in self.visible_objects()}
+        for oid, obj in s.objects.items():  # a fixture that is somewhere else: "by the stove", read at the slip
+            loc = st.locations.get(oid)
+            core = re.sub(r"^(the|a|an)\s+", '', str(obj.get('name') or '').lower()).strip()
+            if obj.get('portable') or loc not in s.rooms or loc == st.room or len(core) < 4 or core in here:
+                continue
+            for name in {core, core.split()[-1]}:     # "the paraffin stove", or just "the stove"
+                if len(name) >= 4 and not any(name in h.split() or name == h for h in here) and name not in mine:
+                    out.append(re.compile(r"\b(in|on|at|by|beside|near|under|against|over) (the |a |an |his |her |"
+                                          r"their )?([\w']+ )?" + re.escape(name) + r'\b'))
         return out
 
     def _still_true(self, text):

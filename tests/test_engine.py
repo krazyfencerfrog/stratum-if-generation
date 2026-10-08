@@ -624,7 +624,8 @@ def mini(**over):
         'world': {
             'rooms': {'deck': {'name': 'the stern deck', 'description': [{'text': 'Wet planks. The fountain pen lies on the bench, its nib wet.'}],
                                'exits': [{'to': 'cabin', 'label': 'down to the cabin'}]},
-                      'cabin': {'name': 'the cabin', 'description': [{'text': 'A narrow green room.'}],
+                      'cabin': {'name': 'the cabin',
+                                'description': [{'text': 'A narrow green room. The stove ticks.'}],
                                 'exits': [{'to': 'deck', 'label': 'up to the deck'}]}},
             'objects': {'pen': {'name': 'the fountain pen', 'location': 'deck', 'portable': True,
                                 'description': [{'text': 'A pen.'}]},
@@ -634,7 +635,8 @@ def mini(**over):
                                    'here': [{'text': 'Ann Lee is asleep in the cabin, warm by the stove.'}],
                                    'topics': {'money': {'label': 'money', 'says': [{'text': "'Money,' she says."}]}}},
                            'C02': {'name': 'Bo Gray', 'gender': 'm', 'description': [{'text': 'Bo.'}],
-                                   'here': [{'text': 'Bo Gray leans on the rail.'}], 'topics': {}}},
+                                   'here': [{'text': 'Bo Gray sits by the stove, warming his hands.'},
+                                            {'text': 'Bo Gray leans on the rail.'}], 'topics': {}}},
         },
         'scenes': {'S1': {'title': 'One', 'opening': [{'text': 'Rain falls on the deck.'}], 'rooms': ['deck', 'cabin'],
                           'cast': {'C01': 'deck', 'C02': 'deck'},
@@ -693,7 +695,8 @@ def room_text_says_only_what_is_true_now():
     eng = Engine(Story(mini()))
     v = eng.start()
     room = v['room']['text']
-    check('asleep in the cabin' not in room and 'Bo Gray leans on the rail' in room and 'Ann Lee is here' in room,
+    check('asleep in the cabin' not in room and 'by the stove' not in room and 'Bo Gray leans on the rail' in room
+          and 'Ann Lee is here' in room,
           f'a here-line naming another room gives way to a plain one: {room}')
     eng.act('take:pen')
     v = eng.act('look')
