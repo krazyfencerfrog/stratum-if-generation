@@ -508,3 +508,53 @@ state, no curses: tested directly), `layout` (pane rectangles by terminal
 size; a new pane is an entry there and a widget), `widgets`, and `app`
 (keys arrive as names, so scripts, tests and curses share one path).
 
+
+## 13. Reading as a player (2026-10-08)
+
+Played kernel40 (stage D, not yet through prose) and kernel35's prose
+package with simulated players and read the transcripts and the screens.
+What the engine now does about what read wrong (`runtime.py`, `story.py`):
+
+- **Menu labels read as actions.** An authored detail that is an action in
+  words ("set the saddle between them") takes no preposition ("on set
+  ..."); a subject ("what a nuisance costs") keeps its "about". A detail does
+  not repeat the verb and object its path says ("Take › the mooring line ›
+  off the bollard"). The plain action beside detailed ones is "take it";
+  an objectless one beside others is "Look › around".
+- **Every option can be picked.** A long Examine is grouped (yourself;
+  people; things you carry; things here) and any level wider than the keys
+  ends in "more…" (the plain player used to drop entries past the 28th).
+- **The room says only what is true now.** A person's here-variant that puts
+  them in another room, or by something only another room has ("by the
+  stove", read at the slip), is skipped; a person the scene's room text
+  already places gets no second line; those left are named in one sentence
+  ("X and Y are here"). Sentences about a portable thing that began in the
+  room and has gone are dropped.
+- **A view says each thing once.** A sentence that repeats or paraphrases
+  one already read in the same view is dropped (openings, their first event
+  and the room's scene layer often said the same thing three times);
+  doubled small words are made single. Endings are only tidied: two people
+  with alike fates both keep their line.
+- **Names.** An unnamed person is named in full once per view and by the
+  short form after (`unnamed_short`, else the label cut before its first
+  qualifying phrase: "the captain"), and short before "'s"; menus use the
+  short form and never capitalise as a sentence. An ending line about a
+  person that never says who ("He is gone, ...") opens with the person.
+- **Leaving a scene** reads only the first lapsed moment's closing line.
+- **The way on.** Once the player has idled past the scene's last nudge and
+  two more actions, the default ways on (never a branch; a required
+  moment's neutral option while it holds the scene) and the path to them
+  carry `way`, shown as →. Random players finished kernel40 14 of 150
+  times; following the mark half the time, 98.
+- **The paned interface at 80x24:** the menu takes the rows its level needs
+  (a third to half the body); the root drops its echo preview line; the
+  footer keeps help and quit; the header does not repeat a first chapter
+  named like the story; the end box wraps the ending's title. A move with
+  no text of its own is recorded by the room's first sentence.
+
+The generator now catches the causes where they are written (stage B
+here-lines naming places, sentence-case event topics; stage D's take on
+fixed things, the engine's own verbs, ways on written as use, openings that
+narrate a deed of the player's, placements that contradict the opening,
+events retelling it; prose recaps that narrate the player's choices): see
+CLAUDE.md.
