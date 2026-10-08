@@ -23,6 +23,7 @@ CORE_VERBS = {
 VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce')
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')     # a person in text: {C02}, rendered by what the player knows
+SHORT_CUT = re.compile(r"\s+(in|with|on|at|from|of|by|who|that|whose|near|under|beside)\s|,")
 
 
 class StoryError(ValueError):
@@ -84,11 +85,23 @@ class Story:
             return 'yourself'
         if thing in self.characters and state is not None and not self.known(thing, state):
             ch = self.characters[thing]
-            return (ch.get('unnamed_short') if short else None) or ch['unnamed']
+            return self.short_unnamed(thing) if short else ch['unnamed']
         for table in (self.objects, self.characters, self.rooms):
             if thing in table:
                 return table[thing].get('name') or thing
         return thing
+
+    def short_unnamed(self, cid):
+        """The short form of a person's unnamed label: `unnamed_short`, else
+        the label cut before its first qualifying phrase ("the captain in the
+        wet canvas coat" -> "the captain"), when that leaves a noun phrase."""
+        ch = self.characters.get(cid) or {}
+        if ch.get('unnamed_short'):
+            return ch['unnamed_short']
+        label = ch.get('unnamed') or ''
+        m = SHORT_CUT.search(label)
+        cut = label[:m.start()].strip() if m else label
+        return cut if len(cut.split()) >= 2 else label
 
     def known(self, cid, state):
         """Whether the player knows this person's name: introduced in play,
@@ -96,18 +109,27 @@ class Story:
         ch = self.characters.get(cid) or {}
         return cid in state.introduced or bool(ch.get('known')) or not ch.get('unnamed')
 
-    def render(self, text, state):
+    def render(self, text, state, sentence=True):
         """Text with each {Cxx} replaced by the name the player knows the
-        person by; an unnamed label opening a sentence is capitalised."""
+        person by. An unnamed label is given in full the first time a text
+        names the person and short after that, and short before "'s" ("the
+        captain in the wet canvas coat" five times in one paragraph; "the wet
+        lock-keeper with a wrench's papers"). A name opening a sentence is
+        capitalised, unless `sentence` is False (a menu label: "about the
+        captain")."""
         if not text or '{' not in text:
             return text
+        told = set()
 
         def one(m):
-            if m.group(1) not in self.characters:
+            cid = m.group(1)
+            if cid not in self.characters:
                 return m.group(0)
-            name = self.name_of(m.group(1), state, short=False)
+            long_form = cid not in told and not text.startswith("'s", m.end())
+            name = self.name_of(cid, state, short=not long_form)
+            told.add(cid)
             before = text[:m.start()].rstrip(' \'"‘“')
-            if not before or before[-1] in '.!?:—':
+            if sentence and (not before or before[-1] in '.!?:—'):
                 name = name[:1].upper() + name[1:]
             return name
         return CODE.sub(one, text)

@@ -12,6 +12,8 @@
     | status: message, or what Enter would do            |
     | footer: the keys                                   |
 
+On a narrow terminal the menu is as tall as its current level needs,
+between a third and a half of the body (`menu_rows`: its entry count).
 The sidebar ("here": the room, who and what is in it, what you carry)
 shows only when wide and there is room; Tab hides or shows it. A pane
 added later is one more entry here and one more widget.
@@ -25,7 +27,7 @@ MIN_H, MIN_W = 14, 48
 WIDE = 90
 
 
-def layout(h, w, sidebar=True):
+def layout(h, w, sidebar=True, menu_rows=None):
     if h < MIN_H or w < MIN_W:
         return {'too_small': True, 'h': h, 'w': w}
     header, status, footer = Rect(0, 0, 1, w), Rect(h - 2, 0, 1, w), Rect(h - 1, 0, 1, w)
@@ -39,7 +41,10 @@ def layout(h, w, sidebar=True):
         if side is None:
             menu = Rect(top, w - right, body, right)
     else:
-        menu_h = max(7, body * 2 // 5)
+        # as tall as the menu needs (its entries, a preview line, the border), within a third to a half of the body:
+        # at 80x24 the old two fifths showed four of nine verbs
+        want = (menu_rows or 0) + 3
+        menu_h = max(7, min(body // 2, max(body // 3, want)))
         story = Rect(top, 0, body - menu_h, w)
         menu = Rect(top + body - menu_h, 0, menu_h, w)
         side = None

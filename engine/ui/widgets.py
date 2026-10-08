@@ -50,7 +50,8 @@ def box(surface, r, title=None, focused=False):
 def header(surface, r, here):
     surface.fill(r.y, r.x, 1, r.w, 'header')
     right = f" turn {here['turn']} "
-    parts = [here['title'], here['chapter'], cap(here['room'])]
+    chapter = here['chapter'] if str(here['chapter']).strip().lower() != str(here['title']).strip().lower() else None
+    parts = [here['title'], chapter, cap(here['room'])]          # a first chapter named like the story is said once
     left = ' ' + ' · '.join(p for p in parts if p) + ' '
     surface.put(r.y, r.x, T.ellipsize(left, r.w - T.width(right) - 1), 'header')
     surface.put(r.y, r.x + r.w - T.width(right), right, 'header')
@@ -116,8 +117,8 @@ def menu(surface, r, session, keys=KEYS):
     """The current menu level. Returns {screen row: entry index}."""
     if session.ended:
         inner = box(surface, r, 'The end', focused=True)
-        lines = [('mark', session.view.get('ending_title') or 'The End'), ('normal', ''),
-                 ('key', 'n  play again'), ('key', 'u  unwind the last action'), ('key', 'h  go back to any point'),
+        lines = [('mark', l) for l in T.wrap(session.view.get('ending_title') or 'The End', inner.w)] + [
+                 ('normal', ''), ('key', 'n  play again'), ('key', 'u  unwind the last action'), ('key', 'h  go back to any point'),
                  ('key', 'j  the story so far'), ('key', 'q  quit')]
         for row, (style, line) in enumerate(lines[:inner.h]):
             surface.put(inner.y + row, inner.x, T.ellipsize(line, inner.w), style)
@@ -125,7 +126,7 @@ def menu(surface, r, session, keys=KEYS):
     path = session.path()
     inner = box(surface, r, ' › '.join(path) if path else 'What do you do?', focused=True)
     items = session.items()
-    rows = max(1, inner.h - 2)
+    rows = max(1, inner.h - 2) if path else inner.h
     index = session.level()['index'] if items else 0
     top = 0 if index < rows else index - rows + 1
     hits = {}
@@ -148,7 +149,7 @@ def menu(surface, r, session, keys=KEYS):
         surface.put(r.y, r.x + r.w - 6, ' ↑ ', 'muted')
     if top + rows < len(items):
         surface.put(r.y + r.h - 1, r.x + r.w - 6, ' ↓ ', 'muted')
-    if inner.h >= 3:
+    if inner.h >= 3 and path:                       # at the root the preview is only the selected label again
         surface.put(inner.y + inner.h - 1, inner.x, T.ellipsize('⏎ ' + session.preview(), inner.w), 'muted')
     return hits
 
@@ -167,8 +168,8 @@ def status(surface, r, session):
         surface.put(r.y, r.x + 1, T.ellipsize(session.message, r.w - 2), 'warn' if session.warn else 'current')
 
 
-FOOTER_MAIN = [('↑↓', 'choose'), ('→⏎', 'open'), ('←', 'back'), ('u', 'unwind'), ('j', 'journal'), ('h', 'history'),
-               ('s', 'save'), ('l', 'load'), ('?', 'help'), ('q', 'quit')]
+FOOTER_MAIN = [('↑↓', 'choose'), ('→⏎', 'open'), ('←', 'back'), ('?', 'help'), ('q', 'quit'), ('u', 'unwind'),
+               ('j', 'journal'), ('h', 'history'), ('s', 'save'), ('l', 'load')]     # help and quit fit at 80 columns
 FOOTER_OVERLAY = {'journal': [('↑↓ PgUp PgDn', 'scroll'), ('Esc j', 'close')],
                   'history': [('↑↓', 'choose'), ('⏎', 'go back to it'), ('Esc h', 'close')],
                   'help': [('Esc ?', 'close')], 'quit': [('y', 'quit'), ('n Esc', 'stay')]}

@@ -382,8 +382,8 @@ def names_show_only_once_the_player_knows_them():
     eng = Engine(story)
     eng.start(seed=1)
     view = eng.act('go:cabin')
-    check(view['room']['text'].count('The old man in the oilskin sits at the table. You nod to the old man in the oilskin.') == 1,
-          f"text before the introduction: {view['room']['text']}")
+    check(view['room']['text'].count('The old man in the oilskin sits at the table. You nod to the old man.') == 1,
+          f"text before the introduction (the full label once, then short): {view['room']['text']}")
     talk = next(c for c in view['menu']['children'] if c['label'] == 'Talk')
     check(talk['children'][0]['label'] == 'the old man', f"menu before the introduction: {talk['children'][0]['label']}")
     check(not evaluate("known('lazlo')", eng.state), 'known before the introduction')
@@ -848,6 +848,38 @@ def tui_draws_every_pane_at_any_size():
     wide.handle('tab')
     wide.draw()
     check('┌─ Here' not in wide.surface.text(), 'Tab hides the side panel')
+
+
+@test
+def tui_reads_well_at_80_by_24():
+    """The common terminal (2026-10-08): the story's title said once, the
+    menu tall enough for its verbs, help and quit in the footer, and the
+    ending's title whole."""
+    from ui.app import App
+    from ui.surface import MemorySurface
+    data = mini()
+    data['scenes']['S1']['title'] = 'Mini'                   # a first chapter named like the story
+    for n in range(6):
+        data['verbs'] = dict(data.get('verbs') or {}, **{f'v{n}': {'label': f'Verb{n}'}})
+        data['scenes']['S1']['interactions'].append({'id': f'S1.v{n}', 'verb': f'v{n}', 'object': 'saddle', 'text': 'x'})
+    from ui.session import Session
+    s = Session(Engine(Story(data)))
+    s.start(seed=1)
+    app = App(s, MemorySurface(24, 80))
+    app.draw()
+    text = app.surface.text()
+    check(text.splitlines()[0].count('Mini') == 1, f'the title is said once: {text.splitlines()[0]}')
+    shown = [l for l in text.splitlines() if l.startswith('│ ') and l[2:3] in '123456789' and l[3:4] == ' ']
+    check(len(shown) >= min(8, len(s.items())), f'the menu shows 8 of its {len(s.items())} entries (the old layout 4): '
+                                                 f'{len(shown)}')
+    check('? help' in text and 'q quit' in text, 'help and quit fit in the footer at 80 columns')
+    data['endings']['E1']['title'] = 'The Lock Is Closed, the Boat Is Going Down the Cut Tonight'
+    s = Session(Engine(Story(data)))
+    s.start(seed=1)
+    s.act('S1.end')
+    app = App(s, MemorySurface(30, 110))
+    app.draw()
+    check('Tonight' in app.surface.text(), 'the ending title wraps rather than being cut')
 
 
 @test

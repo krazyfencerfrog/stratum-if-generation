@@ -29,7 +29,7 @@ class App:
         sf, s = self.surface, self.s
         sf.clear()
         h, w = sf.size()
-        rects = layout(h, w, self.sidebar)
+        rects = layout(h, w, self.sidebar, len(self.s.items()))
         self.rects = rects
         if rects['too_small']:
             W.too_small(sf, h, w)

@@ -134,8 +134,8 @@ class Engine:
             free = detail is not None and bool(source) and source[0] == 'interaction' \
                 and _is_action(detail_label, 2 if text_only else 3)
             into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail, 'detail_free': free,
-                         'object_label': s.render(obj_label, st) or (s.name_of(obj, st) if obj else None),
-                         'detail_label': s.render(detail_label, st) or (s.name_of(detail, st) if detail else None),
+                         'object_label': s.render(obj_label, st, False) or (s.name_of(obj, st) if obj else None),
+                         'detail_label': s.render(detail_label, st, False) or (s.name_of(detail, st) if detail else None),
                          'source': source, 'weight': weight, 'group': group,
                          'new': verb in NEWS and oid not in st.heard})
 
@@ -292,7 +292,8 @@ class Engine:
         moved_room, scene_before = self.perform(opt)
         self.timeline.append(st.clone())
         view = self.view(show_room=moved_room or st.scene != scene_before)
-        text = view['text'] or ([f"You are in {view['room']['name']}."] if view.get('room') else [])
+        text = view['text'] or ([_first_sentence(view['room']['text']) or _cap(view['room']['name']) + '.']
+                                if view.get('room') else [])
         entry = {'label': label, 'text': text, 'turn': st.turns, 'scene': scene_before, 'scene_after': st.scene}
         if opt.get('weight'):
             entry['weight'] = opt['weight']
@@ -768,6 +769,14 @@ def _is_action(label, min_words=3):
     takes no preposition in the menu."""
     label = str(label or '').strip()
     return len(label.split()) >= min_words and not NOUN_START.match(label)
+
+
+def _first_sentence(text):
+    return SENTENCE.split(text or '')[0].strip()
+
+
+def _cap(text):
+    return text[:1].upper() + text[1:] if text else text
 
 
 def _ngrams(text, n=4):
