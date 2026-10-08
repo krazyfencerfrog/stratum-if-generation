@@ -1,0 +1,353 @@
+{
+  "enrichment_budget": {
+    "level": "moderate"
+  },
+  "protagonist": {
+    "who": "You are an ex-soldier who has spent three years making small, clean lies for large, nervous men, and now you stand at the frontier’s edge with your partner, a borrowed crown in one hand and a sword in the other.",
+    "history": "You met your partner in a garrison where you both learned that a uniform is a mask and a salute is a promise; after the army let you go, you sold false titles in three ports and finally found a country no Englishman had claimed.",
+    "wants": "to cross the frontier and make yourselves its kings before the rival’s authority arrives",
+    "need": "to find out whether the partnership can hold a kingdom, or whether the kingdom will make one of you a subject",
+    "can_do": "bluff, command, divide the visible symbols of power, and keep the con moving from one audience to the next",
+    "cannot_do": "make the local chiefs accept you without a shared performance, or keep the rival’s claim out of the room without your partner’s matching authority",
+    "ties": [
+      {
+        "who": "your partner",
+        "what": "the other ex-soldier, the one who can hold a salute as long as you can hold a silence, and the only person whose name is on the contract"
+      },
+      {
+        "who": "the local guide",
+        "what": "the man who knows the passes and knows exactly what you are, and who has chosen to walk with you anyway"
+      },
+      {
+        "who": "the rival claimant",
+        "what": "the agent of a distant government who wears the government’s sash and who has already taken a chair at your table"
+      }
+    ],
+    "open": "whether you keep the crown shared, or take it alone and let the partnership pay for it",
+    "gender": "m",
+    "serves": "3-0b.protagonist_identity",
+    "name": "Bedwyr Ravel"
+  },
+  "arena": {
+    "description": "A wild, uncharted frontier country: a chain of mountain passes, a swollen river valley, and a makeshift capital camp where the chiefs gather before the season turns.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The rival claimant’s caravan is coming down the river, and the chiefs will make their choice at the autumn banquet; after that, the country will have one authority, and it will not be yours unless the con is finished.",
+    "clock_or_stock": "none tracked; the season is told through the rival’s approach and the chiefs’ gatherings, because 3-0c names no failure",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "the rival claimant, an agent of a distant government",
+    "wants": "to be recognized as the lawful authority over the country, or to install a single king who will answer to his government",
+    "means": "he comes with a chain of interpreters, a small armed escort, the government’s red sash, and the power to name one of you king and the other commander before the chiefs",
+    "shown_by": "at the dusty waystation where the two of you make the claim, he takes the spare chair, drinks from the third cup, and sits down as if he were already one of the claimants",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "At the first chief’s camp, the warriors fall silent when you give a military salute, and the rival claimant steps out of the shadows wearing the distant government’s red sash, making the first audience a test of which authority is believed.",
+      "when": "early",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "what": "The river swells after the mountain rain, and the crossing becomes a fight with the current; on the far bank the rival’s officer waits with the boat and the government’s escort.",
+      "when": "middle",
+      "serves": "3b.secondary_affects"
+    },
+    {
+      "what": "The capital’s makeshift hall is raised with a throne of salvaged wagon wheels and a flag of patched sailcloth; the rival claimant walks in with the government’s escort and names one of you king and the other commander before the chiefs.",
+      "when": "late",
+      "serves": "3c.core_thematic_axis"
+    }
+  ],
+  "hidden_truth": null,
+  "mediation": {
+    "question": "How do you divide the crown and the cost between you and your partner: keep the partnership equal, let one of you bear the risk, or break the partnership to secure the kingdom?",
+    "to_reach_pole_a": {
+      "pole": "shared kingship: the crown is held by both, and the cost is shared",
+      "what_you_must_do": "divide the visible symbols of power so that neither man can be mistaken for the sole king: let your partner hold the sword and the salute, take the crown and the chiefs’ cup, and at the banquet let the chiefs see two men who answer to each other",
+      "cost": "both of you bear the frontier’s hardship and the rival’s challenge, and the crown is split and harder to defend; if one falters, the other pays"
+    },
+    "to_reach_pole_b": {
+      "pole": "sole kingship: one man holds the crown, and the other bears the risk",
+      "what_you_must_do": "concentrate authority in one person: take the rival’s chair and the chiefs’ cup, or let your partner stand at the king’s shoulder as commander, and set the other down from the shared seat so he becomes the king’s man",
+      "cost": "the partnership is broken or costed; the other becomes a subject, a servant, or the bearer of the blame, and the con becomes a one-man throne"
+    },
+    "levers": [
+      "the contract made at the frontier’s edge",
+      "the sword and the salute, the visible halves of the claim",
+      "the local guide, who knows the truth and can choose which man to trust",
+      "the rival claimant’s chair at the chiefs’ table, which lets him name one of you king and the other commander",
+      "the chiefs’ cup, which can crown one man or two"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "price": {
+    "what": "the partner’s place at the shared table, given up when the rival names one king and the other commander, leaving him a subject in the kingdom he helped make",
+    "who_pays": "your partner",
+    "why_final": "the naming is done before the chiefs with the rival’s chair and the shared cup between you, and once the shared seat is given up, he cannot be bought back into the crown",
+    "serves": "3c.core_thematic_axis"
+  },
+  "setups": [
+    {
+      "plant": "at the dusty waystation, the rival claimant takes the spare chair, drinks from the third cup, and the notary sets a sword and a crown before you as the two halves of the claim",
+      "payoff": "at the banquet, the rival takes the spare chair and names one of you king and the other commander, forcing the choice: one king and one commander, or two kings who must share the cost"
+    },
+    {
+      "plant": "the local guide keeps his hand on the rim of the shared cup when the chiefs speak, as if he is holding the two of you together",
+      "payoff": "at the crossing, he is the one who grips your partner’s shoulder in the current, and the chiefs see it"
+    }
+  ],
+  "rules": [
+    {
+      "thing": "the contract made at the frontier’s edge",
+      "terms": "the two men who make the contract shall go into the country as two kings; each shall keep the other’s hand in every public audience: one holds the sword, the other the salute; neither may sit alone at the chiefs’ table; if one takes the crown alone, the other stands at his shoulder as commander and yields the shared seat; if the crown is shared, neither may refuse the other’s order in a public ceremony",
+      "if_broken": "if one takes the crown alone, the other loses his shared seat and his share of the tribute, and becomes the king’s man; the partnership is costed, not the player lost"
+    }
+  ],
+  "turns": [
+    {
+      "id": 1,
+      "situation": "At the first chief's camp the warriors fall silent when your partner gives the military salute, and the rival claimant steps out of the shadows wearing the distant government's red sash.",
+      "what_you_must_do": "get the first chief to seat you two as claimants before the rival's sash takes the room",
+      "ways_through": [
+        {
+          "way": "the chief seats you because your partner gives the salute and you answer with the old army's drill, and the local guide says it is a challenge of officers",
+          "cost": "the rival claimant's interpreter copies the drill, and your partner's salute becomes the claim's face from that night on"
+        },
+        {
+          "way": "the chief seats you because you let the local guide take the chief's cup and pour for both of you as if you were his guests",
+          "cost": "the local guide keeps his hand on the cup's rim, and the rival claimant drinks from the third cup and sits down as a claimant"
+        }
+      ],
+      "involves": [
+        "the first chief",
+        "your partner",
+        "the local guide",
+        "the rival claimant"
+      ],
+      "form": "persuade",
+      "set_piece": "the first audience in the chief's camp, the salute answered by silence, the rival's red sash in the firelight",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 2,
+      "situation": "The river swells after the mountain rain, and the crossing becomes a fight with the current; on the far bank the rival claimant's officer waits with the boat and the government's escort.",
+      "what_you_must_do": "get the contract, the sword, and your partner across before the rival's officer takes the boat",
+      "ways_through": [
+        {
+          "way": "the contract and your partner cross because the local guide takes the boat's stern and your partner grips your shoulder in the current, and the chiefs on the bank see the guide holding your partner's shoulder",
+          "cost": "the local guide's hand is cut on the rope, and he will not leave your partner's side after, choosing to trust him more than you"
+        },
+        {
+          "way": "the contract and your partner cross because you let the rival claimant's officer give you the boat's rope and name the crossing a government survey",
+          "cost": "the officer's escort takes the contract's seal for the night, and your partner is made to stand in the current in the government's shadow"
+        },
+        {
+          "way": "the contract and your partner cross because you and your partner wade the rapid without the boat, each holding the other's shoulder, and the local guide carries the contract in his coat",
+          "cost": "the contract is water-damaged and your partner's shoulder is bruised, and the rival claimant's officer takes the boat for his escort, buying you a day but making the chiefs watch the rival wade too"
+        }
+      ],
+      "involves": [
+        "your partner",
+        "the local guide",
+        "the rival claimant's officer"
+      ],
+      "form": "endure",
+      "set_piece": "the river crossing where the current is too strong for the boat, the two men wading into the freezing water, their hands gripping the other's shoulders with desperate strength",
+      "serves": "3b.secondary_affects"
+    },
+    {
+      "id": 3,
+      "situation": "In the private quarters of the 'kings' the map is spread on a crate between you, the candle flame flickering, and the rival claimant's officer has the contract's seal in his hand and will not say what he will name when the hall opens.",
+      "what_you_must_do": "keep the contract's terms from becoming the rival's weapon before the hall opens",
+      "ways_through": [
+        {
+          "way": "you keep the terms hidden because you and your partner agree to hold the sword and the salute as one visible half, and the local guide carries the contract's seal in his own coat",
+          "cost": "the local guide now knows which of you he is keeping safe, and he will answer him first when the chiefs speak"
+        },
+        {
+          "way": "you keep the terms hidden because you give the rival claimant's officer the contract's seal in exchange for his word that he will name both of you in the chiefs' hearing",
+          "cost": "the officer's word is the government's word, and your partner must stand in the current of the rival's naming before the chiefs can see you"
+        }
+      ],
+      "involves": [
+        "your partner",
+        "the local guide",
+        "the rival claimant's officer"
+      ],
+      "form": "conceal_or_reveal",
+      "set_piece": "the two partners standing in a narrow tent at night, the map spread on a crate between them, the candle flame flickering as they argue in low voices about who holds the seal and who holds the sword",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 4,
+      "situation": "The capital's makeshift hall is raised with a throne of salvaged wagon wheels and a flag of patched sailcloth, and the rival claimant walks in with the government's escort and names one of you king and the other commander before the chiefs.",
+      "what_you_must_do": "make the chiefs see who holds the crown in the new hall before the rival's naming is done",
+      "ways_through": [
+        {
+          "way": "the chiefs see two kings because you and your partner take the chiefs' cup together and the local guide hands the sword to the chief's son, and the rival claimant is made to wait on the spare chair",
+          "cost": "the rival claimant's escort stands with the government's sash at the hall's door, and both of you must answer to the chiefs' questions in public"
+        },
+        {
+          "way": "the chiefs see one king because you take the rival claimant's chair and drink from the chiefs' cup alone, and your partner stands at your shoulder with the sword",
+          "cost": "your partner loses his shared seat and his share of the tribute, and becomes the king's man"
+        },
+        {
+          "way": "the chiefs see one king because your partner takes the rival claimant's chair and drinks from the chiefs' cup alone, and you stand at his shoulder with the sword",
+          "cost": "you lose your shared seat and your share of the tribute, and become the king's man"
+        }
+      ],
+      "involves": [
+        "your partner",
+        "the local guide",
+        "the rival claimant"
+      ],
+      "form": "trade",
+      "set_piece": "a banquet in a makeshift hall where local leaders eat roasted meat and drink fermented spirits, watching the two men with a mix of awe and suspicion, while the men carefully manage their plates to appear sovereign rather than hungry",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "id": 5,
+      "situation": "At the autumn banquet the chiefs' cup is between you, the rival claimant holds the spare chair, and the contract's terms are now the only thing standing between two kings and one subject.",
+      "what_you_must_do": "settle whose hand is on the shared cup when the chiefs drink",
+      "ways_through": [
+        {
+          "way": "the chiefs drink from a shared cup because you and your partner take the cup together and the local guide sets the sword and the crown between you, and the rival claimant is left with the spare chair",
+          "cost": "both of you bear the frontier's hardship and the rival's challenge, and the crown is split and harder to defend; if one falters, the other pays"
+        },
+        {
+          "way": "the chiefs drink from one king's cup because you take the rival claimant's chair and drink from the chiefs' cup alone, and your partner stands at your shoulder with the sword",
+          "cost": "your partner's place at the shared table is given up, and he is a subject in the kingdom he helped make"
+        }
+      ],
+      "involves": [
+        "your partner",
+        "the local guide",
+        "the rival claimant"
+      ],
+      "form": "confront",
+      "set_piece": null,
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The local guide has been keeping his hand on the rim of the shared cup when the chiefs speak, as if he is holding the two of you together, and at the crossing he is the one who grips your partner's shoulder in the current, and the chiefs see it.",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "description": "The rival claimant's officer has the contract's seal in his hand and will not say what he will name when the hall opens, and the seal is the only thing that can make the chiefs hear the government's word before yours.",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "description": "The rival claimant has taken the spare chair at the chiefs' table, drinks from the third cup, and sits down as if he were already one of the claimants, and his chair is the only thing that can name one of you king and the other commander.",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the first chief",
+      "kind": "individual",
+      "being": "person",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to see which of the white men can hold a silence long enough to be believed",
+      "holds": "the warriors' silence and the first chief's cup, which validates the claim",
+      "edge": "has seen empires rise and fall in the span of a generation and is amused by the speed of your bluff",
+      "tie": "is the first audience to judge the partnership's performance",
+      "voice": "speaks in short, heavy sentences that land like stones: 'The salute is a promise. The promise is a debt.'",
+      "breaking_point": null,
+      "opposition": false,
+      "matters_to_turns": [
+        1
+      ],
+      "name": "Godric Corvane"
+    },
+    {
+      "role": "your partner",
+      "kind": "individual",
+      "being": "person",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to hold the sword and the salute, and to be the one who does not flinch when the con wobbles",
+      "holds": "the military discipline that makes the salute look real, and the only name on the contract",
+      "edge": "resents you for the crown but is the one who checks your rigging every night and will not let you fall",
+      "tie": "taught you to lift the summer you came, and expected to be named instead of you",
+      "voice": "lifts something heavy while he talks, so he need not look at you: 'She'd have held that pole. You'd need six of me.'",
+      "breaking_point": "leaves the night you tell the company what his aunt could not see",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "name": "Eamon Underhay"
+    },
+    {
+      "role": "the local guide",
+      "kind": "individual",
+      "being": "person",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to know which of you will pay for the passes when the river rises",
+      "holds": "the knowledge of the passes and the exact moment the bluff becomes a lie",
+      "edge": "knows exactly what you are and has chosen to walk with you anyway, which costs him more than the gold",
+      "tie": "owes you his life from the garrison, but owes the river his loyalty",
+      "voice": "counts the steps while he talks, as if the ground might give way: 'One, two, hands. One, two, hands. You're thinking of selling the horses, aren't you.'",
+      "breaking_point": "walks the horses to the riding school the night you sell the first one",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "name": "Niall Fairhollow"
+    },
+    {
+      "role": "the rival claimant",
+      "kind": "individual",
+      "being": "person",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to be recognized as the lawful authority over the country, or to install a single king who will answer to his government",
+      "holds": "the government's red sash and the power to name one of you king and the other commander",
+      "edge": "was the founder's first partner, and still keeps her spangled cape in his wagon",
+      "tie": "promised the founder he would look after her nephew",
+      "voice": "admires everything he means to buy: 'Lovely act. Lovely. Wasted on a field like this.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        4,
+        5
+      ],
+      "name": "Dag Callow"
+    },
+    {
+      "role": "the rival claimant's officer",
+      "kind": "individual",
+      "being": "person",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to secure the seal on the contract before the hall opens, so the naming is done",
+      "holds": "the contract's seal and the boat at the swollen river",
+      "edge": "is the one who actually checks the rigging, and will not let the rival claimant make a mistake",
+      "tie": "owes the rival claimant his commission, but owes the contract its integrity",
+      "voice": "speaks in precise, clipped commands that leave no room for argument: 'The seal is in my hand. The seal does not lie.'",
+      "breaking_point": "leaves the night you take the agent's money",
+      "opposition": true,
+      "matters_to_turns": [
+        2,
+        3
+      ],
+      "name": "Fergal Pellam"
+    }
+  ],
+  "name_pool": "fantasy"
+}

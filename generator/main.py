@@ -111,6 +111,60 @@ PAPER_ACT = re.compile(r"\b(sign|signs|signed|signing|signature|countersign\w*|p
                        r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on)\b", re.I)
 
 
+def repeated_turns(turns):
+    """The turns that retell another turn's outcome in its words
+    (example_guard.repeated_ways), as [(turn id to change, problem, quote)].
+    The turn to change is the later one, except when the later one is the
+    last turn: the last turn carries the story's question, so the earlier
+    one is rewritten. (In the King run of 2026-10-07 the audit quoted the
+    last turn, the repair was pointed at the one turn that must keep the
+    question, and two rounds left both turns as they were.)"""
+    turns = [t for t in turns or [] if isinstance(t, dict)]
+    last = turns[-1].get('id') if turns else None
+    text = {(t.get('id'), j + 1): str(w.get('way') or '') for t in turns
+            for j, w in enumerate(t.get('ways_through') or []) if isinstance(w, dict)}
+    out, done = [], set()
+    for score, a, b in example_guard.repeated_ways(turns):
+        change, keep = (a, b) if b[0] == last else (b, a)
+        if change[0] in done:
+            continue
+        done.add(change[0])
+        why = (f'; turn {keep[0]} is the last turn and keeps the question, so turn {change[0]} changes'
+               if keep[0] == last else '')
+        out.append((change[0],
+                    f'turn {change[0]} way {change[1]} retells turn {keep[0]} way {keep[1]} in the same words '
+                    f'({round(score * 100)}% of their phrases shared): one outcome written twice{why}. Give turn '
+                    f'{change[0]} a local goal of its own and ways that change something else (who is with you, '
+                    f'what you hold, what is damaged)',
+                    text.get(change, '')))
+    return out
+
+
+CARRIED = re.compile(r'^\(round \d+, still in the premise\) ')
+UNREPAIRED_MIN_WORDS = 5      # a shorter quote ("the papers") can survive a real repair elsewhere in the premise
+
+
+def unrepaired(findings, premise, declined=(), changed=()):
+    """The findings a repair was given whose quoted words are still in the
+    premise, word for word, in a section the repair did not return: the
+    audit's own findings (a computed or craft finding is recomputed every
+    round anyway), not declined, quoting at least UNREPAIRED_MIN_WORDS words.
+    A returned section can keep the words and still be the fix (two
+    mediation poles swapped). On the saved repairs to 2026-10-07 this named
+    4 of 44 findings: the King's retold turn twice and a coined phrase, all
+    logged as rewritten in a turn while only cast_seeds came back, and one
+    setup fixed in the turns that use it (one wasted retry)."""
+    out = []
+    for f in findings:
+        if f.get('source') in ('computed', 'craft') or f.get('id') in declined \
+                or len(plain(f.get('quote')).split()) < UNREPAIRED_MIN_WORDS:
+            continue
+        holds = [k for k, v in (premise or {}).items() if quote_in(f.get('quote'), json.dumps(v, ensure_ascii=False))]
+        if holds and not set(holds) & set(changed):
+            out.append(f)
+    return out
+
+
 def soft_premise_finding(f):
     """A finding left after the last repair that is kept as a note, not a
     halt: anything but a computed check or a verified Kernel contradiction."""
@@ -878,6 +932,9 @@ class StoryGenerator:
             parsed['complications'] = []
         if problems:
             raise ValueError('; '.join(problems))
+        if check_forms:
+            # a retold turn costs one retry here instead of a repair round (or a premise that keeps it)
+            bad_forms += [problem for _, problem, _ in repeated_turns(turns)]
         if bad_forms and check_forms:
             raise SoftReject('; '.join(bad_forms))
         plotty = sorted({r for t in turns for r in t['involves'] if FUNCTION_ROLE.search(r)})
@@ -1181,6 +1238,8 @@ class StoryGenerator:
 
         for where, problem in self.craft_problems(premise):     # a quality the count can see: a note, never a halt
             out.append({'source': 'craft', 'where': where, 'problem': problem, 'quote': ''})
+        for tid, problem, quote in repeated_turns(premise.get('turns')):
+            out.append({'source': 'craft', 'where': f'turns[{tid}].ways_through', 'problem': problem, 'quote': quote})
         items = paper.premise_items(premise)
         hits = paper.heavy(items, self.kernel)
         if hits:
@@ -1289,8 +1348,9 @@ class StoryGenerator:
                    'pressure, the situations and the ways through are people, places, objects, documents, events or '
                    'things said, not coined abstractions. If one is not, quote it.'),
             ('E6', 'no two turns pose the same choice: their ways are not the same outcomes with different nouns, and '
-                   'turns before the last two have local goals of their own rather than the decision axis in another '
-                   'form (unless the Kernel itself makes the decision recur). If they do, quote the later turn.'),
+                   'turns before the last have local goals of their own rather than the decision axis in another '
+                   'form (unless the Kernel itself makes the decision recur). If they do, quote the turn that should '
+                   'change: the later one, or the earlier one when the later is the last turn.'),
         ]
         items += [
             ('E7', 'price.what is something lost for good (a life, a body, a bond, a way of life, a place), not a '
@@ -1471,9 +1531,19 @@ class StoryGenerator:
                 key = lambda f: (f['where'], f['problem'])
                 before = {key(f) for f in self.premise_computed_findings(current)}
                 broken = [f for f in self.premise_computed_findings(merged) if key(f) not in before]
+                soft = []
                 if broken:
-                    raise SoftReject('the repair introduced new problems: ' + '; '.join(
+                    soft.append('the repair introduced new problems: ' + '; '.join(
                         f"{f['where']}: {f['problem']}" + (f' ("{f["quote"]}")' if f['quote'] else '') for f in broken))
+                # a finding the log calls fixed while its quoted words are still there was not fixed
+                # (King, 2026-10-07: the log rewrote turn 5, the answer returned only cast_seeds)
+                kept = unrepaired(to_repair, merged, declined_ids(parsed, to_repair), parsed['revised'])
+                if kept:
+                    soft.append('these findings still quote words that are in the premise unchanged, so they are not '
+                                'repaired: ' + '; '.join(f'{f["id"]} ("{f["quote"]}")' for f in kept) +
+                                '. Return the sections that hold those words, rewritten')
+                if soft:
+                    raise SoftReject(' Also, '.join(soft))
 
             repaired = self.run_prompt(f's3_5r{n}', 'premise_repair', {
                 '$$BRIEF_LINES$$': brief_table,
@@ -1486,6 +1556,13 @@ class StoryGenerator:
             premise = self.name_cast(self.merge_premise(premise, repaired['revised']))
             declined |= {finding_key(f) for f in to_repair if f['id'] in declined_ids(repaired, to_repair)}
             findings = self.verify_premise(premise, n)
+            # the audit is a sample: a finding it raised, the repair did not fix and this round missed
+            # stays open (the King's retold turn was raised in round 0, missed in round 1, back in round 2)
+            have = {finding_key(f) for f in findings}
+            findings += [dict({k: v for k, v in f.items() if k != 'id'}, carried=True,
+                              problem=f"(round {n - 1}, still in the premise) " + CARRIED.sub('', f['problem']))
+                         for f in unrepaired(to_repair, premise, declined_ids(repaired, to_repair), repaired['revised'])
+                         if finding_key(f) not in have]
             for f in findings:
                 if finding_key(f) in declined:
                     f['disputed'] = True

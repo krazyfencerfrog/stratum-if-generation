@@ -316,6 +316,51 @@ def paper_is_counted_at_every_step():
 
 
 @test
+def retold_turns_are_found_and_the_right_one_changes():
+    import main as gen_main
+    import example_guard
+    way = "you take the rival claimant's chair and drink from the chiefs' cup alone, and your partner stands at your shoulder"
+    turns = [{'id': 1, 'ways_through': [{'way': 'the river is crossed on the guide\'s boat'}]},
+             {'id': 2, 'ways_through': [{'way': way}, {'way': 'the chiefs see two kings at one table'}]},
+             {'id': 3, 'ways_through': [{'way': 'the chiefs drink from one cup because ' + way}]}]
+    hits = example_guard.repeated_ways(turns)
+    check(len(hits) == 1 and hits[0][1:] == ((2, 1), (3, 1)), f'expected turn 2 way 1 ~ turn 3 way 1: {hits}')
+    found = gen_main.repeated_turns(turns)
+    check(len(found) == 1 and found[0][0] == 2 and 'last turn' in found[0][1] and found[0][2] == way,
+          f'the last turn keeps the question, so turn 2 changes: {found}')
+    four = turns + [{'id': 4, 'ways_through': [{'way': 'the crown is carried home in a horsehair bag'}]}]
+    check(gen_main.repeated_turns(four)[0][0] == 3, 'away from the last turn the later turn changes')
+    check(not example_guard.repeated_ways([turns[0], dict(turns[1], id=2), {'id': 3, 'ways_through': [
+        {'way': 'you set the sword in the niche and let it calm the water'}]}]), 'different outcomes are not a repeat')
+    # 3.5b: a retold turn costs one informed retry
+    run('retold', env={'STUB_REPEAT_TURN': '1'})
+    attempts = [c for c in calls('retold') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
+    check('retells turn' in load('retold', 's3_5b_raw_input_prompt.txt'), 'the retry should name the retold turn')
+
+
+@test
+def a_repair_that_leaves_the_quote_is_retried_and_the_finding_kept():
+    import main as gen_main
+    long_q = 'he opens it after seeing the medical bay'
+    premise = {'turns': [{'ways_through': [{'way': long_q}]}]}
+    fs = [{'id': 'F1', 'source': 'engine check', 'quote': long_q}, {'id': 'F2', 'source': 'engine check', 'quote': 'the bay'},
+          {'id': 'F3', 'source': 'craft', 'quote': long_q}, {'id': 'F4', 'source': 'engine check', 'quote': long_q}]
+    check([f['id'] for f in gen_main.unrepaired(fs, premise, {'F4'})] == ['F1'],
+          'only a long quote, from the audit, not declined, counts as unrepaired')
+    check(not gen_main.unrepaired(fs, premise, (), {'turns': []}), 'a section the repair returned may keep its words')
+    run('unrepaired', env={'STUB_PREMISE_ALWAYS_HARD': '5'})
+    repairs = [c['ok'] for c in calls('unrepaired') if c['step'] == 's3_5r']
+    check(repairs == [False, True, False, True], f'each repair that left the quote should be re-asked once: {repairs}')
+    loop = load('unrepaired', 's3_5_loop.json')
+    r1 = [f for f in loop['rounds'][1]['findings'] if f.get('carried')]
+    check(r1 and r1[0]['problem'].startswith('(round 0, still in the premise)'), f'round 1 should carry the E6 finding: {r1}')
+    check(loop['repair_rounds_used'] == 2 and not loop['still_failing']
+          and any(f.get('carried') and f['problem'].count('still in the premise') == 1 for f in loop['accepted_with']),
+          'the carried judgment is repaired again, then kept as a note; its label does not stack')
+
+
+@test
 def cast_copying_its_example_is_rejected():
     import main as gen_main
     prompt = open(os.path.join(ROOT, 'prompts', 's3_5c_cast.prompt'), encoding='utf-8').read()

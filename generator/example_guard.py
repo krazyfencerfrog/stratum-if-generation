@@ -172,6 +172,39 @@ def repeated_tics(path_texts, new_ids, exempt_texts=(), min_nodes=3, name_words=
     return out
 
 
+REPEAT_WAYS = 0.5     # 66 saved premises to 2026-10-07: the King's copied turn scored 0.75, every other pair 0.35 or less
+
+
+def repeated_ways(turns, threshold=REPEAT_WAYS):
+    """Ways through two different turns that tell the same outcome in the
+    same words: the share of their distinctive 4-word phrases they have in
+    common (Jaccard) at or above threshold. The King's turn 5 copied turn 4's
+    "you take the rival claimant's chair and drink from the chiefs' cup
+    alone, and your partner stands at your shoulder with the sword" (0.75);
+    the closest pair on any other saved premise shared a phrase inside
+    different goals and outcomes (0.35). Which turn should change is the
+    caller's decision. Returns [(score, (turn id, way index), (turn id, way
+    index))], earlier turn first, way indexes from 1, highest score first."""
+    ways = []
+    for i, t in enumerate(turns or []):
+        if not isinstance(t, dict):
+            continue
+        for j, w in enumerate(t.get('ways_through') or []):
+            if isinstance(w, dict):
+                ways.append((t.get('id') or i + 1, j + 1, ngrams(str(w.get('way') or ''))))
+    out = []
+    for a in range(len(ways)):
+        for b in range(a + 1, len(ways)):
+            (ta, wa, ga), (tb, wb, gb) = ways[a], ways[b]
+            if ta == tb or not ga or not gb:
+                continue
+            score = len(ga & gb) / len(ga | gb)
+            if score >= threshold:
+                out.append((round(score, 2), (ta, wa), (tb, wb)))
+    out.sort(key=lambda r: -r[0])
+    return out
+
+
 def described_voices(summaries, cast):
     """Node summaries that narrate a person with their cast sketch's own
     description of how they talk or what their edge is ("Ivo begins a bargain

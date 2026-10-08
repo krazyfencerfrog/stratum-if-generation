@@ -1,0 +1,13 @@
+{
+ "about": "Turn 4's second way retells turn 5's second way nearly word for word (one king takes the rival's chair and drinks alone, the partner at his shoulder with the sword). Turn 5 is the last turn and keeps the question, so turn 4 is the one to change.",
+ "origin": "king5/stories/ref_man_who_would_be_king: the premise as built (round 0); the audit raised it in rounds 0 and 2, missed it in round 1, and both repairs left it",
+ "expect": [
+  {
+   "want": "present",
+   "source": "craft",
+   "where": "turns[4].ways_through",
+   "quote": "drink from the chiefs' cup alone",
+   "why": "a computed check: the same outcome told twice in the same words"
+  }
+ ]
+}

@@ -25,7 +25,9 @@ Scenario knobs (environment variables):
     STUB_PREMISE_ALWAYS_HARD=1   3.5v always finds a craft note (E1): kept, the run goes on;
                                  =2 it always finds a brief constraint broken (a judgment: kept as a note);
                                  =3 a Kernel clause contradicted, quoting the premise (tests the halt);
-                                 =4 the same, quoting words the premise does not have (a note)
+                                 =4 the same, quoting words the premise does not have (a note);
+                                 =5 the first audit only fails E6, quoting a way 3.5r never changes
+                                 (tests the repair's retry and the finding carried into later rounds)
     STUB_PREMISE_LOSS=1          3.5v always reports a way to lose quoting a complication; 3.5r
                                  declines it as the price (tests a declined finding);
                                  =2 the loss it reports quotes the price (dropped by construction)
@@ -39,6 +41,7 @@ Scenario knobs (environment variables):
     STUB_BAD_CAST=1              3.5c's first answer leaves a crowd without a
                                  representative (tests the informed retry)
     STUB_PAPER=1                 3.5b's first answer puts every way through on paper (tests the paper rule's retry)
+    STUB_REPEAT_TURN=1           3.5b's first answer gives the last turn a way copied from turn 2 (tests the retry)
     STUB_BAD_PLAN=1              4a's first answer leaves a turn unplaced
                                  (tests the informed retry)
     STUB_SLOPPY=1                answers use beat names for ids, numbers as
@@ -453,6 +456,8 @@ class StubClient(LlmClient):
             for t in out['turns']:
                 for w in t['ways_through']:
                     w['way'] = 'you sign the treaty and seal it in the ledger, ' + w['way']
+        if env_int('STUB_REPEAT_TURN', 0) and RETRY_MARKER not in p:
+            out['turns'][-1]['ways_through'][0]['way'] = out['turns'][1]['ways_through'][0]['way']
         return out
 
     def _s3_5b(self, p):
@@ -516,6 +521,7 @@ class StubClient(LlmClient):
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
         broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
+        retold = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 5 and self.premise_verifies == 1
         loss = env_int('STUB_PREMISE_LOSS', 0)
         loss_quote = (str((material.get('price') or {}).get('what') or '') if loss == 2 else
                       str(((material.get('complications') or [{}])[-1] or {}).get('description') or ''))
@@ -527,7 +533,9 @@ class StubClient(LlmClient):
             "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and n == explicit,
                              "quote": "stub quote" if broken and n == explicit else ""} for n in constraints],
             "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
-                       for e in engine],
+                       for e in engine if not (retold and e == 'E6')]
+                      + ([{"id": "E6", "note": "stub: turn 2 retells turn 1", "holds": False,
+                           "quote": material['turns'][1]['ways_through'][1]['way']}] if retold else []),
             "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "kind": "number"}]
                           if hard else []) + ([{"material": loss_quote, "note": "stub: the player loses", "kind": "loss"}] if loss else [])
                          + [{"material": "the override codes", "note": "stub: an object in the story", "kind": "fiction"}],
