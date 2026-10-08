@@ -667,6 +667,10 @@ def menus_read_as_actions_and_fit_their_keys():
     check('Take › the fountain pen › take it' in paths and 'Take › the fountain pen › on the saddle' not in paths
           and paths.get('Take › the fountain pen › take it') == 'take:pen',
           f'the plain action beside a detailed one is "take it", not the object again: {sorted(paths)}')
+    import runtime
+    check(runtime._unechoed('take the mooring line off the bollard', 'Take', 'the mooring line') == 'off the bollard'
+          and runtime._unechoed('take the mooring line', 'Take', 'the mooring line') == 'take the mooring line',
+          'a detail does not repeat the verb and object its path says')
     # a long Examine is grouped; a level wider than the keys ends in "more…"
     data = mini()
     for n in range(40):

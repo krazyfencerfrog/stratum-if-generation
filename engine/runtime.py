@@ -234,7 +234,9 @@ class Engine:
                 onode = {'label': opts[0]['object_label'], 'children': []}
                 groups = {}
                 for o in opts:
-                    leaf = {'label': None if o['detail'] is None else detail_text(verb, o['detail_label'], o.get('detail_free')),
+                    leaf = {'label': None if o['detail'] is None else
+                            _unechoed(detail_text(verb, o['detail_label'], o.get('detail_free')), vnode['label'],
+                                      onode['label']),
                             'id': o['id']}
                     if o.get('weight'):
                         leaf['weight'] = o['weight']
@@ -382,7 +384,8 @@ class Engine:
         if opt['object_label']:
             parts.append(opt['object_label'])
         if opt['detail_label']:
-            parts.append(detail_text(opt['verb'], opt['detail_label'], opt.get('detail_free')))
+            parts.append(_unechoed(detail_text(opt['verb'], opt['detail_label'], opt.get('detail_free')), parts[0],
+                                   opt['object_label']))
         return ' › '.join(parts)
 
     def _free_text(self, opt):
@@ -769,6 +772,19 @@ def _is_action(label, min_words=3):
     takes no preposition in the menu."""
     label = str(label or '').strip()
     return len(label.split()) >= min_words and not NOUN_START.match(label)
+
+
+def _unechoed(label, verb_label, object_label):
+    """A detail without the verb and object its menu path already says:
+    "Take › the mooring line › take the mooring line off the bollard" reads
+    "Take › the mooring line › off the bollard". Left whole when nothing
+    would remain or the start differs."""
+    if not label or not verb_label or not object_label:
+        return label
+    lead = f'{verb_label} {object_label} '.lower()
+    if label.lower().startswith(lead) and label[len(lead):].strip():
+        return label[len(lead):].strip()
+    return label
 
 
 def _first_sentence(text):

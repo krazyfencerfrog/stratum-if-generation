@@ -231,3 +231,22 @@ def described_voices(summaries, cast):
                 break
     return out
 
+
+
+# "You set the body on the curb": text that narrates a deed the player never chose (kernel40's openings,
+# kernel35's recaps, 2026-10-08). What you perceive, are, or are in the middle of is fine; the verbs here are deeds.
+YOU_DID = re.compile(r"\b[Yy]ou (set|put|carry|carried|take|took|let|lift|lifted|give|gave|hand|handed|open|opened|"
+                     r"close|closed|sign|signed|pick|picked|lay|laid|drag|dragged|pull|pulled|push|pushed|throw|threw|"
+                     r"cut|tie|tied|untie|untied|leave|left|walk|walked|bring|brought|fetch|fetched|tell|told|say|said|"
+                     r"decide|decided|choose|chose|agree|agreed|refuse|refused|name|named|hold|held|keep|kept|sell|sold|send|sent|"
+                     r"call|called|answer|answered)\b")
+CONDITION = re.compile(r"\b(until|unless|if|when|before|after|will|would|can|could|must|should|to|may|might|whether|"
+                       r"once|let)\s+$")
+
+
+def player_deed(text):
+    """The first "You <deed>" in text that is not a condition ("until you
+    sign"), as a match, or None."""
+    text = str(text or '')
+    return next((m for m in YOU_DID.finditer(text)
+                 if not CONDITION.search(text[max(0, m.start() - 12):m.start()].lower())), None)

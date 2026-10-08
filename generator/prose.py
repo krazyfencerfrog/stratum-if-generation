@@ -29,6 +29,7 @@ import os
 import re
 import sys
 
+import example_guard
 import schemas
 from errors import SoftReject
 
@@ -386,6 +387,9 @@ class ProseWriter:
                     continue
                 if k == 'recap' and not 8 <= len(words(t)) <= 70:
                     soft.append(f'recap: {len(words(t))} words; one or two sentences')
+                if k == 'recap' and example_guard.player_deed(t):     # the same recap is read whatever they did
+                    soft.append(f'recap: says what the player did ("{example_guard.player_deed(t).group(0)}"); say what '
+                                f'the scene put before them, since the journal lists their choices beneath it')
                 if ALTERNATIVES.search(t):
                     soft.append(f'{i}: narrates alternatives ("{ALTERNATIVES.search(t).group(0)}"); say what happens')
                 if MECHANICS.search(t):

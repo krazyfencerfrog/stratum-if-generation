@@ -45,12 +45,6 @@ ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 CORE_VERBS = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 LAPSE_AFTER = 4
 ENGINE_VERBS = ('look', 'examine', 'wait', 'inventory', 'think')     # the engine makes these; a scene's own is a misuse
-# "You set the body on the curb": an opening that narrates a deed the player never chose (kernel40, 2026-10-08).
-# What you perceive, are, or are in the middle of is fine; the verbs here are deeds.
-YOU_DID = re.compile(r"\b[Yy]ou (set|put|carry|carried|take|took|let|lift|lifted|give|gave|hand|handed|open|opened|"
-                     r"close|closed|sign|signed|pick|picked|lay|laid|drag|dragged|pull|pulled|push|pushed|throw|threw|"
-                     r"cut|tie|tied|untie|untied|leave|left|walk|walked|bring|brought|fetch|fetched|tell|told|say|said|"
-                     r"decide|decided|choose|chose|agree|agreed|refuse|refused)\b")
 
 
 class SceneCompiler:
@@ -260,10 +254,8 @@ class SceneCompiler:
                 out.append(f"verb {it['verb']!r} on {label!r}: the engine makes {it['verb']} itself; give this action "
                            f"a verb of its own")
         opening = ' '.join(v.get('text', '') for v in scene.get('opening') or [])
-        m = next((m for m in YOU_DID.finditer(opening)
-                  if not re.search(r"\b(until|unless|if|when|before|after|will|would|can|could|must|should|to|may|"
-                                   r"might|whether|once|let)\s+$", opening[max(0, m.start() - 12):m.start()].lower())), None)
-        if m:                       # "until you sign" is a condition, not a deed
+        m = example_guard.player_deed(opening)
+        if m:
             sentence = next((x for x in re.split(r'(?<=[.!?])\s+', opening) if m.group(0) in x), m.group(0))
             out.append(f'the opening narrates something the player does ("{sentence.strip()}"): the player acts only '
                        f'through the menu. Say what the place and the people are like now; a deed of the player\'s '
