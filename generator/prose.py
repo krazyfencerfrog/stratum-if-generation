@@ -62,10 +62,12 @@ REPEAT_N = 5                  # a run of this many words shared with an earlier 
 
 GUIDANCE = {
     'scene': "THIS PART is one scene: its opening (the first thing read on arrival: put the player in the room and "
-             "the moment, with who is here), what each of its actions does (the response to choosing it), how its "
+             "the moment, with who is here; it tells the world, never a deed the player did not choose), what each of its actions does (the response to choosing it), how its "
              "rooms read during it, the events that happen on their own, the nudges if the player idles, and its "
              "journal entry ('recap': what the scene put before the player, for the story-so-far page).",
-    'person': "THIS PART is one person: how they look (by their state), the line the room shows them by ('here'), "
+    'person': "THIS PART is one person: how they look (by their state), the line the room shows them by ('here': what "
+              "they are doing or holding when found, never where they are, since each scene places them and the line "
+              "is read in every room they turn up in), "
               "and what they say on each subject, in their own voice. 'unnamed' is how the player sees them before "
               "learning their name: a short phrase, three to eight words, starting with 'the' or 'a', what you would "
               "notice first ('the old man in the captain's coat').",

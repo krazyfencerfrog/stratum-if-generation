@@ -12,9 +12,12 @@ What you write:
    becomes visible: the tells. A variant names a state and a direction
    (dana_trust up: she leaves the talkback key open), or a node after which
    it holds (after N04a), or neither (the default, last).
- - here: one sentence for how they appear in a room ("Dana is in the booth,
-   headphones round her neck"), also by state if their stance shows in where
-   they are or what they are doing.
+ - here: one sentence for how they appear when the player finds them: what
+   they are doing, holding, wearing ("Dana has her headphones round her
+   neck, one eye on the call board"), also by state if their stance shows in
+   what they are doing. Never WHERE they are: each scene places them, and
+   the same sentence is read in every room they turn up in ("Dana is in the
+   booth" is false in the corridor).
  - topics: the CURATED things the player can talk to them about, the ones
    the story turns on: what they want, what they hold, what they know, what
    they are hiding, the people they are tied to. Three to eight for an arc
@@ -55,7 +58,7 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
 EXAMPLE (a late-night radio phone-in story; for shape only)
 
 {
-  "notes": "Dana's trust shows in the booth: the talkback key, where she sits, whether she cues your records. The topic the story turns on is the caller she keeps screening out.",
+  "notes": "Dana's trust shows in what she does: the talkback key, which way she faces, whether she cues your records. The topic the story turns on is the caller she keeps screening out.",
   "history": "Dana produced the overnight show for nine years before you, for a host who drank. She covered for him on air until the night she could not, and she has not forgiven herself for the night she could.",
   "description": [
     {"state": "dana_trust", "direction": "up", "after": null, "text": "She has pulled her chair round to face the glass instead of the board, and when she catches you looking she lifts two fingers off the fader: go on."},
@@ -63,8 +66,8 @@ EXAMPLE (a late-night radio phone-in story; for shape only)
     {"state": null, "direction": null, "after": null, "text": "Fifty, cardigan sleeves pushed up, a pencil behind each ear because she always loses the first one."}
   ],
   "here": [
-    {"state": "dana_trust", "direction": "down", "after": null, "text": "Dana is in the booth with her back half to you, talking low into the station phone."},
-    {"state": null, "direction": null, "after": null, "text": "Dana is behind the glass, headphones round her neck, watching the call board."}
+    {"state": "dana_trust", "direction": "down", "after": null, "text": "Dana has her back half to you, talking low into the station phone."},
+    {"state": null, "direction": null, "after": null, "text": "Dana has her headphones round her neck and one eye on the call board."}
   ],
   "topics": [
     {"label": "the caller", "known_after": "N01", "says": [

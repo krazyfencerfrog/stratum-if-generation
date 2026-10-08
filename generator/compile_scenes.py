@@ -35,6 +35,8 @@ import sys
 
 import checks
 import schemas
+from errors import SoftReject
+import example_guard
 from world import compile_variants, slug, as_list, compact
 
 norm = checks.norm
@@ -42,6 +44,13 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 CORE_VERBS = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 LAPSE_AFTER = 4
+ENGINE_VERBS = ('look', 'examine', 'wait', 'inventory', 'think')     # the engine makes these; a scene's own is a misuse
+# "You set the body on the curb": an opening that narrates a deed the player never chose (kernel40, 2026-10-08).
+# What you perceive, are, or are in the middle of is fine; the verbs here are deeds.
+YOU_DID = re.compile(r"\b[Yy]ou (set|put|carry|carried|take|took|let|lift|lifted|give|gave|hand|handed|open|opened|"
+                     r"close|closed|sign|signed|pick|picked|lay|laid|drag|dragged|pull|pulled|push|pushed|throw|threw|"
+                     r"cut|tie|tied|untie|untied|leave|left|walk|walked|bring|brought|fetch|fetched|tell|told|say|said|"
+                     r"decide|decided|choose|chose|agree|agreed|refuse|refused)\b")
 
 
 class SceneCompiler:
@@ -225,10 +234,57 @@ class SceneCompiler:
     def validator(self, sc, packet):
         def validate(parsed):
             problems = []
-            self.build(sc, parsed, problems)
+            built = self.build(sc, parsed, problems)
             if problems:
                 raise ValueError('; '.join(problems[:12]))
+            soft = self.reading_problems(built['scene'], parsed, built['props'])
+            if soft:
+                raise SoftReject('; '.join(soft[:8]))
         return validate
+
+    def reading_problems(self, scene, parsed, props):
+        """What reads wrong to a player, found by playing kernel40 and kernel35
+        (2026-10-08): one informed retry each, never the run."""
+        out = []
+        objects = dict(self.world['objects'], **props)
+        for it in scene['interactions']:
+            obj = objects.get(it.get('object'))
+            label = it.get('object_label') or (obj or {}).get('name') or it.get('object')
+            if it['verb'] == 'take' and obj is not None and not obj.get('portable'):
+                out.append(f"take {label!r}: take picks up a thing that can be carried; {label!r} cannot be, so give "
+                           f"this action a verb of its own (leave, sign, open, ...)")
+            elif it['verb'] == 'take' and it.get('detail') in objects:
+                out.append(f"take {label!r} with {objects[it['detail']].get('name')!r}: an action on two things is not "
+                           f"a take; give it a verb of its own (sign, wrap, ...)")
+            elif it['verb'] in ENGINE_VERBS:
+                out.append(f"verb {it['verb']!r} on {label!r}: the engine makes {it['verb']} itself; give this action "
+                           f"a verb of its own")
+        opening = ' '.join(v.get('text', '') for v in scene.get('opening') or [])
+        m = next((m for m in YOU_DID.finditer(opening)
+                  if not re.search(r"\b(until|unless|if|when|before|after|will|would|can|could|must|should|to|may|"
+                                   r"might|whether|once|let)\s+$", opening[max(0, m.start() - 12):m.start()].lower())), None)
+        if m:                       # "until you sign" is a condition, not a deed
+            sentence = next((x for x in re.split(r'(?<=[.!?])\s+', opening) if m.group(0) in x), m.group(0))
+            out.append(f'the opening narrates something the player does ("{sentence.strip()}"): the player acts only '
+                       f'through the menu. Say what the place and the people are like now; a deed of the player\'s '
+                       f'is an action')
+        rooms = {r: self.world['rooms'][r]['name'] for r in scene['rooms']}
+        for x in re.split(r'(?<=[.!?])\s+', opening):
+            low = x.lower()
+            said = [r for r, name in rooms.items()
+                    if re.search(r'\b(in|at|inside|on) ' + re.escape(str(name).lower()) + r'\b', low)]
+            for cid, placed in scene['cast'].items():
+                ch = self.world['characters'].get(cid) or {}
+                if len(said) == 1 and placed != said[0] and any(
+                        n and n.lower() in low for n in (ch.get('name'), ch.get('role'))):
+                    out.append(f"the opening puts {ch.get('name')} in {rooms[said[0]]} but placement puts them in "
+                               f"{rooms[placed]}; make them agree")
+        grams = example_guard.ngrams(opening)
+        for k, ev in enumerate(as_list(parsed.get('events')), 1):
+            g = example_guard.ngrams(str((ev or {}).get('text') or '')) if isinstance(ev, dict) else set()
+            if len(g) >= 3 and len(g & grams) >= 0.5 * len(g):
+                out.append(f'event {k} retells the opening; an event is something new that happens later')
+        return out
 
     def resolve(self, name, names, open_rooms, extra=()):
         key = norm(name)
@@ -411,7 +467,8 @@ class SceneCompiler:
         exits.sort(key=lambda x: order.get(x['kind'], 3))
         things = set(self.world['objects']) | set(new_objects)
         for it in interactions:
-            if it['verb'] == 'take' and it.get('object') in things \
+            portable = (self.world['objects'].get(it.get('object')) or new_objects.get(it.get('object')) or {}).get('portable')
+            if it['verb'] == 'take' and it.get('object') in things and portable \
                     and not any(e.get('give') == it['object'] for e in it.get('effects') or []):
                 it.setdefault('effects', []).append({'give': it['object']})   # a take the scene writes still takes
                 it['once'] = True

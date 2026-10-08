@@ -12,7 +12,13 @@ sets); you write the scene.
 What you write, naming rooms, people and things exactly as the packet does:
  - opening: what the player reads on entering the scene, two to four
    sentences: where they are, what has changed, who is here, what presses.
- - start_room, and placement: where each person stands.
+   It tells the world, never a deed of the player's ("You carry the saddle
+   into the square" is a choice the player did not make): the player acts
+   only through the menu. Something big that happened between scenes (a
+   death, a fire) is told as what the player finds or hears, not done by
+   them, and never left unsaid.
+ - start_room, and placement: where each person stands. Where the opening
+   puts someone, place them there.
  - room_text: for any room that is different in this scene (water on the
    floor, a light left on), its text for this scene, as variants: by state
    (the tells due here: show the effect of the player's earlier choice in
@@ -39,6 +45,8 @@ What you write, naming rooms, people and things exactly as the packet does:
       taken.
  - events: the event_here (if any) and anything the scene does by itself,
    each with when it happens (after a number of turns, or after a node).
+   An event is something new that happens later in the scene, never the
+   opening told again.
  - nudges: one or two, for a player who has done nothing that matters for a
    while: someone prompts, or the world pushes. A nudge fires wherever the
    player is, so it must not assume a room ("Dana's voice over the talkback"
@@ -51,8 +59,11 @@ What you write, naming rooms, people and things exactly as the packet does:
 Rules:
  - Verbs: prefer the core verbs (talk, use, give, show, take); add a story
    verb where the action deserves its own word, especially one the story
-   repeats (bail, climb, salute). Never two actions with the same verb,
-   object and detail.
+   repeats (bail, climb, salute). Take is only picking up a thing that can
+   be carried: leaving through a door, signing a paper or acting on two
+   things gets its own verb (leave, sign, wrap). Look, examine, wait and
+   think are the engine's own: never write them. Never two actions with the
+   same verb, object and detail.
  - Every option and action is something done or said, never a moral label
    ("be kind"). A detail that is a line to say goes in quotation marks.
  - Stakes live in bodies, places and things; paper only where the story is

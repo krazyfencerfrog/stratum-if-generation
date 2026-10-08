@@ -361,6 +361,43 @@ def a_repair_that_leaves_the_quote_is_retried_and_the_finding_kept():
 
 
 @test
+def world_and_scenes_are_checked_for_how_they_read():
+    """2026-10-08, from playing kernel35 and kernel40: a here-line names no
+    place, event topics are sentence case, and a scene's take, opening and
+    events read right (each a SoftReject: one informed retry)."""
+    import world
+    import compile_scenes as cs
+    w = world.WorldBuilder.__new__(world.WorldBuilder)
+    w.locations = {'L1': {'name': 'the cabin'}, 'L2': {'name': 'the stern deck'}}
+    check(w.placed_here(['The cat is asleep in the cabin.']) and not w.placed_here(['The cat licks one paw.']),
+          'a here-line that says where someone is should be found')
+
+    class G:
+        kernel = 'A boat on the Fenwick canal.'
+    w.gen, w.chars = G(), {'C1': {'name': 'Hugh Calloway'}}
+    check(w.sentence_case('The Signal at the Fenwick Lock') == 'the signal at the Fenwick lock',
+          w.sentence_case('The Signal at the Fenwick Lock'))
+    c = cs.SceneCompiler.__new__(cs.SceneCompiler)
+    c.world = {'rooms': {'deck': {'name': 'the stern deck'}, 'cabin': {'name': 'the cabin'}},
+               'objects': {'door': {'name': 'the door', 'portable': False}, 'pen': {'name': 'the pen', 'portable': True},
+                           'deed': {'name': 'the deed', 'portable': True}},
+               'characters': {'C1': {'name': 'Hugh Calloway', 'role': 'the captain'}}}
+    scene = {'rooms': ['deck', 'cabin'], 'cast': {'C1': 'deck'},
+             'opening': [{'text': 'Rain falls. Hugh Calloway waits in the cabin. You carry the saddle out.'}],
+             'interactions': [{'id': 'a', 'verb': 'take', 'object': 'door'},
+                              {'id': 'b', 'verb': 'take', 'object': 'pen', 'detail': 'deed'},
+                              {'id': 'c', 'verb': 'look', 'object': 'C1'},
+                              {'id': 'd', 'verb': 'take', 'object': 'pen'}]}
+    found = c.reading_problems(scene, {'events': [{'text': 'Rain falls. Hugh Calloway waits in the cabin, and the rain falls.'}]}, {})
+    for want in ("take 'the door'", "take 'the pen' with 'the deed'", "verb 'look'", 'narrates something the player does',
+                 'opening puts Hugh Calloway in the cabin', 'event 1 retells the opening'):
+        check(any(want in f for f in found), f'missing {want!r} in {found}')
+    check(len(found) == 6, f'taking a pen is fine: {found}')
+    scene['opening'] = [{'text': 'The boat will not move until you sign.'}]
+    check(not any('narrates' in f for f in c.reading_problems(scene, {}, {})), 'a condition is not a deed')
+
+
+@test
 def cast_copying_its_example_is_rejected():
     import main as gen_main
     prompt = open(os.path.join(ROOT, 'prompts', 's3_5c_cast.prompt'), encoding='utf-8').read()

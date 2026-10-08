@@ -218,9 +218,36 @@ class WorldBuilder:
                 if own.get('name') and own['name'] not in json.dumps(parsed):
                     soft.append(f"nothing varies with {own['name']}, this person's own arc state: let at least the "
                                 f"description or a topic change as it moves")
+            soft += self.placed_here(parsed.get('here'))
             if soft:
                 raise SoftReject('; '.join(soft))
         return validate
+
+    def placed_here(self, here):
+        """Complaints for `here` lines that say WHERE the person is: the scene
+        places people and the same line is read in every room they turn up in
+        (kernel35: "the cat is asleep in the cabin", read on the deck; the
+        engine now skips such a line, 2026-10-08)."""
+        out = []
+        for v in as_list(here):
+            text = v.get('text') if isinstance(v, dict) else v
+            places = [name for name, pat in self.place_patterns() if pat.search(str(text or '').lower())]
+            if places:
+                out.append(f'here line "{text}" says where they are ({places[0]}); each scene places them, so say what '
+                           f'they are doing, holding or wearing instead')
+        return out
+
+    def place_patterns(self):
+        if not hasattr(self, '_place_patterns'):
+            pats = []
+            for loc in self.locations.values():
+                name = str(loc.get('name') or '').lower()
+                core = re.sub(r"^(the|a|an)\s+", '', name).strip()
+                if len(core) >= 3:
+                    pats.append((name, re.compile(r"\b(in|at|inside|into|on|by|near) (the |a |an |his |her |their )?"
+                                                  + re.escape(core) + r"\b")))
+            self._place_patterns = pats
+        return self._place_patterns
 
     def add_character(self, cid, answer):
         problems = []
@@ -256,6 +283,9 @@ class WorldBuilder:
             missing = [self.who(c) for c in cids if c not in got]
             if missing:
                 raise ValueError(f'no entry for {missing}')
+            soft = [c for x in got.values() for c in self.placed_here([x.get('here')])]
+            if soft:
+                raise SoftReject('; '.join(soft))
         answer = self.gen.run_prompt('s6b1_functional', 'functional', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PEOPLE_JSON$$': compact(packet),
         }, prompt_file='s6b1f_functional.prompt', validator=validate, klass='classify', schema=schemas.WORLD_FUNCTIONAL)
@@ -424,6 +454,22 @@ class WorldBuilder:
 
     # ------------------------------------------------------------ B1c
 
+    def sentence_case(self, title):
+        """A scene title as a menu label: "The Signal in the Fog" -> "the
+        signal in the fog" ("Talk › Emerson › about The Signal in the Fog"
+        before 2026-10-08). Words that are names stay capitalised: the cast's
+        names, and words the Kernel capitalises mid-sentence."""
+        proper = set()
+        for c in self.chars.values():
+            proper.update(str(c.get('name') or '').split())
+        for m in re.finditer(r'(?<![.!?]\s)(?<!^)\b([A-Z][a-z]+)', self.gen.kernel or ''):
+            proper.add(m.group(1))
+        out = []
+        for w in title.split():
+            bare = w.strip('.,:;!?\'"')
+            out.append(w if bare in proper or bare == 'I' else w.lower())
+        return ' '.join(out)
+
     def subject_list(self):
         """What anyone can be asked about: a short menu label, what it is, and when it is known."""
         out = []
@@ -437,7 +483,7 @@ class WorldBuilder:
             elif s['kind'] == 'event':
                 sc = next((sc for sc in self.plan['scenes'] if sc['id'] == s.get('first_scene')), None)
                 if sc:  # the menu gets the scene's title, not the premise's whole sentence
-                    label = str(sc.get('title') or '').strip() or ' '.join(str(s['name']).split()[:6])
+                    label = self.sentence_case(str(sc.get('title') or '').strip()) or ' '.join(str(s['name']).split()[:6])
                     out.append({'subject': label, 'kind': 'event', 'about': s['name'], 'gate': f"flags.done_{sc['major']}"})
         objects = {}
         for oid, o in self.world['objects'].items():
