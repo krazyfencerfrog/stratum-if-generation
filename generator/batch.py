@@ -298,14 +298,17 @@ def main(argv=None):
     a.add_argument('kernels', nargs='?', default='', help='comma-separated kernel ids')
     a.add_argument('--set', choices=['eval', 'quick', 'heldout'], help='every kernel in EVAL_SET.txt, EVAL_QUICK.txt or HELDOUT.txt')
     a.add_argument('--variant', help='replay 3.4 on from stories/<kernel> into stories/<kernel>_<variant>')
-    a.add_argument('flags', nargs=argparse.REMAINDER, help='after --: flags for main.py')
     r = sub.add_parser('run', help='run the queue')
     r.add_argument('--wait', action='store_true', help='keep polling for new jobs when the queue is empty')
     sub.add_parser('status')
     sub.add_parser('report')
+    # main.py's flags are everything after '--', split off before parsing: a REMAINDER argument
+    # after the kernel list swallowed "--variant r1" too (repeat1, 2026-10-07: nine jobs halted at once)
+    argv = list(sys.argv[1:] if argv is None else argv)
+    flags = argv[argv.index('--') + 1:] if '--' in argv else []
+    argv = argv[:argv.index('--')] if '--' in argv else argv
     args = ap.parse_args(argv)
     if args.cmd == 'add':
-        flags = [f for f in args.flags if f != '--']
         ids = kernel_ids(args.set) if args.set else kernel_ids(args.kernels)
         added = add(args.queue, [make_job(k, args.variant, flags) for k in ids])
         print(f"queued {len(added)}: {', '.join(j['story_id'] for j in added) or '(all already queued)'}")

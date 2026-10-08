@@ -1466,6 +1466,17 @@ def batch_runner_queues_resumes_and_locks():
     batch.add(queue, [batch.make_job('kernel1', story_id=ids[0]), batch.make_job('kernel32', story_id=ids[1]),
                       batch.make_job('no_such_kernel', story_id=ids[2])])
     check(len(batch.add(queue, [batch.make_job('kernel1', story_id=ids[0])])) == 0, 'a job already queued was queued twice')
+    # main.py's flags are only what follows '--', wherever --variant sits
+    order = os.path.join(tmp, 'order.json')
+    for argv in (['add', 'kernel7,kernel8', '--variant', 'v1', '--', '--stop-after=3.5'],
+                 ['add', '--variant', 'v1', 'kernel7,kernel8', '--', '--stop-after=3.5']):
+        if os.path.exists(order):
+            os.remove(order)
+        with contextlib.redirect_stdout(io.StringIO()):
+            batch.main(['--queue', order] + argv)
+        jobs = batch.load(order)['jobs']
+        check([(j['story_id'], j['variant'], j['flags']) for j in jobs]
+              == [('kernel7_v1', 'v1', ['--stop-after=3.5']), ('kernel8_v1', 'v1', ['--stop-after=3.5'])], f'{argv}: {jobs}')
     # a job a killed runner left "running" goes back to the queue
     q = batch.load(queue); q['jobs'][1]['status'] = 'running'; batch.save(queue, q)
     said = []
