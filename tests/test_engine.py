@@ -724,6 +724,35 @@ def a_view_does_not_say_the_same_thing_twice():
 
 
 @test
+def a_lingering_player_is_shown_the_way_on():
+    data = mini()
+    sc = data['scenes']['S1']
+    sc['nudges'] = [{'id': 'S1.n1', 'after': 2, 'text': 'Bo coughs.'}]
+    sc['interactions'][-1]['effects'] = [{'set': 'go_S1__E1'}]
+    sc['exits'] = [{'to': 'E1', 'when': 'flags.go_S1__E1'}]
+    eng = Engine(Story(data))
+    eng.start()
+    def marked():
+        return [i for p, i in leaves(eng.menu()) if _leaf(eng.menu(), i).get('way')]
+    check(not marked(), 'no hint before the player lingers')
+    for _ in range(5):
+        eng.act('wait')
+    check(marked() == ['S1.end'], f'after the nudges and two more idle actions the way on is marked: {marked()}')
+    wait = next(c for c in eng.menu()['children'] if c['label'] == 'Wait')
+    check(wait.get('way'), 'the path to it is marked too')
+
+
+def _leaf(tree, oid):
+    if tree.get('id') == oid:
+        return tree
+    for c in tree.get('children') or []:
+        hit = _leaf(c, oid)
+        if hit:
+            return hit
+    return None
+
+
+@test
 def endings_name_who_each_line_is_about():
     eng = Engine(Story(mini()))
     eng.start()

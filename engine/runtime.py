@@ -30,6 +30,7 @@ FREE = ('look', 'inventory')          # meta actions: no turn passes, nothing fi
 CHAIN_LIMIT = 10                      # scene changes or event rounds in one action
 SAVE_FORMAT = 'stratum-save/1'
 COLLAPSE_MODES = ('trivial', 'all')
+WAY_HINT = 2                           # idle actions past the scene's last nudge before the way on is marked
 ALONE = {'look': 'around'}             # an objectless option beside others, by verb ("Look › around"); else the verb
 EXAMINE_GROUPS = (('people', 'people'), ('carried', 'things you carry'), ('here', 'things here'))
 MORE = 'more…'
@@ -129,6 +130,7 @@ class Engine:
             return []
         s, st = self.story, self.state
         built, authored = [], []
+        ways = self.ways_on() if self.hint_due() else set()
 
         def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None,
                 group=None):
@@ -141,7 +143,7 @@ class Engine:
                          'object_label': s.render(obj_label, st, False, short=True) or (s.name_of(obj, st) if obj else None),
                          'detail_label': s.render(detail_label, st, False, short=True) or (s.name_of(detail, st) if detail else None),
                          'source': source, 'weight': weight, 'group': group,
-                         'new': verb in NEWS and oid not in st.heard})
+                         'new': verb in NEWS and oid not in st.heard, 'way': oid in ways})
 
         add(built, 'look', 'look')
         for oid in self.visible_objects():
@@ -184,6 +186,25 @@ class Engine:
 
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
         return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken] + authored
+
+    def hint_due(self):
+        """The player has done nothing that matters for a while, past every
+        nudge the scene has: time to show the way on."""
+        nudges = self.scene().get('nudges') or []
+        return self.state.idle >= max([n.get('after', 3) for n in nudges] or [3]) + WAY_HINT
+
+    def ways_on(self):
+        """The interactions that take the story on from here: a required
+        moment's neutral option while it holds the scene, else the scene's
+        default ways on (not the line-changing ones: a hint never chooses a
+        branch for the player)."""
+        st, sid = self.state, self.state.scene
+        for m in self.moments():
+            if m.get('required') and m['id'] not in st.used and m.get('neutral'):
+                return {m['neutral']}
+        return {it['id'] for it in self.scene().get('interactions') or []
+                if it.get('weight') != 'major' and it['id'] not in st.used
+                and any(str(e.get('set', '')).startswith(f'go_{sid}__') for e in it.get('effects') or [])}
 
     def _available(self, it):
         """An authored interaction can be offered now: in this room (or
@@ -232,7 +253,8 @@ class Engine:
                     for o in opts:
                         vnode['children'].append(dict({'label': None, 'id': o['id']},
                                                       **({'weight': o['weight']} if o.get('weight') else {}),
-                                                      **({'new': True} if o.get('new') else {})))
+                                                      **({'new': True} if o.get('new') else {}),
+                                                      **({'way': True} if o.get('way') else {})))
                         kinds.append(None)
                     continue
                 onode = {'label': opts[0]['object_label'], 'children': []}
@@ -246,6 +268,8 @@ class Engine:
                         leaf['weight'] = o['weight']
                     if o.get('new'):
                         leaf['new'] = True
+                    if o.get('way'):
+                        leaf['way'] = True
                     if o.get('group') and len(opts) > GROUP_AT:
                         if o['group'] not in groups:     # many options: the grouped ones go one level down
                             groups[o['group']] = {'label': GROUP_LABELS.get(o['group'], o['group']), 'children': []}
@@ -917,18 +941,21 @@ def _fit(node, limit=len(KEYS)):
     kids = [_fit(c, limit) for c in node['children']]
     if len(kids) > limit:
         rest = {'label': MORE, 'children': kids[limit - 1:]}
-        if any(c.get('new') for c in rest['children']):
-            rest['new'] = True
+        for mark in ('new', 'way'):
+            if any(c.get(mark) for c in rest['children']):
+                rest[mark] = True
         kids = kids[:limit - 1] + [_fit(rest, limit)]
     return dict(node, children=kids)
 
 
 def _mark_new(node):
-    """A menu node is new when anything under it is."""
+    """A menu node is new when anything under it is, and on the way on when
+    anything under it is."""
     if 'children' in node:
         node['children'] = [_mark_new(c) for c in node['children']]
-        if any(c.get('new') for c in node['children']):
-            node['new'] = True
+        for mark in ('new', 'way'):
+            if any(c.get(mark) for c in node['children']):
+                node[mark] = True
     return node
 
 

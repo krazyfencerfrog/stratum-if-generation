@@ -387,12 +387,14 @@ def world_and_scenes_are_checked_for_how_they_read():
              'interactions': [{'id': 'a', 'verb': 'take', 'object': 'door'},
                               {'id': 'b', 'verb': 'take', 'object': 'pen', 'detail': 'deed'},
                               {'id': 'c', 'verb': 'look', 'object': 'C1'},
-                              {'id': 'd', 'verb': 'take', 'object': 'pen'}]}
+                              {'id': 'd', 'verb': 'take', 'object': 'pen'},
+                              {'id': 'e', 'verb': 'use', 'object': 'lane', 'object_label': 'the school lane',
+                               'effects': [{'set': 'go_S1__S2'}]}]}
     found = c.reading_problems(scene, {'events': [{'text': 'Rain falls. Hugh Calloway waits in the cabin, and the rain falls.'}]}, {})
     for want in ("take 'the door'", "take 'the pen' with 'the deed'", "verb 'look'", 'narrates something the player does',
-                 'opening puts Hugh Calloway in the cabin', 'event 1 retells the opening'):
+                 'opening puts Hugh Calloway in the cabin', 'event 1 retells the opening', "use 'the school lane' leads on"):
         check(any(want in f for f in found), f'missing {want!r} in {found}')
-    check(len(found) == 6, f'taking a pen is fine: {found}')
+    check(len(found) == 7, f'taking a pen is fine: {found}')
     scene['opening'] = [{'text': 'The boat will not move until you sign.'}]
     check(not any('narrates' in f for f in c.reading_problems(scene, {}, {})), 'a condition is not a deed')
 

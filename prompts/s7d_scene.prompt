@@ -40,7 +40,9 @@ What you write, naming rooms, people and things exactly as the packet does:
       play with the dog. They make the place lived in;
     - for EVERY entry in "leaving", the action that takes it ("leads_to":
       its target). The default way on must be findable from every state of
-      the scene, never hidden; a branch is the outline's trigger, done in
+      the scene, never hidden; one that moves the player somewhere (out a
+      door, down a lane) is a go, where a player looks to leave, labelled
+      with how ("out the front door"); a branch is the outline's trigger, done in
       the world, and people around it say what is at stake before it is
       taken.
  - events: the event_here (if any) and anything the scene does by itself,

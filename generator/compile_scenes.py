@@ -44,6 +44,8 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 CORE_VERBS = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 LAPSE_AFTER = 4
+WAY_THING = re.compile(r"\b(door|doors|gate|lane|path|road|track|trail|towpath|ladder|steps|stairs|gangway|hatch|"
+                       r"bridge|street)\b", re.I)       # kernel40 left scenes by "Use › the school lane", "Take › the door"
 ENGINE_VERBS = ('look', 'examine', 'wait', 'inventory', 'think')     # the engine makes these; a scene's own is a misuse
 
 
@@ -250,6 +252,10 @@ class SceneCompiler:
             elif it['verb'] == 'take' and it.get('detail') in objects:
                 out.append(f"take {label!r} with {objects[it['detail']].get('name')!r}: an action on two things is not "
                            f"a take; give it a verb of its own (sign, wrap, ...)")
+            elif it['verb'] in ('use', 'take') and WAY_THING.search(str(label or '')) and any(
+                    str(e.get('set', '')).startswith('go_') for e in it.get('effects') or []):
+                out.append(f"{it['verb']} {label!r} leads on: a way on through a door, lane or ladder is a go (the menu "
+                           f"where a player looks to leave), with a label saying how ('out the front door')")
             elif it['verb'] in ENGINE_VERBS:
                 out.append(f"verb {it['verb']!r} on {label!r}: the engine makes {it['verb']} itself; give this action "
                            f"a verb of its own")

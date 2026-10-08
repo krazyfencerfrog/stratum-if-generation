@@ -30,6 +30,7 @@ HELP = [
     ('normal', '•              not yet examined, asked or thought'),
     ('normal', '◆              a choice that changes the story'),
     ('normal', '…              opens a further menu'),
+    ('normal', '→              the way on (shown when you have lingered)'),
     ('heading', ''),
     ('muted', 'q quits (asks first). Esc closes this.'),
 ]
@@ -134,7 +135,7 @@ def menu(surface, r, session, keys=KEYS):
         child = items[i]
         key = keys[i] if i < len(keys) else ' '
         marks = (' …' if 'id' not in child else '') + (' •' if child.get('new') else '') + \
-                (' ◆' if child.get('weight') == 'major' else '')
+                (' ◆' if child.get('weight') == 'major' else '') + (' →' if child.get('way') else '')
         label = child.get('label') or ''
         y = inner.y + row
         selected = i == index

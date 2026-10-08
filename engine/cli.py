@@ -74,7 +74,8 @@ def show_level(node, path, out):
         more = '' if 'id' in child else ' …'
         mark = ' ◆' if child.get('weight') == 'major' else ''      # a line-changing choice (a front-end option)
         new = ' •' if child.get('new') else ''                      # not yet examined, asked or thought
-        print(f'  {key}. {child["label"]}{more}{new}{mark}', file=out)
+        way = ' →' if child.get('way') else ''                      # the way on, shown once you have idled a while
+        print(f'  {key}. {child["label"]}{more}{new}{mark}{way}', file=out)
     print('  ' + ('[b] prev menu  ' if path else '') + '[u] unwind  [h] history  [j] journal  [s] save  [l] load  [q] quit',
           file=out)
 
