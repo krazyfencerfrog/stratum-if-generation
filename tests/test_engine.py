@@ -616,6 +616,115 @@ def seen_think_and_weight():
     check('◆' in out.getvalue(), f'the terminal player did not mark the major choice:\n{out.getvalue()}')
 
 
+def mini(**over):
+    """A small package for the reading tests (2026-10-08): two rooms, a pen
+    that starts on the desk, two people, one scene with an ending."""
+    data = {
+        'format': 'stratum-story/1', 'story_id': 'mini', 'title': 'Mini',
+        'world': {
+            'rooms': {'deck': {'name': 'the stern deck', 'description': [{'text': 'Wet planks. The fountain pen lies on the bench, its nib wet.'}],
+                               'exits': [{'to': 'cabin', 'label': 'down to the cabin'}]},
+                      'cabin': {'name': 'the cabin', 'description': [{'text': 'A narrow green room.'}],
+                                'exits': [{'to': 'deck', 'label': 'up to the deck'}]}},
+            'objects': {'pen': {'name': 'the fountain pen', 'location': 'deck', 'portable': True,
+                                'description': [{'text': 'A pen.'}]},
+                        'saddle': {'name': 'the saddle', 'location': 'deck', 'portable': True,
+                                   'description': [{'text': 'Old leather.'}]}},
+            'characters': {'C01': {'name': 'Ann Lee', 'gender': 'f', 'description': [{'text': 'Ann.'}],
+                                   'here': [{'text': 'Ann Lee is asleep in the cabin, warm by the stove.'}],
+                                   'topics': {'money': {'label': 'money', 'says': [{'text': "'Money,' she says."}]}}},
+                           'C02': {'name': 'Bo Gray', 'gender': 'm', 'description': [{'text': 'Bo.'}],
+                                   'here': [{'text': 'Bo Gray leans on the rail.'}], 'topics': {}}},
+        },
+        'scenes': {'S1': {'title': 'One', 'opening': [{'text': 'Rain falls on the deck.'}], 'rooms': ['deck', 'cabin'],
+                          'cast': {'C01': 'deck', 'C02': 'deck'},
+                          'interactions': [
+                              {'id': 'S1.a1', 'verb': 'use', 'object': 'saddle', 'detail': 'set_it_down',
+                               'detail_label': 'set the saddle between them', 'text': 'You set it down.'},
+                              {'id': 'S1.a2', 'verb': 'take', 'object': 'pen', 'detail': 'saddle', 'text': 'You sign.'},
+                              {'id': 'S1.a3', 'verb': 'talk', 'object': 'C01', 'detail': 'what_it_costs',
+                               'detail_label': 'what a nuisance costs', 'text': 'She sighs.'},
+                              {'id': 'S1.end', 'verb': 'wait', 'object': 'C02', 'text': 'You wait.',
+                               'effects': [{'set': 'done'}]}],
+                          'exits': [{'to': 'E1', 'when': 'flags.done'}]}},
+        'start': {'scene': 'S1', 'room': 'deck'},
+        'endings': {'E1': {'title': 'The End', 'text': [{'text': 'It ends.'}],
+                           'resolutions': [{'about': 'C01', 'variants': [{'text': 'She is gone, her debt paid.'}]},
+                                           {'about': 'C02', 'variants': [{'text': 'He is gone, his debt paid.'}]}]}},
+    }
+    for k, v in over.items():
+        data[k] = v
+    return data
+
+
+@test
+def menus_read_as_actions_and_fit_their_keys():
+    eng = Engine(Story(mini()))
+    eng.start()
+    paths = {' › '.join(p): i for p, i in leaves(eng.menu())}
+    check('Use › the saddle › set the saddle between them' in paths, f'an action label takes no "on": {sorted(paths)}')
+    check('Talk › Ann Lee › about what a nuisance costs' in paths, 'a subject keeps its "about"')
+    check('Take › the fountain pen › take it' in paths and 'Take › the fountain pen › on the saddle' not in paths
+          and paths.get('Take › the fountain pen › take it') == 'take:pen',
+          f'the plain action beside a detailed one is "take it", not the object again: {sorted(paths)}')
+    # a long Examine is grouped; a level wider than the keys ends in "more…"
+    data = mini()
+    for n in range(40):
+        data['world']['objects'][f'o{n}'] = {'name': f'thing {n}', 'location': 'deck', 'description': [{'text': 'x'}]}
+    eng = Engine(Story(data))
+    eng.start()
+    examine = next(c for c in eng.menu()['children'] if c['label'] == 'Examine')
+    labels = [c['label'] for c in examine['children']]
+    check('people' in labels and 'things here' in labels, f'a long Examine groups people and things: {labels}')
+    here = next(c for c in examine['children'] if c['label'] == 'things here')
+    from menukeys import KEYS
+    check(len(here['children']) <= len(KEYS) and here['children'][-1]['label'] == 'more…',
+          f'a level wider than the keys ends in more…: {len(here["children"])}')
+    every = [i for _, i in leaves(eng.menu())]
+    check(all(f'examine:o{n}' in every for n in range(40)), 'nothing is lost behind more…')
+
+
+@test
+def room_text_says_only_what_is_true_now():
+    eng = Engine(Story(mini()))
+    v = eng.start()
+    room = v['room']['text']
+    check('asleep in the cabin' not in room and 'Bo Gray leans on the rail' in room and 'Ann Lee is here' in room,
+          f'a here-line naming another room gives way to a plain one: {room}')
+    eng.act('take:pen')
+    v = eng.act('look')
+    check('fountain pen lies on the bench' not in v['room']['text'] and 'Wet planks' in v['room']['text'],
+          f'a sentence about a thing that has left the room goes: {v["room"]["text"]}')
+    # the scene's own room text placing a person replaces their here-line
+    data = mini()
+    data['scenes']['S1']['room_text'] = {'deck': [{'text': 'Bo Gray is coiling rope at the stern.'}]}
+    v = Engine(Story(data)).start()
+    check('leans on the rail' not in v['room']['text'] and 'coiling rope' in v['room']['text'], v['room']['text'])
+
+
+@test
+def a_view_does_not_say_the_same_thing_twice():
+    data = mini()
+    data['scenes']['S1']['opening'] = [{'text': 'The town meeting has come to the square for the water vote, and the crowd is '
+                                                'silent except for the wind moving through the dry grass.'}]
+    data['scenes']['S1']['events'] = [{'id': 'S1.e1', 'text': 'The town meeting comes to the square for the water vote, the '
+                                                              'crowd silent except for the wind in the dry grass.'}]
+    data['world']['rooms']['deck']['description'] = [{'text': 'Wet planks and the the rail.'}]
+    v = Engine(Story(data)).start()
+    joined = ' '.join(v['text'])
+    check(joined.count('water vote') == 1, f'an event restating the opening is not read twice: {v["text"]}')
+    check('the the' not in v['room']['text'], 'doubled small words are made single')
+
+
+@test
+def endings_name_who_each_line_is_about():
+    eng = Engine(Story(mini()))
+    eng.start()
+    v = eng.act('S1.end')
+    check(v['ending'] == 'E1' and 'Ann Lee is gone, her debt paid.' in v['text']
+          and 'Bo Gray is gone, his debt paid.' in v['text'], f'each resolution says who, and alike lines both stay: {v["text"]}')
+
+
 def leaves_with(tree):
     if 'id' in tree:
         yield tree

@@ -15,8 +15,10 @@ replaces it. See docs/engine_design.md §6-§7.
 """
 
 import json
+import re
 
 from expressions import evaluate
+from menukeys import KEYS
 from state import GameState
 from story import Story, ending_groups, pick_text
 
@@ -28,6 +30,14 @@ FREE = ('look', 'inventory')          # meta actions: no turn passes, nothing fi
 CHAIN_LIMIT = 10                      # scene changes or event rounds in one action
 SAVE_FORMAT = 'stratum-save/1'
 COLLAPSE_MODES = ('trivial', 'all')
+ALONE = {'look': 'around'}             # an objectless option beside others, by verb ("Look › around"); else the verb
+EXAMINE_GROUPS = (('people', 'people'), ('carried', 'things you carry'), ('here', 'things here'))
+MORE = 'more…'
+PARAPHRASE_SHARE = 0.8                 # ... or whose content words mostly were (a paraphrase of the opening)
+REPEAT_SHARE = 0.6                     # a sentence whose phrases were mostly read already in this view is dropped
+DOUBLED = re.compile(r"\b(the|a|an|of|to|in|on|at|and|for|with|by|from)\s+\1\b", re.I)
+SENTENCE = re.compile(r'(?<=[.!?])\s+(?=[A-Z\'"‘“{])')
+WORD = re.compile(r"[a-z0-9']+")
 
 
 class EngineError(ValueError):
@@ -118,7 +128,12 @@ class Engine:
 
         def add(into, oid, verb, obj=None, detail=None, obj_label=None, detail_label=None, source=None, weight=None,
                 group=None):
-            into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail,
+            topics = (s.characters.get(obj) or {}).get('topics') or {}
+            text_only = detail not in s.objects and detail not in s.characters and detail not in s.rooms \
+                and detail not in topics
+            free = detail is not None and bool(source) and source[0] == 'interaction' \
+                and _is_action(detail_label, 2 if text_only else 3)
+            into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail, 'detail_free': free,
                          'object_label': s.render(obj_label, st) or (s.name_of(obj, st) if obj else None),
                          'detail_label': s.render(detail_label, st) or (s.name_of(detail, st) if detail else None),
                          'source': source, 'weight': weight, 'group': group,
@@ -207,17 +222,20 @@ class Engine:
             objects = {}
             for o in verbs[verb]:
                 objects.setdefault(o['object'], []).append(o)
+            kinds = []                        # what each object node is, for grouping a long Examine
             for obj, opts in objects.items():
                 if obj is None:
                     for o in opts:
                         vnode['children'].append(dict({'label': None, 'id': o['id']},
                                                       **({'weight': o['weight']} if o.get('weight') else {}),
                                                       **({'new': True} if o.get('new') else {})))
+                        kinds.append(None)
                     continue
                 onode = {'label': opts[0]['object_label'], 'children': []}
                 groups = {}
                 for o in opts:
-                    leaf = {'label': None if o['detail'] is None else detail_text(verb, o['detail_label']), 'id': o['id']}
+                    leaf = {'label': None if o['detail'] is None else detail_text(verb, o['detail_label'], o.get('detail_free')),
+                            'id': o['id']}
                     if o.get('weight'):
                         leaf['weight'] = o['weight']
                     if o.get('new'):
@@ -231,10 +249,29 @@ class Engine:
                 order = list(GROUP_LABELS)
                 for g in sorted(groups, key=lambda g: (order.index(g) if g in order else len(order), g)):
                     onode['children'].append(groups[g])
+                if len(onode['children']) > 1:           # the plain action beside detailed ones: "Take › the pen › take it"
+                    for c in onode['children']:
+                        if c.get('label') is None:
+                            c['label'] = f"{vnode['label'].lower()} it"
                 vnode['children'].append(onode)
+                kinds.append(self._kind(obj))
+            if len(vnode['children']) > 1:
+                for c in vnode['children']:
+                    if c.get('label') is None:
+                        c['label'] = ALONE.get(verb, vnode['label'])
+            if verb == 'examine' and len(vnode['children']) > GROUP_AT:
+                vnode['children'] = _group_examine(vnode['children'], kinds)
             root['children'].append(vnode)
-        root['children'] = [_mark_new(_collapse(c, collapse or self.collapse)) for c in root['children']]
-        return root
+        root['children'] = [_fit(_mark_new(_collapse(c, collapse or self.collapse))) for c in root['children']]
+        return _fit(root)
+
+    def _kind(self, thing):
+        """Where an examinable thing belongs in a long Examine menu."""
+        if thing == 'you':
+            return 'you'
+        if thing in self.story.characters:
+            return 'people'
+        return 'carried' if self.state.locations.get(thing) == 'player' else 'here'
 
     # ------------------------------------------------------------ acting
 
@@ -344,7 +381,7 @@ class Engine:
         if opt['object_label']:
             parts.append(opt['object_label'])
         if opt['detail_label']:
-            parts.append(detail_text(opt['verb'], opt['detail_label']))
+            parts.append(detail_text(opt['verb'], opt['detail_label'], opt.get('detail_free')))
         return ' › '.join(parts)
 
     def _free_text(self, opt):
@@ -472,10 +509,17 @@ class Engine:
 
     def _lapse_all(self):
         """Leaving a scene: every optional moment that was offered and never
-        answered lapses."""
+        answered lapses. Only the first one's text is read: three closing
+        lines about a scene the player has just left, before the next one
+        opens, read as noise (kernel40, 2026-10-08)."""
+        told = False
         for m in self.moments():
             if not m.get('required') and m['id'] not in self.state.used and m['id'] in self.state.moments:
+                before = len(self.queue)
                 self._lapse(m)
+                if told:
+                    del self.queue[before:]
+                told = told or len(self.queue) > before
 
     def _exit_due(self):
         st = self.state
@@ -512,8 +556,19 @@ class Engine:
         for group in ending_groups(end):
             text = pick_text(group.get('variants'), st, f"{eid}.{group.get('about')}")
             if text:
-                parts.append(text)
+                parts.append(self._named(text, group.get('about')))
         self.queue.extend(p for p in parts if p)
+
+    def _named(self, text, cid):
+        """A resolution line about a person that never says who ("He is gone,
+        ..."): its opening pronoun becomes the person."""
+        s = self.story
+        if cid not in s.characters or f'{{{cid}}}' in text:
+            return text
+        names = [s.characters[cid].get('name'), s.characters[cid].get('unnamed')]
+        if any(n and n.lower() in text.lower() for n in names):
+            return text
+        return re.sub(r'^(He|She|It)\b', '{' + cid + '}', text, count=1)
 
     # ------------------------------------------------------------ the view
 
@@ -530,27 +585,109 @@ class Engine:
         for frag in room.get('fragments') or []:
             if evaluate(frag.get('when', 'true'), st):
                 (pre if frag.get('position') == 'pre' else post).append(frag['text'])
-        layers = pre + [pick_text(room.get('description'), st, st.room) if full else '',
-                        pick_text((self.scene().get('room_text') or {}).get(st.room), st, f'{st.scene}.{st.room}')]
+        scene_layer = pick_text((self.scene().get('room_text') or {}).get(st.room), st, f'{st.scene}.{st.room}')
+        layers = pre + [self._still_true(pick_text(room.get('description'), st, st.room)) if full else '',
+                        self._still_true(scene_layer)]
         layers += post
+        plain = []
         for cid in self.present():
-            ch = s.characters[cid]
-            here = pick_text(ch.get('here'), st, cid) or f"{{{cid}}} is here."
-            layers.append(here)
+            if self._mentions(scene_layer, cid):
+                continue                # the scene's own words for the room already place them, and know better
+            line = self._here_line(cid)
+            if line is None:
+                plain.append(f'{{{cid}}}')
+            else:
+                layers.append(line)
+        if plain:
+            layers.append(f"{_join(plain)} {'is' if len(plain) == 1 else 'are'} here.")
         listed = [s.name_of(o) for o in self.visible_objects()
                   if st.locations.get(o) == st.room and s.objects[o].get('listed', s.objects[o].get('portable', False))]
         if listed:
             layers.append(f'You can see {_join(listed)}.')
         return {'name': room.get('name', st.room), 'text': s.render(' '.join(x for x in layers if x), st)}
 
+    def _mentions(self, text, cid):
+        """Whether text names this person: by code, name or unnamed label."""
+        if not text:
+            return False
+        if f'{{{cid}}}' in text:
+            return True
+        ch = self.story.characters.get(cid) or {}
+        low = text.lower()
+        return any(n and re.search(r'\b' + re.escape(n.lower()) + r'\b', low)
+                   for n in (ch.get('name'), ch.get('unnamed'), ch.get('unnamed_short')))
+
+    def _here_line(self, cid):
+        """How a present person appears in the room: the first `here` variant
+        that holds and does not put them in another room (stage B writes these
+        per person, by state, and some name a place: "the cat is asleep in the
+        cabin", read on the deck); None when there is none (the room then says
+        plainly who is here, in one sentence)."""
+        s, st = self.story, self.state
+        others = self._other_room_names()
+        for v in s.characters[cid].get('here') or []:
+            if isinstance(v, str):
+                v = {'text': v}
+            if not evaluate(v.get('when', 'true'), st):
+                continue
+            text = v.get('text', '')
+            if isinstance(text, list):
+                text = pick_text([v], st, cid)
+            if text and not any(p.search(text.lower()) for p in others):
+                return text
+        return None
+
+    def _other_room_names(self):
+        """Patterns for the names of rooms other than this one ("the cabin"),
+        leaving out any that are part of this room's own name."""
+        s, st = self.story, self.state
+        mine = str((s.rooms.get(st.room) or {}).get('name') or st.room).lower()
+        out = []
+        for rid, r in s.rooms.items():
+            if rid == st.room:
+                continue
+            core = re.sub(r"^(the|a|an)\s+", '', str(r.get('name') or '').lower()).strip()
+            if len(core) < 3 or core in mine:
+                continue
+            out.append(re.compile(r'\b(in|on|at|inside|into|by|from|near) (the |a |an )?' + re.escape(core) + r'\b'))
+            head = core.split()[-1]         # "in the office" for the clean office, read in the square
+            if len(head) >= 4 and head not in mine.split():
+                out.append(re.compile(r"\b(in|inside|into) (the |a |an |his |her |their )?([\w']+ )?" + re.escape(head) + r'\b'))
+        return out
+
+    def _still_true(self, text):
+        """Room text without the sentences about a portable thing that began
+        in this room and has since gone (taken, given, moved): "The fountain
+        pen lies on the desk" after you pocketed it."""
+        if not text:
+            return text
+        s, st = self.story, self.state
+        gone = []
+        for oid, obj in s.objects.items():
+            if obj.get('portable') and obj.get('location') == st.room and st.locations.get(oid) != st.room:
+                core = re.sub(r"^(the|a|an|your|my)\s+", '', str(obj.get('name') or '').lower()).strip()
+                if len(core) >= 3:
+                    gone.append(re.compile(r'\b' + re.escape(core) + r'\b'))
+        if not gone:
+            return text
+        kept = [x for x in SENTENCE.split(text) if not any(g.search(x.lower()) for g in gone)]
+        return ' '.join(kept)
+
     def view(self, show_room=True, full=False):
         st = self.state
         out = {'text': [self.story.render(t, st) for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
                'ending': st.ending, 'room': None, 'menu': None}
-        if st.ending:
+        if st.ending:                     # one line per person: alike is not a repeat here, so only tidied
+            out['text'] = [DOUBLED.sub(r'\1', t) for t in out['text']]
             out['ending_title'] = self.story.render(self.story.endings[st.ending].get('title'), st)
             return out
         out['room'] = self.describe(full) if show_room else None
+        if out['room']:
+            texts = _unrepeated(out['text'] + [out['room']['text']])
+            out['text'], out['room'] = texts[:-1], dict(out['room'], text=texts[-1] if texts else '')
+        else:
+            out['text'] = _unrepeated(out['text'])
+        out['text'] = [t for t in out['text'] if t]
         out['menu'] = self.menu()
         return out
 
@@ -620,10 +757,62 @@ def _signature(st):
             tuple(sorted((k, str(v)) for k, v in st.locations.items())), tuple(sorted(st.used)), st.scene)
 
 
-def detail_text(verb, label):
+NOUN_START = re.compile(r"^((the|a|an|your|my|his|her|their|its|our|this|that|these|those|some|one|two|what|who|whom|"
+                        r"whose|why|how|where|when|whether|if)\b|[A-Z{'\"‘“])")
+
+
+def _is_action(label, min_words=3):
+    """An authored detail label that is an action in words ("step into the
+    yard and hold the chain", "let the cat hold it"), not a thing or a
+    subject ("the yard", "Viola", "what a nuisance costs"): such a label
+    takes no preposition in the menu."""
+    label = str(label or '').strip()
+    return len(label.split()) >= min_words and not NOUN_START.match(label)
+
+
+def _ngrams(text, n=4):
+    w = WORD.findall(text.lower())
+    return {tuple(w[i:i + n]) for i in range(len(w) - n + 1)}
+
+
+STOP = set("""the a an and or but of to in on at by for with from into onto over under as is are was were be been
+his her their its your you he she they it him them this that these those not no than then there here what
+who which while when where so if all one has have had does do did said says just only still yet""".split())
+
+
+def _content(text):
+    """A sentence's content words, roughly stemmed ("comes" and "come" match)."""
+    return {w.rstrip('s') for w in WORD.findall(text.lower()) if len(w) > 2 and w not in STOP}
+
+
+def _unrepeated(texts):
+    """The paragraphs of one view with each sentence that mostly repeats what
+    was already read in this view dropped (a scene's opening, its first event
+    and the room's scene layer often say the same thing three times), and
+    doubled small words ("the the") made single. Keeps the list's length;
+    a paragraph emptied becomes ''."""
+    seen, words, out = set(), set(), []
+    for text in texts:
+        kept = []
+        for sentence in SENTENCE.split(DOUBLED.sub(r'\1', text or '')):
+            grams, content = _ngrams(sentence), _content(sentence)
+            if len(grams) >= 3 and len(grams & seen) >= REPEAT_SHARE * len(grams):
+                continue
+            if len(content) >= 8 and len(content & words) >= PARAPHRASE_SHARE * len(content):
+                continue                  # the same thing again in other words
+            seen |= grams
+            words |= content
+            kept.append(sentence)
+        out.append(' '.join(kept))
+    return out
+
+
+def detail_text(verb, label, free=False):
     """A detail as the menu shows it: 'about the ledger', 'on the crack',
-    "say 'Boat held, sir'"."""
-    word = 'say' if label[:1] in '\'"‘“' else DETAIL_WORD.get(verb)
+    "say 'Boat held, sir'". A free-text detail that is not a quoted line is
+    an action in its own words ("set the saddle between them") and takes no
+    preposition ("on set the saddle..." before 2026-10-08)."""
+    word = 'say' if label[:1] in '\'"‘“' else (None if free else DETAIL_WORD.get(verb))
     if word and not label.startswith(word + ' '):
         return f'{word} {label}'
     return label
@@ -644,6 +833,34 @@ def _collapse(node, mode):
         if c['label'] is None:
             c['label'] = node['label']      # an objectless option beside others: its verb's own name
     return node
+
+
+def _group_examine(children, kinds):
+    """A long Examine: yourself first, then people, things you carry and
+    things here, each a submenu (a group of one stays a plain entry)."""
+    out = [c for c, k in zip(children, kinds) if k in (None, 'you')]
+    for kind, label in EXAMINE_GROUPS:
+        members = [c for c, k in zip(children, kinds) if k == kind]
+        if len(members) == 1:
+            out.append(members[0])
+        elif members:
+            out.append({'label': label, 'children': members})
+    return out
+
+
+def _fit(node, limit=len(KEYS)):
+    """A level with more entries than there are keys to pick them with ends
+    in a 'more…' entry holding the rest (a front end shows only what it can
+    key; the plain player dropped the 29th entry and on before 2026-10-08)."""
+    if 'children' not in node:
+        return node
+    kids = [_fit(c, limit) for c in node['children']]
+    if len(kids) > limit:
+        rest = {'label': MORE, 'children': kids[limit - 1:]}
+        if any(c.get('new') for c in rest['children']):
+            rest['new'] = True
+        kids = kids[:limit - 1] + [_fit(rest, limit)]
+    return dict(node, children=kids)
 
 
 def _mark_new(node):
