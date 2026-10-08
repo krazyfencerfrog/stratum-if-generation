@@ -109,23 +109,25 @@ class Story:
         ch = self.characters.get(cid) or {}
         return cid in state.introduced or bool(ch.get('known')) or not ch.get('unnamed')
 
-    def render(self, text, state, sentence=True):
+    def render(self, text, state, sentence=True, told=None, short=False):
         """Text with each {Cxx} replaced by the name the player knows the
         person by. An unnamed label is given in full the first time a text
         names the person and short after that, and short before "'s" ("the
         captain in the wet canvas coat" five times in one paragraph; "the wet
-        lock-keeper with a wrench's papers"). A name opening a sentence is
-        capitalised, unless `sentence` is False (a menu label: "about the
-        captain")."""
+        lock-keeper with a wrench's papers"); `told`, a set shared across the
+        paragraphs of one view, carries who has been named in full already,
+        and `short` (menu labels) always gives the short form. A name opening a
+        sentence is capitalised, unless `sentence` is False (a menu label:
+        "about the captain")."""
         if not text or '{' not in text:
             return text
-        told = set()
+        told = set() if told is None else told
 
         def one(m):
             cid = m.group(1)
             if cid not in self.characters:
                 return m.group(0)
-            long_form = cid not in told and not text.startswith("'s", m.end())
+            long_form = not short and cid not in told and not text.startswith("'s", m.end())
             name = self.name_of(cid, state, short=not long_form)
             told.add(cid)
             before = text[:m.start()].rstrip(' \'"‘“')

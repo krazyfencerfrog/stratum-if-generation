@@ -134,8 +134,8 @@ class Engine:
             free = detail is not None and bool(source) and source[0] == 'interaction' \
                 and _is_action(detail_label, 2 if text_only else 3)
             into.append({'id': oid, 'verb': verb, 'object': obj, 'detail': detail, 'detail_free': free,
-                         'object_label': s.render(obj_label, st, False) or (s.name_of(obj, st) if obj else None),
-                         'detail_label': s.render(detail_label, st, False) or (s.name_of(detail, st) if detail else None),
+                         'object_label': s.render(obj_label, st, False, short=True) or (s.name_of(obj, st) if obj else None),
+                         'detail_label': s.render(detail_label, st, False, short=True) or (s.name_of(detail, st) if detail else None),
                          'source': source, 'weight': weight, 'group': group,
                          'new': verb in NEWS and oid not in st.heard})
 
@@ -576,7 +576,7 @@ class Engine:
 
     # ------------------------------------------------------------ the view
 
-    def describe(self, full=False):
+    def describe(self, full=False, told=None):
         """The current room, layered: base description, the scene's layer,
         state fragments, then who and what is here. The base description is
         given the first time and on Look; after that, only what is particular
@@ -608,7 +608,7 @@ class Engine:
                   if st.locations.get(o) == st.room and s.objects[o].get('listed', s.objects[o].get('portable', False))]
         if listed:
             layers.append(f'You can see {_join(listed)}.')
-        return {'name': room.get('name', st.room), 'text': s.render(' '.join(x for x in layers if x), st)}
+        return {'name': room.get('name', st.room), 'text': s.render(' '.join(x for x in layers if x), st, told=told)}
 
     def _mentions(self, text, cid):
         """Whether text names this person: by code, name or unnamed label."""
@@ -679,13 +679,14 @@ class Engine:
 
     def view(self, show_room=True, full=False):
         st = self.state
-        out = {'text': [self.story.render(t, st) for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
+        told = set()                      # who this view has named in full: later paragraphs use the short form
+        out = {'text': [self.story.render(t, st, told=told) for t in self.queue if t], 'scene': st.scene, 'turns': st.turns,
                'ending': st.ending, 'room': None, 'menu': None}
         if st.ending:                     # one line per person: alike is not a repeat here, so only tidied
             out['text'] = [DOUBLED.sub(r'\1', t) for t in out['text']]
             out['ending_title'] = self.story.render(self.story.endings[st.ending].get('title'), st)
             return out
-        out['room'] = self.describe(full) if show_room else None
+        out['room'] = self.describe(full, told) if show_room else None
         if out['room']:
             texts = _unrepeated(out['text'] + [out['room']['text']])
             out['text'], out['room'] = texts[:-1], dict(out['room'], text=texts[-1] if texts else '')
