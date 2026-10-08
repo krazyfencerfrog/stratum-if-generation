@@ -698,6 +698,17 @@ def room_text_says_only_what_is_true_now():
     check('asleep in the cabin' not in room and 'by the stove' not in room and 'Bo Gray leans on the rail' in room
           and 'Ann Lee is here' in room,
           f'a here-line naming another room gives way to a plain one: {room}')
+    data = mini()
+    data['world']['objects']['door'] = {'name': 'the door', 'location': 'deck', 'portable': False,
+                                        'description': [{'text': 'A door.'}]}
+    data['scenes']['S1']['interactions'].append({'id': 'S1.door', 'verb': 'take', 'object': 'door', 'text': 'You leave.',
+                                                 'effects': [{'give': 'door'}]})
+    _, notes = validate(Story(data))
+    check(any('a fixture' in n for n in notes), f'giving a fixture is noted: {notes}')
+    e2 = Engine(Story(data))
+    e2.start()
+    e2.act('S1.door')
+    check(e2.state.locations['door'] == 'deck', 'a fixture is never pocketed')
     eng.act('take:pen')
     v = eng.act('look')
     check('fountain pen lies on the bench' not in v['room']['text'] and 'Wet planks' in v['room']['text'],

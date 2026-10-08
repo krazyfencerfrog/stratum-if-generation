@@ -434,6 +434,9 @@ class Engine:
             elif 'move' in eff:
                 st.move_arc(eff['move'], eff.get('dir', 'up'))
             elif 'give' in eff:
+                obj = s.objects.get(eff['give']) or {}
+                if obj.get('portable') is False and obj.get('location') in s.rooms:
+                    continue        # a fixture is not pocketed ("Take › the schoolhouse door" meaning leave)
                 st.locations[eff['give']] = 'player'
             elif 'take' in eff:
                 st.locations[eff['take']] = None

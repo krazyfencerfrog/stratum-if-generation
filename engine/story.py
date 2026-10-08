@@ -211,6 +211,8 @@ def validate(story):
                 errors.append(f'{where}: place names unknown object or character {v!r}')
             elif k in ('give', 'take') and v not in s.objects:
                 errors.append(f'{where}: {k} names unknown object {v!r}')
+            elif k == 'give' and s.objects[v].get('portable') is False and s.objects[v].get('location') in s.rooms:
+                notes.append(f'{where}: gives {v!r}, a fixture of {s.objects[v]["location"]!r}; the engine leaves it there')
             elif k == 'place' and eff.get('to') not in (None, 'player', *s.rooms, *s.characters):
                 errors.append(f"{where}: place to unknown location {eff.get('to')!r}")
             elif k == 'room' and v not in s.rooms:
