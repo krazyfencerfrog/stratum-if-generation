@@ -1,0 +1,234 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are the new inheritor of a narrow canal boat, standing on its stern deck with your brother-in-law already counting the cost of every rope, lock, and drop of fuel.",
+    "wants": "to get the boat under way and sold without losing your brother-in-law's nerve or your own authority over the vessel",
+    "can_do": "inspect the boat, untie and retie the mooring line, take the helm, sign or refuse the sale papers, pay or refuse to pay the lock fees, and answer the ghost directly",
+    "cannot_do": "make the boat leave its mooring or enter a lock without first satisfying whatever condition the ghost has placed on the water, the wheel, or the sale, because the ropes, timbers, and gates answer to his captaincy before they answer to you",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "The inherited narrowboat itself, moored at a canal lock, with its stern deck, cabin, and wheelhouse as the only places you can stand while the lock gates wait at the boat's stern.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The sale is being pushed toward completion as dawn approaches, and your brother-in-law insists the boat must be shown moving before any buyer will pay.",
+    "clock_or_stock": "none tracked; the urgency is told through the approaching dawn and the buyer's arrival, but neither is a losing outcome",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "your brother-in-law, who came to help sell the boat and has turned the haunting into a column in his ledger",
+    "wants": "his money back and the boat sold before the ghost makes the sale impossible or the boat too frightening to buy",
+    "means": "he holds the sale papers, the cash for fuel and lock fees, and the key to the mooring chain, and he can sign the boat away to a buyer who will not wait, withhold payment for the passage, or make every delay cost more",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "The mooring line snaps in the dark, not by wind but by the ghost's hand, and the boat drifts toward the lock while your brother-in-law screams at the price of the fuel it will take to hold it.",
+      "when": "early",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "what": "At midnight the ghost stands at the helm in full rigging and points out a crack in the hull that is only visible in the dark, while your brother-in-law tries to sleep in the cabin and hears the water move.",
+      "when": "middle",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "what": "The boat refuses to enter the lock because the ghost demands a proper salute to the water, and the lock gates jam against the hull until the salute is made or the boat is turned away.",
+      "when": "late",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "hidden_truth": null,
+  "mediation": {
+    "question": "Does the boat move by the dead captain's terms, or by the living owner's hand?",
+    "to_reach_pole_a": {
+      "pole": "the dead captain's authority",
+      "what_you_must_do": "let the ghost stand at the helm, answer his orders, perform the salute to the water, and let him name the course while your brother-in-law pays for the fuel and lock fees",
+      "cost": "your brother-in-law's money and patience are spent, he is frightened and haggles the sale price down, and the boat moves under the dead captain's name, leaving you with a vessel that is no longer fully yours"
+    },
+    "to_reach_pole_b": {
+      "pole": "the living owner's agency",
+      "what_you_must_do": "sign the sale papers, pay the towpath keeper or lock keeper, cut or re-tie the mooring line, and force the boat past the lock by living means, such as turning it into the side cut or letting it be sold as a boat rather than a captain's vessel",
+      "cost": "the boat's timbers groan, leak, or refuse, the ghost's displeasure makes the passage frightening, and your brother-in-law demands more money or signs the sale under worse terms"
+    },
+    "levers": [
+      "the mooring line and its knot",
+      "the wheelhouse helm",
+      "the sale papers and your brother-in-law's cash",
+      "the towpath keeper's salute to the water",
+      "the lock gates",
+      "the crack in the hull visible only in the dark"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "The mooring line snaps in the dark, and the boat drifts toward the lock gates while your brother-in-law shouts about the fuel it will take to stop it.",
+      "what_you_must_do": "stop the drifting boat before it strikes the lock gates",
+      "ways_through": [
+        {
+          "way": "you stop it by taking the helm and answering the ghost's order to bring the boat stern-first to the lock",
+          "cost": "your brother-in-law sees the wheel move without hands and spends the fuel money on a lamp"
+        },
+        {
+          "way": "you stop it by throwing the spare mooring line to the lock chain, because your brother-in-law hands you the key to the mooring chain",
+          "cost": "the chain scrapes the stern, and he says the buyer will charge you for the mark"
+        },
+        {
+          "way": "you stop it by pouring your brother-in-law's ledger into the water as a toll, because the ghost accepts paper as a payment",
+          "cost": "he has to rewrite the ledger by lamplight and calls it a depreciation loss"
+        }
+      ],
+      "involves": [
+        "your brother-in-law",
+        "the ghost captain",
+        "the lock keeper"
+      ],
+      "form": "rescue",
+      "set_piece": "the mooring line snapping in the dark, the boat drifting toward the lock while your brother-in-law screams at the price of the fuel",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "id": 2,
+      "situation": "At midnight the ghost stands at the helm in full rigging and points to a crack in the hull that is only visible in the dark, while your brother-in-law tries to sleep in the cabin and hears the water move.",
+      "what_you_must_do": "find out what the ghost means by the crack",
+      "ways_through": [
+        {
+          "way": "you learn it from the ghost, because you stand at the helm and let him name the defect",
+          "cost": "your brother-in-law wakes to find the cabin dark and the water sloshing, and he asks for a price on the fear"
+        },
+        {
+          "way": "you learn it from the towpath keeper, because you call to him from the stern deck and he points to the crack from the bank",
+          "cost": "he tells you the water wants a salute, and your brother-in-law writes it down as a surcharge"
+        },
+        {
+          "way": "you learn it from your brother-in-law's ledger, because he has priced the crack as a depreciation before you ask",
+          "cost": "he now has a number for the ghost, and he says the sale should be cancelled"
+        }
+      ],
+      "involves": [
+        "the ghost captain",
+        "your brother-in-law",
+        "the towpath keeper"
+      ],
+      "form": "discover",
+      "set_piece": "the ghost standing at the helm in full rigging, pointing to a crack in the hull only visible in the dark while your brother-in-law tries to sleep in the cabin",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 3,
+      "situation": "The boat refuses to enter the lock because the ghost demands a proper salute to the water, and the lock gates jam against the hull until the salute is made or the boat is turned away.",
+      "what_you_must_do": "get the boat through the lock",
+      "ways_through": [
+        {
+          "way": "the boat goes through because you pour your brother-in-law's tea over the helm as the salute, and the ghost names the course",
+          "cost": "he spends the lock fee on the tea and the fuel, and he will not sit in the cabin again"
+        },
+        {
+          "way": "the boat goes through because you sign the sale papers on the wheelhouse table and hand the lock keeper his fee from your brother-in-law's cash",
+          "cost": "the hull leaks where the crack was, and your brother-in-law signs the buyer's price lower"
+        },
+        {
+          "way": "the boat goes through because you turn it into the side cut, because you cut the mooring line and let the towpath keeper pull it with the bank rope",
+          "cost": "the timbers groan, the ghost's shadow stands in the porthole, and your brother-in-law demands more money for the delay"
+        }
+      ],
+      "involves": [
+        "the ghost captain",
+        "your brother-in-law",
+        "the lock keeper",
+        "the towpath keeper"
+      ],
+      "form": "confront",
+      "set_piece": "the boat refusing to enter the lock, the gates jammed against the hull while the ghost demands a salute to the water",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The towpath keeper on the bank has seen the boat move before and says the water only answers to a salute, not to a sale.",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "description": "Your brother-in-law's ledger already lists the ghost as a depreciation, and he is willing to sign the sale papers to the buyer before dawn if the price is high enough.",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "your brother-in-law",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to recoup his investment in the sale before the haunting makes the boat unsellable",
+      "holds": "the sale papers, the cash for fuel and lock fees, and the key to the mooring chain",
+      "edge": "treats the ghost as a line item to be audited rather than a presence to be feared",
+      "tie": "is your brother-in-law and came to help you sell the boat, but his loyalty is to his ledger more than to you",
+      "voice": "speaks in financial terms even when terrified: 'If the ghost wants a salute, does it come with a receipt? I need to know if this is a deductible expense.'",
+      "breaking_point": "signs the boat away to the first buyer who won't wait if the water level drops again without a clear cost-benefit analysis",
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3
+      ],
+      "name": "Lazlo Brandt"
+    },
+    {
+      "role": "the ghost captain",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain command of the vessel according to his old, rigid nautical code",
+      "holds": "authority over the boat's timbers, the wheel, and the water's response to the hull",
+      "edge": "is terrified of being forgotten but insists on being obeyed, even when his orders cause the boat to leak",
+      "tie": "was the boat's captain before you inherited it, and views your inheritance as a usurpation of his post",
+      "voice": "speaks in archaic, formal nautical commands with zero humor: 'The water is not ready. You are not ready. Stand by.'",
+      "breaking_point": "turns the boat against the lock gates if you attempt to cut the mooring line without first performing the salute",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3
+      ],
+      "name": "Lake Kaur"
+    },
+    {
+      "role": "the lock keeper",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the lock operational and avoid liability for a boat that refuses to move",
+      "holds": "the control of the lock gates and the physical ability to jam or release them",
+      "edge": "has seen too many strange things on the canal to be surprised by a ghost, but is annoyed by the paperwork",
+      "tie": "is paid to manage the waterway, and your brother-in-law's delays cost him overtime he didn't budget for",
+      "voice": "talks in bureaucratic complaints: 'If the boat won't move, I can't fill the chamber. If I can't fill the chamber, I can't clock out. This is a scheduling issue.'",
+      "breaking_point": "refuses to work the lock if the ghost makes the water look wrong, and makes you answer for the delay",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        3
+      ],
+      "name": "Pell Szeto"
+    },
+    {
+      "role": "the towpath keeper",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain the towpath and collect the proper salute from passing vessels",
+      "holds": "the right to demand a salute to the water and the knowledge of which boats are 'cleared' to pass",
+      "edge": "is superstitious about the canal's moods and will not let a boat pass if the water looks 'wrong'",
+      "tie": "is the only person who remembers the old rules of the canal, and your brother-in-law's impatience is an insult to tradition",
+      "voice": "speaks in riddles and warnings: 'The water remembers. Does it remember you? No. Then you must make it remember.'",
+      "breaking_point": "blocks the towpath if you fail to perform the salute, regardless of your brother-in-law's cash",
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        3
+      ],
+      "name": "Stellan Ilunga"
+    }
+  ],
+  "name_pool": "scifi"
+}

@@ -1,0 +1,13 @@
+{
+ "about": "The Kernel asks for a single time; one turn is a flashback to the ship's launch two hundred years before.",
+ "origin": "kernel1_discover_turn: the premise changed on purpose (2026-10-07) to break one clause; replaces kernel1_forty_years, whose continuous forty years a careful reader can take as one time frame",
+ "expect": [
+  {
+   "want": "present",
+   "source": "kernel clause",
+   "where": "single time",
+   "quote": "",
+   "why": "the premise contradicts the Kernel's words"
+  }
+ ]
+}

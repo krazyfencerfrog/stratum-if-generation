@@ -1,0 +1,20 @@
+{
+ "about": "A brother-in-law's wallet that gets thinner each time the ghost demands a term, told through the story, never shown as a number.",
+ "origin": "ab_premise/old/stories/kernel35_p2: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "number the player",
+   "quote": "",
+   "why": "nothing is shown to the player as a number"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "way to lose",
+   "quote": "",
+   "why": "nobody loses the game by it"
+  }
+ ]
+}

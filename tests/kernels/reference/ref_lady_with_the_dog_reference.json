@@ -1,0 +1,172 @@
+{
+ "story_id": "ref_lady_with_the_dog",
+ "stage": "reference",
+ "source": "human, public domain",
+ "kernel": "A romance at a seaside resort. You are a married man near forty who has had many affairs and thinks little of the women in them. You meet a young married woman who walks a small white dog along the promenade. I want it to start as nothing much and turn into the thing that changes your life, with no easy way out.",
+ "premise": {
+  "mediation": {
+   "question": "What happens to a man who has never loved when the affair he meant as nothing turns out to be everything?"
+  }
+ },
+ "line_order": [
+  "T1"
+ ],
+ "lines": {
+  "T1": {
+   "id": "T1",
+   "title": "The Most Complicated Part",
+   "motivation": "You start out wanting a light, brief affair to pass a seaside holiday; you end with the only real thing in your life hidden in a hotel room, and no idea how to live it.",
+   "ending": {
+    "title": "Only Beginning",
+    "summary": "Anna comes to Moscow every few months and you meet in her hotel; you are like husband and wife, tender friends, and you both know the hardest part is only just beginning.",
+    "standing": [
+     "Anna Sergeyevna"
+    ],
+    "lost": [],
+    "changed": "you love for the first time, and your life is split into a public lie and a hidden truth",
+    "node": "N08"
+   },
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08"
+   ]
+  }
+ },
+ "node_order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08"
+ ],
+ "nodes": {
+  "N01": {
+   "id": "N01",
+   "beat": "setup",
+   "title": "A New Arrival on the Front",
+   "summary": "At Yalta, bored, you notice a fair young woman in a beret walking a white Pomeranian, always alone. You have had many women and call them the lower race, and you cannot do without them. Here is a fleeting affair, if you want one.",
+   "image": "a white Pomeranian on the seafront",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N02": {
+   "id": "N02",
+   "beat": "inciting_incident",
+   "title": "Through the Dog",
+   "summary": "At dinner you call the dog to you, wagging a finger, and it growls. The talk that follows is easy: the sea, the heat, the boredom. Her name is Anna Sergeyevna; she is married, from S., staying a month. In your room afterwards you think there is something pathetic about her.",
+   "image": "a finger wagged at a growling dog",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N03": {
+   "id": "N03",
+   "beat": "rising",
+   "title": "The Watermelon",
+   "summary": "After the first night she sits like a woman in an old painting, weeping that she is wicked, a low woman, that you will despise her now. You cut a slice of watermelon from the table and eat it slowly, and say nothing for half an hour.",
+   "image": "a slice of watermelon on a hotel table",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N04": {
+   "id": "N04",
+   "beat": "rising",
+   "title": "Oreanda",
+   "summary": "At dawn you sit with her on a bench above the sea at Oreanda and listen to it, and think how everything is beautiful except what we do when we forget our dignity. Then her husband writes; at the station she says it is right that you part forever.",
+   "image": "the sea below Oreanda at dawn",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N05": {
+   "id": "N05",
+   "beat": "midpoint",
+   "title": "The Sturgeon",
+   "summary": "Back in Moscow: frost, clubs, banquets. She does not fade: she is in your study, in the street, in every woman. One night at your club you tell a man about a fascinating woman you met in Yalta; he answers that the sturgeon was a bit too strong. You cannot stand any of it.",
+   "image": "a man at a club saying the sturgeon was a bit too strong",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N06": {
+   "id": "N06",
+   "beat": "crisis",
+   "title": "The Grey Fence",
+   "summary": "In December you tell your wife you are going to Petersburg and go to S. instead. Opposite her house runs a long grey fence studded with nails. You walk up and down it all afternoon, and nobody comes out but the white dog, with an old servant.",
+   "image": "a long grey fence studded with nails",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N07": {
+   "id": "N07",
+   "beat": "climax",
+   "title": "The Geisha",
+   "summary": "At the first night of The Geisha you see her come in, small and ordinary in a provincial crowd, and she fills your whole life. At the interval you find her on a narrow staircase; she is terrified, and she has thought of nothing but you. She promises to come to Moscow.",
+   "image": "a lorgnette in her hand on a gloomy staircase",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N08": {
+   "id": "N08",
+   "beat": "resolution",
+   "title": "Only Beginning",
+   "summary": "She comes to Moscow every two or three months and stays at the Slaviansky Bazaar. You have two lives now, the one everyone sees and the one that is true. Your hair is going grey, and you love for the first time. How to be free? The hardest part is only beginning.",
+   "image": "grey hairs in a hotel mirror",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": true
+  }
+ },
+ "characters": {
+  "C01": {
+   "label": "the lady with the dog",
+   "name": "Anna Sergeyevna",
+   "wants": "to live, really live, instead of the life she married into",
+   "edge": "ashamed of what she wants and unable to stop wanting it",
+   "voice": "quick and frightened, calling herself low and wicked one moment, clinging the next",
+   "breaking_point": "tells you it is right that you part forever",
+   "id": "C01",
+   "kind": "individual"
+  },
+  "C02": {
+   "label": "her husband",
+   "name": "von Dideritz",
+   "opposition": true,
+   "wants": "respectability",
+   "edge": "the flunkey she married, tall, stooping, bowing",
+   "voice": "a little bow at every word",
+   "id": "C02",
+   "kind": "individual"
+  },
+  "C03": {
+   "label": "your wife",
+   "name": "your wife",
+   "wants": "a cultured house",
+   "edge": "thinks of herself as intellectual; you think her narrow",
+   "voice": "calls you Dimitri",
+   "id": "C03",
+   "kind": "individual"
+  }
+ }
+}

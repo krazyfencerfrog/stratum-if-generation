@@ -1,0 +1,1611 @@
+{
+  "schema_version": 5,
+  "story_id": "kernel35_f5",
+  "stage": "outline",
+  "kernel": "A ghost story that is funny and frightening in equal measure. You inherit a decrepit canal boat with a resident ghost who insists he is still the captain and will not let the boat leave its mooring. Your only living companion is your brother-in-law, who came to help you sell it and who wants his money back more than he wants you safe. I want the ghost to be a real character, scary when he needs to be, and I want the boat to actually go somewhere.",
+  "shape": {
+    "through_lines": 3,
+    "default_max_iterations": 3,
+    "endings_stated": "",
+    "endings_tier": "unstated",
+    "nodes_min": 7,
+    "nodes_max": 9,
+    "linear": false,
+    "choice_density": "unstated",
+    "note": "through_lines is how many distinct story lines (each with its own ending) the shape preference suggests; the review decides whether each next one is worth building."
+  },
+  "premise": {
+    "enrichment_budget": {
+      "level": "minimal"
+    },
+    "protagonist": {
+      "who": "You are the new inheritor of a narrow canal boat, standing on its stern deck with your brother-in-law already counting the cost of every rope, lock, and drop of fuel.",
+      "wants": "to get the boat under way and sold without losing your brother-in-law's nerve or your own authority over the vessel",
+      "can_do": "inspect the boat, untie and retie the mooring line, take the helm, sign or refuse the sale papers, pay or refuse to pay the lock fees, and answer the ghost directly",
+      "cannot_do": "make the boat leave its mooring or enter a lock without first satisfying whatever condition the ghost has placed on the water, the wheel, or the sale, because the ropes, timbers, and gates answer to his captaincy before they answer to you",
+      "serves": "3-0b.protagonist_identity"
+    },
+    "arena": {
+      "description": "The inherited narrowboat itself, moored at a canal lock, with its stern deck, cabin, and wheelhouse as the only places you can stand while the lock gates wait at the boat's stern.",
+      "serves": "3f.setting_structure"
+    },
+    "pressure": {
+      "description": "The sale is being pushed toward completion as dawn approaches, and your brother-in-law insists the boat must be shown moving before any buyer will pay.",
+      "clock_or_stock": "none tracked; the urgency is told through the approaching dawn and the buyer's arrival, but neither is a losing outcome",
+      "serves": "3e.timeline_structure"
+    },
+    "opposition": {
+      "who_or_what": "your brother-in-law, who came to help sell the boat and has turned the haunting into a column in his ledger",
+      "wants": "his money back and the boat sold before the ghost makes the sale impossible or the boat too frightening to buy",
+      "means": "he holds the sale papers, the cash for fuel and lock fees, and the key to the mooring chain, and he can sign the boat away to a buyer who will not wait, withhold payment for the passage, or make every delay cost more",
+      "serves": "3c.core_thematic_axis"
+    },
+    "events": [
+      {
+        "what": "The mooring line snaps in the dark, not by wind but by the ghost's hand, and the boat drifts toward the lock while your brother-in-law screams at the price of the fuel it will take to hold it.",
+        "when": "early",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "what": "At midnight the ghost stands at the helm in full rigging and points out a crack in the hull that is only visible in the dark, while your brother-in-law tries to sleep in the cabin and hears the water move.",
+        "when": "middle",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "what": "The boat refuses to enter the lock because the ghost demands a proper salute to the water, and the lock gates jam against the hull until the salute is made or the boat is turned away.",
+        "when": "late",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "hidden_truth": null,
+    "mediation": {
+      "question": "Does the boat move by the dead captain's terms, or by the living owner's hand?",
+      "to_reach_pole_a": {
+        "pole": "the dead captain's authority",
+        "what_you_must_do": "let the ghost stand at the helm, answer his orders, perform the salute to the water, and let him name the course while your brother-in-law pays for the fuel and lock fees",
+        "cost": "your brother-in-law's money and patience are spent, he is frightened and haggles the sale price down, and the boat moves under the dead captain's name, leaving you with a vessel that is no longer fully yours"
+      },
+      "to_reach_pole_b": {
+        "pole": "the living owner's agency",
+        "what_you_must_do": "sign the sale papers, pay the towpath keeper or lock keeper, cut or re-tie the mooring line, and force the boat past the lock by living means, such as turning it into the side cut or letting it be sold as a boat rather than a captain's vessel",
+        "cost": "the boat's timbers groan, leak, or refuse, the ghost's displeasure makes the passage frightening, and your brother-in-law demands more money or signs the sale under worse terms"
+      },
+      "levers": [
+        "the mooring line and its knot",
+        "the wheelhouse helm",
+        "the sale papers and your brother-in-law's cash",
+        "the towpath keeper's salute to the water",
+        "the lock gates",
+        "the crack in the hull visible only in the dark"
+      ],
+      "serves": "3-0a.primary_decision_axis"
+    },
+    "turns": [
+      {
+        "id": 1,
+        "situation": "The mooring line snaps in the dark, and the boat drifts toward the lock gates while your brother-in-law shouts about the fuel it will take to stop it.",
+        "what_you_must_do": "stop the drifting boat before it strikes the lock gates",
+        "ways_through": [
+          {
+            "way": "you stop it by taking the helm and answering the ghost's order to bring the boat stern-first to the lock",
+            "cost": "your brother-in-law sees the wheel move without hands and spends the fuel money on a lamp"
+          },
+          {
+            "way": "you stop it by throwing the spare mooring line to the lock chain, because your brother-in-law hands you the key to the mooring chain",
+            "cost": "the chain scrapes the stern, and he says the buyer will charge you for the mark"
+          },
+          {
+            "way": "you stop it by pouring your brother-in-law's ledger into the water as a toll, because the ghost accepts paper as a payment",
+            "cost": "he has to rewrite the ledger by lamplight and calls it a depreciation loss"
+          }
+        ],
+        "involves": [
+          "your brother-in-law",
+          "the ghost captain",
+          "the lock keeper"
+        ],
+        "form": "rescue",
+        "set_piece": "the mooring line snapping in the dark, the boat drifting toward the lock while your brother-in-law screams at the price of the fuel",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "id": 2,
+        "situation": "At midnight the ghost stands at the helm in full rigging and points to a crack in the hull that is only visible in the dark, while your brother-in-law tries to sleep in the cabin and hears the water move.",
+        "what_you_must_do": "find out what the ghost means by the crack",
+        "ways_through": [
+          {
+            "way": "you learn it from the ghost, because you stand at the helm and let him name the defect",
+            "cost": "your brother-in-law wakes to find the cabin dark and the water sloshing, and he asks for a price on the fear"
+          },
+          {
+            "way": "you learn it from the towpath keeper, because you call to him from the stern deck and he points to the crack from the bank",
+            "cost": "he tells you the water wants a salute, and your brother-in-law writes it down as a surcharge"
+          },
+          {
+            "way": "you learn it from your brother-in-law's ledger, because he has priced the crack as a depreciation before you ask",
+            "cost": "he now has a number for the ghost, and he says the sale should be cancelled"
+          }
+        ],
+        "involves": [
+          "the ghost captain",
+          "your brother-in-law",
+          "the towpath keeper"
+        ],
+        "form": "discover",
+        "set_piece": "the ghost standing at the helm in full rigging, pointing to a crack in the hull only visible in the dark while your brother-in-law tries to sleep in the cabin",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "id": 3,
+        "situation": "The boat refuses to enter the lock because the ghost demands a proper salute to the water, and the lock gates jam against the hull until the salute is made or the boat is turned away.",
+        "what_you_must_do": "get the boat through the lock",
+        "ways_through": [
+          {
+            "way": "the boat goes through because you pour your brother-in-law's tea over the helm as the salute, and the ghost names the course",
+            "cost": "he spends the lock fee on the tea and the fuel, and he will not sit in the cabin again"
+          },
+          {
+            "way": "the boat goes through because you sign the sale papers on the wheelhouse table and hand the lock keeper his fee from your brother-in-law's cash",
+            "cost": "the hull leaks where the crack was, and your brother-in-law signs the buyer's price lower"
+          },
+          {
+            "way": "the boat goes through because you turn it into the side cut, because you cut the mooring line and let the towpath keeper pull it with the bank rope",
+            "cost": "the timbers groan, the ghost's shadow stands in the porthole, and your brother-in-law demands more money for the delay"
+          }
+        ],
+        "involves": [
+          "the ghost captain",
+          "your brother-in-law",
+          "the lock keeper",
+          "the towpath keeper"
+        ],
+        "form": "confront",
+        "set_piece": "the boat refusing to enter the lock, the gates jammed against the hull while the ghost demands a salute to the water",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "complications": [
+      {
+        "description": "The towpath keeper on the bank has seen the boat move before and says the water only answers to a salute, not to a sale.",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "description": "Your brother-in-law's ledger already lists the ghost as a depreciation, and he is willing to sign the sale papers to the buyer before dawn if the price is high enough.",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "cast_seeds": [
+      {
+        "role": "your brother-in-law",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to recoup his investment in the sale before the haunting makes the boat unsellable",
+        "holds": "the sale papers, the cash for fuel and lock fees, and the key to the mooring chain",
+        "edge": "treats the ghost as a line item to be audited rather than a presence to be feared",
+        "tie": "is your brother-in-law and came to help you sell the boat, but his loyalty is to his ledger more than to you",
+        "voice": "speaks in financial terms even when terrified: 'If the ghost wants a salute, does it come with a receipt? I need to know if this is a deductible expense.'",
+        "breaking_point": "signs the boat away to the first buyer who won't wait if the water level drops again without a clear cost-benefit analysis",
+        "opposition": true,
+        "matters_to_turns": [
+          1,
+          2,
+          3
+        ],
+        "name": "Lazlo Brandt"
+      },
+      {
+        "role": "the ghost captain",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to maintain command of the vessel according to his old, rigid nautical code",
+        "holds": "authority over the boat's timbers, the wheel, and the water's response to the hull",
+        "edge": "is terrified of being forgotten but insists on being obeyed, even when his orders cause the boat to leak",
+        "tie": "was the boat's captain before you inherited it, and views your inheritance as a usurpation of his post",
+        "voice": "speaks in archaic, formal nautical commands with zero humor: 'The water is not ready. You are not ready. Stand by.'",
+        "breaking_point": "turns the boat against the lock gates if you attempt to cut the mooring line without first performing the salute",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3
+        ],
+        "name": "Lake Kaur"
+      },
+      {
+        "role": "the lock keeper",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to keep the lock operational and avoid liability for a boat that refuses to move",
+        "holds": "the control of the lock gates and the physical ability to jam or release them",
+        "edge": "has seen too many strange things on the canal to be surprised by a ghost, but is annoyed by the paperwork",
+        "tie": "is paid to manage the waterway, and your brother-in-law's delays cost him overtime he didn't budget for",
+        "voice": "talks in bureaucratic complaints: 'If the boat won't move, I can't fill the chamber. If I can't fill the chamber, I can't clock out. This is a scheduling issue.'",
+        "breaking_point": "refuses to work the lock if the ghost makes the water look wrong, and makes you answer for the delay",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          3
+        ],
+        "name": "Pell Szeto"
+      },
+      {
+        "role": "the towpath keeper",
+        "kind": "individual",
+        "speaks_for": null,
+        "wants": "to maintain the towpath and collect the proper salute from passing vessels",
+        "holds": "the right to demand a salute to the water and the knowledge of which boats are 'cleared' to pass",
+        "edge": "is superstitious about the canal's moods and will not let a boat pass if the water looks 'wrong'",
+        "tie": "is the only person who remembers the old rules of the canal, and your brother-in-law's impatience is an insult to tradition",
+        "voice": "speaks in riddles and warnings: 'The water remembers. Does it remember you? No. Then you must make it remember.'",
+        "breaking_point": "blocks the towpath if you fail to perform the salute, regardless of your brother-in-law's cash",
+        "opposition": false,
+        "matters_to_turns": [
+          2,
+          3
+        ],
+        "name": "Stellan Ilunga"
+      }
+    ],
+    "name_pool": "scifi"
+  },
+  "framework": {
+    "id": "three_act",
+    "name": "Three-act structure",
+    "shape": "a want is disturbed, pursued through complications that reverse at the midpoint and bottom out in a crisis, then settled in one decisive confrontation",
+    "modifier": {
+      "id": "episodic",
+      "name": "Episodic middle",
+      "effect": "Each middle beat is a self-contained instance of the story's recurring decision with its own small ending; what carries across them is what the protagonist is becoming."
+    },
+    "reading": "The story begins with the boat stuck and the living owner's authority compromised, building through escalating, specific negotiations with the ghost as the sale deadline approaches. It should land on a decisive moment where the boat finally moves, resolving the tension between the dead captain's terms and the living owner's agency in a way that is both frightening and funny.",
+    "why": "The story follows a sustained trajectory of complications (the recurring instances of the ghost's conditions) that reverse at the midpoint (the midnight discovery) and bottom out in a crisis (the jammed lock gates) before settling in the decisive confrontation of the boat moving, which matches the 'want is disturbed... settled in one decisive confrontation' shape.",
+    "named_in_kernel": null,
+    "shortlist": [
+      "three_act",
+      "kishotenketsu",
+      "save_the_cat"
+    ],
+    "scores": {
+      "three_act": 2.0,
+      "freytag": 0.0,
+      "heros_journey": -1.0,
+      "save_the_cat": 2.0,
+      "fichtean_curve": -1.0,
+      "seven_point": 0.0,
+      "story_circle": 1.0,
+      "kishotenketsu": 5.0
+    },
+    "beats": [
+      {
+        "id": "setup",
+        "name": "Setup",
+        "job": "the protagonist's situation and want before the disturbance, shown through something they do",
+        "required": true
+      },
+      {
+        "id": "inciting_incident",
+        "name": "Inciting incident",
+        "job": "the disturbance that makes the want urgent and the old way of getting by impossible",
+        "required": true
+      },
+      {
+        "id": "commitment",
+        "name": "Commitment",
+        "job": "the protagonist commits to one way of pursuing the want; from here there is no going back to the setup",
+        "required": true
+      },
+      {
+        "id": "midpoint",
+        "name": "Midpoint",
+        "job": "a reversal or revelation that changes what the pursuit means or what it will cost",
+        "required": true
+      },
+      {
+        "id": "crisis",
+        "name": "Crisis",
+        "job": "the low point: the chosen way fails or its price comes due, and the opposition has the upper hand",
+        "required": true
+      },
+      {
+        "id": "climax",
+        "name": "Climax",
+        "job": "the decisive confrontation, where the story's question is answered by what the protagonist does",
+        "required": true
+      },
+      {
+        "id": "resolution",
+        "name": "Resolution",
+        "job": "the new state of things: what the answer cost and what it left",
+        "required": true
+      }
+    ]
+  },
+  "lines": {
+    "T1": {
+      "id": "T1",
+      "iteration": 1,
+      "title": "The Salute at Dawn",
+      "motivation": "You start out wanting to prove you can command the boat and sell it before dawn, rather than be ruled by a dead man. By the end you want the boat to move under the captain it already has, even if that means your name is no longer the only one on it.",
+      "strategy": "Meet each of the ghost's nautical demands with a concrete living payment: answer his orders, pay with Lazlo's cash, and give his ledger a receipt for every fright.",
+      "turning_point": "At midnight, the ghost points to the dark crack and Lazlo prices the fear. You realize the boat cannot be sold as a dead man's vessel unless you first let him name what is wrong with it.",
+      "differs_from": null,
+      "ending": {
+        "title": "Under the Dead Captain's Name",
+        "summary": "The boat moves because you let Lake Kaur stand at the helm and name the course, while Lazlo pays for the fuel, the lock fee, and the lowered sale price. It has cost you full authority over the vessel and left you with a boat that is no longer entirely yours.",
+        "node": "N07",
+        "answer": "pole_a",
+        "standing": [
+          "Lazlo Brandt",
+          "Pell Szeto",
+          "Stellan Ilunga"
+        ],
+        "lost": [
+          "the mooring line",
+          "the sale papers as originally written"
+        ],
+        "changed": "the boat is sold under the dead captain's name and moves to the lock with a crack in the hull that only shows in the dark"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07"
+      ],
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07"
+      ],
+      "parent": null,
+      "divergence": null,
+      "rejoins_at": null,
+      "skipped_beats": []
+    },
+    "T2": {
+      "id": "T2",
+      "iteration": 2,
+      "title": "The Chain Mark",
+      "motivation": "When the line snaps, you come to want to stop the boat by something you can hold and pay for, because Lazlo Brandt hands you the key to the mooring chain and prices the scrape before you can answer the ghost. By the end you want the boat sold and moving under your own signed authority, even if that means the dead captain is no longer aboard.",
+      "strategy": "Take the chain, keep the boat under your own hand, let Lazlo Brandt carry the buyer's mark and the cash, and get the boat sold and moving before the water can be saluted.",
+      "turning_point": "The mooring chain key. Once you hold the key and Lazlo Brandt prices the scrape as a buyer's mark, the boat stops being something to answer the ghost and becomes something to sell under your own name.",
+      "differs_from": "T1 answers with the dead captain's authority and loses only the mooring line and the original sale papers; this line answers with the living owner's agency and loses Lake Kaur, leaving the boat sold under your name with the chain mark still on the stern.",
+      "ending": {
+        "title": "The Chain Mark",
+        "summary": "The boat goes through the lock on your signature and Lazlo Brandt's fee, with the chain scrape still blackening the stern and the buyer paying less for the mark. Lake Kaur is left at the mooring, and the sale papers name you, not the dead captain.",
+        "node": "T2N05",
+        "answer": "pole_b",
+        "standing": [
+          "Lazlo Brandt",
+          "Pell Szeto",
+          "Stellan Ilunga"
+        ],
+        "lost": [
+          "Lake Kaur"
+        ],
+        "changed": "the boat is sold under the living owner's hand and the dead captain is no longer aboard"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T2N05"
+      ],
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T2N05"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N02",
+        "trigger": "you threw the spare mooring line to the lock chain",
+        "trigger_kind": "act",
+        "way": 2,
+        "instead_of": "you took the helm and answered Lake Kaur's order to bring the boat stern-first to the lock",
+        "opportunity": "Lazlo Brandt hands you the key to the mooring chain and prices the scrape the chain will make before you can answer the ghost.",
+        "shift": "The boat stops by the chain, not by the wheel, and Lazlo Brandt has already turned the scrape into a buyer's mark. From that moment you want to finish the passage by living payment and signature rather than by the ghost's salute."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: way 2 at N02 gives the line a physical, payable object—the mooring chain—and a mark the buyer will price. That lets the story answer the central question by pole_b: the boat moves under the living owner's signature and fee, and Lake Kaur is left behind instead of kept as captain."
+    },
+    "T3": {
+      "id": "T3",
+      "iteration": 3,
+      "title": "The Number for the Ghost",
+      "motivation": "Once Lazlo has priced the crack as a depreciation, you come to want a number for the ghost more than you want to be afraid of him, because his ledger gives you a way to keep the sale alive without saluting the water; by the end you want the boat sold and moving under a price the dead captain can no longer name, even if that price costs you Lazlo.",
+      "strategy": "Let the ledger set the ghost's cost, let Lazlo Brandt sign the boat away on his own terms, and take the boat into the side cut with Stellan Ilunga's bank rope.",
+      "turning_point": "The ledger's number. When Lazlo writes the ghost's depreciation into the sale papers, the haunting becomes a sum, and you stop answering the ghost and start answering the column.",
+      "differs_from": "T1 lets Lake Kaur stand at the helm and name the course, keeping Lazlo standing and paying with the lowered sale price; this line answers mixed by letting the ledger set the ghost's price and the bank rope move the boat, losing Lazlo to the sale he priced and leaving the ghost's shadow aboard. T2 gets the boat through under your signature and leaves Lake Kaur at the mooring; this line keeps the ghost's shadow aboard and makes the boat move by Stellan's rope and Lazlo's ledger, with Lazlo lost rather than standing.",
+      "ending": {
+        "title": "The Bank Rope",
+        "summary": "The boat is pulled into the side cut by Stellan's rope while the timbers groan and Lake Kaur's shadow stands in the porthole. Lazlo signs the boat away at the ledger's inflated figure, more than the buyer pays, and leaves with the buyer's lower cash. The sale is done without your name on the helm, and the boat is sold as a living ledger's vessel with the ghost's shadow still aboard.",
+        "node": "T3N03",
+        "answer": "mixed",
+        "standing": [
+          "Pell Szeto",
+          "Stellan Ilunga"
+        ],
+        "lost": [
+          "Lazlo Brandt",
+          "the sale papers as originally written"
+        ],
+        "changed": "the boat is sold by the living ledger and pulled by the bank rope, with the ghost's shadow still aboard; Lazlo is gone with the buyer's cash, and the sale papers carry the ledger's number rather than the dead captain's course"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "new_nodes": [
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N04",
+        "trigger": "you took the crack's price from Lazlo's ledger before asking the ghost",
+        "trigger_kind": "act",
+        "way": 3,
+        "instead_of": "you stood at the helm and let Lake Kaur name the defect",
+        "opportunity": null,
+        "shift": "Lazlo's ledger gives the crack a number before the ghost names it, and the number makes the ghost payable rather than salutable. You learn that the haunting can be written as a depreciation, and you come to want the number more than you want to be afraid of the man who made it."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: taking the crack's price from Lazlo's ledger before asking the ghost changes the haunting from a salute to be performed into a number to be paid, and the side-cut bank rope gives the boat a living means of movement that keeps Lake Kaur's shadow aboard without giving him the named course. The seed's ending world holds: the boat is sold by the living ledger and pulled by Stellan's rope, while Lazlo is lost to the sale he priced."
+    }
+  },
+  "line_order": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "nodes": {
+    "N01": {
+      "id": "N01",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "setup",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You stand on the stern deck before dawn and coil the mooring line while Lazlo Brandt counts the cost of every rope, lock, and drop of fuel. Lake Kaur, the ghost captain, says the water is not ready and you are not ready; Lazlo writes the delay as a surcharge and tells you the boat must be shown moving before any buyer will pay.",
+      "title": "Before Dawn",
+      "summary": "You stand on the stern deck before dawn and coil the mooring line while Lazlo Brandt counts the cost of every rope, lock, and drop of fuel. Lake Kaur says the water is not ready and you are not ready, and Lazlo writes the delay as a surcharge. He tells you the boat must be shown moving before any buyer will pay.",
+      "image": "the coiled mooring line and open ledger on the stern deck",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N02": {
+      "id": "N02",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "inciting_incident",
+      "turn": 1,
+      "way": 1,
+      "event": 1,
+      "adapted": "In the dark the mooring line snaps under the ghost's hand and the boat drifts toward the lock gates while Lazlo screams at the price of the fuel it will take to hold it. You take the helm and answer Lake Kaur's order to bring the boat stern-first to the lock; the wheel moves without hands, the boat stops, and Lazlo spends the fuel money on a lamp.",
+      "title": "The Snapped Line",
+      "summary": "The mooring line snaps in the dark under Lake Kaur's hand, and the boat drifts toward the lock gates while Lazlo shouts about the fuel it will take to hold it. You take the helm and answer Lake's order to bring the boat stern-first to the lock, where the wheel turns without hands and the boat stops before Pell Szeto can jam the gates. Lazlo spends the fuel money on a lamp, and the stern deck is lit by the ghost's displeasure.",
+      "image": "the wheel turning by itself under one lamp",
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [
+        {
+          "line": "T2",
+          "text": "Lazlo Brandt hands you the key to the mooring chain and prices the scrape the chain will make before you can answer the ghost."
+        }
+      ],
+      "annotations": {}
+    },
+    "N03": {
+      "id": "N03",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "commitment",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "Lazlo withholds the lock fee and tells you he will sign the boat away to the first buyer who will not wait if the water level drops again without a clear cost-benefit analysis. You tell him the boat will not move until the water is saluted, and he hands you the cash for fuel and the key to the mooring chain, saying if the boat does not move by dawn he sells it as-is.",
+      "title": "The Fee Withheld",
+      "summary": "Lazlo withholds the lock fee and tells you he will sign the boat away to the first buyer who will not wait if the water level drops again without a clear cost-benefit analysis. You tell him the boat will not move until the water is saluted, and he hands you the cash for fuel and the key to the mooring chain. He says if the boat does not move by dawn he sells it as-is.",
+      "image": "the mooring chain key lying on the wet deck",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N04": {
+      "id": "N04",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "midpoint",
+      "turn": 2,
+      "way": 1,
+      "event": 2,
+      "adapted": "At midnight Lake Kaur stands at the helm in full rigging and points to a crack in the hull that is only visible in the dark, while Lazlo tries to sleep in the cabin and hears the water move. You stand at the helm and let the ghost name the defect; Lazlo wakes to find the cabin dark and the water sloshing, and he asks for a price on the fear.",
+      "title": "The Crack in the Dark",
+      "summary": "At midnight Lake Kaur stands at the helm in full rigging and points to a crack in the hull that is only visible in the dark, while Stellan Ilunga waits on the towpath and warns that the water will not be cleared until the defect is named. You stand at the helm and let Lake name the crack, and Lazlo wakes in the cabin to find it dark and the water sloshing. He asks for a price on the fear.",
+      "image": "a black crack in the hull, lit only by the dark",
+      "where": [
+        "L02",
+        "L03",
+        "L04"
+      ],
+      "who": [
+        "C02",
+        "C01",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N05": {
+      "id": "N05",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "crisis",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The crack leaks a dark stain onto the cabin floor, and Lazlo, frightened and holding the sale papers, says the sale should be cancelled unless you give him a number for the ghost. He signs a provisional note selling the boat as-is to the first buyer who will not wait, and the boat's timbers groan as if in answer to his signature.",
+      "title": "The Provisional Sale",
+      "summary": "The crack leaks a dark stain onto the cabin floor, and Lazlo Brandt, frightened and holding the sale papers, says the sale should be cancelled unless you give him a number for the ghost. He signs a provisional note selling the boat as-is to the first buyer who will not wait, and the boat's timbers groan as if in answer to his signature.",
+      "image": "a black stain spreading under the sale papers on the cabin floor",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N06": {
+      "id": "N06",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "climax",
+      "turn": 3,
+      "way": 1,
+      "event": 3,
+      "adapted": "The boat refuses to enter the lock because Lake Kaur demands a proper salute to the water, and the lock gates jam against the hull until the salute is made. You pour Lazlo's tea over the helm as the salute, and the ghost names the course; the gates open, the boat moves, and Lazlo spends the lock fee on the tea and the fuel, and he will not sit in the cabin again.",
+      "title": "The Tea Salute",
+      "summary": "The boat refuses to enter the lock because Lake Kaur demands a proper salute to the water, and the lock gates jam against the hull until the salute is made or the boat is turned away. You pour Lazlo Brandt's tea over the helm as the salute, and Lake Kaur names the course; Pell Szeto releases the gates, Stellan Ilunga steps back from the towpath, and the boat moves. Lazlo Brandt spends the lock fee on the tea and the fuel, and he will not sit in the cabin again.",
+      "image": "the tea-stained helm with the gates open behind it",
+      "where": [
+        "L02",
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C02",
+        "C01",
+        "C03",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N07": {
+      "id": "N07",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "resolution",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The boat goes under the dead captain's name, and Lazlo signs the buyer's price lower because the ghost has made the passage frightening and the hull leak where the crack was. You are left with a vessel that is no longer fully yours, but it has moved, and the sale is done.",
+      "title": "The Lowered Price",
+      "summary": "You let Lake Kaur stand at the helm and name the course, and the boat moves under his name while the hull leaks where the crack was. Lazlo Brandt signs the buyer's price lower, paying for the fuel, the lock fee, and the lowered sale price. The sale is done, and you are left with a vessel that has moved but is no longer entirely yours.",
+      "image": "the sale papers wet with canal water on the stern deck",
+      "where": [
+        "L02",
+        "L01"
+      ],
+      "who": [
+        "C02",
+        "C01"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N01": {
+      "id": "T2N01",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "commitment",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "You keep the mooring chain key in your hand and refuse to let Lake Kaur's salute set the terms. Lazlo Brandt withholds the lock fee, prices the chain scrape as a buyer's mark, and tells you he will sign the boat away at dawn if it is not moving; you answer that the boat will move as your sale, not as the dead captain's vessel.",
+      "title": "The Chain Key",
+      "summary": "You keep the mooring chain key in your hand and refuse to let Lake Kaur's salute set the terms for the boat's movement. Lazlo Brandt withholds the lock fee, prices the chain scrape as a buyer's mark, and tells you he will sign the boat away at dawn if it is not moving. You answer that the boat will move as your sale, not as the dead captain's vessel.",
+      "image": "the cold iron key in your fist, the chain scrape dark on the hull",
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N02": {
+      "id": "T2N02",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "midpoint",
+      "turn": 2,
+      "way": 2,
+      "event": 2,
+      "adapted": "At midnight Lake Kaur stands at the helm in full rigging and points to the crack in the hull that is only visible in the dark. You call to Stellan Ilunga from the stern deck, and he points to the crack from the bank, telling you the water wants a salute; Lazlo Brandt wakes in the cabin, hears the water move, and writes the salute down as a surcharge.",
+      "title": "The Midnight Crack",
+      "summary": "At midnight Lake Kaur stands at the helm in full rigging and points to a crack in the hull that is only visible in the dark. You call to Stellan Ilunga from the stern deck, and he points to the crack from the bank, telling you the water wants a salute. Lazlo Brandt wakes in the cabin, hears the water move, and writes the salute down as a surcharge.",
+      "image": "the dark crack in the hull, lit only by the ghost's cold attention",
+      "where": [
+        "L02",
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C02",
+        "C04",
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N03": {
+      "id": "T2N03",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "crisis",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The crack leaks a dark stain onto the cabin floor, and Lazlo Brandt, frightened and holding the sale papers, signs a provisional note selling the boat as-is to the first buyer who will not wait. The timbers groan, the chain mark looks worse in the lamplight, and it becomes clear that if the boat does not move by dawn it will be sold as a damaged haunted hull rather than under your hand.",
+      "title": "The As-Is Note",
+      "summary": "The crack leaks a dark stain onto the cabin floor, and Lazlo Brandt, frightened and holding the sale papers, signs a provisional note selling the boat as-is to the first buyer who will not wait. The timbers groan, the chain mark looks worse in the lamplight, and it becomes clear that a boat not moving by dawn will be sold as a damaged haunted hull rather than under your hand.",
+      "image": "the wet dark stain spreading across the cabin floorboards",
+      "where": [
+        "L03",
+        "L01"
+      ],
+      "who": [
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N04": {
+      "id": "T2N04",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "climax",
+      "turn": 3,
+      "way": 2,
+      "event": 3,
+      "adapted": "The boat refuses to enter the lock because Lake Kaur demands a proper salute to the water, and the lock gates jam against the hull. You sign the sale papers on the wheelhouse table and hand Pell Szeto his fee from Lazlo Brandt's cash; the gates open, the boat moves, the hull leaks where the crack was, and Lake Kaur is left at the mooring with his salute unanswered.",
+      "title": "The Signed Gates",
+      "summary": "The lock gates jam against the hull while Lake Kaur demands a proper salute, and the water drops as the timbers creak. You sign the sale papers on the wheelhouse table, take the fee from Lazlo Brandt, and hand it to Pell Szeto while Stellan Ilunga names the old salute, a hand over the wheel and a bow to the water. The gates open, the boat moves, and the hull leaks where the crack was, leaving Lake Kaur at the mooring with no answer.",
+      "image": "the signed sale papers lying wet on the wheelhouse table",
+      "where": [
+        "L01",
+        "L02",
+        "L04"
+      ],
+      "who": [
+        "C02",
+        "C01",
+        "C03",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N05": {
+      "id": "T2N05",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "resolution",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The boat goes through under your signature, and Lazlo Brandt signs the buyer's price lower because of the chain mark and the leak. The sale papers name you, not the dead captain, and the boat is sold as a living owner's vessel with the dead captain no longer aboard.",
+      "title": "The Lower Price",
+      "summary": "The boat passes through the lock on your signature and Lazlo Brandt's fee, while the chain scrape still blackens the stern and the buyer's price comes down for the mark. Lazlo signs the lower price beside your name, and the sale papers name you as owner rather than the dead captain. Lake Kaur is left at the mooring, and the boat moves as a living owner's vessel with no ghost aboard.",
+      "image": "the black chain mark beside the signed sale papers",
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N01": {
+      "id": "T3N01",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "crisis",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "Lazlo Brandt writes the crack's price into the ledger as a ghost depreciation and signs a provisional note selling the boat as a damaged haunted hull to the first buyer who will not wait, but only if it is moved by a living hand before dawn. He hands you the cash and the mooring-chain key and refuses to touch the helm, saying if the water level drops again he signs the boat away without a cost-benefit analysis. The timbers groan, and the dark stain on the cabin floor spreads into a line like a ledger rule.",
+      "title": "The Ghost Depreciation",
+      "summary": "Lazlo Brandt writes the crack's price into his ledger as a ghost depreciation and signs a provisional note selling the boat as a damaged haunted hull to the first buyer who will not wait, provided it is moved by a living hand before dawn. He hands you the cash and the mooring-chain key and refuses the helm, asking for a receipt for the water's salute before he will accept another drop. The timbers groan, and the dark stain on the cabin floor spreads into a line like a ledger rule.",
+      "image": "the dark stain spreading into a ledger rule on the cabin floor",
+      "where": [
+        "L01",
+        "L03",
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N02": {
+      "id": "T3N02",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "climax",
+      "turn": 3,
+      "way": 3,
+      "event": 3,
+      "adapted": "The boat refuses to enter the lock and the gates jam against the hull; you cut the mooring line and hand the end to Stellan Ilunga, who pulls it into the side cut with the bank rope while Lake Kaur's shadow stands in the porthole and the timbers groan. Lazlo Brandt signs the final sale at the ledger's inflated figure, more than the buyer will pay, and hands the buyer's lower cash to Pell Szeto for the lock fee, saying the difference is a depreciation loss.",
+      "title": "The Side Cut",
+      "summary": "The boat refuses the lock and the gates jam against the hull because Lake Kaur demands a proper salute to the water. You cut the mooring line and hand the end to Stellan Ilunga, who pulls the boat into the side cut with the bank rope while Lake Kaur's shadow stands in the porthole and the timbers groan. Lazlo Brandt signs the final sale at the ledger's inflated figure, more than the buyer will pay, and hands the buyer's lower cash to Pell Szeto for the lock fee, saying the difference is a depreciation loss.",
+      "image": "the mooring line's cut end swinging in Stellan Ilunga's hand",
+      "where": [
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C02",
+        "C01",
+        "C03",
+        "C04"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N03": {
+      "id": "T3N03",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "resolution",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "The boat lies in the side cut with the sale papers signed at the ledger's number, and Lake Kaur's shadow remains in the porthole as the water settles. Lazlo Brandt walks down the towpath with the buyer's lower cash and his ledger, leaving the boat behind; the sale is done without your name on the helm, and the vessel moves as a living ledger's sale with the dead captain's shadow still aboard.",
+      "title": "The Ledger's Sale",
+      "summary": "The boat lies in the side cut with the sale papers signed at the ledger's number, and Lake Kaur's shadow remains in the porthole as the water settles. Lazlo Brandt walks down the towpath with the buyer's lower cash and his ledger, leaving the boat behind. The sale is done without your name on the helm, and the vessel moves as a living ledger's sale with the dead captain's shadow still aboard.",
+      "image": "Lake Kaur's shadow standing still in the porthole",
+      "where": [
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    }
+  },
+  "node_order": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T2N04",
+    "T2N05",
+    "T3N01",
+    "T3N02",
+    "T3N03"
+  ],
+  "characters": {
+    "C01": {
+      "id": "C01",
+      "label": "your brother-in-law",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to recoup his investment in the sale before the haunting makes the boat unsellable",
+      "holds": "the sale papers, the cash for fuel and lock fees, and the key to the mooring chain",
+      "edge": "treats the ghost as a line item to be audited rather than a presence to be feared",
+      "tie": "is your brother-in-law and came to help you sell the boat, but his loyalty is to his ledger more than to you",
+      "voice": "speaks in financial terms even when terrified: 'If the ghost wants a salute, does it come with a receipt? I need to know if this is a deductible expense.'",
+      "breaking_point": "signs the boat away to the first buyer who won't wait if the water level drops again without a clear cost-benefit analysis",
+      "opposition": true,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T2N05",
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "name": "Lazlo Brandt",
+      "profile": null,
+      "packet": null
+    },
+    "C02": {
+      "id": "C02",
+      "label": "the ghost captain",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain command of the vessel according to his old, rigid nautical code",
+      "holds": "authority over the boat's timbers, the wheel, and the water's response to the hull",
+      "edge": "is terrified of being forgotten but insists on being obeyed, even when his orders cause the boat to leak",
+      "tie": "was the boat's captain before you inherited it, and views your inheritance as a usurpation of his post",
+      "voice": "speaks in archaic, formal nautical commands with zero humor: 'The water is not ready. You are not ready. Stand by.'",
+      "breaking_point": "turns the boat against the lock gates if you attempt to cut the mooring line without first performing the salute",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N04",
+        "N06",
+        "N07",
+        "T2N01",
+        "T2N02",
+        "T2N04",
+        "T2N05",
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "name": "Lake Kaur",
+      "profile": null,
+      "packet": null
+    },
+    "C03": {
+      "id": "C03",
+      "label": "the lock keeper",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to keep the lock operational and avoid liability for a boat that refuses to move",
+      "holds": "the control of the lock gates and the physical ability to jam or release them",
+      "edge": "has seen too many strange things on the canal to be surprised by a ghost, but is annoyed by the paperwork",
+      "tie": "is paid to manage the waterway, and your brother-in-law's delays cost him overtime he didn't budget for",
+      "voice": "talks in bureaucratic complaints: 'If the boat won't move, I can't fill the chamber. If I can't fill the chamber, I can't clock out. This is a scheduling issue.'",
+      "breaking_point": "refuses to work the lock if the ghost makes the water look wrong, and makes you answer for the delay",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        3
+      ],
+      "source": "premise",
+      "nodes": [
+        "N02",
+        "N06",
+        "T2N04",
+        "T3N02"
+      ],
+      "name": "Pell Szeto",
+      "profile": null,
+      "packet": null
+    },
+    "C04": {
+      "id": "C04",
+      "label": "the towpath keeper",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to maintain the towpath and collect the proper salute from passing vessels",
+      "holds": "the right to demand a salute to the water and the knowledge of which boats are 'cleared' to pass",
+      "edge": "is superstitious about the canal's moods and will not let a boat pass if the water looks 'wrong'",
+      "tie": "is the only person who remembers the old rules of the canal, and your brother-in-law's impatience is an insult to tradition",
+      "voice": "speaks in riddles and warnings: 'The water remembers. Does it remember you? No. Then you must make it remember.'",
+      "breaking_point": "blocks the towpath if you fail to perform the salute, regardless of your brother-in-law's cash",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        2,
+        3
+      ],
+      "source": "premise",
+      "nodes": [
+        "N04",
+        "N06",
+        "T2N02",
+        "T2N04",
+        "T3N02"
+      ],
+      "name": "Stellan Ilunga",
+      "profile": null,
+      "packet": null
+    }
+  },
+  "locations": {
+    "L01": {
+      "id": "L01",
+      "name": "the stern deck",
+      "kind": "the open deck at the back of the narrowboat",
+      "why": "where the mooring line, sale talk, and lock fees are handled",
+      "source": "T1",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N06",
+        "N07",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T2N05",
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L02": {
+      "id": "L02",
+      "name": "the wheelhouse",
+      "kind": "the small steering space at the stern",
+      "why": "where the helm is taken and the ghost's orders are answered",
+      "source": "T1",
+      "nodes": [
+        "N02",
+        "N04",
+        "N06",
+        "N07",
+        "T2N01",
+        "T2N02",
+        "T2N04",
+        "T2N05",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L03": {
+      "id": "L03",
+      "name": "the cabin",
+      "kind": "the enclosed living space inside the boat",
+      "why": "where Lazlo tries to sleep and hears the water move",
+      "source": "T1",
+      "nodes": [
+        "N04",
+        "N05",
+        "T2N03",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L04": {
+      "id": "L04",
+      "name": "the towpath",
+      "kind": "the path beside the canal at the lock",
+      "why": "where the towpath keeper can stand and demand the old salute",
+      "source": "T1",
+      "nodes": [
+        "N04",
+        "N06",
+        "T2N02",
+        "T2N04",
+        "T3N02",
+        "T3N03"
+      ],
+      "rooms": null,
+      "packet": null
+    }
+  },
+  "branching": "plan",
+  "plan": {
+    "assessment": "T1 answers the question for the dead captain: the boat moves only when Lake Kaur is allowed to stand at the helm and name the course, and the price is your full authority over the vessel. The missing worlds are the boat moving by a living hand without the salute, and a pole_a ending where a living companion is lost instead of only the line and the original papers. The story can part earliest at N02, when the snapped line can be answered by chain, ledger, or ghost-order rather than by the main line's answered helm.",
+    "seeds": [
+      {
+        "motivation": "When the line snaps and the boat drifts, you come to want to stop it by something you can hold and pay for, because Lazlo hands you the key to the mooring chain and prices the scrape before you can answer the ghost.",
+        "strategy": "Take the chain, keep the boat under your own hand, let Lazlo carry the buyer's mark and the cash, and get the boat sold and moving before the water can be saluted.",
+        "diverges_at": "N02",
+        "trigger": "you threw the spare mooring line to the lock chain",
+        "trigger_kind": "act",
+        "way": 2,
+        "ending": {
+          "title": "The Chain Mark",
+          "summary": "The boat goes through the lock on your signature and Lazlo's fee, with the chain scrape still blackening the stern and the buyer paying less for the mark. Lake Kaur is left at the mooring, and the sale papers name you, not the dead captain.",
+          "answer": "pole_b",
+          "standing": [
+            "Lazlo Brandt",
+            "Pell Szeto",
+            "Stellan Ilunga"
+          ],
+          "lost": [
+            "Lake Kaur"
+          ],
+          "changed": "the boat is sold under the living owner's hand and the dead captain is no longer aboard"
+        },
+        "why_different": "T1 keeps the ghost as captain and loses only the original papers; this line loses the ghost and keeps the boat moving by your own signed authority, so the answer to the story's question is reversed."
+      },
+      {
+        "motivation": "Once Lazlo has priced the crack as a depreciation, you come to want a number for the ghost more than you want to be afraid of him, because his ledger gives you a way to keep the sale alive without saluting the water.",
+        "strategy": "Let the ledger set the ghost's cost, let Lazlo sign the boat away on his own terms, and take the boat into the side cut with the towpath keeper's bank rope.",
+        "diverges_at": "N04",
+        "trigger": "you took the crack's price from Lazlo's ledger before asking the ghost",
+        "trigger_kind": "act",
+        "way": 3,
+        "ending": {
+          "title": "The Bank Rope",
+          "summary": "The boat is pulled into the side cut by Stellan's rope while the timbers groan and Lake Kaur's shadow stands in the porthole. Lazlo signs the boat away for more money than the buyer pays, and the sale is done without your name on the helm.",
+          "answer": "mixed",
+          "standing": [
+            "Pell Szeto",
+            "Stellan Ilunga"
+          ],
+          "lost": [
+            "Lazlo Brandt",
+            "the sale papers as originally written"
+          ],
+          "changed": "the boat is sold by the living ledger and pulled by the bank rope, with the ghost's shadow still aboard"
+        },
+        "why_different": "T1 keeps Lazlo standing and gives the ghost full command; this line loses Lazlo to his own sale note and makes the boat move by a mixed hand of ledger, rope, and ghost-shadow rather than by the dead captain's named course."
+      }
+    ]
+  },
+  "promises": {
+    "reading": "The reader wants a gothic comedy where the horror is bureaucratic and the comedy is domestic: a haunted vessel that refuses to move because its dead captain has a point, and a living heir who is too broke and too pressured to argue back. They want to feel the creak of the timbers and the sting of a sibling's impatience, balanced by the relief of a joke that lands right when the hair on the back of the neck stands up.",
+    "genre": "gothic comedy / nautical ghost story",
+    "player_fantasy": "To be the reluctant captain of a haunted vessel, using wit and stubbornness to negotiate passage with a dead man while keeping a living man from selling the ship out from under you.",
+    "promises": [
+      {
+        "what": "a ghost who is terrifying in the dark but petty and specific in the light, enforcing nautical rules that no longer exist",
+        "why": "the Kernel demands a 'real character' who is both scary and funny; the humor comes from the ghost's rigid adherence to protocol, the fright from his power over the boat",
+        "in_kernel": true
+      },
+      {
+        "what": "a brother-in-law who measures every creak in pounds and pence, treating the haunting as a depreciation issue rather than a supernatural one",
+        "why": "the Kernel specifies he wants his money back more than your safety; this provides the constant, grounded pressure that contrasts with the ghost's ethereal authority",
+        "in_kernel": true
+      },
+      {
+        "what": "the boat itself as a responsive entity, groaning, leaking, or refusing to unmoor when the captain's conditions are not met",
+        "why": "the Kernel says the boat 'insists' it won't leave; the setting must feel alive and obstructive, not just a backdrop",
+        "in_kernel": true
+      },
+      {
+        "what": "a sequence of escalating tests where the player must satisfy the ghost's 'captaincy' requirements to unlock movement",
+        "why": "the brief identifies the decision axis as labeling how to get the boat underway; the audience expects a puzzle of appeasement or defiance rather than a simple fight",
+        "in_kernel": false
+      },
+      {
+        "what": "moments of genuine, unironic fright that puncture the comedy, reminding the player that the ghost is real and dangerous",
+        "why": "the Kernel asks for 'fright in equal measure'; without this, the story becomes a farce rather than a ghost story",
+        "in_kernel": true
+      }
+    ],
+    "set_pieces": [
+      {
+        "scene": "the mooring line snapping not by wind, but by the ghost's hand, leaving the boat drifting in a narrow channel while the brother-in-law screams at the price of the fuel",
+        "where": "the canal lock"
+      },
+      {
+        "scene": "a midnight inspection where the ghost stands at the helm in full rigging, pointing out a 'defect' that is actually a crack in the hull only visible in the dark, while the brother-in-law tries to sleep in the cabin",
+        "where": "the wheelhouse"
+      },
+      {
+        "scene": "the boat refusing to enter a lock because the ghost demands a 'proper salute' to the water, forcing the player to choose between performing a ridiculous ritual or finding a way to bypass the lock entirely",
+        "where": "the lock gates"
+      }
+    ],
+    "tone_engine": "Funny: the comedy arises from the mismatch between the ghost's archaic, serious nautical demeanor and the mundane financial anxiety of the brother-in-law, who tries to apply real-world logic to supernatural rules. Eerie: the fright is sustained by the boat's physical responsiveness to the ghost's mood; the timbers creak, the water level drops, and the shadows lengthen when the ghost is displeased, creating a constant low-level dread beneath the jokes.",
+    "obligatory_cast": [
+      "the ghost's 'crew' of shadows or reflections that appear in the portholes, who mimic the player's movements with a slight, wrong delay",
+      "a canal towpath keeper or neighbor who sees the boat's strange movements and offers cryptic, helpful, or useless advice from the bank"
+    ],
+    "must_not": [
+      "no permanent death of the brother-in-law: the Kernel implies he is a companion to be managed, not a victim to be mourned, and his financial pressure must persist",
+      "no modern technology solving the ghost: the brief implies the solution is about 'labeling how to get the boat under way' through interaction with the ghost, not using a GPS or a tow truck",
+      "no romantic subplot with the ghost: the Kernel frames the relationship as one of authority and ownership, not affection"
+    ]
+  },
+  "edges": [
+    {
+      "from": "N01",
+      "to": "N02",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N02",
+      "to": "N03",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you took the helm and answered Lake Kaur's order to bring the boat stern-first to the lock"
+      ]
+    },
+    {
+      "from": "N03",
+      "to": "N04",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "N05",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you stood at the helm and let Lake Kaur name the defect"
+      ]
+    },
+    {
+      "from": "N05",
+      "to": "N06",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N06",
+      "to": "N07",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N02",
+      "to": "T2N01",
+      "lines": [
+        "T2"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you threw the spare mooring line to the lock chain",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T2N01",
+      "to": "T2N02",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N02",
+      "to": "T2N03",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N03",
+      "to": "T2N04",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N04",
+      "to": "T2N05",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "T3N01",
+      "lines": [
+        "T3"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you took the crack's price from Lazlo's ledger before asking the ghost",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T3N01",
+      "to": "T3N02",
+      "lines": [
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T3N02",
+      "to": "T3N03",
+      "lines": [
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    }
+  ],
+  "grid": {
+    "beats": [
+      "setup",
+      "inciting_incident",
+      "commitment",
+      "midpoint",
+      "crisis",
+      "climax",
+      "resolution"
+    ],
+    "rows": {
+      "T1": {
+        "setup": [
+          "N01"
+        ],
+        "inciting_incident": [
+          "N02"
+        ],
+        "commitment": [
+          "N03"
+        ],
+        "midpoint": [
+          "N04"
+        ],
+        "crisis": [
+          "N05"
+        ],
+        "climax": [
+          "N06"
+        ],
+        "resolution": [
+          "N07"
+        ]
+      },
+      "T2": {
+        "setup": [
+          "N01"
+        ],
+        "inciting_incident": [
+          "N02"
+        ],
+        "commitment": [
+          "T2N01"
+        ],
+        "midpoint": [
+          "T2N02"
+        ],
+        "crisis": [
+          "T2N03"
+        ],
+        "climax": [
+          "T2N04"
+        ],
+        "resolution": [
+          "T2N05"
+        ]
+      },
+      "T3": {
+        "setup": [
+          "N01"
+        ],
+        "inciting_incident": [
+          "N02"
+        ],
+        "commitment": [
+          "N03"
+        ],
+        "midpoint": [
+          "N04"
+        ],
+        "crisis": [
+          "T3N01"
+        ],
+        "climax": [
+          "T3N02"
+        ],
+        "resolution": [
+          "T3N03"
+        ]
+      }
+    },
+    "skipped": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    }
+  },
+  "hooks": [
+    {
+      "node": "N02",
+      "turn": 1,
+      "way": 3,
+      "what": "you stop it by pouring your brother-in-law's ledger into the water as a toll, because the ghost accepts paper as a payment",
+      "cost": "he has to rewrite the ledger by lamplight and calls it a depreciation loss"
+    },
+    {
+      "node": "N04",
+      "turn": 2,
+      "way": 2,
+      "what": "you learn it from the towpath keeper, because you call to him from the stern deck and he points to the crack from the bank",
+      "cost": "he tells you the water wants a salute, and your brother-in-law writes it down as a surcharge"
+    },
+    {
+      "node": "N06",
+      "turn": 3,
+      "way": 2,
+      "what": "the boat goes through because you sign the sale papers on the wheelhouse table and hand the lock keeper his fee from your brother-in-law's cash",
+      "cost": "the hull leaks where the crack was, and your brother-in-law signs the buyer's price lower"
+    },
+    {
+      "node": "N06",
+      "turn": 3,
+      "way": 3,
+      "what": "the boat goes through because you turn it into the side cut, because you cut the mooring line and let the towpath keeper pull it with the bank rope",
+      "cost": "the timbers groan, the ghost's shadow stands in the porthole, and your brother-in-law demands more money for the delay"
+    },
+    {
+      "node": "T2N02",
+      "turn": 2,
+      "way": 1,
+      "what": "you learn it from the ghost, because you stand at the helm and let him name the defect",
+      "cost": "your brother-in-law wakes to find the cabin dark and the water sloshing, and he asks for a price on the fear"
+    },
+    {
+      "node": "T2N02",
+      "turn": 2,
+      "way": 3,
+      "what": "you learn it from your brother-in-law's ledger, because he has priced the crack as a depreciation before you ask",
+      "cost": "he now has a number for the ghost, and he says the sale should be cancelled"
+    },
+    {
+      "node": "T2N04",
+      "turn": 3,
+      "way": 1,
+      "what": "the boat goes through because you pour your brother-in-law's tea over the helm as the salute, and the ghost names the course",
+      "cost": "he spends the lock fee on the tea and the fuel, and he will not sit in the cabin again"
+    },
+    {
+      "node": "T2N04",
+      "turn": 3,
+      "way": 3,
+      "what": "the boat goes through because you turn it into the side cut, because you cut the mooring line and let the towpath keeper pull it with the bank rope",
+      "cost": "the timbers groan, the ghost's shadow stands in the porthole, and your brother-in-law demands more money for the delay"
+    },
+    {
+      "node": "T3N02",
+      "turn": 3,
+      "way": 1,
+      "what": "the boat goes through because you pour your brother-in-law's tea over the helm as the salute, and the ghost names the course",
+      "cost": "he spends the lock fee on the tea and the fuel, and he will not sit in the cabin again"
+    },
+    {
+      "node": "T3N02",
+      "turn": 3,
+      "way": 2,
+      "what": "the boat goes through because you sign the sale papers on the wheelhouse table and hand the lock keeper his fee from your brother-in-law's cash",
+      "cost": "the hull leaks where the crack was, and your brother-in-law signs the buyer's price lower"
+    }
+  ],
+  "checks": {
+    "findings": [],
+    "notes": []
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "line": "T1",
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N06",
+        "N07"
+      ],
+      "judge": null,
+      "plan": {
+        "assessment": "T1 answers the question for the dead captain: the boat moves only when Lake Kaur is allowed to stand at the helm and name the course, and the price is your full authority over the vessel. The missing worlds are the boat moving by a living hand without the salute, and a pole_a ending where a living companion is lost instead of only the line and the original papers. The story can part earliest at N02, when the snapped line can be answered by chain, ledger, or ghost-order rather than by the main line's answered helm.",
+        "seeds": 2
+      }
+    },
+    {
+      "iteration": 2,
+      "line": "T2",
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T2N04",
+        "T2N05"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 3,
+      "line": "T3",
+      "new_nodes": [
+        "T3N01",
+        "T3N02",
+        "T3N03"
+      ],
+      "judge": null
+    }
+  ],
+  "stop_reason": "reached --max-iterations (3)",
+  "warnings": []
+}

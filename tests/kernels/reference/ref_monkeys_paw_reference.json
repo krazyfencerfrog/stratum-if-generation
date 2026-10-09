@@ -1,0 +1,183 @@
+{
+ "story_id": "ref_monkeys_paw",
+ "stage": "reference",
+ "source": "human, public domain",
+ "kernel": "A horror story. On a wild night an old soldier back from India visits your family's cottage at the end of a lonely road, and shows you a mummified paw that he says grants three wishes. He begs you to burn it. I want the wishes to come true in the worst possible way, and the dread to build slowly from something small. No gore.",
+ "premise": {
+  "mediation": {
+   "question": "If fate punishes those who interfere with it, what do you wish for when the first wish has cost everything?"
+  }
+ },
+ "line_order": [
+  "T1"
+ ],
+ "lines": {
+  "T1": {
+   "id": "T1",
+   "title": "Three Wishes",
+   "motivation": "You start out wanting a little money to clear the house; you end wanting only to undo what you wished.",
+   "ending": {
+    "title": "The Empty Road",
+    "summary": "The knocking stops. Your wife opens the door on an empty road and a streetlamp flickering on nothing; your son stays dead, and you are the one who made sure of it.",
+    "standing": [
+     "Mrs White"
+    ],
+    "lost": [
+     "Herbert White"
+    ],
+    "changed": "the money is paid, the son is buried, and the last wish was spent to keep him so",
+    "node": "N08"
+   },
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08"
+   ]
+  }
+ },
+ "node_order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08"
+ ],
+ "nodes": {
+  "N01": {
+   "id": "N01",
+   "beat": "setup",
+   "title": "Check",
+   "summary": "Laburnam Villa, a raw wet night. You play chess with your son Herbert and lose, because you put your king into needless danger; you grumble about living at the end of a road nobody else lives on. Your wife knits by the fire and tells you that you'll win next time.",
+   "image": "a chessboard by the fire, the king left open",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N02": {
+   "id": "N02",
+   "beat": "inciting_incident",
+   "title": "The Sergeant-Major's Paw",
+   "summary": "Sergeant-Major Morris, back from twenty-one years in India, drinks your whisky and tells stories, then shows you a little mummified paw. An old fakir put a spell on it to show that fate rules lives: three men can have three wishes. The first man's third wish was for death.",
+   "image": "a dried, shrivelled paw on the table",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N03": {
+   "id": "N03",
+   "beat": "rising",
+   "title": "Out of the Fire",
+   "summary": "Morris throws the paw on the fire. You snatch it out. He begs you to let it burn, then tells you how to wish, and warns you to wish for something sensible. Herbert laughs: wish to be an emperor, father, then you won't be henpecked.",
+   "image": "a paw snatched from the coals, smelling of smoke",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N04": {
+   "id": "N04",
+   "beat": "rising",
+   "title": "Two Hundred Pounds",
+   "summary": "To clear the house you wish for two hundred pounds. The paw twists in your hand like a snake. Nothing else happens. Herbert jokes about the money in a bag on the bed and something horrible on the wardrobe; in the dying fire he sees a monkey's face.",
+   "image": "the paw twisting like a snake in your hand",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N05": {
+   "id": "N05",
+   "beat": "midpoint",
+   "title": "Maw and Meggins",
+   "summary": "A stranger in good clothes walks past your gate three times before opening it. He is from Maw and Meggins, where Herbert works. Herbert was caught in the machinery. The firm admits no liability, but in consideration of your son's services offers a sum: two hundred pounds.",
+   "image": "a well-dressed man pacing past the gate three times",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N06": {
+   "id": "N06",
+   "beat": "crisis",
+   "title": "The Second Wish",
+   "summary": "A week after the funeral your wife wakes you: the paw! Two wishes left. Wish him alive. You tell her he was ten days dead, that you knew him only by his clothes. She drags you down to the cold parlour, and you wish your son alive again.",
+   "image": "the paw on the mantelpiece in the cold parlour",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N07": {
+   "id": "N07",
+   "beat": "climax",
+   "title": "The Knocking",
+   "summary": "A knock at the door, quiet and stealthy. Your wife runs to it crying that it is Herbert; you hold her; she breaks free and fights the bolt she cannot reach. Knock after knock shakes the house while you crawl on the floor, hunting for the paw in the dark.",
+   "image": "a bolt at the top of the door, too high for her to reach",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N08": {
+   "id": "N08",
+   "beat": "resolution",
+   "title": "The Empty Road",
+   "summary": "You find the paw and breathe your third wish as the bolt slides back. The knocking stops. Your wife's long wail; you run to her and look out at a quiet, empty road under a flickering lamp.",
+   "image": "a streetlamp flickering on an empty road",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": true
+  }
+ },
+ "characters": {
+  "C01": {
+   "label": "the old soldier",
+   "name": "Sergeant-Major Morris",
+   "wants": "to be rid of the paw and to warn you",
+   "edge": "has used his three wishes and will not say what they were",
+   "voice": "\"If you must wish, wish for something sensible.\"",
+   "id": "C01",
+   "kind": "individual"
+  },
+  "C02": {
+   "label": "your son",
+   "name": "Herbert White",
+   "wants": "to laugh at it all",
+   "edge": "a cheerful mocker of fate",
+   "voice": "\"Well, I don't see the money, and I bet I never shall.\"",
+   "id": "C02",
+   "kind": "individual"
+  },
+  "C03": {
+   "label": "your wife",
+   "name": "Mrs White",
+   "opposition": true,
+   "wants": "her son back at any price",
+   "edge": "grief that will not be argued with",
+   "voice": "\"Go down and get it quickly, and wish our boy alive again.\"",
+   "breaking_point": "turns on you when you refuse the second wish",
+   "id": "C03",
+   "kind": "individual"
+  },
+  "C04": {
+   "label": "the man from the firm",
+   "name": "the man from Maw and Meggins",
+   "wants": "to deliver his message and leave",
+   "edge": "kind, careful, and the messenger of the wish",
+   "voice": "\"I was asked to say...\"",
+   "id": "C04",
+   "kind": "individual"
+  }
+ }
+}

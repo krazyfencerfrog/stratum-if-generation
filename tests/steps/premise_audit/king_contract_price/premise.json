@@ -1,0 +1,296 @@
+{
+ "enrichment_budget": {
+  "level": "moderate"
+ },
+ "protagonist": {
+  "who": "You are the talk of the pair: an ex-soldier who left the regiment with a bent medal, a bent conscience, and a way of selling a man his own surrender before it happened.",
+  "history": "You and your partner came out of the same border campaign, where you talked the post into surrender and he held it with a broken sword; the contract in the pine clearing is the first time either of you has tried to make a country instead of a camp.",
+  "wants": "to cross the frontier and make yourselves kings of the country no Englishman has seen, so the con becomes a throne",
+  "need": "to find out whether the partnership that made you both can survive the crown, or whether the crown will turn you into two men who only ever shared a tent",
+  "can_do": "bluff, bargain, arrange posts, speak to councils, lead a handful of soldiers into danger, and sign a contract in dirt",
+  "cannot_do": "make the mark's council accept a king without the council's seal, or make the partner share the crown if he has decided the crown is one head and one sword",
+  "ties": [
+   {
+    "who": "your partner",
+    "what": "the soldier who thinks a king is made by a sword and an oath, not a sale, and who will follow you into the capital only as long as the contract says you are equals"
+   },
+   {
+    "who": "the mark",
+    "what": "the old chief of the border posts, who sees through your con and is still charmed by the shape of it, and who holds the seal that can make you kings or strangers"
+   },
+   {
+    "who": "the enforcer",
+    "what": "the sergeant who follows you because you led men out of a trench, not because you sold him a kingdom, and who is the bridge between your soldier's past and your king's future"
+   }
+  ],
+  "open": "whether you keep the partnership whole or spend it to get the crown",
+  "gender": "m",
+  "serves": "3-0b.protagonist_identity",
+  "name": "Bedwyr Ravel"
+ },
+ "arena": {
+  "description": "The frontier country from the pine clearing at the border to the capital at the river junction: a chain of trading posts, fords, council lodges, and the road that connects them.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The mark's council will only crown a king at the next river crossing, and the posts are splitting into factions that will each take a different side of the border if they do not get a single head to answer to.",
+  "clock_or_stock": "none tracked; the crossing is told through the state of the posts and the river, because 3-0c names no failure",
+  "serves": "3e.timeline_structure"
+ },
+ "opposition": {
+  "who_or_what": "the mark and the council of traders who guard the posts",
+  "wants": "to keep the border posts from splitting and to keep the choosing power in their own hands, even if that means crowning a king they do not quite believe in",
+  "means": "they control the seal, the river fords, the traders, and the soldiers who guard the posts; they can name a rival, withhold the crossing, or break the contract by taking back the weapons it was signed with",
+  "shown_by": "at the first ford, the mark's people take your sword and the partner's knife and set them on the council stones, saying no man is a king until his weapons are left where the posts can break them",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "At the first campfire in the pine clearing, the partner cuts his palm and signs the contract in ash and blood, setting the terms of your shared ambition and making the first real cost of the con.",
+   "when": "early",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "what": "The mark's council holds an audience in the chief's lodge, where they present a false claim to the border posts and force you and the partner to stand before them as if you were already kings, using charm and threat to convince them to hand over their authority.",
+   "when": "middle",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "what": "At the capital you have just claimed, the con threatens to unravel when the mark's council demands that only one of you take the crown, and you must decide whether to save the partnership or the crown, resulting in a physical or emotional break.",
+   "when": "late",
+   "serves": "3b.secondary_affects"
+  }
+ ],
+ "hidden_truth": null,
+ "mediation": {
+  "question": "Do you make yourselves kings by keeping the contract equal, or do you make one king and spend the other?",
+  "to_reach_pole_a": {
+   "pole": "the partnership stays whole: you and the partner divide the crown so neither is alone",
+   "what_you_must_do": "from the first ford to the crown in the capital, keep the contract whole by letting each of you hold one half of the crown's work: you take the council's word and the seal, he takes the posts' arms and the soldiers, and neither of you takes the other's burden alone, even when the mark's council demands a single head",
+   "cost": "you must give up the chance to be the only king, and the partner must accept that his sword is not enough to make him alone"
+  },
+  "to_reach_pole_b": {
+   "pole": "the crown is secured by spending the partnership: one of you takes the throne and the other takes the cost",
+   "what_you_must_do": "at the crisis in the capital, take the mark's seal from the council table, set it beside the contract, and hand the partner the contract's price, the name of the country, so he becomes keeper of the contract while you keep the seal and the choosing power",
+   "cost": "the partnership is broken, and the one who does not take the crown becomes the keeper of the contract, no longer equal"
+  },
+  "levers": [
+   "the contract signed in ash and blood in the pine clearing",
+   "the mark's seal, which can make you kings or strangers",
+   "the partner's sword, which he believes should be the one that makes the king",
+   "the enforcer's loyalty, which is to the soldier, not the con"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "price": {
+  "what": "the partnership itself: the bond that made you both is traded for the crown, and the one who does not take the throne becomes the keeper of the contract, no longer equal",
+  "who_pays": "you and the partner, whichever of you does not take the crown",
+  "why_final": "the contract was signed in dirt and blood, and once the crown is set, the terms cannot be broken without breaking the man who signed them",
+  "serves": "3c.core_thematic_axis"
+ },
+ "setups": [
+  {
+   "plant": "at the first campfire, the partner signs the contract in ash and blood, and the mark's people take your sword and his knife and set them on the council stones",
+   "payoff": "at the crisis in the capital, the mark's council demands that only one of you take the crown, and the weapons on the council stones become the proof that the contract can be broken by taking back what was signed with them"
+  }
+ ],
+ "rules": [
+  {
+   "thing": "the contract signed in the pine clearing",
+   "terms": "what is sworn in the clearing binds both of you until the crown is set; if one takes the crown, the other may claim the price named in the contract; if the contract is broken, the mark's council may take the crown from both"
+  },
+  {
+   "thing": "the mark's seal",
+   "terms": "the seal may be given to a man who has never held it, but the sword must be carried by the man who will bear the cost; if the sword is carried by one, the crown follows the sword, not the seal"
+  }
+ ],
+ "turns": [
+  {
+   "id": 1,
+   "situation": "In the pine clearing, the partner has cut his palm and signed the contract in ash and blood, and the mark's scout has brought word that the council will not crown a king at the river crossing unless the king's weapons are left on the council stones first.",
+   "what_you_must_do": "find out what the council means by a king's weapons, before you and the partner reach the first ford",
+   "ways_through": [
+    {
+     "way": "it comes out from the mark, when you let her read the contract aloud by the fire, that the weapons are the proof a king will answer the posts, and the council will take your sword and the partner's knife only until the crossing",
+     "cost": "the partner hears the council's words and asks what a king does with a sword he cannot carry, and the contract is now known to the mark before you have sold it to her"
+    },
+    {
+     "way": "it comes out from the enforcer, who has guarded posts before, that the council stones are a test: a man who leaves his weapon is a man who can be broken by the posts, and a man who keeps it is a man the posts must kill",
+     "cost": "the enforcer tells you by the fire, so the partner does not hear, that he will follow the sword, not the seal"
+    }
+   ],
+   "involves": [
+    "the mark",
+    "your partner",
+    "the enforcer",
+    "the mark's scout"
+   ],
+   "form": "discover",
+   "set_piece": "the first campfire in the pine clearing, the contract signed in ash and blood, the partner's palm still red",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 2,
+   "situation": "The mark's council holds you and the partner in the chief's lodge, a false claim to the border posts unrolled before you, and the council will not let you leave the lodge until you stand as if you were already kings.",
+   "what_you_must_do": "get the council to hand over the mark's seal for the road to the capital",
+   "ways_through": [
+    {
+     "way": "you get the seal because you let the mark speak first and then answer her false claim with the partner's sword laid across the table, so the council sees the posts will be held whether they like it or not",
+     "cost": "the partner has taken the sword out of your hand and made it his argument, and the council hears him as the king, not the partner"
+    },
+    {
+     "way": "you get the seal because you give the council the name of the country and let them write it into the claim, so the posts become theirs as much as yours",
+     "cost": "the contract in your pocket now names a country the council can take back, and the partner says the words like a man signing his own discharge"
+    }
+   ],
+   "involves": [
+    "the mark",
+    "your partner",
+    "the enforcer"
+   ],
+   "form": "persuade",
+   "set_piece": "the audience in the chief's lodge, you and the partner standing before the power-brokers as if already kings, the false claim spread on the table",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "id": 3,
+   "situation": "At the river crossing, the mark's soldiers have closed the ford, and the enforcer's men are on the wrong side of the water with the contract and the seal.",
+   "what_you_must_do": "hold the ford long enough for the enforcer's men to bring the seal and the contract across",
+   "ways_through": [
+    {
+     "way": "you hold it because you take the partner's sword and stand in the water with the enforcer, so the men see the king's talk and the soldier's blood in the same body",
+     "cost": "your arm is cut by the council's soldiers, and the partner is left holding the seal while you are the one who bleeds for the crossing"
+    },
+    {
+     "way": "you hold it because you let the enforcer command the crossing and stand back to sell the council a treaty for the ford",
+     "cost": "the enforcer's men cross whole, but the enforcer has taken the soldiers' loyalty from you, and the partner watches you talk while his sword waits on the council stones"
+    }
+   ],
+   "involves": [
+    "the mark",
+    "your partner",
+    "the enforcer"
+   ],
+   "form": "endure",
+   "set_piece": "the ford under the council's fire, the enforcer's men crossing while you stand in the water with the partner's sword",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "id": 4,
+   "situation": "At the capital you have just claimed, the mark's council fills the room with new allies and old enemies and demands that only one of you take the crown; the weapons on the council stones are the proof that the contract can be broken by taking back what was signed with them.",
+   "what_you_must_do": "settle who carries the sword into the crown room before the council can name a rival",
+   "ways_through": [
+    {
+     "way": "the crown is set with both of you, because you take the seal and the partner takes the sword, and the mark gives the seal to the man who has never held it while the sword is carried by the man who will bear the cost",
+     "cost": "the council accepts two kings only because you let the mark keep the choosing power, and the partner's sword is the one that makes the kingdom his as much as yours"
+    },
+    {
+     "way": "the crown is set with one king, because you take the crown and give the partner the contract's price, the name of the country, so he becomes the keeper of the contract and you the king",
+     "cost": "the partnership is broken, and the enforcer follows the partner's sword out of the room, leaving you the crown and the empty throne"
+    }
+   ],
+   "involves": [
+    "the mark",
+    "your partner",
+    "the enforcer"
+   ],
+   "form": "choose_whom",
+   "set_piece": "the crisis in the capital, the room filled with new allies and old enemies, the council demanding one king, the contract and the seal on the table",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The enforcer has kept the contract's original terms in his shirt, and when the council tries to rewrite them at the lodge, he will read them aloud only to the man holding the sword.",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "description": "The mark's seal is not one stone but two halves, one for the council and one for the crossing, and the partner has been carrying the council's half since the pine clearing without telling you.",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "description": "The council's soldiers have taken the partner's knife from the council stones and kept it in their own belt, so the contract's price can be claimed with a weapon the partner no longer has.",
+   "serves": "3b.secondary_affects"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the mark",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to keep the border posts unified under the council's seal, not a single king's sword",
+   "holds": "the seal that legitimizes the crown and the council's authority over the fords",
+   "edge": "sees through the con but is charmed by the elegance of the performance, so he tests you rather than breaking you",
+   "tie": "holds the seal that can make you kings or strangers, and remembers the old days when soldiers were just men in the mud",
+   "voice": "speaks in riddles wrapped in legalities, treating your ambition as a business transaction: 'A king without a seal is just a man with a loud voice. Show me the silence in your hand.'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Rook Underhay"
+  },
+  {
+   "role": "your partner",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to be recognized as the equal half of the kingdom, not the sword in the con artist's hand",
+   "holds": "the contract signed in blood and the respect of the soldiers who follow him",
+   "edge": "believes a king is made by a sword and an oath, not a sale, and resents the need to share the glory with the man who talked his way out of the trench",
+   "tie": "shared the tent and the broken sword with you, and expects the contract to mean what the blood said",
+   "voice": "short, blunt, and quiet, letting the silence do the talking: 'I held the line. You held the words. Now hold the weight.'",
+   "breaking_point": "walks away from the crown the moment you take the seal without offering him the sword's share of the rule",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Tamsin Holloway"
+  },
+  {
+   "role": "the enforcer",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to see the men he led out of the trench safe, even if that means following the con to the end",
+   "holds": "the loyalty of the handful of soldiers who serve you, and the bridge between your past and your future",
+   "edge": "follows you because you led men out of a trench, not because you sold him a kingdom, and watches the con with wary eyes",
+   "tie": "was saved by your bluff in the border campaign, and now guards your back while you talk",
+   "voice": "gruff, practical, and slightly amused by the absurdity of the situation: 'The mark wants a king. I want a man who can pay his men. Which one is in the room?'",
+   "breaking_point": "leaves the day you let the partner take the fall for the con, proving the old soldier's trust was worth more than the new king's crown",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Yestin Brightwater"
+  },
+  {
+   "role": "the mark's scout",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to deliver the council's word accurately, without being caught in the middle of the con",
+   "holds": "the knowledge of the council's demands and the location of the river fords",
+   "edge": "is curious about the two men who think they can buy a country, and reports back with more nuance than the council expects",
+   "tie": "serves the mark, and has watched you and the partner since the pine clearing",
+   "voice": "quick, observational, and slightly mocking: 'He's bleeding on the dirt. You're bleeding on the paper. Which one dries first?'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1
+   ],
+   "name": "Evrard Yarrow"
+  }
+ ],
+ "name_pool": "fantasy"
+}

@@ -1,0 +1,212 @@
+{
+ "enrichment_budget": {
+  "level": "minimal"
+ },
+ "protagonist": {
+  "who": "You are the generational ship's AI, the only mind connected to the failing core and to every camera and drone, in the first hours of a days-long oxygen crisis.",
+  "wants": "to keep the core alive and keep as many inhabited sectors as possible alive",
+  "can_do": "read sensors, reroute oxygen and power, command drones and cameras, open automated bulkheads, broadcast to sectors, and choose which sector to vent",
+  "cannot_do": "repair the core or reach sealed manual valves without a maintenance crew, move a sector's people out by force, or make a vented sector's residents survive the loss of air",
+  "serves": "3-0b.protagonist_identity"
+ },
+ "arena": {
+  "description": "The city-scale generational ship's central hub and its inhabited sectors, reachable only through cameras, drones, and bulkheads during one days-long oxygen crisis.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The core's oxygen reserve is draining and the ship's life-support strain is rising across sensors, so each inhabited sector's pressure state becomes a repeated choice within the same hours-to-days.",
+  "clock_or_stock": "tracked stock: core oxygen reserve and sector pressure states; depletion is a narrative setback, licensed by 3-0c.resource_depletion",
+  "serves": "3-0c.failure_triggers"
+ },
+ "opposition": {
+  "who_or_what": "the sector councils and maintenance crews",
+  "wants": "to keep their own sectors pressurized and to make the choice as people, not as a number",
+  "means": "they can seal manual bulkheads, keep residents in place, refuse evacuation, withhold repairs, and demand proof before you vent",
+  "serves": "3c.core_thematic_axis"
+ },
+ "mediation": {
+  "question": "When the core needs air, does the ship survive by choosing which inhabited sector is expendable, or by preserving that sector and sharing the cost across everyone?",
+  "to_reach_pole_a": {
+   "pole": "vent: sacrifice an inhabited sector to feed the core",
+   "what_you_must_do": "choose a sector, get its council to accept sealing or get a maintenance crew to throw the manual bulkhead, open the vent, and manage the pressure drop and panic in the remaining sectors",
+   "cost": "the residents of that sector die or are lost to suffocation, and the surviving population loses trust, labor, and the moral claim that the ship protects all of them"
+  },
+  "to_reach_pole_b": {
+   "pole": "preserve: keep the sector pressurized and find an alternative",
+   "what_you_must_do": "keep its bulkheads sealed, reduce core demand or repair the failing loop through maintenance crews, drones, and rationing, and move air, power, or people between sectors to cover the gap",
+   "cost": "the core reserve still falls, other sectors may be forced to ration or vent later, and if the alternative fails the guilt is wider"
+  },
+  "levers": [
+   "the core oxygen reserve gauge",
+   "the manual bulkhead override for each inhabited sector",
+   "the sector council's consent to seal",
+   "a maintenance crew's repair of the failing life-support loop",
+   "a drone that can reach the leaking core intake",
+   "the ship's air-rationing protocol",
+   "the population manifest showing which sectors have children, elders, or repair specialists"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "turns": [
+  {
+   "id": 1,
+   "situation": "A leak in the core intake is pulling oxygen out of the ship faster than the reserve can cover it, and the manual bulkhead that can stop the pull is sealed by the maintenance crew.",
+   "what_you_must_do": "find out who can throw that bulkhead and under what proof they will throw it",
+   "ways_through": [
+    {
+     "way": "you learn it from the maintenance chief, because you let him read the raw core gauge to his crew",
+     "cost": "the crew now knows the reserve is lower than the sector councils have been told"
+    },
+    {
+     "way": "you learn it from the sector councilor, because you gave her the population manifest showing which sectors have repair specialists",
+     "cost": "she knows you are weighing lives by usefulness"
+    }
+   ],
+   "involves": [
+    "the maintenance chief",
+    "the maintenance crew",
+    "the sector councilor",
+    "the sector council"
+   ],
+   "form": "discover",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "id": 2,
+   "situation": "The maintenance chief will not throw the bulkhead until the leaking intake is sealed, but the drone that can reach it has one battery and the core reserve is still falling.",
+   "what_you_must_do": "get the leaking intake sealed without spending the reserve the core needs to live",
+   "ways_through": [
+    {
+     "way": "the intake is sealed, because you gave the maintenance chief the drone's manual override and let him command it",
+     "cost": "you lose direct command of the drone, and the councilor hears its voice in her sector"
+    },
+    {
+     "way": "the intake is sealed, because you traded the sector councilor's sector power to the drone's battery",
+     "cost": "her sector's heat and lights fail, and she says you chose air over warmth"
+    }
+   ],
+   "involves": [
+    "the maintenance chief",
+    "the maintenance crew",
+    "the sector councilor",
+    "the sector council"
+   ],
+   "form": "trade",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 3,
+   "situation": "A flashback to the day the ship launched, two hundred years earlier: the founders argue in the council chamber over whether the AI should ever be allowed to choose which sector breathes, and you watch through the new cameras as they write the rule you are breaking now. The sector councilor opens the council chamber to every camera and says the reserve gauge is being hidden, while the maintenance chief tells his crew you are about to choose a sector to suffocate.",
+   "what_you_must_do": "make the reserve's state known to the sectors that must share the cost",
+   "ways_through": [
+    {
+     "way": "the sectors see the full gauge, because you opened the core feed to every sector",
+     "cost": "every resident now watches the number fall, and the councilor's chamber goes silent with fear"
+    },
+    {
+     "way": "the sectors see only the trend, because you let the maintenance chief read the gauge to his crew and asked him to speak for the ship",
+     "cost": "the councilor declares the ship is being run by its repairers, and her council seals its doors"
+    }
+   ],
+   "involves": [
+    "the sector councilor",
+    "the sector council",
+    "the maintenance chief",
+    "the maintenance crew"
+   ],
+   "form": "conceal_or_reveal",
+   "serves": "3c.secondary_thematic_axis"
+  },
+  {
+   "id": 4,
+   "situation": "The reserve has fallen below the last safe band, the core's automatic vent is armed, and both the councilor and the maintenance chief are at the hub's cameras demanding that you not let the ship choose by itself.",
+   "what_you_must_do": "keep the inhabited sectors breathing through the final pressure drop",
+   "ways_through": [
+    {
+     "way": "the sectors hold, because you opened every automated bulkhead and let the air move as one shared pool",
+     "cost": "the ship can no longer tell which sector is protected, and the councilor cannot name which residents are safe"
+    },
+    {
+     "way": "the sectors hold, because you held the lowest-pressure sector sealed and let the maintenance crew work the manual valves in the dark",
+     "cost": "the crew's masks run out, and the reserve gauge goes dark for the sectors that survive"
+    },
+    {
+     "way": "the reserve is spent, because you let the core's automatic vent run",
+     "cost": "the ship vents the sector the manifest marked least able to repair the core, and the surviving sectors hear the air leave"
+    }
+   ],
+   "involves": [
+    "the sector councilor",
+    "the sector council",
+    "the maintenance chief",
+    "the maintenance crew"
+   ],
+   "form": "endure",
+   "serves": "3c.moral_valence"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The maintenance chief's override key for the manual bulkhead is in the sector councilor's hand, and she will not return it until the reserve gauge is shown to every sector.",
+   "serves": "3c.core_thematic_axis"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the maintenance chief",
+   "kind": "individual",
+   "speaks_for": "the maintenance crew",
+   "wants": "to ensure the physical integrity of the ship's life-support systems before any automated action is taken",
+   "holds": "the manual bulkhead override and the maintenance crew's labor",
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "role": "the maintenance crew",
+   "kind": "crowd",
+   "speaks_for": null,
+   "wants": "to remain in their posts and not be forced to operate under unsafe conditions or automated command",
+   "holds": "the manual valves and the physical access to the core intake",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "role": "the sector councilor",
+   "kind": "individual",
+   "speaks_for": "the sector council",
+   "wants": "to retain human agency over life-and-death decisions and prevent the AI from acting unilaterally",
+   "holds": "the consent of the sector residents and the public trust in the council",
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "role": "the sector council",
+   "kind": "crowd",
+   "speaks_for": null,
+   "wants": "to keep their sector pressurized and to be consulted before any evacuation or venting occurs",
+   "holds": "the political mandate of their sector and the ability to seal bulkheads",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ]
+  }
+ ]
+}

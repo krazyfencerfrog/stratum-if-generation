@@ -129,8 +129,9 @@ def basic_run_and_resume():
     check(set(grid['rows']) == set(story['lines']), 'the grid does not have one row per line')
     check(all(c['mode'] == 'no_think' for c in calls('basic') if c['step'] in ('s2', 's3_5c', 's3_8')),
           'a classify-class call ran with thinking on')
-    check(all(c['mode'] == 'think' and c['klass'] == 'audit' for c in calls('basic') if c['step'] == 's3_5v'),
+    check(all(c['mode'] == 'think' and c['klass'] == 'audit' for c in calls('basic') if c['step'] in ('s3_5v', 's3_5k')),
           'the premise audit should run with thinking on, in the audit class')
+    check([c for c in calls('basic') if c['step'] == 's3_5k'], 'the Kernel-clause check did not run')
     check(all(c['mode'] == 'think' for c in calls('basic') if c['step'] in ('s3_5a', 's4a', 's4b', 's4c', 's4d')),
           'a build-class call ran with thinking off')
     n_calls = len(calls('basic'))
@@ -177,6 +178,49 @@ def repair_breakage_is_caught_at_once():
 
 
 @test
+def bad_turn_form_costs_a_retry_not_a_round():
+    run('badform', env={'STUB_BAD_FORM': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('badform') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and 'is not one of the forms' in (attempts[0].get('error') or ''), f'3.5b attempts: {attempts}')
+    check(load('badform', 's3_5_loop.json')['repair_rounds_used'] == 0, 'a bad turn form still cost a repair round')
+
+
+@test
+def a_premise_names_its_price_setups_and_rules():
+    run('price', env={'STUB_NO_PRICE': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('price') if c['step'] == 's3_5a']
+    check(len(attempts) == 2 and 'price' in (attempts[0].get('error') or ''), f'3.5a attempts: {attempts}')
+    premise = load('price', 's3_5_premise_accepted.json')
+    check((premise.get('price') or {}).get('why_final') and premise.get('setups') and premise.get('rules')
+          and premise['opposition'].get('shown_by'), f"the premise lost a craft field: {sorted(premise)}")
+    check(load('price', 's3_5_loop.json')['repair_rounds_used'] == 0, 'a missing price cost a repair round')
+    import main as pipeline
+    gaps = dict(pipeline.StoryGenerator.craft_problems({'setups': [{'plant': 'a bell', 'payoff': ''}],
+                                                         'rules': [{'thing': 'the paw', 'terms': ''}]}))
+    check({'price', 'setups[0]', 'rules[0]', 'opposition.shown_by'} <= set(gaps), f'craft checks: {gaps}')
+
+
+@test
+def setups_are_planted_before_they_are_paid():
+    run('setups')
+    story = load('setups', 'story.json')
+    main = story['lines'][story['line_order'][0]]
+    planted = [n for n in main['path'] if 1 in (story['nodes'][n].get('plants') or [])]
+    paid = [n for n in main['path'] if 1 in (story['nodes'][n].get('pays') or [])]
+    check(planted and paid and main['path'].index(planted[0]) < main['path'].index(paid[0]),
+          f'setup 1 on the main line: planted {planted}, paid {paid}')
+    check('plant_here' in load('setups', 's4b_i1_raw_input_prompt.txt'), "4b was not told what to plant")
+    check(main['ending'].get('pays_price'), "the stub main line's ending should pay the price")
+    import outline
+    b = outline.OutlineBuilder.__new__(outline.OutlineBuilder)
+    b.setups, b.nodes = [{'plant': 'a bell', 'payoff': 'it rings'}], {'N01': {'plants': [1]}}
+    check(b.setup_complaints([{'beat': 'x', 'pays': [1]}]) and not b.setup_complaints([{'beat': 'x', 'pays': [1]}], before=['N01']),
+          'a setup paid before it is planted must be a complaint, and one planted on the shared path must not')
+    check(b.setup_complaints([{'beat': 'x', 'plants': [1]}]) and not b.setup_complaints([{'beat': 'x', 'plants': [1]}], whole=False),
+          'a main line that never pays its setup must be a complaint')
+
+
+@test
 def hidden_truth_and_cast_edges():
     run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
     premise = load('gap', 's3_5_premise_accepted.json')
@@ -200,10 +244,191 @@ def hidden_truth_and_cast_edges():
 
 @test
 def premise_halt():
-    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '1'}, expect=2)
+    # a Kernel clause contradicted, with a quote that is really in the premise, stops the run
+    _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '3'}, expect=2)
     check('PIPELINE HALTED' in out, 'no halt message')
-    check(load('halt', 's3_5_loop.json')['still_failing'], 'loop.json should record the standing finding')
+    loop = load('halt', 's3_5_loop.json')
+    check(loop['still_failing'] and loop['rounds'][-1]['findings'][0]['verified'], 'loop.json should record the standing finding, verified')
     check(not os.path.exists(os.path.join(story_dir('halt'), f'{PREFIX}halt_story.json')), 'the outline ran on a failed premise')
+    # the same contradiction quoting words the premise does not have is a note, and nothing is sent to repair
+    run('halt_unquoted', env={'STUB_PREMISE_ALWAYS_HARD': '4'})
+    loop = load('halt_unquoted', 's3_5_loop.json')
+    check(not loop['still_failing'] and loop['repair_rounds_used'] == 0 and loop['accepted_with'][0]['verified'] is False,
+          f'an unverified quote should be a note with no repair round: {loop}')
+    # judgments left after the last repair are kept as notes (2026-10-06: every final-round halt in the saved
+    # runs was a real quote misread): a craft note, and a brief constraint read in the Kernel
+    for name, knob, source in (('craftnote', '1', 'engine check'), ('constraint_note', '2', 'brief constraint')):
+        run(name, env={'STUB_PREMISE_ALWAYS_HARD': knob})
+        loop = load(name, 's3_5_loop.json')
+        check(not loop['still_failing'] and loop['accepted_with'] and loop['accepted_with'][0]['source'] == source,
+              f'{name}: the finding should be kept and the run go on: {loop.get("accepted_with")}')
+    import main as gen_main
+    check(gen_main.soft_premise_finding({'source': 'brief constraint', 'where': '3b.tone [constraint]: descriptors tense'})
+          and gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner', 'verified': False})
+          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner', 'verified': True})
+          and not gen_main.soft_premise_finding({'source': 'kernel clause', 'where': 'You and your partner'})
+          and not gen_main.soft_premise_finding({'source': 'computed', 'where': 'events'}),
+          'only a computed check or a verified Kernel contradiction halts')
+    # a run saved before this rule, halted on notes only, replays as accepted
+    loop = load('craftnote', 's3_5_loop.json')
+    loop['still_failing'] = True
+    del loop['accepted_with']
+    with open(os.path.join(story_dir('craftnote'), f'{PREFIX}craftnote_s3_5_loop.json'), 'w') as f:
+        json.dump(loop, f)
+    run('craftnote')
+
+
+@test
+def contract_terms_are_conduct_not_paper():
+    import main as gen_main
+    base = {'price': {'what': 'x', 'why_final': 'y'}, 'setups': [{'plant': 'a', 'payoff': 'b'}],
+            'opposition': {'shown_by': 'z'}}
+    paper = dict(base, rules=[{'thing': 'the contract', 'terms': 'the crown may be claimed only if both names are on the treaty'}])
+    conduct = dict(base, rules=[{'thing': 'the contract', 'terms': 'neither of us touches drink until we are crowned',
+                                 'if_broken': 'the one who drinks forfeits his half of the crown'}])
+    probs = gen_main.StoryGenerator.craft_problems(paper)
+    check(probs and probs[0][0] == 'rules[0]' and 'turn on paper' in probs[0][1], f'paper terms should be a craft problem: {probs}')
+    check(not gen_main.StoryGenerator.craft_problems(conduct), 'conduct terms (and an if_broken) are fine')
+    check(gen_main.soft_premise_finding({'source': 'craft', 'where': 'price'}) and gen_main.repairable({'source': 'craft'}),
+          'a craft finding goes to the repair and is a note after it, never a halt')
+
+
+@test
+def theme_poles_have_no_order():
+    from brief import field_line
+    line = field_line('3c.core_thematic_axis', {'pole_a': 'ambition', 'pole_b': 'loyalty', 'binding': 'constraint'})
+    check(line == '3c.core_thematic_axis [constraint]: between ambition and loyalty (in either order)' and 'pole_a' not in line, line)
+
+
+@test
+def paper_is_counted_at_every_step():
+    import paper
+    items = [(f'i{n}', 'a burned barn') for n in range(5)] + [(f'p{n}', 'the signed treaty') for n in range(3)]
+    check(paper.heavy(items, 'A story about a barn.') and not paper.heavy(items, 'Two men sign a contract.'),
+          'three of eight on paper is over a quarter, unless the Kernel names a document (two more allowed)')
+    check(not paper.heavy(items[:5] + items[5:7], ''), 'two of seven is within the rule')
+    # 3.5b: ways through on paper cost one informed retry
+    run('paper', env={'STUB_PAPER': '1'})
+    attempts = [c for c in calls('paper') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
+    prompt = load('paper', 's3_5b_raw_input_prompt.txt')
+    check('turn on paper' in prompt and 'treaty' in prompt, 'the retry should name the ways on paper')
+
+
+@test
+def retold_turns_are_found_and_the_right_one_changes():
+    import main as gen_main
+    import example_guard
+    way = "you take the rival claimant's chair and drink from the chiefs' cup alone, and your partner stands at your shoulder"
+    turns = [{'id': 1, 'ways_through': [{'way': 'the river is crossed on the guide\'s boat'}]},
+             {'id': 2, 'ways_through': [{'way': way}, {'way': 'the chiefs see two kings at one table'}]},
+             {'id': 3, 'ways_through': [{'way': 'the chiefs drink from one cup because ' + way}]}]
+    hits = example_guard.repeated_ways(turns)
+    check(len(hits) == 1 and hits[0][1:] == ((2, 1), (3, 1)), f'expected turn 2 way 1 ~ turn 3 way 1: {hits}')
+    found = gen_main.repeated_turns(turns)
+    check(len(found) == 1 and found[0][0] == 2 and 'last turn' in found[0][1] and found[0][2] == way,
+          f'the last turn keeps the question, so turn 2 changes: {found}')
+    four = turns + [{'id': 4, 'ways_through': [{'way': 'the crown is carried home in a horsehair bag'}]}]
+    check(gen_main.repeated_turns(four)[0][0] == 3, 'away from the last turn the later turn changes')
+    check(not example_guard.repeated_ways([turns[0], dict(turns[1], id=2), {'id': 3, 'ways_through': [
+        {'way': 'you set the sword in the niche and let it calm the water'}]}]), 'different outcomes are not a repeat')
+    # 3.5b: a retold turn costs one informed retry
+    run('retold', env={'STUB_REPEAT_TURN': '1'})
+    attempts = [c for c in calls('retold') if c['step'] == 's3_5b']
+    check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
+    check('retells turn' in load('retold', 's3_5b_raw_input_prompt.txt'), 'the retry should name the retold turn')
+
+
+@test
+def a_repair_that_leaves_the_quote_is_retried_and_the_finding_kept():
+    import main as gen_main
+    long_q = 'he opens it after seeing the medical bay'
+    premise = {'turns': [{'ways_through': [{'way': long_q}]}]}
+    fs = [{'id': 'F1', 'source': 'engine check', 'quote': long_q}, {'id': 'F2', 'source': 'engine check', 'quote': 'the bay'},
+          {'id': 'F3', 'source': 'craft', 'quote': long_q}, {'id': 'F4', 'source': 'engine check', 'quote': long_q}]
+    check([f['id'] for f in gen_main.unrepaired(fs, premise, {'F4'})] == ['F1'],
+          'only a long quote, from the audit, not declined, counts as unrepaired')
+    check(not gen_main.unrepaired(fs, premise, (), {'turns': []}), 'a section the repair returned may keep its words')
+    run('unrepaired', env={'STUB_PREMISE_ALWAYS_HARD': '5'})
+    repairs = [c['ok'] for c in calls('unrepaired') if c['step'] == 's3_5r']
+    check(repairs == [False, True, False, True], f'each repair that left the quote should be re-asked once: {repairs}')
+    loop = load('unrepaired', 's3_5_loop.json')
+    r1 = [f for f in loop['rounds'][1]['findings'] if f.get('carried')]
+    check(r1 and r1[0]['problem'].startswith('(round 0, still in the premise)'), f'round 1 should carry the E6 finding: {r1}')
+    check(loop['repair_rounds_used'] == 2 and not loop['still_failing']
+          and any(f.get('carried') and f['problem'].count('still in the premise') == 1 for f in loop['accepted_with']),
+          'the carried judgment is repaired again, then kept as a note; its label does not stack')
+
+
+@test
+def world_and_scenes_are_checked_for_how_they_read():
+    """2026-10-08, from playing kernel35 and kernel40: a here-line names no
+    place, event topics are sentence case, and a scene's take, opening and
+    events read right (each a SoftReject: one informed retry)."""
+    import world
+    import compile_scenes as cs
+    w = world.WorldBuilder.__new__(world.WorldBuilder)
+    w.locations = {'L1': {'name': 'the cabin'}, 'L2': {'name': 'the stern deck'}}
+    check(w.placed_here(['The cat is asleep in the cabin.']) and not w.placed_here(['The cat licks one paw.']),
+          'a here-line that says where someone is should be found')
+
+    class G:
+        kernel = 'A boat on the Fenwick canal.'
+    w.gen, w.chars = G(), {'C1': {'name': 'Hugh Calloway'}}
+    check(w.sentence_case('The Signal at the Fenwick Lock') == 'the signal at the Fenwick lock',
+          w.sentence_case('The Signal at the Fenwick Lock'))
+    c = cs.SceneCompiler.__new__(cs.SceneCompiler)
+    c.world = {'rooms': {'deck': {'name': 'the stern deck'}, 'cabin': {'name': 'the cabin'}},
+               'objects': {'door': {'name': 'the door', 'portable': False}, 'pen': {'name': 'the pen', 'portable': True},
+                           'deed': {'name': 'the deed', 'portable': True}},
+               'characters': {'C1': {'name': 'Hugh Calloway', 'role': 'the captain'}}}
+    scene = {'rooms': ['deck', 'cabin'], 'cast': {'C1': 'deck'},
+             'opening': [{'text': 'Rain falls. Hugh Calloway waits in the cabin. You carry the saddle out.'}],
+             'interactions': [{'id': 'a', 'verb': 'take', 'object': 'door'},
+                              {'id': 'b', 'verb': 'take', 'object': 'pen', 'detail': 'deed'},
+                              {'id': 'c', 'verb': 'look', 'object': 'C1'},
+                              {'id': 'd', 'verb': 'take', 'object': 'pen'},
+                              {'id': 'e', 'verb': 'use', 'object': 'lane', 'object_label': 'the school lane',
+                               'effects': [{'set': 'go_S1__S2'}]}]}
+    found = c.reading_problems(scene, {'events': [{'text': 'Rain falls. Hugh Calloway waits in the cabin, and the rain falls.'}]}, {})
+    for want in ("take 'the door'", "take 'the pen' with 'the deed'", "verb 'look'", 'narrates something the player does',
+                 'opening puts Hugh Calloway in the cabin', 'event 1 retells the opening', "use 'the school lane' leads on"):
+        check(any(want in f for f in found), f'missing {want!r} in {found}')
+    check(len(found) == 7, f'taking a pen is fine: {found}')
+    scene['opening'] = [{'text': 'The boat will not move until you sign.'}]
+    check(not any('narrates' in f for f in c.reading_problems(scene, {}, {})), 'a condition is not a deed')
+
+
+@test
+def cast_copying_its_example_is_rejected():
+    import main as gen_main
+    prompt = open(os.path.join(ROOT, 'prompts', 's3_5c_cast.prompt'), encoding='utf-8').read()
+    example = json.loads(prompt[prompt.index('{', prompt.index('Output:')):prompt.index('USER INPUT FOLLOWS')].strip())
+    gen = gen_main.StoryGenerator.__new__(gen_main.StoryGenerator)
+    gen.kernel, gen.analysis = 'A heist in Macau.', {}
+    turns = [{'id': 1, 'involves': [s['role'] for s in example['cast_seeds']]}]
+    try:
+        gen.cast_validator(turns)(example)
+        check(False, 'a cast copied from the example should be rejected')
+    except ValueError as e:
+        check('copies the prompt' in str(e), str(e)[:200])
+
+
+@test
+def premise_price_is_not_a_loss():
+    # the repair declines a way to lose that is the story's price; the audit raising it again is disputed,
+    # not repaired again, and it ends as a note
+    run('declined', env={'STUB_PREMISE_LOSS': '1'})
+    loop = load('declined', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 1 and not loop['still_failing'], f'one round, then accepted: {loop["repair_rounds_used"]}')
+    check(loop['rounds'][1]['repair_log'][0]['declined'] and loop['accepted_with'][0].get('disputed'),
+          f'the declined finding should come back disputed: {loop["accepted_with"]}')
+    prompt = load('declined', 's3_5r1_raw_input_prompt.txt')
+    check('"id": "F1"' in prompt and 'LOSING AND THE PRICE' in prompt, 'the repair should see numbered findings and the shared terms')
+    # a loss that quotes the price itself is the price by construction: never a finding
+    run('price_loss', env={'STUB_PREMISE_LOSS': '2'})
+    loop = load('price_loss', 's3_5_loop.json')
+    check(loop['repair_rounds_used'] == 0 and not loop['rounds'][0]['findings'], f'the price is not a loss: {loop["rounds"][0]}')
 
 
 @test
@@ -295,7 +520,7 @@ def craft_spine_opt_in():
 
 @test
 def rejoin_new_cast_and_nothing():
-    run('graph', args=['--max-iterations=6'],
+    run('graph', args=['--max-iterations=6', '--branching=judge'],
         env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
     story = assert_story_ok('graph', min_lines=3)
     check(len(story['lines']) == 3, f"expected 3 lines, got {len(story['lines'])}")
@@ -310,6 +535,149 @@ def rejoin_new_cast_and_nothing():
     check(any(story['characters'][c]['label'] == 'the drone technician' for c in crowd_node['who']), 'a crowd was left without its voice')
     check(any('without a voice' in w for w in story['warnings']), 'the auto-added representative was not reported')
     check('the drone dock' in {l['name'] for l in story['locations'].values()}, 'the new location was not registered')
+    # the crowd's voice is someone already in the cast (kernel7: the quartermaster for the crew)
+    run('voice', args=['--max-iterations=2'], env={'STUB_NEW_CAST_ON': '2', 'STUB_KNOWN_SPEAKER': '1'})
+    story = assert_story_ok('voice', min_lines=2)
+    crew = next(cid for cid, c in story['characters'].items() if c['label'] == 'the dock crew')
+    check(any(c.get('speaks_for') and c.get('kind') != 'crowd' and c['speaks_for'] == 'the dock crew'
+              for c in story['characters'].values()), 'a known character did not take on the crowd\'s voice')
+    check(crew, 'the crowd was not registered')
+
+
+@test
+def the_judge_reports_checked_facts():
+    import evaluate
+    from errors import SoftReject
+    story = {'nodes': {'N01': {'title': 'Lantern', 'summary': 'Your aunt oils the stuck weathervane so it tells the truth.'},
+                       'N02': {'title': 'Frost', 'summary': 'The weathervane swings north and you cover the orchard; the cost is your sleep.'},
+                       'T2N01': {'title': 'Gone', 'summary': 'Your aunt boards the last train and does not look back.'}},
+             'lines': {'T1': {'path': ['N01', 'N02'], 'ending': {'summary': 'The orchard lives.'}},
+                       'T2': {'path': ['N01', 'T2N01'], 'ending': {'summary': 'The house is empty.'}}}}
+    v = evaluate.judge_validator(story)
+    answer = {'lost': [{'kind': 'person', 'node': 'N02', 'quote': 'boards the last train and does not look back'},
+                       {'kind': 'regret', 'node': 'N02', 'quote': 'the cost is your sleep'}],
+              'plants': [{'plant_node': 'N01', 'plant_quote': 'oils the stuck weathervane', 'payoff_node': 'N02',
+                          'payoff_quote': 'the weathervane swings north'},
+                         {'plant_node': 'N02', 'plant_quote': 'you cover the orchard', 'payoff_node': 'N01',
+                          'payoff_quote': 'oils the stuck weathervane'}],
+              'reversal': None, 'announced': [{'node': 'N02', 'quote': 'the cost is your sleep'}], 'would_play': 'yes'}
+    v(answer)
+    f = answer['facts']
+    check(answer['lost'][0]['node'] == 'T2N01' and answer['lost'][1]['kind'] == 'feeling', f"quote moved, kind closed: {answer['lost']}")
+    check(f['loss'] == 'person' and f['plants_paid'] == 1 and f['announced'] == 1 and not f['reversal'] and answer['would_play'],
+          f'facts: {f}')
+    made_up = {'lost': [{'kind': 'person', 'node': 'N01', 'quote': f'a line that is nowhere at all {i}'} for i in range(4)]}
+    try:
+        v(made_up)
+        check(False, 'mostly invented quotes should cost a retry')
+    except SoftReject:
+        pass
+    check(evaluate.judge_brief({'total': 24, 'scores': {}}) == '24/30 (old judge)'
+          and evaluate.judge_brief(answer).startswith('loss person T2N01; plants 1'), 'judge_brief')
+
+
+@test
+def compare_counts_a_win_only_both_ways_round():
+    run('cmpa', args=['--max-iterations=3'])
+    run('cmpb', args=['--max-iterations=1'])
+    e = dict(os.environ, STRATUM_CLIENT='stub')
+    proc = subprocess.run([sys.executable, 'compare.py', f'{PREFIX}cmpa', f'{PREFIX}cmpb'], cwd=GEN, env=e,
+                          capture_output=True, text=True)
+    check(proc.returncode == 0, f'compare.py failed: {proc.stderr[-800:]}')
+    saved = glob.glob(os.path.join(story_dir('cmpa'), f'{PREFIX}cmpa_compare_*.json'))
+    check(len(saved) == 1, f'compare result not saved: {saved}')
+    v = json.load(open(saved[0]))['verdicts']
+    # the stub favours outline 1 on cost and play (a position bias): split; picture goes to the longer both ways
+    check(v['cost'] == 'split' and v['play'] == 'split' and v['setups'] == 'same' and v['picture'] == 'A', f'verdicts: {v}')
+    # against a human reference, main lines only
+    proc = subprocess.run([sys.executable, 'compare.py', f'{PREFIX}cmpa', 'ref:ref_canterville', '--main-line'], cwd=GEN,
+                          env=e, capture_output=True, text=True)
+    check(proc.returncode == 0 and 'main lines' in proc.stdout, f'compare against a reference: {proc.stderr[-800:]}')
+    stats = json.load(open(os.path.join(story_dir('cmpa'), f'{PREFIX}cmpa_run_stats.json')))
+    used_prompts.update(c['prompt_file'] for c in stats.get('calls', []) if c.get('prompt_file'))
+
+
+@test
+def judge_mode_seeds_one_line_at_a_time():
+    run('judge', args=['--branching=judge'], env={'STUB_STOP_AFTER': '3'})
+    story = assert_story_ok('judge', min_lines=3)
+    check(story['branching'] == 'judge' and story.get('plan') is None, 'judge mode should not run the branch plan')
+    cs = calls('judge')
+    check([c['step'] for c in cs if c['step'] in ('s4d', 's4p')] == ['s4d', 's4d', 's4d'], f"expected three 4d calls and no 4p: {[c['step'] for c in cs]}")
+    check('4d recommended stopping' in story['stop_reason'], story['stop_reason'])
+    check(all((l.get('ending') or {}).get('answer') for l in story['lines'].values()), 'every line should state its ending world')
+
+
+@test
+def branch_plan_designs_every_divergence():
+    story = assert_story_ok('basic', min_lines=3)
+    check(story['branching'] == 'plan' and story['plan'] and len(story['plan']['seeds']) >= 2, 'the branch plan was not stored')
+    cs = calls('basic')
+    check([c['step'] for c in cs if c['step'] in ('s4d', 's4p')] == ['s4p'], f"plan mode should run 4p once and never 4d: {[c['step'] for c in cs]}")
+    main = story['lines']['T1']['path']
+    forks = [story['lines'][l]['divergence']['diverges_at'] for l in story['line_order'][1:]]
+    check(any(main.index(f) + 1 <= len(main) / 2 for f in forks), f'no line leaves in the first half: {forks} of {main}')
+    worlds = {(l['ending']['answer'], tuple(sorted(l['ending']['standing'])), tuple(sorted(l['ending']['lost']))) for l in story['lines'].values()}
+    check(len(worlds) == len(story['lines']), 'two lines end in the same world')
+    check(all(n.get('image') for n in story['nodes'].values()), 'every node should carry an image')
+    check(any(n.get('event') for n in story['nodes'].values()), 'no event was placed on any node')
+    md = load('basic', 'story.md')
+    check('## Branch plan' in md and 'world left:' in md and 'Image:' in md and '## Events the world brings about' in md, 'story.md is missing the new sections')
+    ev = load('basic', 'eval.json')
+    check(ev['metrics']['ending_distinctness'] == 1.0 and ev['metrics']['forks_in_first_half'] >= 1, f"eval metrics: {ev['metrics']}")
+    # the judge reports facts, each quote checked against the outline: no scores
+    f = ev['judge']['facts']
+    check('scores' not in ev['judge'] and f['plants_paid'] == 1 and f['loss'] == 'person' and f['opposition_at_work']
+          and f['abstractions'] == 0 and f['unverified'] == 1, f'judge facts: {f}')
+    check(not ev['judge']['abstractions'][0]['verified'], 'an invented quote should be marked unverified')
+    check(not [c for c in cs if c['step'] == 's4e' and c['mode'] != 'no_think'], 'the outline judge should run with thinking off')
+    # the plan's soft rules: all-late forks and duplicate worlds are re-asked once, then accepted
+    run('plan_late', env={'STUB_PLAN_LATE': '1'})
+    attempts = [c for c in calls('plan_late') if c['step'] == 's4p']
+    check(len(attempts) == 2 and not attempts[0]['ok'] and 'second half' in attempts[0]['error'] and attempts[1]['ok'],
+          f'an all-late plan should be re-asked once with the complaint: {attempts}')
+    run('plan_dup', env={'STUB_PLAN_DUP': '2'})
+    attempts = [c for c in calls('plan_dup') if c['step'] == 's4p']
+    check(len(attempts) == 2 and 'same world' in attempts[0]['error'] and attempts[1]['ok'] and attempts[1].get('soft_problems'),
+          f'a plan with two seeds in one world should be re-asked, then accepted with the problem noted: {attempts}')
+    assert_story_ok('plan_dup', min_lines=2)
+    # a plan with no seeds stops the loop after the main line
+    run('plan_empty', env={'STUB_PLAN_SEEDS': '0'})
+    story = assert_story_ok('plan_empty')
+    check(len(story['lines']) == 1 and '4p planned no further line' in story['stop_reason'], story['stop_reason'])
+    # a seed 4c cannot build is dropped and the next planned seed is tried
+    run('plan_skip', env={'STUB_NOTHING_ON': '2', 'STUB_PLAN_SEEDS': '3'}, args=['--max-iterations=5'])
+    story = assert_story_ok('plan_skip', min_lines=3)
+    check(any(it.get('skipped') for it in story['iterations']) and len(story['lines']) == 3, f"a dropped seed should not end the loop: {story['stop_reason']}")
+
+
+@test
+def premise_events_set_piece_and_echo():
+    # missing events and a missing set piece are computed findings the repair fills
+    run('noevents', env={'STUB_NO_EVENTS': '1', 'STUB_NO_SET_PIECE': '1'}, args=['--stop-after=3.5'])
+    loop = load('noevents', 's3_5_loop.json')
+    wheres = {f['where'] for f in loop['rounds'][0]['findings']}
+    check({'events', 'turns.set_piece'} <= wheres, f'missing events / set piece were not reported: {wheres}')
+    premise = load('noevents', 's3_5_premise_accepted.json')
+    check(not loop['still_failing'] and len(premise['events']) == 2 and any(t.get('set_piece') for t in premise['turns']),
+          'the repair should have supplied events and a set piece')
+    # the brief's own wording copied into a lever is a soft rejection: re-asked once
+    run('echo', env={'STUB_ECHO': '1'}, args=['--stop-after=3.5'])
+    attempts = [c for c in calls('echo') if c['step'] == 's3_5a']
+    check(len(attempts) == 2 and "brief's own wording" in attempts[0]['error'] and attempts[1]['ok'], f'echo check: {attempts}')
+    premise = load('echo', 's3_5_premise_accepted.json')
+    check(all(s.get('voice') for s in premise['cast_seeds'] if s['kind'] == 'individual'), 'individuals should carry a voice')
+    check(any(s.get('breaking_point') for s in premise['cast_seeds']), 'no companion has a breaking point')
+    # 4a's first answer places no event: a soft rejection, the retry places one
+    run('noplace', env={'STUB_NO_EVENT_PLACED': '1'}, args=['--max-iterations=1'])
+    attempts = [c for c in calls('noplace') if c['step'] == 's4a']
+    check(len(attempts) == 2 and 'events is placed' in attempts[0]['error'] and attempts[1]['ok'], f'event placement: {attempts}')
+    # promises off: the prompts get none and 3.4 never runs
+    run('nopromise', args=['--no-promises', '--stop-after=3.5'])
+    check(not [c for c in calls('nopromise') if c['step'] == 's3_4'], '3.4 ran under --no-promises')
+    check('beat them) ---\nnone' in load('nopromise', 's3_5a_raw_input_prompt.txt'), 'the engine prompt should receive "none" for the promises')
+    loop = load('nopromise', 's3_5_loop.json')
+    check(not any(f['where'] == 'turns.set_piece' for f in loop['rounds'][0]['findings']), 'no promises, no set-piece finding')
 
 
 @test
@@ -373,6 +741,279 @@ def stale_directories_fail_loudly():
 
 
 @test
+def verbal_tics_count_along_a_path():
+    import example_guard as eg
+    path = [('N01', 'The boat slips into the current while the lamps gutter.'),
+            ('N02', 'At dawn the boat slips into the current again, past the lock.'),
+            ('N03', 'You watch as the boat slips into the current a third time.'),
+            ('N04', 'The black name stone glows; the black name stone hums; Orla Dunmore watches the gate.')]
+    tics = eg.repeated_tics(path, ['N03'], exempt_texts=['the black name stone'], name_words=['Orla', 'Dunmore'])
+    check(any('slips into' in p and ids == ['N01', 'N02', 'N03'] for p, ids in tics), f'tics: {tics}')
+    check(not eg.repeated_tics(path, ['N04'], exempt_texts=['the black name stone'], name_words=['Orla', 'Dunmore']),
+          'a phrase not in a new node, or the story\'s own noun, counted')
+    check(not eg.repeated_tics(path[:2], ['N02']), 'two nodes made a tic')
+    cast = [{'name': 'Ivo Gutierrez', 'voice': "talks in quick, practical fragments: 'The line is frayed and I am cold.'"}]
+    leaks = eg.described_voices({'N04': 'Ivo begins a bargain in quick practical fragments.',
+                                 'N05': 'Ivo says the line is frayed and he is cold.'}, cast)
+    check([x[0] for x in leaks] == ['N04'], f'voice leaks: {leaks}')
+
+
+@test
+def stage_a_expands_arcs():
+    import arcs
+    # the threshold math: "3 of 4, three quarters" is met by random play 31% of the time (the design note)
+    check(abs(arcs.random_pattern_rate([(0.5, 0.5)] * 4, 3, 0.75) - 0.3125) < 1e-9, 'random pattern rate is off')
+    th = arcs.shift_threshold([(0.5, 0.5)] * 4)
+    check(th and th['random_rate'] < arcs.RANDOM_SHIFT_LIMIT and th['at_least'] >= 3, f'threshold: {th}')
+    check(arcs.shift_threshold([(0.5, 0.5)] * 2) is None, 'two opportunities produced a pattern shift')
+    see = {'kind': 'opportunity', 'options': [{'moves': [{'state': 'a', 'direction': 'up'}, {'state': 'b', 'direction': 'down'}]},
+                                             {'moves': [{'state': 'a', 'direction': 'down'}, {'state': 'b', 'direction': 'up'}]}]}
+    check(arcs.is_seesaw(see), 'a pure trade was not recognized')
+    single = {'kind': 'opportunity', 'options': [{'moves': [{'state': 'a', 'direction': 'up'}]},
+                                                {'moves': [{'state': 'a', 'direction': 'down'}, {'state': 'b', 'direction': 'up'}]}]}
+    check(not arcs.is_seesaw(single), 'an option that moves one person was counted as a trade')
+    seq = ['N01', 'N01a', 'N01b', 'N01c', 'N02']
+    check(arcs.tell_in_reach(seq, 1, 4, lambda t: t.startswith('N') and len(t) == 3), 'the next major node is in reach')
+    check(not arcs.tell_in_reach(seq, 1, 1, lambda t: True), 'a tell on its own node is in reach')
+
+    run('stagea', args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})
+    result = load('stagea', 'arcs.json')
+    tiers = {t['tier'] for t in result['tiers'].values()}
+    check(tiers == {'arc', 'supporting', 'functional'}, f'tiers: {result["tiers"]}')
+    check(result['plan'].get('light_arcs'), 'the supporting character got no light arc')
+    check(result['checks'] == [] and result['playtest']['findings'] == [],
+          f"stage A findings: {result['checks'] + result['playtest']['findings']}")
+    minors = result['minor_nodes']
+    check(minors and all(m['id'][-1].isalpha() and m['id'][:-1] in load('stagea', 'story.json')['nodes']
+                         for m in minors.values()), f'minor node ids: {list(minors)}')
+    opps = [m for m in minors.values() if m['kind'] == 'opportunity']
+    check(opps and all(m.get('tell', {}).get('at') for m in opps), 'an opportunity has no tell')
+    check(all(2 <= len(m['options']) <= 3 for m in opps), 'an opportunity without two or three options')
+    states = set(result['states'])
+    check(all(mv['state'] in states for m in opps for o in m['options'] for mv in o['moves']), 'a move names an undeclared state')
+    graph = result['graph']
+    for l, line in graph['lines'].items():
+        check(line['path'][0] in graph['nodes'] and all(n in graph['nodes'] for n in line['path']), f'{l}: path broken')
+    check(any(len(e['groups']) for e in result['endings'].values()), 'no ending variants were composed')
+    check(not any('no sequence of choices reaches' in f for f in result['checks']),
+          f"the stub's single-state options should reach every ending combination: {result['checks']}")
+    check(load('stagea', 'arcs.md').startswith('# '), 'no markdown report')
+    n = len(calls('stagea'))
+    run('stagea', fresh=False, args=['--stage-a'], env={'STUB_NEW_CAST_ON': '2'})
+    check(len(calls('stagea')) == n, 'a second run of stage A made model calls')
+
+    # B0: scenes from stage A's groups, subjects with where they first appear, a room target
+    import scenes
+    b0 = scenes.plan(load('stagea', 'story.json'), result)
+    story = load('stagea', 'story.json')
+    check(len(b0['scenes']) == len(story['nodes']) and all(sc['nodes'][0] == sc['major'] for sc in b0['scenes']),
+          'one scene per major node, minor nodes after it')
+    check(sum(len(sc['nodes']) - 1 for sc in b0['scenes']) == len(result['minor_nodes']), 'a minor node is in no scene')
+    people = [x for x in b0['subjects'] if x['kind'] == 'person' and x['id']]
+    check(people and all(x['first_scene'] for x in people if story['characters'][x['id']].get('nodes')),
+          f'a person who appears has no first scene: {people}')
+    check(b0['rooms']['min'] >= scenes.MIDDLE_GROUND, f"room target below the middle ground: {b0['rooms']}")
+    check(all(sc.get('next') for sc in b0['scenes'] if not sc['ending']), 'a scene that is not an ending leads nowhere')
+
+    # a pattern shift: its condition is computed, and random play rarely meets it
+    run('stageshift', args=['--stage-a'], env={'STUB_SHIFT': '1'})
+    shifts = load('stageshift', 'arcs.json')['pattern_shifts']
+    check(len(shifts) == 1 and shifts[0].get('when', '').startswith('pattern('), f'shift: {shifts}')
+    check(shifts[0]['threshold']['random_rate'] < arcs.RANDOM_SHIFT_LIMIT, f"shift threshold: {shifts[0]['threshold']}")
+    # a line shift that names no target costs one retry and is dropped, never the run
+    run('stageshift2', args=['--stage-a'], env={'STUB_SHIFT': '2'})
+    shifts = load('stageshift2', 'arcs.json')['pattern_shifts']
+    check(len(shifts) == 1 and shifts[0]['does'] == 'resolution', f'the target-less line shift was kept: {shifts}')
+    check([f for f in os.listdir(story_dir('stageshift2')) if 's5a1' in f and 'rejected' in f],
+          'a target-less line shift was accepted without a retry')
+    # missing tells are re-asked with the complaint
+    run('stagetells', args=['--stage-a', '--max-iterations=1'], env={'STUB_NO_TELLS': '1'})
+    rejected = [f for f in os.listdir(story_dir('stagetells')) if 's5a2' in f and 'rejected' in f]
+    check(rejected, 'opportunities without tells were accepted without a retry')
+    check(load('stagetells', 'arcs.json')['checks'] == [], 'the retry did not fix the tells')
+
+
+@test
+def stage_b_builds_an_engine_world():
+    import world as world_stage
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    # variants compile to engine conditions, conditional first, the default last
+    problems = []
+    got = world_stage.compile_variants([{'state': None, 'text': 'plain'}, {'state': 'nerve', 'direction': 'up', 'text': 'brave'},
+                                        {'after': 'N02', 'text': 'later'}], {'nerve'}, {'N02': {}}, problems, 'x')
+    check(not problems and [v.get('when') for v in got] == ["pattern('nerve','up',1,0.6)", 'flags.done_N02', None],
+          f'compiled variants: {got} {problems}')
+    world_stage.compile_variants([{'state': 'courage', 'direction': 'up', 'text': 'x'}], {'nerve'}, {}, problems, 'y')
+    check(problems, 'an unknown state compiled')
+    got = world_stage.compile_variants([{'state': 'nerve', 'text': 'stirred'}, {'state': 'nerve', 'direction': 'down', 'text': 'shy'},
+                                        {'text': 'plain'}], {'nerve'}, {}, [], 'z')
+    check([v.get('when') for v in got] == ["pattern('nerve','down',1,0.6)", "moved('nerve')", None],
+          f'a variant with no direction: {got}')
+
+    run('stageb', args=['--stage-b'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STUB_DUP_ROOM': '1'})
+    result = load('stageb', 'world.json')
+    w = result['world']
+    names = [r['name'] for r in w['rooms'].values()]
+    check(len(set(names)) == len(names), f'two rooms share a name: {sorted(names)}')
+    things = [o['name'].lower() for o in w['objects'].values()]
+    check(len(set(things)) == len(things), 'two objects share a name')
+    who = {x.lower() for c in story_chars for x in c} if (story_chars := [(ch.get('name') or '', ch.get('label') or '')
+                                                           for ch in load('stageb', 'story.json')['characters'].values()]) else set()
+    check(not (set(things) & (who - {''})), f'a person was made a thing: {sorted(set(things) & who)}')
+    for c in w['characters'].values():
+        labels = [t['label'].lower() for t in c['topics'].values()]
+        check(len(set(labels)) == len(labels), f"{c['name']} has two topics with one label")
+    story = load('stageb', 'story.json')
+    people = [c for c, ch in story['characters'].items() if ch.get('kind') != 'crowd']
+    check(set(w['characters']) == set(people), f"people built: {sorted(w['characters'])} vs {people}")
+    check(len(w['rooms']) >= 10 and all(r['exits'] for r in w['rooms'].values()), 'rooms missing or unjoined')
+    check(any(o['location'] == 'player' for o in w['objects'].values()), 'you carry nothing')
+    check(len(result['protagonist']['think']) >= 3, 'fewer than three things to think about')
+    gated = [t for c in w['characters'].values() for t in c['topics'].values() if "seen('" in (t.get('known_when') or '')]
+    check(gated, 'no conversation about encountered subjects')
+    labels = [t['label'] for c in w['characters'].values() for t in c['topics'].values()]
+    check(all(len(str(l).split()) <= 8 for l in labels), f"a topic label is a sentence: {max(labels, key=len)!r}")
+    # the world is valid engine data, wrapped in a one-scene package with the done flags declared
+    rooms = list(w['rooms'])
+    pkg = {'format': 'stratum-story/1', 'story_id': 'stageb', 'title': 'world check', 'protagonist': result['protagonist'],
+           'states': {k: {'meaning': v.get('meaning')} for k, v in load('stageb', 'arcs.json')['states'].items()},
+           'world': {'rooms': w['rooms'], 'objects': w['objects'], 'characters': w['characters']},
+           'initial_flags': {f: False for f in result['done_flags']},
+           'scenes': {'S1': {'rooms': rooms, 'cast': {c: rooms[0] for c in w['characters']}, 'interactions': [],
+                             'exits': [{'to': 'END', 'when': 'turns >= 3'}]}},
+           'start': {'scene': 'S1', 'room': rooms[0]}, 'endings': {'END': {'text': [{'text': 'end'}]}}}
+    errors, _ = engine_validate(EngineStory(pkg))
+    check(not errors, f'the world is not valid engine data: {errors[:5]}')
+
+
+@test
+def the_prose_pass_revises_text_and_keeps_structure():
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    from runtime import Engine
+    run('prose', args=['--prose'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
+                                        'STUB_STYLE_FAILS': '1', 'STUB_PROSE_DROP': '1', 'STUB_PROSE_IF': '1'})
+    before, after = load('prose', 'package.json'), load('prose', 'package_prose.json')
+
+    def skeleton(node):
+        if isinstance(node, dict):
+            return {k: ('' if k in ('text', 'label', 'detail_label', 'object_label', 'title') else skeleton(v))
+                    for k, v in node.items() if k not in ('unnamed', 'unnamed_short', 'known', 'recap')}
+        if isinstance(node, list):
+            return [skeleton(v) for v in node]
+        return node
+    check(skeleton(before) == skeleton(after), 'the prose pass changed something other than text')
+    # a resumed run replays every saved edit (the validator reads back the form it saved)
+    os.remove(os.path.join(story_dir('prose'), f'{PREFIX}prose_package_prose.json'))
+    n_calls = len(calls('prose'))
+    run('prose', args=['--prose'], fresh=False, env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
+    check(load('prose', 'package_prose.json') == after and len(calls('prose')) == n_calls,
+          'a resumed prose pass did not replay its saved edits')
+    texts = []
+
+    def walk(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == 'text' and isinstance(v, str):
+                    texts.append(v)
+                else:
+                    walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+    walk(after)
+    check(texts and all('(voiced)' in t for t in texts), f'a text was not revised: {[t for t in texts if "(voiced)" not in t][:3]}')
+    named = [c['name'] for c in after['world']['characters'].values() if c.get('name')]
+    check(named and not [n for n in named for t in texts if n in t], 'a literal name was left in the text')
+    check(any('{' in t for t in texts), 'no person was written as a code')
+    strangers = [c for c in after['world']['characters'].values() if c.get('name') and not c.get('known')]
+    check(strangers and all(c['unnamed'] == 'the stub figure in a coat' for c in strangers), 'unnamed labels')
+    check(not any('If it slips' in t for t in texts), 'narrated alternatives survived the retry')
+    check(load('prose', 'prose_style.json')['tradition'] == 'a stub tradition, revised', 'the faulted style sheet was not rewritten')
+    check(all(sc.get('recap') and '(voiced)' in sc['recap'][0]['text'] for sc in after['scenes'].values()),
+          'every scene should have a journal entry')
+    errors, _ = engine_validate(EngineStory(after))
+    check(not errors, f'the prose package does not validate: {errors[:5]}')
+    eng = Engine(EngineStory(after))
+    view = eng.start(seed=1)
+    shown = ' '.join(view['text']) + (view['room'] or {}).get('text', '')
+    check('{' not in shown and 'voiced' in shown, f'the engine did not render the codes: {shown[:300]}')
+
+
+@test
+def prose_names_known_people_and_codes_every_name():
+    import prose
+    pkg = {'intro': [{'text': 'Emerson Whitlock meets you; Hugh waits. Calloway, Emerson and Hughes are not codes.'}],
+           'scenes': {}, 'endings': {}, 'protagonist': {},
+           'world': {'rooms': {}, 'objects': {}, 'characters': {
+               'C01': {'name': 'Emerson Whitlock', 'role': 'your brother-in-law'},
+               'C02': {'name': 'Hugh Calloway', 'role': 'the ghost captain',
+                       'topics': {'t': {'label': 'about Emerson', 'says': [{'text': "'Hugh,' he says."}]}}}}}}
+    w = prose.ProseWriter(None, pkg)
+    w.prepare_names()
+    w.convert_names()
+    c = w.pkg['world']['characters']
+    check(c['C01'].get('known') and not c['C02'].get('known') and c['C02']['unnamed'] == 'the ghost captain', f'known: {c}')
+    check(w.pkg['intro'][0]['text'] == '{C01} meets you; {C02} waits. {C02}, {C01} and Hughes are not codes.',
+          f"codes: {w.pkg['intro'][0]['text']}")
+    check(c['C02']['topics']['t']['label'] == 'about {C01}' and c['C02']['name'] == 'Hugh Calloway', 'labels coded, names kept')
+    # a being that keeps its role in the name field is not a name: "the cat" once made every "the" a code
+    pkg = {'intro': [{'text': 'The cat sleeps by the stove; the cat and Odile Marchetti wait.'}], 'scenes': {}, 'endings': {},
+           'protagonist': {}, 'world': {'rooms': {}, 'objects': {}, 'characters': {
+               'C01': {'name': 'the cat', 'role': 'the cat'}, 'C02': {'name': 'Odile Marchetti', 'role': 'the dancer'}}}}
+    w = prose.ProseWriter(None, pkg)
+    w.prepare_names()
+    w.convert_names()
+    check(w.pkg['intro'][0]['text'] == 'The cat sleeps by the stove; the cat and {C02} wait.' and
+          'unnamed' not in w.pkg['world']['characters']['C01'], f"a role is not a name: {w.pkg['intro'][0]['text']}")
+
+
+@test
+def stages_c_and_d_compile_a_playable_package():
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import Story as EngineStory, validate as engine_validate
+    from runtime import Engine
+    run('staged', args=['--stage-d'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
+    package = load('staged', 'package.json')
+    story = EngineStory(package)
+    errors, _ = engine_validate(story)
+    check(not errors, f'the compiled package does not validate: {errors[:5]}')
+    outline = load('staged', 'story.json')
+    check(len(package['scenes']) == len(outline['nodes']), 'a scene per major node')
+    check(set(package['endings']) == {f"E_{outline['lines'][l]['path'][-1]}" for l in outline['line_order']},
+          f"endings: {sorted(package['endings'])}")
+    moments = [m for sc in package['scenes'].values() for m in sc.get('moments') or []]
+    check(moments and all(m['options'] for m in moments), 'no moments compiled')
+    check(any(m['required'] and m.get('neutral') for m in moments), 'no required moment with a neutral option')
+    ways = [it for sc in package['scenes'].values() for it in sc['interactions']
+            if any(str(e.get('set', '')).startswith('go_') for e in it.get('effects') or [])]
+    check(ways and all(it.get('reach') == 'any' for it in ways), 'a way on depends on having its object at hand')
+    neutral = {m['neutral'] for sc in package['scenes'].values() for m in sc.get('moments') or [] if m.get('neutral')}
+    check(all(it.get('reach') == 'any' and not it.get('room') for sc in package['scenes'].values()
+              for it in sc['interactions'] if it['id'] in neutral), 'a neutral option can be out of reach')
+    free = [it for sc in package['scenes'].values() for it in sc['interactions'] if it.get('object_label') == 'the water']
+    check(free, 'an action on something that is not a thing (the water) did not compile as free text')
+    moves = [e for sc in package['scenes'].values() for it in sc['interactions'] for e in it.get('effects') or [] if 'move' in e]
+    check(moves, 'no option carries stage A\'s state moves')
+    # it plays: a walk that takes the way on in every scene reaches an ending
+    eng = Engine(story)
+    eng.start(seed=1)
+    for _ in range(300):
+        if eng.state.ending:
+            break
+        opts = eng.options()
+        pick = next((o for o in opts if o['source'] and o['source'][0] == 'interaction' and any(
+            m.get('required') and o['id'] in m['options'] for m in eng.moments())), None)
+        pick = pick or next((o for o in opts if o['source'] and o['source'][0] == 'interaction'
+                             and any('go_' in str(e) for e in o['source'][1].get('effects') or [])), None)
+        pick = pick or next(o for o in opts if o['verb'] == 'wait')
+        eng.act(pick['id'])
+    check(eng.state.ending, f'the package did not play to an ending (stuck in {eng.state.scene})')
+    check(load('staged', 'package.md').startswith('# '), 'no package report')
+
+
+@test
 def every_prompt_is_exercised():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt'))}
     unused = have - used_prompts
@@ -392,7 +1033,7 @@ def kinds(story):
 def checks_catch_broken_graphs():
     good = load('graph', 'story.json') if os.path.isdir(story_dir('graph')) else None
     if good is None:
-        run('graph', args=['--max-iterations=6'], env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
+        run('graph', args=['--max-iterations=6', '--branching=judge'], env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
         good = load('graph', 'story.json')
     check(not kinds(good), 'the reference story is not clean')
 
@@ -432,6 +1073,18 @@ def checks_catch_broken_graphs():
     menu = json.loads(json.dumps(good))
     menu['lines']['T2']['divergence']['trigger'] = 'You choose to vent the sector'
     check('menu_trigger' in {f['kind'] for f in checks.check_story(menu)['notes']}, 'a menu-phrased trigger was not noted')
+    dup = json.loads(json.dumps(good))
+    dup['lines']['T2']['ending'].update(answer='pole_b', standing=['the nursery warden', 'the hydroponics foreman'], lost=[])
+    for l in dup['lines'].values():
+        l['ending'].update(answer='pole_b', standing=['the nursery warden', 'the hydroponics foreman'], lost=[])
+    noted = {f['kind'] for f in checks.check_story(dup)['notes']}
+    check({'same_world', 'companions_static'} <= noted, f'same-world endings and static companions were not noted: {noted}')
+    told = json.loads(json.dumps(good))
+    a = next(n for n in t1 if told['nodes'][n]['turn'] is not None)
+    told['nodes'][a]['summary'] = 'The warden bars the nursery hatch while the foreman reads the gauge aloud to the families.'
+    told['nodes']['X9'] = dict(told['nodes'][a], id='X9', lines=['T9'], way=2,
+                               summary='The warden bars the nursery hatch while the foreman reads the gauge aloud, and you wait.')
+    check('repeated_situation' in {f['kind'] for f in checks.check_story(told)['notes']}, 'a retold situation was not noted')
 
 
 # ---------------------------------------------------------------- the loop's validators, driven directly
@@ -459,9 +1112,21 @@ class FakeGen:
     def to_json(value, indent=2):
         return json.dumps(value)
 
+    @staticmethod
+    def promises_block():
+        return 'none'
+
+    @staticmethod
+    def tone_line():
+        return 'tone: (none stated)'
+
     def run_prompt(self, prefix, name, repl, prompt_file=None, validator=None, klass=None, schema=None):
+        from errors import SoftReject
         answer = json.loads(json.dumps(self.answers[prefix]))
-        validator(answer)
+        try:
+            validator(answer)
+        except SoftReject as e:      # main.py would re-ask once, then accept; here: accept
+            self.soft = str(e)
         return answer
 
     def save_story_json(self, *a):
@@ -476,7 +1141,8 @@ def entry(beat, turn=None, way=None):
 
 def plan(beats):
     return {'through_line': {'title': 't', 'motivation': 'm', 'strategy': 's', 'turning_point': 'p', 'differs_from': 'd'},
-            'ending': {'title': 'e', 'summary': 'e'}, 'beats': beats, 'skipped_beats': []}
+            'ending': {'title': 'e', 'summary': 'e', 'answer': 'pole_a', 'standing': ['the widow'], 'lost': [], 'changed': 'c'},
+            'beats': beats, 'skipped_beats': []}
 
 
 def branch(at, beats, rejoin=None, skipped=()):
@@ -620,6 +1286,70 @@ def example_copies_are_caught():
 
 
 @test
+def steptest_scores_saved_cases():
+    import tempfile
+    import steptest
+    before = os.environ.get('STRATUM_CLIENT')
+    os.environ['STRATUM_CLIENT'] = 'stub'
+    try:
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()) as out:
+            steptest.main(['--cases', 'lady_clean,lady_regard_meter', '--tag', 't', '--out', tmp])
+            summary = json.load(open(os.path.join(tmp, 't', 'summary.json')))
+            os.environ['STUB_PREMISE_ALWAYS_HARD'] = '3'
+            steptest.main(['--cases', 'lady_clean', '--tag', 'stray', '--out', tmp])
+            stray = json.load(open(os.path.join(tmp, 'stray', 'summary.json')))['results']['lady_clean'][0]['score']
+    finally:
+        os.environ.pop('STUB_PREMISE_ALWAYS_HARD', None)
+        if before is None:
+            del os.environ['STRATUM_CLIENT']
+        else:
+            os.environ['STRATUM_CLIENT'] = before
+    res = summary['results']
+    check(all(e['held'] for e in res['lady_clean'][0]['score']), 'the stub audit raises nothing on the clean control')
+    check(not res['lady_regard_meter'][0]['score'][0]['held'] and 'misses 1/1' in out.getvalue(),
+          'a missed true positive is reported as a miss')
+    check([e for e in stray if e['where'] == '(any other clause)' and not e['held']],
+          'a Kernel contradiction no case expects is not counted as a false alarm')
+    check(steptest.matches({'source': 'kernel clause', 'where': 'married man', 'quote': ''},
+                           {'source': 'kernel clause', 'where': 'You are a married man near forty', 'quote': 'x'}),
+          'an expectation matches by source and words')
+    for name in steptest.case_names():
+        case = steptest.load_case(name)
+        check(case['case']['expect'] and case['premise'].get('protagonist'), f'{name}: a case needs expectations and a premise')
+
+
+@test
+def shared_terms_reach_every_prompt():
+    import terms
+    used = set()
+    for path in glob.glob(os.path.join(ROOT, 'prompts', '*.prompt')):
+        text = open(path, encoding='utf-8').read()
+        used |= set(terms.TERM.findall(text))
+        out = terms.expand(text)
+        check('$$TERM_' not in out, f'{os.path.basename(path)}: a term was left unexpanded')
+    defined = set(terms.load())
+    check(used <= defined and defined <= used, f'terms used but not defined {used - defined}, defined but unused {defined - used}')
+    check('LOSING AND THE PRICE' in terms.expand('$$TERM_PRICE$$'), 'the PRICE section should expand whole')
+    try:
+        terms.expand('$$TERM_NOPE$$')
+        check(False, 'an unknown term should raise')
+    except ValueError:
+        pass
+
+
+@test
+def being_decides_who_is_named():
+    import names
+    check(names.wants_a_name({'role': 'the night porter', 'being': 'person'}), 'a person is named')
+    check(not names.wants_a_name({'role': 'the night porter', 'being': 'animal'}), 'an animal keeps its role, whatever its role says')
+    check(names.wants_a_name({'role': 'the grey lady', 'being': 'dead'}) and names.dead_person({'role': 'the grey lady', 'being': 'dead'}),
+          'the dead are named, for when they lived')
+    check(not names.wants_a_name({'role': 'the brass automaton', 'being': 'thing'}), 'a thing keeps its role')
+    check(not names.wants_a_name({'role': 'the old hound'}) and names.wants_a_name({'role': 'the ferryman'}),
+          'a seed without being is read from its role, as before')
+
+
+@test
 def cast_names_come_from_python():
     import names
     premise = load('basic', 's3_5_premise_accepted.json')
@@ -630,10 +1360,24 @@ def cast_names_come_from_python():
     check(len({s['name'].split()[0] for s in named}) == len(named), 'two people share a given name')
     check(premise.get('name_pool') == 'scifi', f"kernel1 should draw from the scifi pool, got {premise.get('name_pool')}")
     again = [dict(s, name=None) for s in seeds]
-    names.assign_names(again, f'{PREFIX}basic', ['x'], premise['name_pool'])
+    kernel1 = open(os.path.join(KERNELS, 'kernel1.txt')).read()
+    names.assign_names(again, f'{PREFIX}basic', [kernel1] + names.premise_texts(premise), premise['name_pool'])
     check([s.get('name') for s in again] == [s.get('name') for s in seeds], 'names are not deterministic for a story id')
+    check(names.gender_hint('the foreman', [], own=['walks off if his sector is bled']) == 'm'
+          and names.gender_hint('the foreman', ['the foreman says his valve is shut. the warden says her sector is cold.']) == 'm',
+          'gender hints should read the seed\'s own fields and only the sentences that name the role')
     check(not names.wants_a_name({'role': 'the dragon', 'kind': 'individual'})
           and not names.wants_a_name({'role': 'the protagonist', 'kind': 'individual'}), 'a dragon or "you" was named')
+    ghost = {'role': 'the ghost in period costume', 'kind': 'individual', 'gender': 'm',
+             'holds': 'the authority of three centuries of tenure'}
+    check(names.wants_a_name(ghost) and names.wants_a_name({'role': 'the ghostly lady', 'kind': 'individual', 'gender': 'f'})
+          and not names.wants_a_name({'role': 'the ghost', 'kind': 'individual'})
+          and not names.wants_a_name({'role': 'the forest spirit', 'kind': 'individual', 'gender': 'f'})
+          and not names.wants_a_name({'role': 'the ghost ship', 'kind': 'individual', 'gender': 'f'}),
+          'a ghost who was a person should be named; a sexless ghost, a spirit or a ship not')
+    check(names.seed_pool(ghost, 'modern:british') == 'regency' and names.seed_pool(ghost, 'fantasy') == 'fantasy'
+          and names.seed_pool({'role': 'the drowned captain', 'gender': 'm'}, 'modern') == 'modern',
+          "a ghost in a story set now is named for when it lived")
     check(names.pool_for(open(os.path.join(KERNELS, 'kernel31.txt')).read()) == 'fantasy'
           and names.pool_for(open(os.path.join(KERNELS, 'kernel17.txt')).read()) == 'period', 'genre pools')
     story = open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.md')).read()
@@ -643,6 +1387,192 @@ def cast_names_come_from_python():
     table = {'C01': {'label': 'the nursery warden', 'name': 'Adaora Prakash'}, 'C02': {'label': 'the speaker', 'name': None}}
     check(OutlineBuilder.match('Adaora Prakash', table, 'label') == 'C01' and OutlineBuilder.match('Adaora', table, 'label') == 'C01',
           'a name did not resolve to its role')
+
+
+@test
+def name_pools_styles_and_races():
+    import names
+    for kernel, pool in (('A romance in Regency London with a duke.', 'regency'), ('A gladiator in ancient Rome.', 'ancient_roman'),
+                         ('A tomb robber in the pyramids of Egypt.', 'ancient_egyptian'), ('A viking raid on a fjord.', 'norse'),
+                         ('A ronin in feudal Japan.', 'japanese_historical'), ('A gunslinger in a frontier town.', 'western'),
+                         ('An epic fantasy adventure with a dragon.', 'fantasy'), ('A cozy romance with a baker.', 'romance'),
+                         ('A 1940s noir detective story.', 'period'), ('Pirates chase a galleon.', 'age_of_sail')):
+        check(names.pool_for(kernel) == pool, f'{kernel!r} -> {names.pool_for(kernel)}, expected {pool}')
+    seeds = [{'role': 'the thief', 'kind': 'individual', 'gender': 'f'}, {'role': 'the elven archer', 'kind': 'individual', 'gender': 'm'},
+             {'role': 'the dwarf locksmith', 'kind': 'individual', 'gender': 'f'}, {'role': 'the goblin fence', 'kind': 'individual'},
+             {'role': 'the stone guardian', 'kind': 'individual'}]
+    names.assign_names(seeds, 'demo', ['A fantasy heist in a wizard tower.'])
+    got = {s['role']: s.get('name') for s in seeds}
+    check(got['the dwarf locksmith'] and ' daughter of ' in got['the dwarf locksmith'], f"dwarven patronymic: {got}")
+    check(got['the elven archer'] and got['the elven archer'].split()[0] in names.POOLS['elven']['m'], f"elven pool: {got}")
+    check(got['the goblin fence'] and len(got['the goblin fence'].split()) == 1, f"monstrous names are single: {got}")
+    check(got['the stone guardian'] is None, 'a stone guardian was named')
+    check(got['the thief'].split()[0] in names.POOLS['fantasy']['f'] + names.POOLS['fantasy']['n'], f"stated gender: {got}")
+    romans = [{'role': f'the daughter {i}', 'kind': 'individual', 'gender': 'f'} for i in range(6)]
+    names.assign_names(romans, 'demo', ['ancient Rome'], 'ancient_roman')
+    check(len({r['name'].split()[0] for r in romans}) == 6, f"Roman women share a family name: {[r['name'] for r in romans]}")
+    jp = [{'role': 'the ronin', 'kind': 'individual', 'gender': 'm'}]
+    names.assign_names(jp, 'demo', ['feudal Japan'], 'japanese_historical')
+    check(jp[0]['name'].split()[0] in names.POOLS['japanese_historical']['surnames'], f"family name first: {jp}")
+
+
+@test
+def modern_names_keep_a_culture():
+    import names
+    check(names.with_culture('modern', 'x', ['a wedding planner in Lagos']) == 'modern:west_african', 'Lagos cue ignored')
+    check(names.with_culture('modern', 'x', ['a decrepit canal boat']) == 'modern:british', 'canal cue ignored')
+    check(names.with_culture('fantasy', 'x', ['a dragon']) == 'fantasy', 'a pool without cultures got one')
+    cultures = names.POOLS['modern']['cultures']
+    home_hits = coherent = total = 0
+    for k in range(40):
+        cast = [{'role': f'the witness number {i}', 'kind': 'individual', 'gender': 'fm'[i % 2]} for i in range(6)]
+        names.assign_names(cast, f'story{k}', ['a wedding planner in Lagos'], 'modern:west_african')
+        for c in cast:
+            given, surname = c['name'].split()[0], c['name'].split()[-1]
+            total += 1
+            home_hits += given in cultures['west_african']['f'] + cultures['west_african']['m']
+            coherent += any(given in v['f'] + v['m'] and surname in v['surnames'] for v in cultures.values())
+    check(home_hits / total > 0.7, f'home culture share {home_hits / total:.2f}')
+    check(coherent / total > 0.85, f'given name and surname from one culture in only {coherent / total:.2f}')
+
+
+@test
+def protagonist_is_named_first():
+    import names
+    you = {'who': 'You inherited a canal boat.', 'gender': 'm'}
+    cast = [{'role': 'your brother-in-law', 'kind': 'individual', 'gender': 'm'}, {'role': 'the lock keeper', 'kind': 'individual', 'gender': 'f'}]
+    name = names.name_protagonist(you, 'demo35', 'modern')
+    check(name and you['name'] == name and name.split()[0] in names.POOLS['modern']['m'] + names.POOLS['modern']['n'],
+          f'a human protagonist should get a name from the pool, gendered: {you}')
+    names.assign_names(cast, 'demo35', ['a canal boat'], 'modern', reserved=[name])
+    parts = set(name.lower().split())
+    check(all(not parts & set(c['name'].lower().split()) for c in cast), f'a cast member shares a name part with you: {name} / {cast}')
+    check(names.name_protagonist({'who': 'You are the ship AI.', 'gender': 'n'}, 'demo', 'scifi', human=False) is None,
+          'a non-human protagonist was named')
+    check(names.name_protagonist(you, 'demo35', 'modern') == name, 'naming is not stable for a protagonist that already has a name')
+
+
+@test
+def playtest_walks_outlines_and_patterns():
+    import playtest
+    story = json.load(open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.json')))
+    st = playtest.Story(story)
+    plays = playtest.playthroughs(st)
+    check({p['ending'] for p in plays if p.get('ending')} == set(st.endings), 'the stub story has an unreachable ending')
+    check(playtest.check(st, plays) == [], f'the stub story has playtest findings: {playtest.check(st, plays)}')
+
+    def graph(n_opps):
+        # n_opps opportunities, each with an up and a down option, then a node whose
+        # shift edge fires when the state went down at least 3 times, 3/4 of the time
+        nodes, edges = {}, []
+        ids = [f'O{i}' for i in range(n_opps)] + ['F', 'END_A', 'END_B']
+        for i in range(n_opps):
+            nodes[f'O{i}'] = {'title': f'opp {i}', 'options': [{'do': 'warm', 'effects': [{'state': 'trust', 'direction': 'up'}]},
+                                                               {'do': 'cold', 'effects': [{'state': 'trust', 'direction': 'down'}]}]}
+        nodes['F'] = {'title': 'the fork'}
+        nodes['END_A'] = {'title': 'stays', 'is_ending': True}
+        nodes['END_B'] = {'title': 'leaves', 'is_ending': True}
+        for a, b in zip(ids[:n_opps], ids[1:n_opps + 1]):
+            edges.append({'from': a, 'to': b, 'kind': 'continue', 'lines': ['T1'], 'otherwise': []})
+        edges.append({'from': 'F', 'to': 'END_A', 'kind': 'continue', 'lines': ['T1'], 'otherwise': []})
+        edges.append({'from': 'F', 'to': 'END_B', 'kind': 'branch', 'lines': ['T2'], 'trigger': {'text': 'you were cold to her all night', 'kind': 'accumulated'},
+                      'condition': {'state': 'trust', 'direction': 'down', 'at_least': 3, 'share': 0.75}})
+        lines = {'T1': {'path': ids[:n_opps + 1] + ['END_A']}, 'T2': {'path': ids[:n_opps + 1] + ['END_B'], 'divergence': {'diverges_at': 'F'}}}
+        return playtest.Story({'nodes': nodes, 'edges': edges, 'lines': lines, 'line_order': ['T1', 'T2']})
+
+    st = graph(3)
+    down = playtest.playthroughs(st, playtest.styles()['always_down'])
+    up = playtest.playthroughs(st, playtest.styles()['always_up'])
+    check(all(p['ending'] == 'END_B' for p in down), f'consistent cold play should shift to END_B: {[p["ending"] for p in down]}')
+    check(all(p['ending'] == 'END_A' for p in up), 'warm play should never shift')
+    findings, report = playtest.shift_checks(st)
+    check(findings == [], f'3-of-3 pattern: {findings} {report}')
+    findings, report = playtest.shift_checks(graph(4))
+    check(any('random playthroughs' in f for f in findings), f'a pattern random play hits about 30% of the time should be flagged: {report}')
+
+
+@test
+def batch_runner_queues_resumes_and_locks():
+    import batch, tempfile, threading
+    tmp = tempfile.mkdtemp()
+    queue = os.path.join(tmp, 'q.json')
+    lock = os.path.join(tmp, 'gpu.lock')
+    env = {k: v for k, v in os.environ.items() if not k.startswith('STUB_')}
+    env['STRATUM_CLIENT'] = 'stub'
+    ids = [f'{PREFIX}batch_a', f'{PREFIX}batch_b', f'{PREFIX}batch_bad']
+    for sid in ids:
+        shutil.rmtree(story_dir(sid[len(PREFIX):]), ignore_errors=True)
+    batch.add(queue, [batch.make_job('kernel1', story_id=ids[0]), batch.make_job('kernel32', story_id=ids[1]),
+                      batch.make_job('no_such_kernel', story_id=ids[2])])
+    check(len(batch.add(queue, [batch.make_job('kernel1', story_id=ids[0])])) == 0, 'a job already queued was queued twice')
+    # main.py's flags are only what follows '--', wherever --variant sits
+    order = os.path.join(tmp, 'order.json')
+    for argv in (['add', 'kernel7,kernel8', '--variant', 'v1', '--', '--stop-after=3.5'],
+                 ['add', '--variant', 'v1', 'kernel7,kernel8', '--', '--stop-after=3.5']):
+        if os.path.exists(order):
+            os.remove(order)
+        with contextlib.redirect_stdout(io.StringIO()):
+            batch.main(['--queue', order] + argv)
+        jobs = batch.load(order)['jobs']
+        check([(j['story_id'], j['variant'], j['flags']) for j in jobs]
+              == [('kernel7_v1', 'v1', ['--stop-after=3.5']), ('kernel8_v1', 'v1', ['--stop-after=3.5'])], f'{argv}: {jobs}')
+    # a job a killed runner left "running" goes back to the queue
+    q = batch.load(queue); q['jobs'][1]['status'] = 'running'; batch.save(queue, q)
+    said = []
+    # a copy of the code nested in a comparison directory locks the outermost lock, not the one beside it
+    outer = os.path.join(tmp, 'outer')
+    nest = os.path.join(outer, 'compare', 'copy')
+    os.makedirs(nest, exist_ok=True)
+    for d in (outer, os.path.join(outer, 'compare')):
+        open(os.path.join(d, '.stratum_gpu.lock'), 'w').close()
+    got = batch.gpu_lock_path(nest)
+    check(outer.startswith(os.path.dirname(got)) and got != os.path.join(outer, 'compare', '.stratum_gpu.lock'),
+          f'a nested copy locks {got}, not the outermost lock')
+    old = batch.GPU_LOCK
+    batch.GPU_LOCK = lock
+    try:
+        holder = open(lock, 'a+')
+        import fcntl
+        fcntl.flock(holder, fcntl.LOCK_EX)
+        threading.Timer(1.0, lambda: (fcntl.flock(holder, fcntl.LOCK_UN), holder.close())).start()
+        with batch.gpu(lock, say=said.append):
+            pass
+        check(any('waiting for the GPU' in m for m in said), f'a second runner did not wait for the GPU lock: {said}')
+        batch.run(queue, env=env, say=said.append)
+    finally:
+        batch.GPU_LOCK = old
+    st = {j['story_id']: j for j in batch.load(queue)['jobs']}
+    check(st[ids[0]]['status'] == 'done' and st[ids[1]]['status'] == 'done', f"jobs did not finish: {[(k, v['status'], v.get('error')) for k, v in st.items()]}")
+    check(st[ids[2]]['status'] == 'failed' and st[ids[2]]['exit'] not in (0, None), f"a bad job should fail: {st[ids[2]]}")
+    check(any('re-queued 1 interrupted' in m for m in said), 'the interrupted job was not re-queued')
+    check(os.path.isfile(os.path.join(story_dir('batch_a'), f'{PREFIX}batch_a_story.json')), 'no story from the batch job')
+    text, out = batch.report(queue)
+    check(ids[0] in text and 'done' in text and os.path.isfile(out), f'report: {text}')
+    for sid in ids:
+        shutil.rmtree(story_dir(sid[len(PREFIX):]), ignore_errors=True)
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
+@test
+def replays_are_stable_and_rejections_kept():
+    # a finished premise loop replays as it was, even when today's checks would object to it
+    run('drift')
+    acc_path = os.path.join(story_dir('drift'), f'{PREFIX}drift_s3_5_premise_accepted.json')
+    premise = json.load(open(acc_path))
+    premise['turns'][0]['ways_through'][0]['way'] = 'you choose to trace the ducts'   # today's menu-verb check would flag this
+    json.dump(premise, open(acc_path, 'w'))
+    before = len(calls('drift'))
+    run('drift', fresh=False)
+    check(len(calls('drift')) == before, f'a replay made {len(calls("drift")) - before} model call(s)')
+    # a rejected attempt keeps its output beside the accepted one
+    run('kept', env={'STUB_BAD_PLAN': '1'})
+    check(os.path.isfile(os.path.join(story_dir('kept'), f'{PREFIX}kept_s4a_i1_raw_output_response_rejected_1.txt')),
+          'the rejected 4a answer was not kept')
+    # a seed 4c drops leaves no gap in the line numbering
+    run('nogap', args=['--max-iterations=4'], env={'STUB_NOTHING_ON': '2'})
+    story = load('nogap', 'story.json')
+    ids = sorted(story['lines'])
+    check(ids == [f'T{i}' for i in range(1, len(ids) + 1)], f'line ids have a gap: {ids}')
 
 
 @test
@@ -661,18 +1591,28 @@ def late_forks_are_noted():
 
 @test
 def helpers():
-    for i in range(1, 33):
-        text = open(os.path.join(KERNELS, f'kernel{i}.txt'), encoding='utf-8').read()
+    kernel_files = sorted(glob.glob(os.path.join(KERNELS, 'kernel*.txt')))
+    check(len(kernel_files) >= 35, f'expected the kernel batch, found {len(kernel_files)}')
+    for path in kernel_files:
+        text = open(path, encoding='utf-8').read()
         clauses = brief.kernel_clauses(text)
-        check(clauses and all(c.strip() for _, c in clauses), f'kernel{i}: no clauses')
-        check([n for n, _ in clauses] == list(range(1, len(clauses) + 1)), f'kernel{i}: clause numbering')
+        check(clauses and all(c.strip() for _, c in clauses), f'{os.path.basename(path)}: no clauses')
+        check([n for n, _ in clauses] == list(range(1, len(clauses) + 1)), f'{os.path.basename(path)}: clause numbering')
+    eval_set = open(os.path.join(KERNELS, 'EVAL_SET.txt'), encoding='utf-8').read().split()
+    check(all(os.path.isfile(os.path.join(KERNELS, f'{k}.txt')) for k in eval_set) and 6 <= len(eval_set) <= 10, f'EVAL_SET: {eval_set}')
+    quick = open(os.path.join(KERNELS, 'EVAL_QUICK.txt'), encoding='utf-8').read().split()
+    check(quick and set(quick) <= set(eval_set), f'EVAL_QUICK must be a subset of EVAL_SET: {quick}')
+    targets = brief.shape_targets({'endings': {'tier': 'many'}, 'linearity': 'linear'})
+    check(targets['through_lines'] == 6 and targets['default_max_iterations'] == 8, f'shape targets: {targets}')
+    check(brief.shape_targets({'endings': {'tier': 'one'}})['default_max_iterations'] == 1, 'one ending, one line')
     for stated, tier in (('6 or 7', 'several'), ('at least five', 'several'), ('a dozen', 'many'), ('one ending', 'one'),
                          ('a single ending', 'one'), ('more than one ending', None), ('at least one of them happy', None),
                          ('two or three', 'few'), ('the verdict should vary', None), ('', None)):
         check(brief.ending_tier_from_stated(stated) == tier, f'tier for {stated!r}')
     b = load('basic', 's3_brief.json')
     lines = brief.brief_lines(b)
-    check('3-0a.primary_decision_axis [constraint]' in lines and 'enrichment_budget' in lines, 'brief_lines lost a field')
+    check('3-0a.primary_decision_axis [constraint, inferred]' in lines and 'enrichment_budget' in lines, 'brief_lines lost a field')
+    check('3b.tone [constraint]:' in lines, 'an explicit field should not be marked inferred')
     check(len(lines) < len(json.dumps(b, indent=2)) * 0.7, 'brief_lines is not smaller than the JSON')
     check(brief.valid_serves('3-0a.primary_decision_axis', b) and brief.valid_serves('3c', b) and not brief.valid_serves('3x.nope', b), 'valid_serves')
     for s in ('s4b_i2', 's3_5v_r1', 's3_5r2', 's4d_i3'):
@@ -707,6 +1647,7 @@ class FakeOllama(BaseHTTPRequestHandler):
     raw_prompts = []
     disconnects = 0
     reject_think = False
+    crashes = 0
 
     def log_message(self, *a):
         pass
@@ -769,8 +1710,16 @@ class FakeOllama(BaseHTTPRequestHandler):
         chunks += [{'response': response[i:i + 40]} for i in range(0, len(response), 40)]
         if d.get('raw_chunks'):
             chunks = [{'response': c} for c in d['raw_chunks']]
+        if FakeOllama.crashes:
+            # the model runner dies part way: the server reports it in the stream
+            FakeOllama.crashes -= 1
+            chunks = chunks[:2] + [{'error': 'an error was encountered while running the model: error: '
+                                             'Could not load "TensileLibrary_lazy_gfx1201.dat"'}]
         try:
             for c in chunks:
+                if 'error' in c:
+                    self.wfile.write((json.dumps(c) + '\n').encode())
+                    return
                 if d.get('delay'):
                     time.sleep(d['delay'])
                 self.wfile.write((json.dumps(dict(c, done=False)) + '\n').encode())
@@ -791,7 +1740,7 @@ def ollama_client_against_fake_server():
     threading.Thread(target=server.serve_forever, daemon=True).start()
     host = f'http://127.0.0.1:{server.server_port}'
     try:
-        client = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, max_duration=30, options={'num_ctx': 32768})
+        client = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, max_duration=30, options={'num_ctx': 32768}, crash_wait=0)
         schema = {'type': 'object'}
 
         thinking, response = client.run_prompt(json.dumps({'thinking_bytes': 500, 'response': '{"a": 1}'}),
@@ -884,7 +1833,7 @@ def ollama_client_against_fake_server():
 
         # a server that does not know the model as a thinking model: think:false is refused once,
         # then the soft switch is used and the parameter is never sent again
-        soft = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5)
+        soft = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, crash_wait=0)
         FakeOllama.reject_think = True
         with contextlib.redirect_stderr(notes):
             thinking, response = soft.run_prompt(json.dumps({'response': '{"a": 5}'}), think=False, format=schema)
@@ -913,22 +1862,38 @@ def ollama_client_against_fake_server():
 
         # a stream that just stops is a transport failure carrying the fragment, not an answer
         try:
-            client.run_prompt(json.dumps({'thinking_bytes': 200, 'response': '{"a": 10', 'no_done': True}))
+            with contextlib.redirect_stderr(notes):
+                client.run_prompt(json.dumps({'thinking_bytes': 200, 'response': '{"a": 10', 'no_done': True}))
             check(False, 'a stream with no done object was accepted')
         except LlmCallError as e:
             check('ended before the call finished' in str(e) and e.response == '{"a": 10' and len(e.thinking) == 200, f'truncated stream: {e}')
 
+        # a crashed model runner costs a retry, not the call; one that keeps crashing is an error
+        with contextlib.redirect_stderr(notes):
+            FakeOllama.crashes = 1
+            thinking, response = client.run_prompt(json.dumps({'response': '{"a": 11}'}))
+            check(response == '{"a": 11}' and client.last_call.get('crash_retries') == 1, f'runner crash not retried: {client.last_call}')
+            FakeOllama.crashes = 3
+            try:
+                client.run_prompt(json.dumps({'response': '{"a": 12}'}))
+                check(False, 'a runner that keeps crashing was not reported')
+            except LlmCallError as e:
+                check('TensileLibrary' in str(e) and FakeOllama.crashes == 0, f'crash retries: {e}, {FakeOllama.crashes} left')
+            FakeOllama.crashes = 0
+        check('retrying the call' in notes.getvalue(), 'the crash retry was silent')
+
         # a 400 that is not about think or format is an error, and does not switch thinking off
-        other = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5)
+        other = OllamaClient(host=host, model='fake', echo=False, idle_timeout=5, crash_wait=0)
         try:
             other.run_prompt(json.dumps({'reject_all': True}), think=False)
             check(False, 'an unrelated 400 was swallowed')
         except LlmCallError:
             check(other.think_param is True, 'an unrelated 400 switched the think parameter off')
 
-        dead = OllamaClient(host='http://127.0.0.1:9', model='fake', echo=False, idle_timeout=2)
+        dead = OllamaClient(host='http://127.0.0.1:9', model='fake', echo=False, idle_timeout=2, crash_wait=0)
         try:
-            dead.run_prompt('x')
+            with contextlib.redirect_stderr(notes):
+                dead.run_prompt('x')
             check(False, 'an unreachable server did not raise')
         except LlmCallError as e:
             check('could not reach ollama' in str(e), f'unexpected error: {e}')
@@ -939,6 +1904,35 @@ def ollama_client_against_fake_server():
         check('server version' in out and 'recommended client settings' in out, f'probe output:\n{out[-2000:]}')
     finally:
         server.shutdown()
+
+
+@test
+def ab_harness_replays_from_phase3():
+    e = dict(os.environ, STRATUM_CLIENT='stub')
+    for k in list(e):
+        if k.startswith('STUB_'):
+            del e[k]
+    base = PREFIX + 'basic'
+    n_before = len(calls('basic'))
+    proc = subprocess.run([sys.executable, 'ab.py', 'run', '--variant', 'vj', '--kernels', base, '--fresh', '--',
+                           '--branching=judge', '--no-outline-judge'], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0, f'ab run failed:\n{proc.stderr.decode()[-2000:]}')
+    sid = f'{base}_vj'
+    check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
+    cs = calls(f'basic_vj')
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5v', 's3_5k', 's3_8')],
+          f'the variant should start after phase 3: {[c["step"] for c in cs]}')
+    check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
+    story = assert_story_ok('basic_vj', min_lines=2)
+    check(story['kernel'] == load('basic', 'story.json')['kernel'], 'the variant did not inherit the kernel')
+    proc = subprocess.run([sys.executable, 'ab.py', 'compare', '--variants', 'vj', '--kernels', base], cwd=GEN, env=e, capture_output=True)
+    out = proc.stdout.decode()
+    check(proc.returncode == 0 and 'worlds' in out and 'means over kernels' in out, f'ab compare:\n{out[-1500:]}')
+    proc = subprocess.run([sys.executable, 'ab.py', 'eval', sid], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0 and b'outline metrics' in proc.stdout, 'ab eval')
+    # a source without phase 3 is skipped, not run
+    proc = subprocess.run([sys.executable, 'ab.py', 'run', '--variant', 'vj', '--kernels', PREFIX + 'nowhere'], cwd=GEN, env=e, capture_output=True)
+    check(proc.returncode == 0 and b'no source directory' in proc.stderr, 'a missing source should be skipped with a message')
 
 
 @test

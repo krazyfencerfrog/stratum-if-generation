@@ -1,0 +1,13 @@
+{
+ "about": "The Kernel says you gather a small party along the way; the premise sends you north with the party already formed. A real contradiction of the Kernel.",
+ "origin": "batch2/stories/kernel31: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "present",
+   "source": "kernel clause",
+   "where": "gather",
+   "quote": "",
+   "why": "the premise contradicts the Kernel's words"
+  }
+ ]
+}

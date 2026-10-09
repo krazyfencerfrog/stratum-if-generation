@@ -134,17 +134,22 @@ def _fields(bundle):
 CLASS_RANK = {'constraint': 2, 'default': 1, 'free': 0}
 
 
-def binding_for(field_id, constraint_map):
-    """Strongest binding class among the map entries under this field id
-    (the map lists leaf paths such as 3b.transgression.ceiling)."""
+def binding_and_tier(field_id, constraint_map):
+    """(binding class, evidence tier of the strongest entry). A constraint
+    whose tier is strong_inference is one phase 3 inferred rather than read:
+    it still binds (may not be contradicted), and the brief says so, so a
+    construction prompt knows it is a floor the Kernel's details forced, not
+    a ceiling the user drew."""
     fields = (constraint_map or {}).get('fields') or {}
-    best = None
+    best, tier = None, None
     for key, entry in fields.items():
         if key == field_id or key.startswith(field_id + '.') or key.startswith(field_id + '['):
             cls = entry.get('class', 'default')
             if best is None or CLASS_RANK.get(cls, 1) > CLASS_RANK.get(best, 1):
-                best = cls
-    return best or 'free'
+                best, tier = cls, entry.get('evidence_basis')
+            elif CLASS_RANK.get(cls, 1) == CLASS_RANK.get(best, 1) and entry.get('evidence_basis') == 'explicit':
+                tier = 'explicit'
+    return best or 'free', tier
 
 
 def build_brief(bundle, constraint_map, cross_check):
@@ -153,7 +158,9 @@ def build_brief(bundle, constraint_map, cross_check):
     fields = {}
     for field_id, value in _fields(bundle).items():
         entry = dict(value)
-        entry['binding'] = binding_for(field_id, constraint_map)
+        entry['binding'], tier = binding_and_tier(field_id, constraint_map)
+        if entry['binding'] == 'constraint' and tier == 'strong_inference':
+            entry['inferred'] = True
         fields[field_id] = entry
 
     resolved = []
@@ -196,6 +203,8 @@ def brief_lite(brief):
 
     return {
         'decision': pick('3-0a.primary_decision_axis', 'label', 'description'),
+        'setting': {'structure': (f.get('3f.setting_structure') or {}).get('ceiling'),
+                    'scale': (f.get('3f.setting_scale') or {}).get('ceiling')},
         'theme': pick('3c.core_thematic_axis', 'pole_a', 'pole_b'),
         'protagonist': pick('3-0b.protagonist_identity', 'type', 'role'),
         'affect': {
@@ -229,10 +238,22 @@ def _flat(value):
 
 
 def field_line(field_id, entry):
-    """One brief field as text: '3b.tone [constraint]: descriptors claustrophobic, tense'."""
+    """One brief field as text: '3b.tone [constraint]: descriptors claustrophobic, tense'.
+    A constraint phase 3 inferred rather than read is marked '[constraint, inferred]'."""
     entry = entry or {}
-    parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k != 'binding']
-    return f"{field_id} [{entry.get('binding', 'free')}]: " + '; '.join(parts)
+    parts = [f'{k} {_flat(v)}' for k, v in entry.items() if k not in ('binding', 'inferred', 'pole_a', 'pole_b')]
+    if 'pole_a' in entry and 'pole_b' in entry:
+        # the theme's two poles, unordered: written as pole_a/pole_b they collided with the premise's own
+        # mediation.to_reach_pole_a/b, and the audit reported the premise's order as a contradiction (2026-10-07)
+        parts.insert(0, f"between {_flat(entry['pole_a'])} and {_flat(entry['pole_b'])} (in either order)")
+    binding = entry.get('binding', 'free') + (', inferred' if entry.get('inferred') else '')
+    if binding == 'free':
+        # phase 3 must put SOMETHING in a field the Kernel says nothing about;
+        # shown bare, that placeholder reads as a choice (kernel8, "surprise
+        # me", came out a quiet one-room drama because every placeholder
+        # was the smallest option)
+        binding = 'free: a placeholder nothing in the Kernel chose; replace it freely'
+    return f"{field_id} [{binding}]: " + '; '.join(parts)
 
 
 # Extracted answers about the story's SIZE (how many endings, how often it
@@ -320,7 +341,11 @@ def kernel_clauses(kernel):
 
 # ---------------------------------------------------------------- shape
 
-ENDING_TIER_TO_LINES = {'one': 1, 'few': 2, 'several': 3, 'many': 5, 'unstated': 3}
+# how many story lines (each with its own ending) each ending tier suggests;
+# also the default --max-iterations when none is given (a linear shape gets
+# two more: its extra lines are one node each)
+ENDING_TIER_TO_LINES = {'one': 1, 'few': 2, 'several': 4, 'many': 6, 'unstated': 3}
+LINEAR_EXTRA_LINES = 2
 LENGTH_TO_NODES = {'short': (4, 6), 'medium': (5, 8), 'long': (7, 10), 'unstated': (5, 8)}
 
 
@@ -359,8 +384,10 @@ def shape_targets(shape):
     length = str(shape.get('length', 'unstated') or 'unstated').lower()
     linearity = str(shape.get('linearity', 'unstated') or 'unstated').lower()
     lo, hi = LENGTH_TO_NODES.get(length, LENGTH_TO_NODES['unstated'])
+    lines = ENDING_TIER_TO_LINES.get(tier, 3)
     return {
-        'through_lines': ENDING_TIER_TO_LINES.get(tier, 3),
+        'through_lines': lines,
+        'default_max_iterations': lines + (LINEAR_EXTRA_LINES if linearity == 'linear' and lines > 1 else 0),
         'endings_stated': endings.get('stated', ''),
         'endings_tier': tier,
         'nodes_min': lo,
@@ -370,3 +397,34 @@ def shape_targets(shape):
         'note': 'through_lines is how many distinct story lines (each with its own ending) the '
                 'shape preference suggests; the review decides whether each next one is worth building.',
     }
+
+
+# ---------------------------------------------------------------- genre promises (3.4)
+
+def promises_lines(promises):
+    """The genre-promises step's output as a short block the construction
+    prompts read, or 'none' when the step did not run. Promises are
+    defaults: the Kernel's words and the brief's constraints beat them."""
+    if not isinstance(promises, dict):
+        return 'none'
+    out = []
+    if promises.get('genre'):
+        out.append(f"genre: {promises['genre']}")
+    if promises.get('player_fantasy'):
+        out.append(f"player fantasy: {promises['player_fantasy']}")
+    for p in promises.get('promises') or []:
+        if isinstance(p, dict) and p.get('what'):
+            tag = 'in the Kernel' if p.get('in_kernel') else 'the genre expects it'
+            out.append(f"promise ({tag}): {p['what']}")
+    for i, sp in enumerate(promises.get('set_pieces') or [], 1):
+        if isinstance(sp, dict) and sp.get('scene'):
+            out.append(f"set piece {i}: {sp['scene']}" + (f" (at {sp['where']})" if sp.get('where') else ''))
+    if promises.get('tone_engine'):
+        out.append(f"tone engine: {promises['tone_engine']}")
+    for c in promises.get('obligatory_cast') or []:
+        if isinstance(c, str) and c.strip():
+            out.append(f"the genre expects someone like: {c.strip()}")
+    for m in promises.get('must_not') or []:
+        if isinstance(m, str) and m.strip():
+            out.append(f"must not (the Kernel rules it out): {m.strip()}")
+    return '\n'.join(out) or 'none'

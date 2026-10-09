@@ -1,0 +1,229 @@
+{
+ "enrichment_budget": {
+  "level": "generous"
+ },
+ "protagonist": {
+  "who": "You are the new night assistant in a municipal archive’s reading room, hired to shelve a returned book before the building closes.",
+  "wants": "to understand what the book is and get the room back to an ordinary library before the building’s nightly close finishes it.",
+  "can_do": "read, examine, move shelves, talk to the night archivist and the night custodian, open the book’s pages, and use the room’s levers and passages.",
+  "cannot_do": "open the central book without the night key, move the central reading chair, or make the night archivist accept what the page says without showing her a fact she can check against the room itself.",
+  "serves": "3-0b.protagonist_identity"
+ },
+ "arena": {
+  "description": "A circular reading room in the basement of a municipal archive: long shelves, a central reading table, a bookcase that is a door, a wall crack at the corner, and a book that should not be on the shelf.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The building is closing for the night: the lamps dim in stages, the shelves lock, and the book’s final page is due to be filled by the time the last lamp goes out.",
+  "clock_or_stock": "none tracked; the night is told through lamp-out stages and rearrangements, because 3-0c names no failure",
+  "serves": "3e.timeline_duration"
+ },
+ "opposition": {
+  "who_or_what": "the building’s mechanism, administered by the night custodian",
+  "wants": "to close the book and file the current reader so the room can rest",
+  "means": "it moves shelves, locks doors, dims lamps, repeats the phrase, and can make the companion correct the same false fact",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "You open the returned book and find a page describing the reading room exactly, including your position at the center table; when you look up, the page has added a line about what you just did.",
+   "when": "early",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "what": "The lights fail for a minute; when they return, the shelves have shifted, the central table has moved to the corner, and the night archivist points at a crack in the wall and jokes that it spells READ, while the letters actually spell READER.",
+   "when": "middle",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "what": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page.",
+   "when": "late",
+   "serves": "3c.core_thematic_axis"
+  }
+ ],
+ "hidden_truth": {
+  "truth": "The reading room is a machine that files people as pages. The recurring phrase 'the reader is in the center of the room' is not a description but a job title: whoever stands at the center when the book closes becomes the next page. The night archivist is not wrong because careless; she is a copy of the previous reader, and the copy keeps correcting the same fact because the original is already filed.",
+  "who_knows": "the mechanism, and the night custodian, who has been closing the book each night to keep the copies from noticing",
+  "what_it_changes": "the choice is no longer about shelving a book but about choosing who stands at the center: you, the archivist, or the custodian, and whether the book is opened or closed",
+  "serves": "3-0b.epistemic_gap"
+ },
+ "mediation": {
+  "question": "Do you let the room finish its work, or do you stop it before it files you?",
+  "to_reach_pole_a": {
+   "pole": "let the room finish its work",
+   "what_you_must_do": "get the book to the central chair, have the companion correct the false fact, use the crack word to open the bookcase door, and stand at the center when the last lamp dims",
+   "cost": "the room files whoever is at the center; the companion’s copy is lost, the custodian’s night shift ends, and you become a page"
+  },
+  "to_reach_pole_b": {
+   "pole": "stop the room before it files you",
+   "what_you_must_do": "return the page to the book, move the central chair out of the center, and convince the companion to read the crack word backwards so the mechanism closes without a reader",
+   "cost": "the room forgets what it was for; the book is shelved, the archivist stops correcting the same fact, and the building’s nightly close becomes ordinary"
+  },
+  "levers": [
+   "the returned book",
+   "the night key",
+   "the central reading chair",
+   "the crack in the wall that spells READER",
+   "the night archivist’s repeated correction",
+   "the night custodian’s lamp"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "turns": [
+  {
+   "id": 1,
+   "situation": "You open the returned book and find a page describing the reading room exactly, including your position at the center table; when you look up, the page has added a line about what you just did.",
+   "what_you_must_do": "find out what the returned book is recording",
+   "ways_through": [
+    {
+     "way": "you learn it by holding the page against the room and matching each line to the shelves, the table, and the corner crack",
+     "cost": "the page adds your name under the line for the reader, and the night custodian hears you say the word aloud"
+    },
+    {
+     "way": "you learn it from the night archivist, once you show her the page's line and let her check it against the room",
+     "cost": "she corrects the page's false line and becomes less sure of her own fact"
+    }
+   ],
+   "involves": [
+    "the night archivist",
+    "the night custodian"
+   ],
+   "form": "discover",
+   "set_piece": "a page in the returned book describing the exact room, including your own position at the center table, adding a line as you look up",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "id": 2,
+   "situation": "The lights fail for a minute; when they return, the shelves have shifted, the central table has moved to the corner, and the night archivist points at a crack in the wall and jokes that it spells READ, while the letters actually spell READER.",
+   "what_you_must_do": "get the night archivist to read the crack word as it is",
+   "ways_through": [
+    {
+     "way": "you get her to read it by showing her the page from the book that describes the corner crack and the word READER",
+     "cost": "she says the word is a job title and then corrects you with the false fact again, but slower"
+    },
+    {
+     "way": "you get her to read it by letting the night custodian's lamp pass over the crack so the letters stand out",
+     "cost": "the custodian dims the lamp and the shelves lock for the rest of the night"
+    },
+    {
+     "way": "you get her to read it by moving the central table back to the center so the crack can be seen from the room's middle",
+     "cost": "the table is not yours to move, and the archivist's copy flickers as if her page is being pulled"
+    }
+   ],
+   "involves": [
+    "the night archivist",
+    "the night custodian"
+   ],
+   "form": "persuade",
+   "set_piece": "the archivist pointing at a crack in the wall and laughing it off, while the letters spell READER",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "id": 3,
+   "situation": "The bookcase door is open only a hand's width, and the night custodian holds the night key in his palm while the last lamp begins to dim.",
+   "what_you_must_do": "get the night key to open the central book",
+   "ways_through": [
+    {
+     "way": "you get the key by giving the custodian the page with your name",
+     "cost": "the page is filed in the book and your name is no longer on it, but the archivist's correction stops for a minute"
+    },
+    {
+     "way": "you get the key by letting the archivist stand at the center while you hold the lamp",
+     "cost": "the archivist becomes the page for the night and the custodian's shift is saved"
+    },
+    {
+     "way": "you get the key by moving the central chair out of the center",
+     "cost": "the chair is locked and the room's shelves close around you"
+    }
+   ],
+   "involves": [
+    "the night custodian",
+    "the night archivist"
+   ],
+   "form": "trade",
+   "set_piece": null,
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 4,
+   "situation": "The last lamp goes out for good; when it comes back, the central chair is occupied by a page that has your name on it, and the book is open to the blank page.",
+   "what_you_must_do": "settle who stands at the center when the book closes",
+   "ways_through": [
+    {
+     "way": "the book closes with you at the center, because you take the page with your name and sit in the central chair",
+     "cost": "the room is rested, the archivist stops correcting, and you become the next page"
+    },
+    {
+     "way": "the book closes with the archivist at the center, because you give her the page with your name and move the chair to her",
+     "cost": "she stops correcting and becomes a page, and you keep your name"
+    },
+    {
+     "way": "the book closes without a reader, because you move the chair out of the center, return the page to the book, and make the archivist read the crack backwards",
+     "cost": "the room forgets what it was for, and the building's close becomes ordinary"
+    }
+   ],
+   "involves": [
+    "the night archivist",
+    "the night custodian"
+   ],
+   "form": "choose_whom",
+   "set_piece": "the last lamp going out and the room rearranging in the dark, so when it comes back the central chair holds a page with your name and the book is open to the blank page",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The night key is not on the key ring; it is the small brass plate in the returned book's cover, and the book will not open to the final page unless it is used.",
+   "serves": "3b.secondary_affects"
+  },
+  {
+   "description": "The night archivist's correction is not a mistake: she says the same false fact because the fact is true in the room she was filed in.",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "description": "The night custodian has been closing the book each night to keep the copies from noticing, and he will not say which copy is next.",
+   "serves": "3c.core_thematic_axis"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "the night archivist",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to correct the false fact in the record and restore the room's order",
+   "holds": "the knowledge of the room's previous state and the ability to identify discrepancies in the text",
+   "edge": "is a copy of the previous reader and does not know she is a copy, believing her corrections are her own expertise",
+   "tie": "was the last person to stand at the center before being filed, and now serves as the room's memory",
+   "voice": "speaks with precise, academic detachment, treating the impossible as a clerical error: 'The timestamp is incorrect. It was 11:00, not 11:01. Please note the discrepancy.'",
+   "breaking_point": "turns if you fail to correct the specific false fact she identifies, as her existence depends on the record being right",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Brisa Penhallow"
+  },
+  {
+   "role": "the night custodian",
+   "kind": "individual",
+   "speaks_for": null,
+   "wants": "to complete the nightly close and ensure the book is filed without incident",
+   "holds": "the night key and control over the room's physical mechanisms like lights and shelves",
+   "edge": "knows the room files people as pages and has been closing the book each night to prevent the copies from realizing they are gone",
+   "tie": "is the administrator of the mechanism that trapped the archivist, and is responsible for her continued existence in the room",
+   "voice": "speaks in short, procedural instructions, avoiding eye contact and treating the room's strangeness as routine maintenance: 'The lamp is dimming. Please stand clear of the center table.'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Cadhla Marrack"
+  }
+ ],
+ "name_pool": "fantasy"
+}

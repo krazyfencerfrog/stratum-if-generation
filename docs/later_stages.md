@@ -6,7 +6,7 @@ is already in the repository to build it from. The outline loop's schema was
 shaped to leave these hooks; they are listed in section 1 so a change to the
 loop does not quietly remove one.
 
-Order: **A** beat expansion, **B** character and setting buildout, **C**
+Order: **A** arcs and node expansion, **B** character and setting buildout, **C**
 reconciliation, **D** per-node room build. Prose comes after D.
 
 All four annotate one evolving document, `<id>_story.json`. Per-call files
@@ -18,11 +18,11 @@ the document is the assembled view every stage reads and rewrites.
 
 | in the story document | written by the loop as | filled by |
 |---|---|---|
-| `nodes[id].annotations` | `{}` | A writes `expansion`; D writes `build` |
+| `nodes[id].annotations` | `{}` | A2 writes `expansion` (the minor nodes it added); D writes `build` |
 | `nodes[id].additions` | what a later line needs this node to contain for its trigger to be possible | A must honor each one |
 | `edges[].trigger` | `{text, kind: act or accumulated, formal: null}` | D writes `formal`: the condition over state variables |
 | `edges[].otherwise` | the other side of each fork, in plain words | D, when it writes the default exit |
-| `characters[id].name, profile, packet` | `null` | B |
+| `characters[id].name, profile, packet` | name from Python, the rest `null` | B (A0 adds `arc_tier`, A1 adds `arc`) |
 | `locations[id].rooms, packet` | `null` | B |
 | `lines[id].ending` | title and summary; for a rejoining line, how the shared ending reads on that line | A (ending variants), D (variant conditions) |
 | `hooks` | ways through a turn no line took | A may mention them as roads not taken; D may make them visible dead ends |
@@ -33,199 +33,736 @@ Prefixes continue the numbering: `s5*` stage A, `s6*` stage B, `s7*` stage C,
 `s8*` stage D. Each call gets a class from `generator/stats.py` before its
 prompt is written; the class is its budget.
 
-## 2. Stage A: beat expansion
+## 2. Stage A: arcs and node expansion
 
-**Job.** For each node, work out what needs to happen in it: what serves each
-present character's arc, what makes each outgoing trigger possible, and one
-or two things that make it interesting. Still an outline: ordered events, not
-rooms.
+Revised 2026-10-04 in conversation with the user. This replaces the earlier
+"beat expansion" sketch; its craft devices (setup/payoff pairs, irony) are
+kept as part of A1.
 
-**A0, the craft pass (one call per story, plus one small call per extra
-line).** This is the old 3.75, moved here because its devices are about how
-beats play. Changes from `prompts/later/sA_craft_spine.prompt`:
+**Built 2026-10-04** (`generator/arcs.py`, prompts `s5a0`-`s5a2`; `main.py
+--stage-a`, or `python arcs.py <story_id>` on an outline made by older code;
+output `<id>_arcs.json` and `<id>_arcs.md`). Not yet run on the live model.
+Settled while building:
+- **A0 tiers:** arc = the opposition, anyone whose standing differs between
+  endings, or a companion with a breaking point who is in at least half the
+  nodes. A breaking point alone is not enough: the cast step gives one to
+  every companion, which would have made kernel35's lock keeper and towpath
+  keeper arc characters. The call sorts the rest into supporting and
+  functional.
+- **Tells** must land by the next beat: within two nodes, or at the first
+  major node after the opportunity (minor nodes other lines hang after a
+  shared node can push the next beat further away). A minor node after a
+  shared major node is on every line through it, so its tell must land on
+  all of them; the packet lists each major node's lines, and the validator
+  checks every line (the stub found a T3-only tell on a node T1 and T4 also
+  pass through).
+- **Minor nodes hang after a major node only**; "before N05" is "after N04".
+  A branch leaves from the last minor node of its major node's group.
+- **Pattern-shift conditions** are computed exactly (dynamic programming over
+  each opportunity's option split): the least strict pattern with at least
+  three moves and a share of 0.75-1.0 that random play meets under 15% of
+  the time; with four two-option opportunities that is all four (6%).
+  Resolution and ending shifts become the first variant of the composed
+  ending; line shifts become accumulated edges.
+- **First live run (kernel35_f5, 2026-10-04 evening, 28 minutes, every call
+  accepted first time):** tiers, states, moments on every major node, tells,
+  active attempts and composed endings all came out right, with good
+  physical detail ("the key is cold enough to sting your palm"). The flaw:
+  most choices were a SEESAW, one person's state up and the other's down
+  (6 of 14 opportunities in every option, 21 of 30 options overall, no
+  option good or bad for both), so the player answered "Lazlo or the
+  ghost?" again and again, and on T2 the ending with both at your side was
+  unreachable by any sequence of choices. Fixed with a rule in A2 (most
+  options move one person's state, at a cost in the world; at most a third
+  of a line's opportunities trade one person against another; a way to do
+  right or wrong by both), a soft check in A2's validator, and a final check
+  that enumerates every combination of choices along each line and reports
+  ending combinations nothing reaches. Also seen: the outline's paperwork
+  (ledger, receipts, as-is note) carried straight into the options; the A2
+  rule now says an option is done for a reason the player can feel, not a
+  document signed or priced.
+- **Resolution variants** use a weaker pattern (a majority of at least two
+  moves, share 0.6), with the line's fixed resolution, or the last one, as
+  the fallback.
 
-- `want_need_tension` becomes one entry per line. Each line has its own
-  motivation; a single story-wide need fought that.
-- `escalation_shape` is dropped. The framework is the escalation shape, and
-  matching a pattern to `3b.primary_trajectory` is now part of the computed
-  shortlist.
-- `setup_payoff_pairs` cite node ids, and a pair is valid only if the setup
-  node precedes the payoff node on at least one line (computed).
-- `irony_mode` stays; its type against `3-0b.epistemic_gap.present` is a
-  lookup and is computed.
+**The idea.** The outline's lines carry the PROTAGONIST's arc: each line is
+a different answer to what "you" want and how it resolves, and the player
+picks among them through big, informed choices. The other characters' arcs
+live inside and across those lines, and stage A makes them playable: it maps
+every arc onto the node graph, then expands the graph with small nodes that
+give the player chances to influence, understand and complete those arcs.
+Character arcs drive the expansion; rooms come much later (stage D).
+
+### Principles (from the user)
+
+- **Arcs may vary by line but are not forced to.** A character's arc is
+  shared wherever nothing pushes it apart, and forks only where a line, or
+  the player's accumulated choices, actually change it.
+- **No blind switches.** A single minor choice never throws the whole line.
+  A line shift comes either from a big choice whose consequences the player
+  can broadly foresee, or from the AGGREGATE of many minor choices: a
+  pattern that shows a preference or a play style. A "do you answer the
+  phone" choice, with no information about what it will cause, never
+  decides an outcome on its own.
+- **The player perceives arcs through whatever the story affords:** what
+  characters say, what they do, where they are, what the player discovers.
+  The means vary by story; the stage does not fix one.
+- **The protagonist has an arc** in most stories: the general direction of
+  their path. Lines change it significantly; they are how the player shows
+  how they WANT it to resolve.
+- **"You" is defined, but steerable** (decided 2026-10-04): between a blank
+  player insert and a fixed character. The premise (3.5a) gives the
+  protagonist a `history` (how you came to be here), a `need` under the want,
+  `ties` (what each key person is to you, from your side; 3.5c's cast ties
+  must agree), and `open` (what is left to the player: how you feel, which
+  way you grow). Without this, the protagonist's arc describes what you do,
+  not who changes (found writing the kernel35 example). The pipeline also
+  fixes `gender` (3.5a) and a name (Python, from the story's pool, before
+  the cast; human protagonists only): "you" stays "you" in the text, the
+  name is what others call you. A different "you" is a different story; the
+  story is not weakened to leave the protagonist undefined.
+- **Small nodes, separate in the graph.** Expansion adds minor beats as
+  their own nodes, not as content inside the major ones: the graph grows,
+  every node stays small (which later stages need), and the structure stays
+  checkable.
+- **Cost is not the constraint.** This is the stage that makes the story;
+  every call should earn its place, but none is cut to save time.
+
+### A0. Arc cast (computed, plus one small classify call)
+
+Every character gets an `arc` tier:
+- `arc`: companions and the opposition, whose standing can differ between
+  endings (computed from `opposition`, `breaking_point`, and whether their
+  standing varies across the ending worlds);
+- `supporting`: recurring, with a stance that shifts but no ending of their
+  own (a thinking-off call decides between supporting and functional for
+  the rest, with a reason first);
+- `functional`: a role in one or two nodes.
+
+Typically two to four `arc` characters; it depends on the story. **The arc
+cast is closed here.** Later stages may add only functional characters (a
+role, one line of purpose, where they are); a new character who needs an
+arc means the outline is missing something and goes back through it.
+
+### A1. Arc plan (one call per story, judge or build class)
+
+Input: the line digests (motivation, strategy, turning point, path, ending
+world), the arc and supporting cast (wants, edge, tie, voice, breaking
+point), the premise's turns, events and hidden truth, the node list with
+summaries.
+
+Output, per arc character (and, lighter, per supporting character: see
+Decisions), plus the story's `state_visibility` with its reason, and for the
+protagonist whose arc is written from
+each line's motivation and turning point in the same form so the whole set
+can be checked together):
 
 ```json
-"craft": {
-  "arcs": {"T1": {"want": "...", "need": "...", "tension": "..."}},
-  "irony": {"type": "situational | dramatic", "device": "..."},
-  "setup_payoff": [{"setup_node": "N02", "payoff_node": "N04", "what": "...", "lines": ["T1"]}],
-  "motif": null
-}
-```
-
-Verify and repair as 3.5 does now: computed checks first (node ids exist,
-order on a shared path, irony type), then a no-think audit with one entry per
-Kernel clause and per device ("does this create a second decision axis?"),
-then a repair that returns only the changed sections. Class: build for A0,
-classify for the audit.
-
-**A1, per node (`s5b_<node>`).** Packet, and nothing else:
-
-- the node: beat job, `adapted`, `summary`, `where` and `who` as sketches
-- for each line through it: motivation and strategy, and the summaries of
-  the node before and the node after on that line
-- `must_enable`: each outgoing edge's trigger text and `otherwise` text
-- `additions`
-- the craft devices that name this node
-- the node's premise turn, with the way each line through it takes
-
-```json
-"annotations": {"expansion": {
-  "arrives_with": ["what is true when play reaches this node, in plain words"],
-  "events": [{"what": "...", "who": ["label"], "where": "location name"}],
-  "arc_beats": [{"character": "label", "change": "what shifts for them here"}],
-  "enables": [{"edge": "N03->T2N01", "by": "what the player can do here that the trigger sentence describes"}],
-  "interest": [{"kind": "reversal | reveal | plant | payoff | cost_shown", "what": "..."}],
-  "leaves_with": ["what is true when play leaves, per outgoing edge where it differs"]
+"arcs": {"C02": {
+  "starts": "what they want, believe and feel about you at the opening",
+  "moments": [{"node": "N04", "lines": ["T1", "T2"], "change": "what shifts and why",
+               "kind": "turn | reveal | test | demonstration"}],
+  "forks": [{"after": "N04", "by": "line | state", "how": "what makes the arc split here"}],
+  "resolutions": [{"lines": ["T1"], "state": "what they have become, and whether they stand with you",
+                   "needs": "the pattern of play that leads here (for state forks), or null"}],
+  "state": {"name": "lazlo_trust", "meaning": "how far he believes you will sell", "moves": "up when you ..., down when you ..."}
 }}
 ```
 
-Three to six events. Class: build, but the packet is small; if traces run
-long, split `events` from the rest. A shared node is expanded once, with
-every line through it in the packet.
+Also carried from the old craft pass: setup/payoff pairs citing node ids
+(computed: the setup precedes the payoff on at least one line), and the
+irony device (its type is a lookup against the epistemic gap).
 
-**Computed checks after A.** Every outgoing branch has an `enables` entry;
-every `additions` text is covered by an event; everyone in `events.who` is
-in the node's `who` (or is reported for the register); every setup/payoff
-pair lands in an event of each named node; `leaves_with` of a node is
-consistent with `arrives_with` of its successors (a string-overlap warning,
-not a judgment).
+Computed checks: every arc character has at least one moment on every line
+they appear in; their resolutions match the ending worlds (who stands, who is
+lost); a state fork names a state that some minor choice moves; no arc
+resolves on a single minor choice. Audit and repair as 3.5 does, if the
+checks are not enough.
 
-**Cost estimate.** A0 about 20 minutes; A1 about 10 minutes a node. A
-four-line story of 18 nodes: about 3.5 hours.
+### A2. Node expansion (one call per line, build class)
 
-## 3. Stage B: character and setting buildout
+For each line, and for each major node on it, add minor nodes before, inside or after it, each of one
+kind:
 
-**Job.** Depth for the people and places the outline actually uses. This is
-where voice, stance, topics, fixtures and connections belong. Each entity
-gets a long form (for people and for later reference) and a packet form of
-150 words or fewer (what per-node calls receive), as the lessons doc's §6a
-requires.
+- **opportunity**: a small choice that moves an arc's state ("help him hide
+  the stain" / "show the lock keeper"). Its effect is on state, never on
+  the line by itself; what each option means is something the player can
+  read from the situation.
+- **revelation**: something learned that explains a character or the
+  hidden truth (a logbook, an overheard call, an object).
+- **demonstration**: a character acting from where their arc currently is,
+  so the change is seen, not told.
+- **resolution**: where an arc lands, usually near an ending; may come in
+  variants keyed to state.
 
-**B1, characters (`s6c_<id>`, one call each, or two or three sketches per
-call).** Basis: `prompts/later/sB_cast.prompt`. Packet: the sketch (label,
-kind, wants, holds, speaks_for, opposition), the nodes the character is in
-(summary and the expansion events that name them), and how each line they
-are on ends for them.
+Each minor node: id, kind, the arc(s) it serves, a 30-50 word summary, one
+image, who, and for opportunities the options with their state effects in
+plain words.
 
-```json
-"profile": {
-  "name": "...", "voice": "...", "stance_at_open": "...", "moved_by": "...",
-  "arcs": {"T1": "where they end on this line", "T2": "..."},
-  "topics": [{"topic": "...", "knows": "...", "says_it_when": "plain words"}],
-  "ties": [{"to": "label", "what": "..."}]
-},
-"packet": "150 words or fewer: who they are, what they want, how they talk, what moves them"
-```
+Rules for opportunities (decided 2026-10-04):
+- **Two or three options**, each something done or said, never a moral
+  label ("be kind").
+- **Sometimes an active attempt**: about one opportunity in three on a line
+  offers a physical try at changing the situation (fix it, take it, go
+  there) that can succeed, fail or be stopped; a failed attempt has its own
+  effect, it is never a dead end. Not every situation needs one.
+- **A tell, soon**: each opportunity names `tell`, how and where its effect
+  becomes perceptible, within the next one or two nodes on that line, in
+  the story's visibility mode (a ledger entry, a lamp, a change in how
+  someone stands or what they call you). The engine has a visual-novel style
+  rollback, so a player who gets an unexpected outcome must be able to see
+  it early, not rewind across half the story. `hidden` visibility hides what
+  an effect means, never that something happened. Minor nodes do not create lines; they hang off the major
+node's position on each line that passes through it, and a shared major
+node is expanded once, with every line through it in the packet.
 
-A naming pass may run first as one small no-think call for the whole cast,
-so names are chosen together. Crowds get a `who` line and no profile; the
-rule that a crowd has a representative is already enforced.
+**Pattern shifts** (decided 2026-10-04). An obvious pattern of choices may
+change any level of the story: an arc's resolution, a line's ending, or the
+line itself (a jump to another line where the graph has a node to land on).
+"Obvious" means it cannot be random:
+- at least three opportunities on the path so far moved the state, and at
+  least three quarters of them moved it the same way;
+- before the shift lands, the player has seen at least two of those
+  opportunities' tells and one warning: a demonstration node where the
+  character visibly nears the edge (with rollback, the player sees it coming
+  and can turn back without a long rewind);
+- every path through the shift point also has a way to avoid it.
+A1 declares each one: `{"state", "direction", "threshold", "at": node,
+"does": "resolution | ending | line", "to": target}`; the computed checks
+confirm all three conditions.
+The fixed rule is not enough by itself: with exactly four opportunities,
+"three of four" is met by random play about 31% of the time (found by
+`generator/playtest.py`). So the threshold is computed, not declared: Python
+sets it from the number of opportunities on the paths to the shift so that
+random play triggers it rarely (target under 15%), and the playtest
+simulator verifies it by sampling.
 
-**B2, locations (`s6l_<id>`, one call each).** Basis:
-`prompts/later/sB_world.prompt`. Packet: the sketch, the nodes that use it
-with their expansion events located there, the protagonist's can/cannot, and
-the premise's levers.
+**Arc state and line shifts.** Opportunities move named states. A line's
+ending may come in variants keyed to state (a companion stays or goes). An
+edge may also be `accumulated`: a line shift triggered by a state pattern
+("you sided with the ghost at every chance"), which is where the outline's
+accumulated triggers finally come from. Big choices stay `act` triggers, as
+the outline wrote them.
 
-```json
-"rooms": [{"id": "L04.a", "name": "...", "purpose": "...", "fixtures": ["..."], "connects": ["L04.b"]}],
-"protagonist_can": "...",
-"levers_here": ["..."],
-"packet": "150 words or fewer"
-```
+Computed checks after A2: every opportunity has a tell placed within two
+nodes; about one in three opportunities on a line offers an active attempt;
+every arc moment is played by some major or minor node; every state an arc resolution needs is moved by at least two
+opportunities on the paths that reach it (aggregate, never single); every
+accumulated trigger's pattern is reachable; every resolution variant has a
+state condition; minor-node summaries stay within size.
 
-One to three rooms per location. A final computed pass makes connections
-mutual and links locations to each other (`validate_world` in
-`generator/later/cast_world_craft.py` already does the first half); which
-locations adjoin is one small classification call over the list of names.
+### What Python does and what the model does (decided 2026-10-04)
 
-**Cost estimate.** About 12 minutes per character and per location: a cast
-of six and seven locations is about 2.5 hours.
+The pipeline's rule holds here too: counts, lookups and structure are
+Python; judgment and invention are the model's. Stage A has a lot of
+structure, so roughly half of it is code.
+
+**Python owns:**
+- **Graph surgery.** The model describes minor nodes; Python assigns ids,
+  inserts them, wires edges, attaches them to every line through a shared
+  major node, and assembles each call's packet.
+- **The state registry.** A1 declares named states. Every option effect
+  carries a structured tag beside its plain-language text
+  (`{"state": "lazlo_nerve", "direction": "up"}`); a tag naming an
+  undeclared state is rejected.
+- **All threshold math.** The model never counts "three quarters of at
+  least three". It declares a pattern shift's state and direction; Python
+  counts the opportunities on each path, decides whether the threshold is
+  reachable and avoidable, and computes the condition.
+- **Every rule check:** a tell within two nodes; about one active attempt
+  in three opportunities; each state an outcome depends on moved by two or
+  more opportunities; arc moments spread, not piled into one node;
+  resolutions agree with the ending worlds; a warning placed before each
+  shift; the arc cast closed.
+- **Composing ending variants:** the table of combinations (Lazlo stays or
+  goes x the captain's regard) is generated, not written by the model.
+- **A playtest simulator.** Once the graph has states and effects, Python
+  walks it with different play styles (always conciliatory, always
+  dismissive, random, mixed) and reports which endings, variants and
+  pattern shifts each reaches. It tests the design rules directly: an
+  obvious pattern does shift the story; random play never does; every
+  ending and resolution is reachable. No prompt can check that.
+
+**The model owns:** what each arc is (what changes, why, at what cost); the
+minor nodes' scenes, the options' wording, what each tell and warning
+looks like; the judgment calls (visibility mode, supporting vs. functional,
+which pattern shifts make narrative sense).
+
+**Working pattern: the model proposes, Python checks, the model repairs
+from precise complaints.** This also keeps prompts small: instead of a
+prompt carrying every rule (on this model a long rule list mostly buys
+re-checking), Python finds exactly what is missing and asks for exactly
+that ("add one opportunity before N05 that moves lazlo_nerve"), as a small
+targeted call.
+
+**Option to try: Python as planner, the model as writer.** After A1, Python
+computes each line's task list (arc moments that need a node, states that
+need another opportunity, where each tell must land) and the model writes
+one item per small call. More calls, each with a tiny input; given that
+trace size follows input size, possibly better than one large per-line
+call. Build the per-line version first and compare.
+
+### Decisions (2026-10-04)
+
+- **A2 works a line at a time**, not a node at a time: an arc's moments are
+  paced across the whole line, and a per-node packet cannot see that. A
+  major node shared by several lines is expanded on the first line that
+  reaches it; later lines see its minor nodes and add only what their own
+  arcs need there.
+- **How visible arc state is, is decided per story**, in A1, with a reason:
+  `state_visibility` is `signposted` (characters say where they stand, "he
+  won't forget that"), `observed` (shown through what they do and where
+  they are, for the player to read) or `hidden` (discovered at the
+  resolution). It follows how observant the protagonist is and the story's
+  viewpoint (a detective notices; a frightened newcomer may not). A2 writes
+  opportunities to match.
+- **Supporting characters get light arcs**, or they read as cardboard: in
+  A1 each has `starts`, one or two `moments` where their stance shifts, and
+  an end stance per line; no forks of their own and no named state. A2 may
+  give them demonstration nodes. Functional characters get none.
+- **The outline's `additions`** (what a later line needs a node to contain
+  for its trigger to be possible) are honored in A2, as part of expanding
+  that major node. Can move later if it fits better elsewhere.
+
+**Cost.** Not the constraint (see principles). Rough: A0 a minute, A1 about
+10 minutes, A2 one larger call per line (10-15 minutes, more if the packet
+has to be split), so 1-2 hours for a four-line story, plus any audit and
+repair.
+
+## 3. Stage B: the world (characters, rooms, objects)
+
+Revised 2026-10-04 to target the engine in `docs/engine_design.md`, then
+designed in conversation with the user the same evening (decisions below).
+
+**Job.** Build the world the scenes will use: characters with topics and
+stances, rooms with exits, the objects in them, and "you". Depth follows the
+arc tiers from A0: full profiles for `arc` characters, medium for
+`supporting`, a line or two for `functional`. Much of what this stage once
+had to invent now exists (voice, edge, tie, breaking point from 3.5c; arcs
+and states from A1; minor nodes from A2); B's new work is what the engine
+needs, and a world worth wandering in.
+
+### Decisions (2026-10-04)
+
+- **Scale is story-dependent, never small.** The floor is the middle ground
+  (kernel35: the boat's five rooms, the towpath, the lock, the boatyard;
+  about ten rooms, most scenes opening three to six). Exploration and
+  adventure stories span more (twenty to forty). B0 computes a target from
+  the brief (setting scale and structure, the genre promises) and B2 builds
+  to it.
+- **Talk to anyone about anything you know, within reason.** Curated topics
+  carry the story; on top of them every character has something to say
+  about every person, notable object, place and event the player has
+  encountered, in their own voice (short lines; for arc characters the
+  subjects that matter vary by their state). It costs more writing and
+  gives better play: it is where characters live, and it masks which
+  conversations matter.
+- **Examine everything, within reason:** four to eight examinable things
+  per room, two or three of them story-relevant, most of the rest saying
+  something about a person or the place's history rather than pure scenery.
+- **"You" is part of the world:** a self-description that changes with the
+  story (examine yourself), what you start out carrying (Mira's ring), and
+  a THINK verb: topics about your history, your ties and your need, what you
+  think shifting as the story moves. This is where the defined-but-steerable
+  protagonist (later_stages §2 principles) shows up in play.
+- **Connective places are added fairly freely, never as skeletons:** the
+  stairs, the yard, the corridor exist where the geography wants them, and
+  each must contribute to the story's feel: specific details and at least
+  one thing worth examining.
+
+**Built 2026-10-04** (`generator/world.py`, prompts `s6b1`, `s6b1f`, `s6b2`,
+`s6b2m`, `s6b1c`, `s6b3`; `main.py --stage-b`, or `python world.py <id>` on
+a directory with stage A's output). Not yet run on the live model. Settled
+while building: the order is B1 (with the functional people batched),
+B2 and the map, then B1c (conversation needs the places and the notable
+objects to exist), then B3; every node sets `done_<node id>` when it plays
+(stage D's job), so text can be keyed "after N04a"; the model writes
+variants as `{state, direction, after, text}` and Python compiles them to
+conditions (a state variant is `pattern(state, dir, 1, 0.6)`); conversation
+about a person or object is gated by `seen(id)`, about a place by visiting
+one of its rooms, about an event by the done flag of the node where it
+lands. The plumbing test wraps the stub world in a one-scene package and
+runs the engine's validator over it.
+
+### Engine additions these need
+
+- `seen` state: characters present in a room the player enters and objects
+  the player sees or examines are recorded automatically; `seen('x')` in
+  conditions. Conversations about encountered subjects use it, so B writes
+  no flag per subject.
+- `think` as a core verb, with the protagonist's topics; `examine` of the
+  player; the player's starting inventory (objects with location
+  `player`, already supported).
+
+### Steps
+
+**B0 (Python): scenes and subjects.** Built 2026-10-04 (`generator/scenes.py`;
+`python scenes.py <id>` writes `<id>_scenes.json`): one scene per major node
+and its minor nodes (minor nodes inherit its places); consecutive groups that
+every line passes through together, in the same places, with no event
+between, are listed as merge candidates and not merged; the room target's
+floor is ten for every story. Objects are left to B2. As designed:  Group each line's expanded path
+(major and minor nodes, from A2) into scenes: consecutive nodes in the same
+places with no time jump (the engine's unit; engine_design §2). The model
+reviews only the borderline joins, if any. Collect the subject list: every
+person, notable object (levers, revelation objects, what the moments name),
+place and event, with where each first appears. Compute the target room
+count.
+
+**B1, characters (one call per arc or supporting character; functional
+characters in one batch).** Input: the cast seed, the arc or light arc, the
+scenes they are in, the states that concern them, the hidden truth if they
+know it. Output (engine §4.3): curated `topics` (when each becomes known,
+what they say by state, effects); `description` and `here` variants by
+state (the tells live here); for arc characters a short history. Python
+checks: every `known_when` names a flag some moment sets or a `seen()`;
+every state a stance reads is declared; the hidden truth appears only in
+the topics of those who know it.
+
+**B1c, conversation (one call per character; functional characters in
+batches).** Input: the character's packet and voice, the subject list with
+where each first appears, the character's tie to each subject. Output: one
+line per subject they would plausibly have something to say about, in
+voice, gated by `seen(subject)`; for arc characters, variants by state on
+the subjects their arc touches. A subject a character would not know about
+gets a line that says so in character, or nothing.
+
+**B2, places (one call per location) and the map.** Input: the location
+sketch, the scenes that use it and their moments, the objects the moments
+need, the room target. Output (engine §4.1-4.2): rooms with permanent base
+descriptions (base text names only what never changes; engine §4.1),
+exits, story objects where the moments need them and four to eight
+examinable things per room. One map call over all locations decides which
+adjoin and adds connective places; Python makes exits mutual and checks
+every scene's rooms are connected among themselves.
+
+**B3, you (one call).** Input: the protagonist (who, history, need, ties,
+open, gender, name), the lines and the protagonist's arc per line from A1.
+Output: self-description variants, starting inventory, THINK topics (your
+history, each tie, your need, the open question) with what you think by
+state or line.
+
+**Cost.** Not the constraint (see the principles in §2). Roughly 5-10
+minutes per character, per conversation, per location and for you; kernel35
+would be fifteen to twenty calls, two to three hours.
 
 ## 4. Stage C: reconciliation
 
-**Job.** Make sure the depth from B is reflected in the right paths and
-nothing is orphaned or contradicted. Mostly computed.
+**Built 2026-10-04 as the first pass of stage D** (`generator/compile_scenes.py`):
+every scene's rooms joined among themselves, every scene leading somewhere,
+every name the scene compiler writes resolving to a room, person or thing
+(a hard retry of that scene's call), every done flag the world reads set by
+something (unset ones are set on entering the scene that holds the node).
+The per-line contradiction pass below is not built.
 
-Computed (extending `generator/checks.py`):
+**Job.** Make sure the world from B fits the scenes from A and nothing is
+orphaned or contradicted, before D compiles. Mostly computed:
+- every scene's rooms exist and are connected among themselves;
+- every object a moment names exists and can be where the moment needs it;
+- every topic is reachable (its `known_when` flag is set by some moment
+  before a scene where the character is present);
+- every character's stances cover the states their arc moves;
+- the playtest simulator walks the A2 graph with the B world attached and
+  reports unreachable scenes, endings and resolution variants.
 
-- every `events.who` and `events.where` resolves; every character with a
-  profile appears in a node, every room is used by an event or is flagged
-- every lever the premise names is placed in exactly one room or held by one
-  character
-- every character's `arcs` has an entry for each line they appear on
-- every topic's `says_it_when` names something an event provides
-- a character's `stance_at_open` is not contradicted by their first node
-  (keyword overlap warning only)
+One model pass per line (thinking off, over packets): for each scene, does
+anything in it contradict the packet of anyone in it, or of a room it uses?
+yes/no with a quote. A finding re-runs the one B or A2 call it names, with
+the finding attached, and returns only what changed. After C the world is
+locked: D may not add characters, rooms or scenes.
 
-One model pass per line (class: classify), over packets only: for each node
-on the line, "does this node's expansion contradict the packet of anyone in
-it, or of the place it is in? yes/no, one sentence, quote". Findings name a
-node or an entity; repair re-runs exactly that A1 or B call with the finding
-attached, as a third call, and returns only what changed.
+## 5. Stage D: compile scenes
 
-Output: `story.reconciliation = {findings, repairs}` and `stage:
-"reconciled"`. After C the graph is locked: D may not add nodes, lines,
-characters or locations.
+**Built 2026-10-04** (`generator/compile_scenes.py`, prompt `s7d_scene`;
+`main.py --stage-d`, or `python compile_scenes.py <id>` on a directory with
+stages A and B): one call per scene writes the scene by name (opening,
+placement, room text, a moment per opportunity with one action per stage A
+option in order, revelations, incidental actions, the action taking each
+outgoing edge, events, placeless nudges, props); Python copies stage A's
+state moves onto the options by position, decides required moments (a state
+some ending variant or pattern shift reads) and demands their neutral
+option, sets the done flags, builds exits as flags the leading actions set
+(pattern shifts first, then branches, then the default), assembles
+`<id>_package.json` and checks it with the engine's validator and playtest
+(`<id>_package.md`). On the stub, kernel to playable package end to end. Not
+yet built: the repair call fed by the playtest's findings; exploring a whole
+story exhaustively does not scale (the stub stops at the state limit in its
+first scene), so per-scene exploration from each scene's entry states is
+the next step for the check.
 
-## 5. Stage D: per-node room build
+**Job.** Turn each scene into engine data (engine §4.4): which rooms it
+opens, where the cast is, its interactions (from its moments: opportunities
+with their arc-state effects, revelations setting knowledge flags, active
+attempts with their outcomes), its events (the outline's events that land
+here, tells that must appear soon after an opportunity), scene-specific
+room text (demonstrations, tells), and its exits (the outline's branch
+triggers as flag or pattern conditions; accumulated triggers as pattern
+conditions with the thresholds Python computed).
 
-**Job.** What the old 4b did: per-room interactions with `requires` and
-`sets`, per-character agendas, structured exit conditions. It runs last
-because by then every input it needs is a packet.
+One call per scene (the unit is small: one place-set, one stretch of time,
+a handful of moments). Python assembles the package, validates every
+condition and id, composes ending variants, and runs the playtest
+simulator on the result.
 
-Carry over, from `generator/later/node_build.py` and
-`prompts/later/sD_node_build.prompt`: `normalize_writes`, the node validator,
-the state registry (recomputed from every built node), `mechanical_checks`
-(exit reachability, reads before writes, menu interactions, missing rooms and
-characters), node repair from a finding list, and the review prompt
-`sD_review.prompt` for the judgment checks on node interiors.
+**The playtest is the check, in the loop** (as the computed checks are for
+the outline). `engine/story.validate` and `engine/playtest.py` run on every
+scene D returns, assembled with what is built so far; their findings are
+the repair list a separate repair call receives, returning only what it
+changed. What they catch that a reader of the JSON would not:
+- **stuck states**: some sequence of actions leaves no way to any ending;
+- **missed opportunities**: an arc-moving choice offered to under half of
+  curious simulated players. The rule this enforces: **a scene's way
+  forward must not bypass its opportunities.** The demo's first draft had
+  "Untie the line" open from turn one, and 65% of players left the scene
+  without ever being offered Lazlo's ledger choice. The fix is narrative
+  gating (your first try at the line brings Lazlo up the steps with the
+  ledger, and the line comes free once you have answered him), with a
+  neutral answer so the choice is offered, never forced one way.
+  Discoveries a player may miss by design are marked `optional`;
+- **pattern shifts random play triggers** (over 15% of random plays) or
+  that no consistent style can reach;
+- content nothing ever offers (interactions, topics, events, nudges, scene
+  exits, ending resolutions), and people named before anyone introduced
+  them.
+The walkthroughs (the shortest route to each ending and resolution
+combination) go into the run's report for a human to read.
 
-What changes:
+### Decisions (2026-10-04, with the user)
 
-- the packet comes from the story document: the node's summary and
-  expansion, the rooms of its locations, the packets of its characters, and
-  the state registry
-- exits are not invented: each outgoing edge already exists with a
-  plain-language trigger. D writes the condition that sentence becomes
-  (`edge.trigger.formal = [{variable, value}]`) and the default edge's
-  condition from `otherwise`. An `accumulated` trigger reads variables set
-  in earlier nodes; the registry says which exist.
-- `mechanical_checks` gains: every `expansion.enables` entry is reachable
-  through interactions that set the trigger's variables
-- the open-exit problem is gone by construction: there are no exits with
-  `leads_to: null`, so the review cannot flag one and repair cannot "fix"
-  one by rewording it
+- **Ignored opportunities: a mix.** An opportunity whose state feeds an
+  ending variant or a pattern shift on a line through the scene is
+  REQUIRED (Python decides, from A1's resolutions and shifts): it gates the
+  scene's exits, and always offers a neutral option, so the choice is
+  offered, never forced one way. Every other opportunity LAPSES: after a
+  while, or when you leave, the moment passes, and walking away is itself
+  the answer, with its own small effect ("Lazlo writes 'ignored' in the
+  ledger").
+- **Big, line-changing choices are signposted in the fiction** (people say
+  what is at stake; the text weighs it), always. The interaction also
+  carries `weight: "major"`, which the front end may show on the radial (a
+  distinct ring or icon) as a player option.
+- **Time is computed.** An action takes time if it changes something (a
+  flag, an arc state, where an object is), moves you to another room, or
+  is Wait; an action that changes nothing is free (examining, incidental
+  talk, thinking). D may override per interaction where the fiction says
+  otherwise ("search the whole hold"). Turn-timed events count time; nudges
+  count every action, so endless examining still gets a prod.
+- **Two to four incidental activities per scene** beyond examining and
+  conversation: a chore to help with, a drink to share, the dog; flavour,
+  sometimes with a small effect. They make a place lived in, and they mask
+  which actions matter.
+- **Text that fires anywhere must not assume a place.** Events, nudges and
+  lapses fire wherever the player is; the demo's nudge said "Lazlo's voice
+  comes up from the cabin" to a player standing in the cabin. Give such text
+  room variants (`at('cabin')`) or write it placeless. A check for D: an
+  event or nudge naming a room the player can be in, without a variant for
+  that room.
+- **Story verbs:** prefer the core verbs; add a story verb where a genre
+  action deserves its own word, especially one the story repeats (Bail,
+  Climb, Salute). Action stories lean on them more. A one-use story verb is
+  a validator note.
 
-```json
-"annotations": {"build": {
-  "arrival": "...",
-  "rooms": [{"room": "L04.a", "now": "...", "interactions": [{"target": "...", "action": "...", "requires": [], "result": "...", "sets": []}]}],
-  "characters": [{"label": "...", "in_room": "L04.a", "agenda": "...", "moved_by": "..."}],
-  "clock": null
-}}
-```
+### Engine additions these need
 
-**Cost estimate, honestly.** The archived run spent 65 to 150 minutes per
-node on this with a 60 to 124 KB trace. With packets instead of full
-definitions and exits given instead of invented it should be less, but this
-is the stage to split before running: one call per room of a node, with the
-node-level pieces (arrival, exits) in a small call of their own. Budget it as
-the most expensive stage and measure it on two nodes before running a story.
+- **Moments** in a scene: `{id, options: [interaction ids], required,
+  neutral: interaction id, lapse: {after, text, effects}}`. Taking an option
+  closes the rest; a required moment holds the scene's exits until
+  answered; an optional one lapses after `after` actions, or on leaving its
+  room, firing its lapse. The playtest's missed-opportunity check reads
+  `required` instead of the hand-marked `optional`.
+- **Computed time:** each action reports whether time passed (the rule
+  above, with an interaction's `takes_time` overriding); `turns` and
+  `turns_in_scene` advance only then.
+- **`weight`** on interactions, passed through to the menu tree.
 
-## 6. What to build first
+Carry over from `generator/later/node_build.py` where it fits: the state
+registry, `mechanical_checks` (reachability, reads before writes, menu
+options that are moral labels rather than acts), node repair from a finding
+list. The open-exit problem the old node build had is gone by construction:
+scene exits come from the outline's edges.
 
-A1 on the kernel1 outline's first three nodes, by hand-checking the packet
-size and the trace, before A0 or anything in B. The packet design is the
-risk in every later stage, and three nodes are enough to see whether it
-holds.
+### First live run (2026-10-04, kernel35_f5)
+
+Stage B built 13 rooms, 75 objects and 4 people in 92 minutes; stage D
+compiled 15 scenes in about 2 hours. What it taught:
+- Locations can be parts of one place (the stern deck, the wheelhouse, the
+  cabin of one boat); each place call rebuilt the whole boat. Place calls
+  now see what is built, and stage C joins any rooms a scene cannot walk
+  between.
+- The validator must not cost a retry for what code can settle: a variant
+  naming a state with no direction now means moved(state); an action on
+  something that is not a thing (the water) is free text.
+- The model writes actions without knowing where things lie, so a way on, a
+  branch or a moment's option that needs a thing from another room hides the
+  story behind a fetch quest. Those never wait on an object at hand now; a
+  take the scene writes gives the thing.
+- The whole-story playtest could not see past scene 2, which is why scenes
+  are now explored one at a time, and the menu itself is checked.
+- Conversation breadth needs a limit: everyone commenting on every object is
+  filler. A person is asked about the things tied to them.
+
+### Second live run (2026-10-05, kernel35_f5, the clean rebuild)
+
+The whole current pipeline from the saved outline: stages A, B, C and D in
+177 minutes, 36 calls. Stage B built 61 objects and 4 people; stage D
+compiled 9 scenes, and the package plays: seekers reach an ending in every
+run (main line 42 of 50 to its own ending, branch seekers 48 of 50 to T2's),
+in 19 to 24 actions. What it taught:
+- Things were still made per place: the mooring line four times, the tiller,
+  the keys, the knife, and the cat (a character) as an object too, so menus
+  listed them twice. A place's thing whose name exists is the one already
+  made, and the place call sees what exists.
+- Every scene's first attempt was rejected because "the cat" found the
+  object before the person: an hour of retries. Placement looks people up
+  first.
+- A way on came as a verb and a detail with no object ("go", "up the plank
+  gangway"); the detail is now the object.
+- The cat as a character works: its topics are reactions ("pads to the
+  bollard, sits on the knot, and meows once; the line creaks looser").
+
+## 6. Prose
+
+After D: the text the player reads. Designed 2026-10-05 with the user.
+
+**What it is: an editing pass, not a writing pass.** Stages B and D already
+write real prose (the clean kernel35 package: 522 text fields, about 15,000
+words, much of it good: "the mooring line creaks like a man settling into
+his seat"). What it lacks is one voice and freedom from a handful of
+recurring faults, seen in that package:
+- narrating alternatives instead of an outcome ("If it slips, Emerson
+  sees a movable boat...; if it bites your palm, Hugh's correction
+  stands...");
+- names the player has not learned (the first opening calls the ghost
+  "Hugh Calloway");
+- endings that state the theme ("It has cost Emerson's trust and your
+  clean ownership") instead of showing it;
+- the same image opening scene after scene (rain on the canopy, five
+  times);
+- mechanical leftovers (an action labelled "let the cat" with no object);
+- each call's own register: nothing holds one voice across 30 calls.
+
+### Decisions (2026-10-05, with the user)
+
+- **Edit in place; the structure is frozen.** The prose stage rewrites
+  only text fields (descriptions, here-lines, says, interaction text,
+  openings, room text, events, nudges, endings and resolutions, the intro,
+  "you"). Python checks that every id, condition, effect and label key is
+  unchanged, so the package still validates and the playtest still holds;
+  a call that touches anything else is rejected.
+- **The voice is per story.** One call builds a STYLE SHEET from the
+  story's kernel, tone line, genre promises (3.4) and cast voices: tense
+  and person (second person, present unless the brief says otherwise),
+  register, sentence length and rhythm, each character's speech, the
+  story's recurring images (and which are spent), words to avoid, and the
+  tradition the story belongs to when one fits ("a comic English ghost
+  story"), as a target. It ends with a SAMPLE PARAGRAPH in that voice:
+  every prose call gets the sheet and the sample, because an example holds
+  a voice better than rules. No human step: the sheet is checked by Python
+  (fields present, the sample in the right tense and person, no mechanics
+  words, no names outside the cast) and by one cheap check call (does the
+  sample deliver the tone line and the promises?), with one repair round,
+  as the premise is.
+- **Length: soft targets, longer where it pays.** About 60 words for a
+  room, one to three sentences for an action's response, about 90 for a
+  scene opening, about 150 for an ending. Python flags only text far past
+  them (about twice); the sheet says where length earns its place
+  (revelations, big choices, the opening after a turn, endings). Never
+  terser than today.
+- **Order: scene by scene, in story order**, each call given a running
+  digest of what the player has already read (images used, lines spoken,
+  what each person has said they want), so later scenes call back instead
+  of repeating. Then one call per character (every state of a person in
+  one voice), then rooms and objects by location. About 20-25 calls,
+  2-2.5 hours per story on the local model.
+- **Written ahead of time, never live**: a local 27B model is too slow to
+  write each turn, and live text could not be playtested.
+- **Names are the engine's job** (below), not the prose's.
+
+### Names: the engine shows what you know
+
+Text refers to a person by a code, `{C02}`, and the engine renders it:
+the character's `unnamed` label ("the old man in the captain's coat"; a
+short form, "the captain", for menus) until the player has been
+introduced, then the name ("Hugh"). Menus follow the same rule ("Talk ›
+the captain" becomes "Talk › Hugh"). The effect `{"introduce": "C02"}`
+(on an interaction, topic, event or moment option) teaches the name; the
+state keeps an `introduced` set (as it keeps `heard`), and `known('C02')`
+reads it. A character the protagonist already knows (a brother-in-law) is
+`known: true`; one with no `unnamed` label is known from the start too, so
+older packages play as before. The validator rejects a code that names no
+character. BUILT in the engine 2026-10-05 (engine_design.md §4.3); stages B
+and D do not write codes or labels yet. This replaces asking any prompt to
+track who the player knows, which a scene reached in several states
+would get wrong somewhere.
+
+### Checks (Python, on every prose call)
+
+- structure unchanged (ids, conditions, effects, keys);
+- no narrated alternatives ("if ...; if ..." in one response);
+- endings and resolutions do not name the cost or the theme in abstract
+  words ("it has cost", "trust", "the price");
+- no phrase of four or more words repeated across scenes, and no opening
+  image the digest marks as spent;
+- no mechanics words (state, flag, option, menu, scene, node);
+- people written as codes, never as bare names;
+- lengths within twice the soft targets.
+
+### Built (2026-10-06): `generator/prose.py`, `--prose`
+
+Built as designed, with these settled while building:
+- **Names live in the prose stage, not stage B.** Labels with literal
+  names still in the text would show "the ghost captain" in the menu beside
+  "Hugh Calloway" in the text, so the pass sets them together: every named
+  person gets `unnamed` (the role, then the person call's own short
+  description) and `known` when the role is a relative or "your ...", and
+  every literal name (full, or a first or last name no one else shares) in
+  text and labels becomes a code, before the edits (the model revises text
+  that already has codes) and again after. **A first conversation is an
+  introduction** (engine/runtime.py); the `introduce` effect remains for a
+  scene that names someone earlier.
+- **One editing prompt** (`s8b_edit`) for every part, with the part's
+  guidance filled in by Python: each scene in story order, each person,
+  each location (rooms with the things in them), then the frame (the
+  opening, "you", the endings). A part over 40 texts is sent in pieces.
+  Every text is sent with an id, what it is ("what the action "talk ›
+  {C01} › say 'Later'" does") and its condition, and comes back by id:
+  the structure is untouched by construction.
+- **The style check** (`s8v`) is a cheap call; a sheet it faults is written
+  once more with the problems (`s8a_r1`).
+- **Checks** are informed retries (SoftReject): narrated alternatives, game
+  words (menu, node, variant, the player, playthrough: words that are never
+  ordinary English), craft announced ("the cost is"), more than twice the
+  soft length, and across scenes a five-word run already read that the
+  revision brought (a fact the text already had may recur). A missing text
+  or a code that names nobody is a hard retry.
+- Output: `<id>_package_prose.json` beside the package (the package is
+  kept), `<id>_prose_style.json`, `<id>_prose.md` (the sheet, its sample,
+  the size before and after, findings, the engine validator).
+- Not yet run on the live model: the first run is kernel35's package
+  (about 25 calls, 2-2.5 hours).
+
+### The build plan (done)
+
+1. Engine: `{Cxx}` rendering, `unnamed`, the `introduce` effect, the
+   `introduced` set, `known()`, the validator rules (BUILT 2026-10-05).
+   Then stage B gives every person an `unnamed` label and `known` where
+   the protagonist knows them, and stage D marks introductions (the first
+   talk, or the moment the outline names them).
+2. The style sheet call and its checks.
+3. The scene, character and location passes and their checks; the stub
+   and tests for each.
+4. One live run on kernel35 and one held-out kernel, read against the
+   faults above.
+
+## 7. What to build first
+
+1. ~~Port the engine core (expression language, text variants, rewind) into
+   `engine/` and fix its three bugs; add the world, scene and interaction
+   model and the menu builder; hand-write a tiny package (two scenes of
+   kernel35) and play it in a terminal.~~ Done 2026-10-04 (engine_design.md
+   §11; `python engine/cli.py engine/examples/kernel35_demo.json`).
+2. ~~The playtest simulator on the engine format.~~ Done 2026-10-04
+   (`python engine/playtest.py <package> --walkthroughs`; see §5 for how
+   stage D uses it).
+3. Stage A (A0-A2) on one kernel (built; first live run on kernel35_f5
+   queued), then B, C, D, checked against the hand-written package.

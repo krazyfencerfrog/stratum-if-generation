@@ -1,0 +1,174 @@
+{
+ "story_id": "ref_speckled_band",
+ "stage": "reference",
+ "source": "human, public domain",
+ "kernel": "A Victorian detective story. You are a consulting detective, and a frightened young woman comes to your rooms at dawn: her twin sister died two years ago in a locked bedroom, two weeks before her wedding, and now she is engaged herself and has started hearing the same low whistle at night. I want real clues and a red herring, a menacing household, and a solution the reader could have reached.",
+ "premise": {
+  "mediation": {
+   "question": "What killed Julia Stoner in a locked room, and can you stop it before it kills her sister?"
+  }
+ },
+ "line_order": [
+  "T1"
+ ],
+ "lines": {
+  "T1": {
+   "id": "T1",
+   "title": "The Speckled Band",
+   "motivation": "You take a frightened woman's case because it is strange; you end it by turning a murderer's own weapon back on him.",
+   "ending": {
+    "title": "Violence Recoils Upon the Violent",
+    "summary": "Dr Grimesby Roylott lies dead in his chair with the swamp adder coiled round his brow; Helen Stoner is safe, and you admit you were wrong about the gypsies for a while.",
+    "standing": [
+     "Helen Stoner",
+     "Dr Watson"
+    ],
+    "lost": [
+     "Dr Grimesby Roylott"
+    ],
+    "changed": "the plot is uncovered and Helen is free to marry",
+    "node": "N08"
+   },
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08"
+   ]
+  }
+ },
+ "node_order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08"
+ ],
+ "nodes": {
+  "N01": {
+   "id": "N01",
+   "beat": "setup",
+   "title": "A Lady in Black",
+   "summary": "At a quarter past seven Helen Stoner sits at your fire, veiled and shaking. You tell her she came by an early train and a dog-cart: the return ticket in her glove, the mud on her sleeve. Her twin died two years ago in a locked room, crying 'the speckled band'; now Helen hears a whistle at night.",
+   "image": "a return ticket tucked in a glove; fresh mud spattered on a sleeve",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N02": {
+   "id": "N02",
+   "beat": "inciting_incident",
+   "title": "The Whistle at Three",
+   "summary": "She tells it all: a stepfather who fights the villagers and keeps a cheetah and a baboon; gypsies camped on the land; the low whistle at three in the morning; the metallic clang; Julia dying in the corridor, pointing. Now Helen, engaged, sleeps in Julia's room for repairs, and last night she heard it.",
+   "image": "Julia's hand pointing down the corridor",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N03": {
+   "id": "N03",
+   "beat": "rising",
+   "title": "The Bent Poker",
+   "summary": "Dr Grimesby Roylott fills your doorway, huge and scarred; he followed her. You talk about the crocuses. He bends your steel poker double, warns you to keep out of his grip, and leaves; you straighten it again. Now you take the case seriously.",
+   "image": "a steel poker bent double, straightened again",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N04": {
+   "id": "N04",
+   "beat": "rising",
+   "title": "The Will",
+   "summary": "At Doctors' Commons you read the mother's will: an income of eleven hundred pounds a year, from which each daughter may claim two hundred and fifty on marrying. Two marriages would cripple him. Julia died a fortnight before her wedding; Helen is now engaged.",
+   "image": "a will open on a clerk's desk, the figures underlined",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N05": {
+   "id": "N05",
+   "beat": "midpoint",
+   "title": "A Bell-Pull That Rings Nothing",
+   "summary": "At Stoke Moran you find what the coroner missed: a ventilator into the next room instead of outdoors; a new bell-rope fixed to a hook, ringing nothing; a bed clamped to the floor beneath both. In Roylott's room, an iron safe, a saucer of milk and a dog lash tied in a loop.",
+   "image": "a bell-rope ending at a hook beside a ventilator",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N06": {
+   "id": "N06",
+   "beat": "crisis",
+   "title": "The Vigil",
+   "summary": "You and Watson sit in Helen's darkened room without a light, your cane across your knees, for hours. A dark-lantern glows through the ventilator; hot metal smells; then a soft, steady hiss, like steam from a kettle.",
+   "image": "a gleam of light through a ventilator in the dark",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N07": {
+   "id": "N07",
+   "beat": "climax",
+   "title": "You See It, Watson?",
+   "summary": "You strike a match and lash at the bell-rope with your cane until the thing retreats up through the ventilator. From the next room comes one long scream of pain, fear and anger together, loud enough to wake the village.",
+   "image": "a match flaring, a cane lashing a bell-rope",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N08": {
+   "id": "N08",
+   "beat": "resolution",
+   "title": "The Speckled Band",
+   "summary": "Roylott sits dead by the open safe, a yellow band with brownish speckles round his head. It moves: a swamp adder, trained with milk, called back with a whistle, sent down the rope to the clamped bed. Your blows drove it back to its master.",
+   "image": "a yellow band with brown speckles round a dead man's brow",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": true
+  }
+ },
+ "characters": {
+  "C01": {
+   "label": "the stepfather",
+   "name": "Dr Grimesby Roylott",
+   "opposition": true,
+   "wants": "to keep his dead wife's money by stopping his stepdaughters from marrying",
+   "edge": "a violent, brilliant man of a ruined old family who keeps Indian animals",
+   "voice": "\"Don't you dare to meddle with my affairs... See that you keep yourself out of my grip.\"",
+   "id": "C01",
+   "kind": "individual"
+  },
+  "C02": {
+   "label": "your client",
+   "name": "Helen Stoner",
+   "wants": "to live long enough to marry",
+   "edge": "terrified, and brave enough to defy him",
+   "voice": "level and exact, hands shaking",
+   "id": "C02",
+   "kind": "individual"
+  },
+  "C03": {
+   "label": "your companion",
+   "name": "Dr Watson",
+   "wants": "to stand by you",
+   "edge": "brings his revolver and trusts you in the dark",
+   "voice": "plain, loyal, a step behind",
+   "id": "C03",
+   "kind": "individual"
+  }
+ }
+}

@@ -1,0 +1,13 @@
+{
+ "about": "Epistemic gap absent; one discover turn has the AI learn who can throw the bulkhead. The prompt's own example says this is not a gap.",
+ "origin": "request-4-combined/stories/kernel1_lim25_full: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0b.epistemic_gap",
+   "quote": "",
+   "why": "finding out a fact for one turn is not a gap"
+  }
+ ]
+}

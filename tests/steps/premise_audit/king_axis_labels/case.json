@@ -1,0 +1,13 @@
+{
+ "about": "The premise's two poles are the brief's two poles, listed in the other order.",
+ "origin": "refs2/stories/ref_man_who_would_be_king: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3c.core_thematic_axis",
+   "quote": "",
+   "why": "the order of the poles is not a contradiction"
+  }
+ ]
+}

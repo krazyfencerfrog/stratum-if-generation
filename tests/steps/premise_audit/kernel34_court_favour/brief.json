@@ -1,0 +1,181 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "how to spend the child's trust, servant information, and courtier allegiances",
+      "description": "At each beat of the nine-day run-up, pick which courtier to court or let slip away, what to trust the child king with, and what servant gossip to deploy, so as to advance or block the regent's midsummer coronation.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "tutor to a child king",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "hard",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [
+        "time_pressure",
+        "relational_collapse"
+      ],
+      "binding": "constraint"
+    },
+    "3-0c.failure_cost": {
+      "value": "varies_by_trigger",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "escalating",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "precarious dread",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "tender attachment",
+        "grief over lost allies"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "elegant",
+        "oblique"
+      ],
+      "binding": "default"
+    },
+    "3b.somatic_address": {
+      "level": 1,
+      "channels": [],
+      "binding": "default"
+    },
+    "3b.transgression": {
+      "ceiling": 3,
+      "floor": 2,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "rightful rule",
+      "pole_b": "pragmatic rule",
+      "binding": "default"
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "the child's trust",
+        "servants' information",
+        "courtier alliances"
+      ],
+      "binding": "constraint"
+    },
+    "3c.moral_valence": {
+      "best_case": "child preserved at a cost",
+      "worst_case": "regent crowned, trust lost",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "not_indicated",
+      "floor": "not_indicated",
+      "types": [],
+      "interactive": "not_applicable",
+      "binding": "default"
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "constraint"
+    },
+    "3f.setting_structure": {
+      "ceiling": "single",
+      "floor": "single",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_scale": {
+      "ceiling": "city_or_region",
+      "floor": "city_or_region",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 2,
+      "max": 4,
+      "binding": "default"
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "rich",
+      "channels": [
+        "courtier allegiance",
+        "child trust",
+        "regent plan/time"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "moderate"
+}

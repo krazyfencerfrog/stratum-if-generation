@@ -1,0 +1,182 @@
+{
+ "story_id": "ref_man_who_would_be_king",
+ "stage": "reference",
+ "source": "human, public domain",
+ "kernel": "An adventure in the 1880s. You and your partner, two ex-soldiers turned confidence men, sign a contract to cross the frontier into a country no Englishman has seen and make yourselves its kings. I want the rise to be glorious and the ambition to cost something, and I want the partnership to be the heart of it.",
+ "premise": {
+  "mediation": {
+   "question": "Can two loafers make themselves kings, and what does the crown cost the friendship that won it?"
+  }
+ },
+ "line_order": [
+  "T1"
+ ],
+ "lines": {
+  "T1": {
+   "id": "T1",
+   "title": "Kings of Kafiristan",
+   "motivation": "You start out a partner in a scheme to be king; you end carrying your partner's crowned head home, because you swore never to leave him.",
+   "ending": {
+    "title": "And There the Matter Rests",
+    "summary": "You come back to the newspaper office a year later, broken and crippled, with Dravot's head in a horsehair bag and his gold crown on it, and you die of the sun a few days after. The head is never found.",
+    "standing": [],
+    "lost": [
+     "Daniel Dravot",
+     "Billy Fish"
+    ],
+    "changed": "nothing is left of the kingdom but a story the newspaperman can tell",
+    "node": "N08"
+   },
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08"
+   ]
+  }
+ },
+ "node_order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08"
+ ],
+ "nodes": {
+  "N01": {
+   "id": "N01",
+   "beat": "setup",
+   "title": "Brother to a Prince",
+   "summary": "On a train in Central India you meet a newspaperman and ask him to carry a message to your partner Dravot at Marwar Junction. You are loafers who blackmail small native states by posing as correspondents; he gets you both warned off the border.",
+   "image": "a red-bearded man leaning from a train window at Marwar Junction",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N02": {
+   "id": "N02",
+   "beat": "inciting_incident",
+   "title": "The Contrack",
+   "summary": "Two years later you and Dravot walk into the newspaperman's office at midnight. India is not big enough for you: you are going to Kafiristan to be kings. You show him your contract: no liquor, no women, and stand by each other till the work is done.",
+   "image": "the contract on the office table, signed Gentlemen at Large",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N03": {
+   "id": "N03",
+   "beat": "rising",
+   "title": "The Mad Priest",
+   "summary": "Dravot goes north as a mad priest with whirligigs to sell, you as his servant, twenty Martini rifles hidden under the toys. Past Jagdallak, the camels left behind, you walk into a country no Englishman has seen.",
+   "image": "whirligigs and mud toys hiding the rifle barrels",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N04": {
+   "id": "N04",
+   "beat": "rising",
+   "title": "A God in a Valley",
+   "summary": "You come down into a valley where two villages fight, and Dravot shoots a man at long range. The people bow down: he is a god, a son of Alexander. Village by village you drill an army, settle quarrels, and make chiefs of men like Billy Fish.",
+   "image": "a crowd kneeling in the snow before a red-bearded man",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N05": {
+   "id": "N05",
+   "beat": "midpoint",
+   "title": "The Master's Mark",
+   "summary": "Under an old stone idol the priests find the Master Mason's mark, and when Dravot shows them the secret signs they take him for a god indeed. He opens a Lodge and makes himself Grand Master. He dreams of an empire, and of handing it to the Queen.",
+   "image": "the Master Mason's mark under a stone idol",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N06": {
+   "id": "N06",
+   "beat": "crisis",
+   "title": "Keep Clear of Women",
+   "summary": "Dravot wants a queen and a son. You remind him of the Contrack; Billy Fish says a god may not marry a mortal girl. He takes one anyway. At the wedding she bites his neck and draws blood: neither god nor devil, but a man.",
+   "image": "a girl's teeth marks bleeding on a king's neck",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N07": {
+   "id": "N07",
+   "beat": "climax",
+   "title": "The Rope Bridge",
+   "summary": "The army turns. Billy Fish stays to die with you. Dravot walks out onto the rope bridge in his crown and asks you to forgive him; you do. He shouts to them to cut, and falls, turning, a long way. They crucify you between two pines and, when you live, let you go.",
+   "image": "a gold crown on a man falling from a cut rope bridge",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": false
+  },
+  "N08": {
+   "id": "N08",
+   "beat": "resolution",
+   "title": "And There the Matter Rests",
+   "summary": "You crawl back to the newspaper office with Dravot's head in a black horsehair bag, the gold crown on it, and tell everything. Two days later you are in the road, singing a hymn. You die in the asylum, of the sun.",
+   "image": "a crowned head in a black horsehair bag",
+   "lines": [
+    "T1"
+   ],
+   "is_ending": true
+  }
+ },
+ "characters": {
+  "C01": {
+   "label": "your partner",
+   "name": "Daniel Dravot",
+   "wants": "to be a king, then an emperor, then a god",
+   "edge": "magnificent, reckless, and convinced of his own divinity",
+   "voice": "\"I won't make a Nation, I'll make an Empire!\"",
+   "breaking_point": "breaks the Contrack to take a queen",
+   "id": "C01",
+   "kind": "individual"
+  },
+  "C02": {
+   "label": "the newspaperman",
+   "name": "the narrator",
+   "wants": "a quiet night and a story",
+   "edge": "disapproving and fascinated",
+   "voice": "dry, decent, ironic",
+   "id": "C02",
+   "kind": "individual"
+  },
+  "C03": {
+   "label": "the chief who stands by you",
+   "name": "Billy Fish",
+   "wants": "to serve his kings",
+   "edge": "loyal past reason",
+   "voice": "grave and faithful to the end",
+   "id": "C03",
+   "kind": "individual"
+  },
+  "C04": {
+   "label": "the priests",
+   "name": "the priests",
+   "opposition": true,
+   "wants": "a god who is truly a god",
+   "edge": "the power that made Dravot and can unmake him",
+   "voice": "\"Neither God nor Devil but a man!\"",
+   "id": "C04",
+   "kind": "individual"
+  }
+ }
+}

@@ -1,0 +1,1285 @@
+{
+  "schema_version": 5,
+  "story_id": "kernel35_b3",
+  "stage": "outline",
+  "kernel": "A ghost story that is funny and frightening in equal measure. You inherit a decrepit canal boat with a resident ghost who insists he is still the captain and will not let the boat leave its mooring. Your only living companion is your brother-in-law, who came to help you sell it and who wants his money back more than he wants you safe. I want the ghost to be a real character, scary when he needs to be, and I want the boat to actually go somewhere.",
+  "shape": {
+    "through_lines": 3,
+    "default_max_iterations": 3,
+    "endings_stated": "",
+    "endings_tier": "unstated",
+    "nodes_min": 5,
+    "nodes_max": 8,
+    "linear": false,
+    "choice_density": "unstated",
+    "note": "through_lines is how many distinct story lines (each with its own ending) the shape preference suggests; the review decides whether each next one is worth building."
+  },
+  "premise": {
+    "enrichment_budget": {
+      "level": "minimal"
+    },
+    "protagonist": {
+      "who": "You are the new owner of a narrow, leaking narrowboat, the only living person aboard while a dead captain still keeps the log.",
+      "history": "You inherited the boat from your late sister, who kept it as a summer house and left you the keys, the unpaid canal dues, and a brother-in-law who paid to clear the title and now wants that money back.",
+      "wants": "to get the boat under way and to a place where it can be sold before your brother-in-law's patience runs out.",
+      "need": "to find out whether owning a boat means you can move it, or whether you must answer to everyone who ever kept it.",
+      "can_do": "steer when the wheel will turn, re-tie the mooring line if it lets you, read the logbook, talk to the ghost and your brother-in-law, carry the sale papers and coins, set the galley table, and make the boat physically ready to move.",
+      "cannot_do": "make the ghost obey, cut the mooring line while it is bound, sell the boat without a buyer reaching the stern, or move the boat without the wheel, ropes, and line cooperating.",
+      "ties": [
+        {
+          "who": "your brother-in-law",
+          "what": "your sister's husband, the man who paid to clear the title and now counts every coin as if your safety were a line item."
+        },
+        {
+          "who": "the ghost captain",
+          "what": "the dead man in the rotting uniform who still checks the logs and complains about the bilge water as if you were both still on duty."
+        }
+      ],
+      "open": "whether you learn to command the boat as a living owner or let the dead captain's protocol decide your terms.",
+      "gender": "f",
+      "serves": "3-0b.protagonist_identity",
+      "name": "Ingrid Kowalczyk"
+    },
+    "arena": {
+      "description": "A decrepit narrowboat moored stern-to-towpath on a quiet canal, with a narrow stern deck at the mooring ring, a low-ceilinged galley, and a bow where the mooring line is tied to a bollard.",
+      "serves": "3f.setting_structure"
+    },
+    "pressure": {
+      "description": "Your brother-in-law will not wait past the evening to see the boat sold, and the canal's low water is already pulling at the hull as if the boat were meant to move tonight.",
+      "clock_or_stock": "none tracked; the urgency is told through the brother-in-law's impatience, the falling light, and the water's pull, because 3-0c names no failure trigger",
+      "serves": "3e.timeline_structure"
+    },
+    "opposition": {
+      "who_or_what": "the ghost captain",
+      "wants": "to remain the boat's captain and to have it move only under his orders, with the logbook kept true and the bilge water answered to.",
+      "means": "he can seize the steering wheel, tighten the ropes, make the mooring line refuse the knife, set the galley table, stand behind you where the light will not hold, and speak with his mouth slightly out of sync with his voice.",
+      "serves": "3c.core_thematic_axis"
+    },
+    "events": [
+      {
+        "what": "A distant walker stops at the stern mooring ring and asks if the boat is for sale; your brother-in-law begins a bargain while the ghost stands directly behind you, blocking the view of the boat's interior.",
+        "when": "early",
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "what": "The galley table sets itself for a meal the ghost insists on eating, and your brother-in-law's sandwich keeps sliding off the plate under the low ceiling.",
+        "when": "middle",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "what": "The mooring line at the bow snaps not with a bang but with a wet, organic sound, as if it were a tendon, and the boat slips into the current; just below the hull, the ghost's face looks up, not angry but disappointed.",
+        "when": "late",
+        "serves": "3b.primary_affect"
+      }
+    ],
+    "hidden_truth": null,
+    "mediation": {
+      "question": "Who has the right to make this boat move: the dead captain who keeps the log, or the living owner who holds the key?",
+      "to_reach_pole_a": {
+        "pole": "answer the ghost's captain's terms",
+        "what_you_must_do": "let him remain captain: acknowledge his authority in the logbook, set the galley table for his meal, use the brass whistle to give the order to move, and let him choose the first leg of the journey.",
+        "cost": "you surrender some of your ownership, your brother-in-law watches you bargain with a corpse and doubts the sale, and the boat moves on the dead man's schedule rather than yours."
+      },
+      "to_reach_pole_b": {
+        "pole": "assert the living owner's agency",
+        "what_you_must_do": "work around or defy the ghost: get the sale papers and your brother-in-law's coins into your hands, find a buyer or passerby who will pay for the boat as property, and physically free the mooring line, the wheel, or the ropes so the boat moves without his order.",
+        "cost": "the boat resists with tightening ropes, a seizing wheel, and a mooring line that will not cut, and your brother-in-law's safety and patience are tested as the cold and the dark close in."
+      },
+      "levers": [
+        "the captain's logbook",
+        "the brass whistle",
+        "the mooring line and bollard at the bow",
+        "the steering wheel",
+        "your brother-in-law's sale papers and coin purse",
+        "the galley table"
+      ],
+      "serves": "3-0a.primary_decision_axis"
+    },
+    "turns": [
+      {
+        "id": 1,
+        "situation": "The steering wheel will not turn, the logbook lies open on the galley table, and the ghost captain demands the bilge be sounded before any order to move is given; your brother-in-law is on the stern deck counting coins and asking for a price.",
+        "what_you_must_do": "find out what the boat's first move requires under the ghost's captaincy",
+        "ways_through": [
+          {
+            "way": "you learn it from the logbook, because you read the standing orders and find that the ghost requires a log entry, a whistle call, and a meal set before the wheel will answer",
+            "cost": "the brother-in-law hears you reading to the dead and asks whether the sale is still possible"
+          },
+          {
+            "way": "you learn it from the ghost, because you answer his complaint about the bilge water and he tells you the order to move will come only after the meal",
+            "cost": "the wheel seizes again while you are speaking to him, and the brother-in-law's coin purse slips into the bilge"
+          }
+        ],
+        "involves": [
+          "the ghost captain",
+          "your brother-in-law"
+        ],
+        "form": "discover",
+        "set_piece": null,
+        "serves": "3c.core_thematic_axis"
+      },
+      {
+        "id": 2,
+        "situation": "A distant walker stops at the stern mooring ring and asks if the boat is for sale; your brother-in-law begins a bargain while the ghost stands directly behind you, blocking the view of the boat's interior.",
+        "what_you_must_do": "get the walker to agree to buy the boat before he walks on",
+        "ways_through": [
+          {
+            "way": "the walker agrees, because your brother-in-law names a price low enough that the ghost's shadow does not scare him off the towpath",
+            "cost": "the brother-in-law gets less than his money back and the ghost stands closer to the sale papers"
+          },
+          {
+            "way": "the walker agrees, because you let the ghost block the view and the walker pays for the boat on faith, asking no questions",
+            "cost": "the brother-in-law's coins are in your hand, but he does not trust what you sold him"
+          },
+          {
+            "way": "the walker agrees, because you show him the logbook and the standing order, and he pays for the boat as a captain's vessel",
+            "cost": "the ghost's terms are now the buyer's terms, and the first leg is his to choose"
+          }
+        ],
+        "involves": [
+          "the distant walker",
+          "your brother-in-law",
+          "the ghost captain"
+        ],
+        "form": "trade",
+        "set_piece": "the brother-in-law trying to sell the boat to a passerby on the towpath while the ghost stands directly behind the player, blocking the view of the boat's interior",
+        "serves": "3-0a.primary_decision_axis"
+      },
+      {
+        "id": 3,
+        "situation": "The galley table sets itself for a meal the ghost insists on eating, and your brother-in-law's sandwich keeps sliding off the plate under the low ceiling.",
+        "what_you_must_do": "get the galley quiet enough to make the boat ready for the first leg",
+        "ways_through": [
+          {
+            "way": "the galley quiets, because you set the table for the ghost's meal and the plates stop moving",
+            "cost": "the brother-in-law's sandwich is ruined, and he asks what else you intend to pay for"
+          },
+          {
+            "way": "the galley quiets, because you move your brother-in-law to the stern deck and let the ghost eat alone",
+            "cost": "the brother-in-law is colder and farther from the sale papers, and the ghost's voice is slightly out of sync with his mouth"
+          },
+          {
+            "way": "the galley quiets, because you use the brass whistle to call the meal off and the table stops setting itself",
+            "cost": "the ghost turns his back to the galley, and the wheel will not turn until he is faced again"
+          }
+        ],
+        "involves": [
+          "the ghost captain",
+          "your brother-in-law"
+        ],
+        "form": "endure",
+        "set_piece": "the galley table setting itself for a meal the ghost insists on eating, while the brother-in-law tries to eat a sandwich that keeps sliding off the plate",
+        "serves": "3b.primary_affect"
+      },
+      {
+        "id": 4,
+        "situation": "The mooring line at the bow snaps not with a bang but with a wet, organic sound, as if it were a tendon, and the boat slips into the current; just below the hull, the ghost's face looks up, not angry but disappointed.",
+        "what_you_must_do": "get the boat under way before the current takes it past the next junction",
+        "ways_through": [
+          {
+            "way": "the boat moves, because you sound the brass whistle and let the ghost give the order, and he chooses the first leg",
+            "cost": "you have surrendered the boat's schedule to the dead captain, and the brother-in-law watches you bargain with a corpse"
+          },
+          {
+            "way": "the boat moves, because you free the mooring line with the knife while the ghost's hand is off it, and the brother-in-law holds the wheel",
+            "cost": "the ropes tighten around your hands, and the brother-in-law's coins are wet with canal water"
+          },
+          {
+            "way": "the boat moves, because you hand the sale papers to the distant walker on the towpath and let him take the bow line",
+            "cost": "the walker has the boat's first leg, and the ghost's face in the water looks up with disappointment"
+          }
+        ],
+        "involves": [
+          "the ghost captain",
+          "your brother-in-law",
+          "the distant walker"
+        ],
+        "form": "confront",
+        "set_piece": "the mooring line snapping not with a bang but with a wet, organic sound, as if it were a tendon, releasing the boat into the current, with the ghost's face visible in the dark water below the hull",
+        "serves": "3-0a.primary_decision_axis"
+      }
+    ],
+    "complications": [
+      {
+        "description": "The brass whistle, the ghost's order lever, is in the brother-in-law's coin purse because he took it as collateral for his money.",
+        "serves": "3-0a.secondary_decision_axes"
+      },
+      {
+        "description": "The distant walker will pay only for a boat that can be seen moving, not one that is moored; the sale papers must be signed at the stern before the first leg.",
+        "serves": "3c.core_thematic_axis"
+      }
+    ],
+    "cast_seeds": [
+      {
+        "role": "the ghost captain",
+        "kind": "individual",
+        "speaks_for": null,
+        "gender": "m",
+        "wants": "to retain command of the vessel by enforcing strict maritime protocol and maintaining the logbook's integrity",
+        "holds": "the steering wheel, the mooring line's tension, and the authority of the dead captain's log",
+        "edge": "insists on the dignity of the rank while his physical form rots, treating the living owner as a subordinate who has failed to sound the bilge",
+        "tie": "served the boat before the sister inherited it and views the sister's legacy as a dereliction of duty that must be corrected",
+        "voice": "speaks with a mouth slightly out of sync with the voice, issuing orders with the weary patience of a man who has been waiting for a reply for decades: 'The bilge. Sound the bilge. You are not in command until you have answered to the water.'",
+        "breaking_point": null,
+        "opposition": true,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Pieter Oyelaran"
+      },
+      {
+        "role": "your brother-in-law",
+        "kind": "individual",
+        "speaks_for": null,
+        "gender": "m",
+        "wants": "to recover the money he spent clearing the title and to leave the boat before the cold sets in",
+        "holds": "the sale papers, the coin purse, and the only living perspective on the absurdity of the situation",
+        "edge": "counts every coin as if the protagonist's safety were a line item, refusing to acknowledge the ghost's presence as anything other than a draft or a trick of the light",
+        "tie": "was the sister's husband and paid to clear the title, and now treats the protagonist's hesitation as a personal financial liability",
+        "voice": "talks in quick, practical fragments that cut through the eerie silence: 'The line's frayed, the roof's leaking, and I'm standing in a draft. Give me a price or give me a way out.'",
+        "breaking_point": "leaves the boat the moment he sees the protagonist prioritize the ghost's protocol over the sale papers",
+        "opposition": false,
+        "matters_to_turns": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "name": "Ivo Gutierrez"
+      },
+      {
+        "role": "the distant walker",
+        "kind": "individual",
+        "speaks_for": null,
+        "gender": "n",
+        "wants": "to purchase the boat or simply observe it, acting as the catalyst that forces the transaction to close",
+        "holds": "the potential buyer's interest and the physical presence at the stern that blocks the view",
+        "edge": "stops at the mooring ring with a casual curiosity that makes the protagonist's internal struggle visible to an outsider",
+        "tie": "has no prior connection to the protagonist but is bound to the story by the act of asking if the boat is for sale",
+        "voice": "speaks with a polite, detached curiosity that ignores the supernatural tension: 'Is this one for sale? It looks like it's seen a bit of water, but the hull seems sound.'",
+        "breaking_point": null,
+        "opposition": false,
+        "matters_to_turns": [
+          2,
+          4
+        ],
+        "name": "Kwame Nakashima"
+      }
+    ],
+    "name_pool": "modern"
+  },
+  "framework": {
+    "id": "kishotenketsu",
+    "name": "Kishotenketsu",
+    "shape": "a situation is introduced and deepened without conflict, an unexpected element recasts it, and the two are reconciled",
+    "modifier": {
+      "id": "episodic",
+      "name": "Episodic middle",
+      "effect": "Each middle beat is a self-contained instance of the story's recurring decision with its own small ending; what carries across them is what the protagonist is becoming."
+    },
+    "reading": "The story opens with the boat stuck and the living wanting to sell it, then escalates through escalating, self-contained hauntings and bargaining attempts that deepen the absurdity rather than the danger. It should land on the boat actually moving, not because the ghost is defeated, but because the situation resolves into a comic, uneasy success where the dead captain's authority is acknowledged in a way that lets the living move forward.",
+    "why": "Its four-beat structure matches the brief's 'sustained' trajectory (3b.primary_trajectory) and 'none' failure presence (3-0c.failure_presence), where the conflict is a negotiation rather than a hard defeat. The 'Turn' (ten) aligns with the engine's 'confront' turn where the line snaps, and the 'Reconciliation' (ketsu) matches the 'comic, uneasy success' (3c.moral_valence) where the boat moves and the brother-in-law's money is addressed, rather than a climactic battle.",
+    "named_in_kernel": null,
+    "shortlist": [
+      "three_act",
+      "kishotenketsu",
+      "save_the_cat"
+    ],
+    "scores": {
+      "three_act": 2.0,
+      "freytag": 0.0,
+      "heros_journey": -1.0,
+      "save_the_cat": 2.0,
+      "fichtean_curve": -1.0,
+      "seven_point": 0.0,
+      "story_circle": 1.0,
+      "kishotenketsu": 5.0
+    },
+    "beats": [
+      {
+        "id": "ki",
+        "name": "Introduction (ki)",
+        "job": "the people and the place at rest: what an ordinary day here is",
+        "required": true
+      },
+      {
+        "id": "sho",
+        "name": "Development (sho)",
+        "job": "the same situation, deepened: more of what was introduced, with no new conflict required",
+        "required": true
+      },
+      {
+        "id": "ten",
+        "name": "Turn (ten)",
+        "job": "an unexpected element or viewpoint that recasts what came before",
+        "required": true
+      },
+      {
+        "id": "ketsu",
+        "name": "Reconciliation (ketsu)",
+        "job": "the turn and the earlier material are brought together into a new whole",
+        "required": true
+      }
+    ]
+  },
+  "lines": {
+    "T1": {
+      "id": "T1",
+      "iteration": 1,
+      "title": "The First Leg",
+      "motivation": "You start out needing to sell the boat before Ivo Gutierrez’s patience runs out, and by the end you are trying to learn whether a living owner can make a dead man’s vessel move without becoming his clerk.",
+      "strategy": "Keep the sale papers, the coins, and the buyer in front of you, and meet the ghost captain’s protocol only far enough to make the boat obey.",
+      "turning_point": "The distant walker, Kwame Nakashima, agrees to buy only if he can see the boat move; from then on, the sale and the first leg become the same action.",
+      "differs_from": null,
+      "ending": {
+        "title": "A Sold Boat Under a Dead Captain’s Keel",
+        "summary": "The boat leaves the mooring and begins its first leg with the sale papers signed at the stern, the coins in Ivo Gutierrez’s wet hand, and Pieter Oyelaran’s face looking up from the water with disappointment rather than anger. It costs you the clean authority of ownership: the boat moves, but it moves on terms the dead man helped write.",
+        "node": "N05",
+        "answer": "mixed",
+        "standing": [
+          "your brother-in-law",
+          "the distant walker"
+        ],
+        "lost": [
+          "the ghost captain"
+        ],
+        "changed": "the boat is sold, under way, and no longer yours to command alone"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "parent": null,
+      "divergence": null,
+      "rejoins_at": null,
+      "skipped_beats": []
+    },
+    "T2": {
+      "id": "T2",
+      "iteration": 2,
+      "title": "The Bilge Answer",
+      "motivation": "You start out needing to sell the boat before Ivo Gutierrez's patience runs out, but after answering Pieter Oyelaran's complaint about the unsounded bilge and feeling the wheel seize in your hand while Ivo Gutierrez's coin purse slips into the water, you come to want the dead captain's terms to be the only terms that work. By the end you want the boat moving and sold, even if that means the sale is made under Pieter Oyelaran's captaincy and Ivo Gutierrez is left with no share.",
+      "strategy": "Keep the logbook, the brass whistle, and the meal in front of you; satisfy Pieter Oyelaran's standing orders; let Kwame Nakashima agree to buy the boat on faith while the ghost blocks the view; and move Ivo Gutierrez out of the way of the protocol until he leaves the boat of his own accord.",
+      "turning_point": "The coin purse in the bilge. Once Ivo Gutierrez's money is gone and the wheel answers only while Pieter Oyelaran is speaking, the sale papers stop being enough; the logbook becomes the only instrument that can make the boat move.",
+      "differs_from": "T1 answers the question in mixed terms, keeps Ivo Gutierrez standing at the stern with wet sale papers, and leaves Pieter Oyelaran disappointed in the water; this line answers with pole_a, keeps the dead captain standing as the boat's effective captain, and loses Ivo Gutierrez, who walks off the towpath before the boat moves.",
+      "ending": {
+        "title": "The Bilge Answer",
+        "summary": "At first light the boat moves under Pieter Oyelaran's log entry and whistle call. Kwame Nakashima pays at the stern for a boat he bought on faith, and Ivo Gutierrez is left on the towpath with his coin purse gone and no share of the sale. The boat goes under the dead captain's first leg, with the logbook still open and the ghost keeping the wheel.",
+        "node": "T2N03",
+        "answer": "pole_a",
+        "standing": [
+          "the distant walker",
+          "the ghost captain"
+        ],
+        "lost": [
+          "your brother-in-law"
+        ],
+        "changed": "the boat is sold as a captain's vessel with the logbook still open and the dead captain's terms governing the first leg"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N02",
+        "trigger": "you answered Pieter Oyelaran's complaint about the unsounded bilge and let the wheel seize in your hand while Ivo Gutierrez's coin purse slipped into the bilge",
+        "trigger_kind": "act",
+        "way": 2,
+        "instead_of": "you read the standing orders from the logbook and learned that the wheel would answer only after a log entry, a whistle call, and a meal were set",
+        "opportunity": "Ivo Gutierrez's coin purse must be on the stern deck near the bilge, with the brass whistle in it, so that it can slip into the water when the wheel seizes.",
+        "shift": "The wheel answers only while you are speaking to the dead captain, and the living owner's money is already under the hull. Pieter Oyelaran's complaint has become a working instruction, and Ivo Gutierrez's practical leverage is gone."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: N02's unused way 2 makes the living owner's money go into the bilge and leaves the logbook as the only working order. That change lets the line move toward pole_a without retelling T1: the sale is still made at the stern, but the buyer is won by faith rather than by the logbook's terms, Ivo's breaking point is crossed in the galley, and the boat finally moves under the dead captain's whistle call with Ivo already lost on the towpath."
+    },
+    "T3": {
+      "id": "T3",
+      "iteration": 3,
+      "title": "The Owner's Key",
+      "motivation": "You come to want the sale papers to matter more than the ghost's protocol, because Ivo Gutierrez's ruined sandwich and cold face make clear that the boat is becoming a set of standing orders before it becomes a sale; by the end you want the boat moved and sold under your own key as an ordinary owner, even if that leaves Pieter Oyelaran facing the stern with his log closed.",
+      "strategy": "Call the ghost's meal off with the brass whistle, keep Ivo Gutierrez at the sale papers, write your own log entry, and free the bow line so the boat moves under Ingrid Kowalczyk's key before Pieter Oyelaran can face the wheel again.",
+      "turning_point": "The brass whistle in your hand: when you cancel the meal, the galley stops being Pieter Oyelaran's protocol and becomes your sale, and the logbook stops being only his record.",
+      "differs_from": "T1: T1 moves the boat on mixed terms with the dead captain's help, while this line answers pole_b by selling the boat as an ordinary narrowboat and letting Ingrid Kowalczyk choose the first leg. T2: T2 lets the dead captain's terms become the only terms and loses Ivo Gutierrez, while this line keeps Ivo Gutierrez at the sale papers and rejects Pieter Oyelaran's captaincy in favor of the living owner's key.",
+      "ending": {
+        "title": "The Owner's Key",
+        "summary": "The boat moves under Ingrid Kowalczyk's key and her own log entry, and Kwame Nakashima pays for an ordinary narrowboat rather than a captain's vessel. Ivo Gutierrez gets his money back and stands with the sale papers dry, while Pieter Oyelaran is left facing the stern with the logbook closed. The price is the dead captain's claim: the ropes cut your hands, the cold stays in the hull, and the boat no longer moves on his schedule.",
+        "node": "T3N01",
+        "answer": "pole_b",
+        "standing": [
+          "your brother-in-law",
+          "the distant walker"
+        ],
+        "lost": [
+          "the ghost captain"
+        ],
+        "changed": "the boat is sold as an ordinary narrowboat and Ingrid Kowalczyk chooses the first leg"
+      },
+      "path": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "T3N01"
+      ],
+      "new_nodes": [
+        "T3N01"
+      ],
+      "parent": "T1",
+      "divergence": {
+        "diverges_at": "N04",
+        "trigger": "you used the brass whistle to call Pieter Oyelaran's meal off and made the set table stop moving",
+        "trigger_kind": "act",
+        "way": 3,
+        "instead_of": "you set the table for Pieter Oyelaran's meal and let the plates stop moving",
+        "opportunity": "Add to N04 that Ivo Gutierrez pulls the brass whistle from his coin purse and presses it into your hand, demanding the ghost be stopped before the meal ruins the sale.",
+        "shift": "The whistle stops the table, and Pieter Oyelaran turns his back to the galley; the wheel will not turn until he is faced again. Ivo Gutierrez's cold face and the dry sale papers in your hand make clear that the living sale is the thing you must finish, not the dead man's meal."
+      },
+      "rejoins_at": null,
+      "skipped_beats": [],
+      "why": "The seed holds as given: calling the meal off with the brass whistle is turn 3's unused way 3 at N04, and it changes the boat's movement from Pieter Oyelaran's protocol into Ingrid Kowalczyk's sale. The seed's ending world holds because the line can keep Ivo Gutierrez at the sale papers, sell to Kwame Nakashima as an ordinary narrowboat, and leave Pieter Oyelaran without the logbook's authority."
+    }
+  },
+  "line_order": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "nodes": {
+    "N01": {
+      "id": "N01",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ki",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "adapted": "Ingrid Kowalczyk is aboard the leaking narrowboat at dusk with Ivo Gutierrez on the stern deck counting coins, while Pieter Oyelaran checks the logbook and complains that the bilge has not been sounded; the mooring line is fast, the wheel is cold, and the canal water is already low against the hull.",
+      "title": "Dusk on the Moored Boat",
+      "summary": "You stand on the stern deck of the leaking narrowboat at dusk while Ivo Gutierrez counts coins and Pieter Oyelaran checks the logbook at the bow. Pieter complains that the bilge has not been sounded, and the mooring line lies fast against the bollard. You leave the sale papers where Ivo Gutierrez can see them, so the ordinary day closes as a negotiation with a dead man's vessel.",
+      "image": "the fast mooring line at the bow bollard",
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C02",
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N02": {
+      "id": "N02",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "sho",
+      "turn": 1,
+      "way": 1,
+      "event": null,
+      "adapted": "Ingrid reads the standing orders in the captain’s logbook and learns that the wheel will answer only after a log entry, a whistle call, and a meal are set; Pieter Oyelaran’s hand closes over the steering wheel as she reads, and Ivo Gutierrez hears her reading to the dead and asks whether the sale is still possible.",
+      "title": "The Standing Orders",
+      "summary": "You read the standing orders in the captain’s logbook and learn that the wheel will answer only after a log entry, a whistle call, and a meal are set. Pieter’s hand closes over the cold wheel as you read, and Ivo hears you reading to the dead and asks whether the sale is still possible. The boat’s first move now stands on the ghost’s protocol, with Ivo’s coins waiting on the stern deck.",
+      "image": "the logbook open on the galley table beside the cold wheel",
+      "where": [
+        "L03",
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "additions": [
+        {
+          "line": "T2",
+          "text": "Ivo Gutierrez's coin purse must be on the stern deck near the bilge, with the brass whistle in it, so that it can slip into the water when the wheel seizes."
+        }
+      ],
+      "annotations": {}
+    },
+    "N03": {
+      "id": "N03",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ten",
+      "turn": 2,
+      "way": 3,
+      "event": 1,
+      "adapted": "Kwame Nakashima stops at the stern mooring ring and asks if the boat is for sale while Pieter Oyelaran stands directly behind Ingrid, blocking the view of the interior; Ingrid shows the walker the logbook and the standing order, and he agrees to buy the boat as a captain’s vessel, but only if he can see it move before he pays the full price.",
+      "title": "The Buyer at the Stern",
+      "summary": "Kwame Nakashima stops at the stern mooring ring and asks whether the boat is for sale while Pieter stands directly behind you, blocking the view of the interior. You show him the logbook and the standing order, and Ivo begins a bargain over the price. Kwame agrees to buy the boat as a captain’s vessel, but only if he can see it move before he pays the full price, so the first leg now becomes his to choose.",
+      "image": "the open logbook at the stern mooring ring",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C03",
+        "C02",
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "N04": {
+      "id": "N04",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ketsu",
+      "turn": 3,
+      "way": 1,
+      "event": 2,
+      "adapted": "The galley table sets itself for a meal Pieter Oyelaran insists on eating, and Ivo Gutierrez’s sandwich keeps sliding off the plate under the low ceiling; Ingrid sets the table for the ghost’s meal, the plates stop moving, and Ivo Gutierrez’s ruined sandwich and cold face make clear that the sale papers are now worth less than the protocol.",
+      "title": "The Set Table",
+      "summary": "The galley table sets itself for a meal Pieter Oyelaran insists on eating, and Ivo Gutierrez's sandwich keeps sliding off his plate under the low ceiling. You set the table for Pieter's meal, the plates stop moving, and the galley quiets enough to make the boat ready for the first leg. Ivo's ruined sandwich and cold face make the sale papers worth less than protocol, and he asks, in quick practical fragments, what else you intend to pay for.",
+      "image": "a sandwich sliding off Ivo Gutierrez's plate under the low ceiling",
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "additions": [
+        {
+          "line": "T3",
+          "text": "Add to N04 that Ivo Gutierrez pulls the brass whistle from his coin purse and presses it into your hand, demanding the ghost be stopped before the meal ruins the sale."
+        }
+      ],
+      "annotations": {}
+    },
+    "N05": {
+      "id": "N05",
+      "line": "T1",
+      "iteration": 1,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": 1,
+      "event": 3,
+      "adapted": "The mooring line at the bow snaps with a wet, organic sound and the boat slips into the current, with Pieter Oyelaran’s face looking up from just below the hull, not angry but disappointed; Ingrid sounds the brass whistle, lets the ghost give the order, and the boat moves on the dead captain’s chosen first leg while Ivo Gutierrez holds the wet sale papers and Kwame Nakashima watches from the towpath.",
+      "title": "The First Leg",
+      "summary": "The mooring line at the bow snaps with a wet, organic sound, and the boat slips into the current while Pieter Oyelaran's face looks up from just below the hull, not angry but disappointed. You sound the brass whistle and let Pieter give the order, and the boat moves on the dead captain's chosen first leg before the current can carry it past the next junction. Ivo Gutierrez watches you bargain with a corpse, holds the signed sale papers at the stern, and keeps the coins in his wet hand while Kwame Nakashima watches from the towpath as the boat leaves on terms the dead man helped write.",
+      "image": "Pieter Oyelaran's face looking up from the black water",
+      "where": [
+        "L02",
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T1"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N01": {
+      "id": "T2N01",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ten",
+      "turn": 2,
+      "way": 2,
+      "event": 1,
+      "adapted": "Kwame Nakashima stops at the stern mooring ring and asks if the boat is for sale while Pieter Oyelaran stands directly behind Ingrid Kowalczyk, blocking the view of the galley. Ingrid Kowalczyk lets the ghost hold the dark space behind her, and Kwame Nakashima agrees to buy the boat on faith, asking no questions about the interior because his coin purse is already gone and the sale papers are the only thing left to sign. Ivo Gutierrez's coins are not in his hand; they are under the hull, and he watches the buyer with a cold, practical face that is beginning to turn away.",
+      "title": "The Buyer at the Ring",
+      "summary": "Kwame Nakashima stops at the stern mooring ring and asks if the boat is for sale, while Ivo Gutierrez begins a bargain in quick practical fragments and Pieter Oyelaran stands directly behind you, blocking the view of the boat's interior. You hold the sale papers out and let the dark space behind you answer for the hull, and Kwame Nakashima agrees to buy the boat on faith, asking no questions about the interior because Ivo Gutierrez's coin purse is already gone and the sale papers are the only thing left to sign. Ivo Gutierrez watches the buyer with a cold, practical face that begins to turn away, his coins not in his hand but under the hull.",
+      "image": "sale papers held out before the dark space",
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C03",
+        "C02",
+        "C01"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N02": {
+      "id": "T2N02",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ketsu",
+      "turn": 3,
+      "way": 2,
+      "event": 2,
+      "adapted": "The galley table sets itself for Pieter Oyelaran's meal, and Ivo Gutierrez's sandwich slides off the plate under the low ceiling. Ingrid Kowalczyk moves Ivo Gutierrez to the stern deck and lets the ghost eat alone; the plates stop moving, but Ivo Gutierrez sees her prioritize the dead captain's protocol over the sale papers and leaves the boat, stepping onto the towpath with no coin purse, no share of the bargain, and no intention of waiting for the first leg.",
+      "title": "The Galley Meal",
+      "summary": "The galley table sets itself for Pieter Oyelaran's meal, and Ivo Gutierrez's sandwich keeps sliding off the plate under the low ceiling. You move Ivo Gutierrez to the stern deck and let Pieter Oyelaran eat alone, and the plates stop moving while Pieter Oyelaran's voice stays slightly out of sync with his mouth. Ivo Gutierrez leaves the boat, stepping onto the towpath with no coin purse, no share of the bargain, and no intention of waiting for the first leg.",
+      "image": "a sandwich sliding off a plate under the low ceiling",
+      "where": [
+        "L03",
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02"
+      ],
+      "is_ending": false,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T2N03": {
+      "id": "T2N03",
+      "line": "T2",
+      "iteration": 2,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": 1,
+      "event": 3,
+      "adapted": "The mooring line at the bow snaps with a wet, organic sound, and the boat slips into the current. Ingrid Kowalczyk sounds the brass whistle recovered from the bilge, lets Pieter Oyelaran give the order, and he chooses the first leg. Kwame Nakashima signs the sale papers at the stern and pays for the boat as a captain's vessel, while Ivo Gutierrez watches from the towpath with his coin purse gone and no place on the boat.",
+      "title": "The First Leg",
+      "summary": "At first light, the mooring line at the bow snaps with a wet, organic sound, as if it were a tendon, and the boat slips into the current while Pieter Oyelaran's face looks up from just below the hull, not angry but disappointed. You sound the brass whistle and let Pieter Oyelaran give the order before the current takes the boat past the next junction, and he chooses the first leg while Kwame Nakashima signs the sale papers at the stern and pays for the boat as a captain's vessel. Ivo Gutierrez watches from the towpath with his coin purse gone and no place on the boat, and the logbook stays open under the dead captain's first leg.",
+      "image": "the mooring line snapping with a wet, organic sound",
+      "where": [
+        "L02",
+        "L01",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T2"
+      ],
+      "additions": [],
+      "annotations": {}
+    },
+    "T3N01": {
+      "id": "T3N01",
+      "line": "T3",
+      "iteration": 3,
+      "beat": "ketsu",
+      "turn": 4,
+      "way": 2,
+      "event": 3,
+      "adapted": "Ingrid Kowalczyk writes her own entry in the logbook and turns the key while Pieter Oyelaran's mouth moves a half-beat behind his voice as he complains that the whistle has cancelled the meal. Ivo Gutierrez holds the wheel and keeps his hands on the sale papers, and Ingrid Kowalczyk frees the bow line with the knife while Pieter Oyelaran's hand is off it; the line snaps with a wet, organic sound, the boat slips into the current, and Pieter Oyelaran's face looks up from the water, not angry but disappointed. Kwame Nakashima signs at the stern for an ordinary narrowboat, Ivo Gutierrez gets his money back with dry sale papers, and the boat moves under Ingrid Kowalczyk's chosen first leg.",
+      "title": "The Owner's Key",
+      "summary": "You cut the bow line free with the knife while Pieter Oyelaran's hand is off the rope, and it snaps with a wet, tendon sound as the boat slips into the current. As you write your own entry in the logbook and turn the owner's key, Pieter complains, mouth a half-beat behind his voice, that the brass whistle has cancelled the meal; Ivo Gutierrez holds the wheel and keeps his hands on the sale papers. Kwame Nakashima signs at the stern for an ordinary narrowboat, Ivo gets his money back with the sale papers dry while his coins stay wet with canal water, and the boat moves under your key and your own log entry while the ropes cut your hands, the cold stays in the hull, and Pieter's face looks up from the water, not angry but disappointed, leaving him facing the stern with the logbook closed and the boat no longer moving on his schedule.",
+      "image": "the snapped bow line dripping like a tendon in the current",
+      "where": [
+        "L03",
+        "L02",
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "is_ending": true,
+      "lines": [
+        "T3"
+      ],
+      "additions": [],
+      "annotations": {}
+    }
+  },
+  "node_order": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T3N01"
+  ],
+  "characters": {
+    "C01": {
+      "id": "C01",
+      "label": "the ghost captain",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to retain command of the vessel by enforcing strict maritime protocol and maintaining the logbook's integrity",
+      "holds": "the steering wheel, the mooring line's tension, and the authority of the dead captain's log",
+      "edge": "insists on the dignity of the rank while his physical form rots, treating the living owner as a subordinate who has failed to sound the bilge",
+      "tie": "served the boat before the sister inherited it and views the sister's legacy as a dereliction of duty that must be corrected",
+      "voice": "speaks with a mouth slightly out of sync with the voice, issuing orders with the weary patience of a man who has been waiting for a reply for decades: 'The bilge. Sound the bilge. You are not in command until you have answered to the water.'",
+      "breaking_point": "",
+      "opposition": true,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "name": "Pieter Oyelaran",
+      "profile": null,
+      "packet": null
+    },
+    "C02": {
+      "id": "C02",
+      "label": "your brother-in-law",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to recover the money he spent clearing the title and to leave the boat before the cold sets in",
+      "holds": "the sale papers, the coin purse, and the only living perspective on the absurdity of the situation",
+      "edge": "counts every coin as if the protagonist's safety were a line item, refusing to acknowledge the ghost's presence as anything other than a draft or a trick of the light",
+      "tie": "was the sister's husband and paid to clear the title, and now treats the protagonist's hesitation as a personal financial liability",
+      "voice": "talks in quick, practical fragments that cut through the eerie silence: 'The line's frayed, the roof's leaking, and I'm standing in a draft. Give me a price or give me a way out.'",
+      "breaking_point": "leaves the boat the moment he sees the protagonist prioritize the ghost's protocol over the sale papers",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "name": "Ivo Gutierrez",
+      "profile": null,
+      "packet": null
+    },
+    "C03": {
+      "id": "C03",
+      "label": "the distant walker",
+      "kind": "individual",
+      "speaks_for": null,
+      "wants": "to purchase the boat or simply observe it, acting as the catalyst that forces the transaction to close",
+      "holds": "the potential buyer's interest and the physical presence at the stern that blocks the view",
+      "edge": "stops at the mooring ring with a casual curiosity that makes the protagonist's internal struggle visible to an outsider",
+      "tie": "has no prior connection to the protagonist but is bound to the story by the act of asking if the boat is for sale",
+      "voice": "speaks with a polite, detached curiosity that ignores the supernatural tension: 'Is this one for sale? It looks like it's seen a bit of water, but the hull seems sound.'",
+      "breaking_point": "",
+      "opposition": false,
+      "why": "",
+      "matters_to_turns": [
+        2,
+        4
+      ],
+      "source": "premise",
+      "nodes": [
+        "N03",
+        "N05",
+        "T2N01",
+        "T2N03",
+        "T3N01"
+      ],
+      "name": "Kwame Nakashima",
+      "profile": null,
+      "packet": null
+    }
+  },
+  "locations": {
+    "L01": {
+      "id": "L01",
+      "name": "the stern deck",
+      "kind": "a narrow open deck at the stern of the narrowboat",
+      "why": "where the mooring ring, coins, sale papers, and any buyer can meet you",
+      "source": "T1",
+      "nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N05",
+        "T2N01",
+        "T2N02",
+        "T2N03",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L02": {
+      "id": "L02",
+      "name": "the bow",
+      "kind": "a small fore area of the narrowboat",
+      "why": "where the mooring line is tied to the bollard and the boat's fastness can be checked",
+      "source": "T1",
+      "nodes": [
+        "N01",
+        "N05",
+        "T2N03",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L03": {
+      "id": "L03",
+      "name": "the galley",
+      "kind": "a low-ceilinged interior room of the narrowboat",
+      "why": "where the logbook and standing orders can be read and the meal set",
+      "source": "T1",
+      "nodes": [
+        "N02",
+        "N04",
+        "T2N02",
+        "T3N01"
+      ],
+      "rooms": null,
+      "packet": null
+    },
+    "L04": {
+      "id": "L04",
+      "name": "the towpath",
+      "kind": "the canal bank beside the moored narrowboat",
+      "why": "where the buyer can stand outside the boat and watch the first leg begin",
+      "source": "T1",
+      "nodes": [
+        "N05",
+        "T2N02",
+        "T2N03"
+      ],
+      "rooms": null,
+      "packet": null
+    }
+  },
+  "branching": "plan",
+  "plan": {
+    "assessment": "T1 answers the question only in the middle: the boat moves, but on terms the dead captain helped write, and the world it leaves has Ivo and the walker standing while the ghost is lost. Missing are a clean pole_a ending where the ghost's terms are answered and Ivo is the one lost, and a clean pole_b ending where the living owner asserts agency and the boat is sold as an ordinary vessel. The story can part early at N02, when the wheel first answers the logbook instead of the living owner.",
+    "seeds": [
+      {
+        "motivation": "You come to want the dead captain's terms to be the only terms, because the wheel seizes in your hand while you answer Pieter Oyelaran's complaint about the unsounded bilge and Ivo Gutierrez's coin purse slips into the water, so the living owner's money is already gone and the logbook is the only order left.",
+        "strategy": "Keep the logbook, the whistle, and the meal in front of you, satisfy Pieter Oyelaran's standing orders, and let the boat move under his first leg so Kwame Nakashima can buy it as a captain's vessel.",
+        "diverges_at": "N02",
+        "trigger": "you answered Pieter Oyelaran's complaint about the unsounded bilge and let the wheel seize in your hand while Ivo Gutierrez's coin purse slipped into the bilge",
+        "trigger_kind": "act",
+        "way": 2,
+        "ending": {
+          "title": "The Bilge Answer",
+          "summary": "The boat moves at first light under Pieter Oyelaran's log entry and whistle call, and Kwame Nakashima pays for it as a captain's vessel. Ivo Gutierrez is left on the towpath with his coin purse gone and no share of the sale, while the dead captain keeps the wheel.",
+          "answer": "pole_a",
+          "standing": [
+            "the distant walker",
+            "the ghost captain"
+          ],
+          "lost": [
+            "your brother-in-law"
+          ],
+          "changed": "the boat is sold as a captain's vessel with the logbook still open"
+        },
+        "why_different": "T1 keeps Ivo and loses the ghost on mixed terms; this line gives the boat to the ghost's terms, loses Ivo, and keeps the dead captain at the wheel."
+      },
+      {
+        "motivation": "You come to want the sale papers to matter more than the ghost's protocol, because Ivo Gutierrez's ruined sandwich and cold face make clear that the boat is becoming a set of standing orders before it becomes a sale, and the living owner's key is the only thing left that can make it move.",
+        "strategy": "Call the ghost's meal off with the brass whistle, keep Ivo Gutierrez at the sale papers, and make the boat move under Ingrid Kowalczyk's key and her own log entry before Pieter Oyelaran can face the wheel again.",
+        "diverges_at": "N04",
+        "trigger": "you used the brass whistle to call Pieter Oyelaran's meal off and made the set table stop moving",
+        "trigger_kind": "act",
+        "way": 3,
+        "ending": {
+          "title": "The Owner's Key",
+          "summary": "The boat moves under Ingrid Kowalczyk's key and her own log entry, and Kwame Nakashima pays for an ordinary narrowboat rather than a captain's vessel. Ivo Gutierrez gets his money back and stands with the sale papers dry, while Pieter Oyelaran is left facing the stern with the logbook closed.",
+          "answer": "pole_b",
+          "standing": [
+            "your brother-in-law",
+            "the distant walker"
+          ],
+          "lost": [
+            "the ghost captain"
+          ],
+          "changed": "the boat is sold as an ordinary narrowboat and the owner chooses the first leg"
+        },
+        "why_different": "T1 moves the boat on mixed terms with the dead captain's help; this line moves it under the living owner's agency and sells it as an ordinary vessel, so the answer is pole_b rather than mixed."
+      }
+    ]
+  },
+  "promises": {
+    "reading": "This is a gothic comedy set on the water: a haunted vessel that refuses to move because its dead captain still believes he is in command. The writer wants the specific texture of a canal boat—the creaking wood, the narrow galley, the mist on the water—to ground the supernatural, and wants the fear to be real enough to make the humor land. They are hoping to feel the relief of a shared secret and the thrill of outwitting a stubborn authority figure who is also a monster.",
+    "genre": "gothic comedy / haunted vessel",
+    "player_fantasy": "To be the living owner of a place that refuses to obey you, armed only with logic, leverage, and a skeptical relative, while the walls close in and the dead man's grip tightens.",
+    "promises": [
+      {
+        "what": "a ghost who is not a sheet but a specific, rotting, uniformed figure who still checks the logs and complains about the bilge water",
+        "why": "the Kernel demands a 'real character' who is scary when needed; the humor comes from the banality of his complaints clashing with his spectral nature",
+        "in_kernel": true
+      },
+      {
+        "what": "a brother-in-law who is physically present but emotionally distant, counting coins while the temperature drops, serving as the audience's anchor to reality",
+        "why": "the Kernel specifies this companion; he provides the 'financial anxiety' and the counter-weight to the ghost's authority",
+        "in_kernel": true
+      },
+      {
+        "what": "the boat itself as a responsive antagonist: ropes that tighten, wheels that seize, and a mooring line that will not cut",
+        "why": "the 'single setting' constraint means the environment must act; the boat is the third party in the triangle of owner, ghost, and brother",
+        "in_kernel": false
+      },
+      {
+        "what": "a moment where the 'funny' and 'frightening' merge: a joke that is also a threat, or a scare that is also a bureaucratic hurdle",
+        "why": "the Kernel asks for equal measure; the tone engine relies on this overlap to maintain the specific 'eerie/funny' blend",
+        "in_kernel": false
+      },
+      {
+        "what": "the physical act of moving the boat: the churning of the water, the groaning of the hull, the first few feet of progress against the ghost's will",
+        "why": "the Kernel insists the boat 'actually go somewhere'; the climax of the tension is the physical movement of the setting",
+        "in_kernel": true
+      }
+    ],
+    "set_pieces": [
+      {
+        "scene": "the brother-in-law trying to sell the boat to a passerby on the towpath while the ghost stands directly behind the player, blocking the view of the boat's interior",
+        "where": "the stern deck, near the mooring ring"
+      },
+      {
+        "scene": "the galley table setting itself for a meal the ghost insists on eating, while the brother-in-law tries to eat a sandwich that keeps sliding off the plate",
+        "where": "the narrow galley, under the low ceiling"
+      },
+      {
+        "scene": "the mooring line snapping not with a bang but with a wet, organic sound, as if it were a tendon, releasing the boat into the current",
+        "where": "the bow, where the line is tied to the bollard"
+      },
+      {
+        "scene": "the ghost's face visible in the dark water of the canal, looking up at the boat's hull as it drifts away, not angry but disappointed",
+        "where": "the canal water, just below the hull"
+      }
+    ],
+    "tone_engine": "Funny: the ghost is a stickler for protocol and the brother-in-law is a pragmatist; the comedy arises from the absurdity of negotiating with a corpse over property rights. Eerie: the cold is constant, the shadows move when they shouldn't, and the ghost's voice is always slightly out of sync with his mouth.",
+    "obligatory_cast": [
+      "a canal towpath that is empty except for the occasional, distant walker who sees the boat but not the ghost",
+      "a specific, mundane object that serves as the ghost's 'anchor' to the boat, such as a brass whistle or a logbook that only he can read"
+    ],
+    "must_not": [
+      "no other ghosts or supernatural entities: the haunting is singular and personal to the captain",
+      "no modern technology that solves the problem instantly (e.g., a phone app to sell the boat): the solution must be physical and negotiated",
+      "no death of the living characters: the fear is sustained, not fatal, per the 'comic, uneasy success' trajectory"
+    ]
+  },
+  "edges": [
+    {
+      "from": "N01",
+      "to": "N02",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N02",
+      "to": "N03",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you read the standing orders from the logbook and learned that the wheel would answer only after a log entry, a whistle call, and a meal were set"
+      ]
+    },
+    {
+      "from": "N03",
+      "to": "N04",
+      "lines": [
+        "T1",
+        "T3"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "N05",
+      "lines": [
+        "T1"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": [
+        "you set the table for Pieter Oyelaran's meal and let the plates stop moving"
+      ]
+    },
+    {
+      "from": "N02",
+      "to": "T2N01",
+      "lines": [
+        "T2"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you answered Pieter Oyelaran's complaint about the unsounded bilge and let the wheel seize in your hand while Ivo Gutierrez's coin purse slipped into the bilge",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    },
+    {
+      "from": "T2N01",
+      "to": "T2N02",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "T2N02",
+      "to": "T2N03",
+      "lines": [
+        "T2"
+      ],
+      "kind": "continue",
+      "trigger": null,
+      "otherwise": []
+    },
+    {
+      "from": "N04",
+      "to": "T3N01",
+      "lines": [
+        "T3"
+      ],
+      "kind": "branch",
+      "trigger": {
+        "text": "you used the brass whistle to call Pieter Oyelaran's meal off and made the set table stop moving",
+        "kind": "act",
+        "formal": null
+      },
+      "otherwise": []
+    }
+  ],
+  "grid": {
+    "beats": [
+      "ki",
+      "sho",
+      "ten",
+      "ketsu"
+    ],
+    "rows": {
+      "T1": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "N03"
+        ],
+        "ketsu": [
+          "N04",
+          "N05"
+        ]
+      },
+      "T2": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "T2N01"
+        ],
+        "ketsu": [
+          "T2N02",
+          "T2N03"
+        ]
+      },
+      "T3": {
+        "ki": [
+          "N01"
+        ],
+        "sho": [
+          "N02"
+        ],
+        "ten": [
+          "N03"
+        ],
+        "ketsu": [
+          "N04",
+          "T3N01"
+        ]
+      }
+    },
+    "skipped": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    }
+  },
+  "hooks": [
+    {
+      "node": "N03",
+      "turn": 2,
+      "way": 1,
+      "what": "the walker agrees, because your brother-in-law names a price low enough that the ghost's shadow does not scare him off the towpath",
+      "cost": "the brother-in-law gets less than his money back and the ghost stands closer to the sale papers"
+    },
+    {
+      "node": "N03",
+      "turn": 2,
+      "way": 2,
+      "what": "the walker agrees, because you let the ghost block the view and the walker pays for the boat on faith, asking no questions",
+      "cost": "the brother-in-law's coins are in your hand, but he does not trust what you sold him"
+    },
+    {
+      "node": "N04",
+      "turn": 3,
+      "way": 2,
+      "what": "the galley quiets, because you move your brother-in-law to the stern deck and let the ghost eat alone",
+      "cost": "the brother-in-law is colder and farther from the sale papers, and the ghost's voice is slightly out of sync with his mouth"
+    },
+    {
+      "node": "T2N01",
+      "turn": 2,
+      "way": 1,
+      "what": "the walker agrees, because your brother-in-law names a price low enough that the ghost's shadow does not scare him off the towpath",
+      "cost": "the brother-in-law gets less than his money back and the ghost stands closer to the sale papers"
+    },
+    {
+      "node": "T2N01",
+      "turn": 2,
+      "way": 3,
+      "what": "the walker agrees, because you show him the logbook and the standing order, and he pays for the boat as a captain's vessel",
+      "cost": "the ghost's terms are now the buyer's terms, and the first leg is his to choose"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 1,
+      "what": "the galley quiets, because you set the table for the ghost's meal and the plates stop moving",
+      "cost": "the brother-in-law's sandwich is ruined, and he asks what else you intend to pay for"
+    },
+    {
+      "node": "T2N02",
+      "turn": 3,
+      "way": 3,
+      "what": "the galley quiets, because you use the brass whistle to call the meal off and the table stops setting itself",
+      "cost": "the ghost turns his back to the galley, and the wheel will not turn until he is faced again"
+    }
+  ],
+  "checks": {
+    "findings": [],
+    "notes": [
+      {
+        "kind": "repeated_node",
+        "issue": "nodes N05 and T2N03 play the same turn the same way in the same beat on different lines; the second retells the first",
+        "lines": [],
+        "nodes": [
+          "N05",
+          "T2N03"
+        ]
+      }
+    ]
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "line": "T1",
+      "new_nodes": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "judge": null,
+      "plan": {
+        "assessment": "T1 answers the question only in the middle: the boat moves, but on terms the dead captain helped write, and the world it leaves has Ivo and the walker standing while the ghost is lost. Missing are a clean pole_a ending where the ghost's terms are answered and Ivo is the one lost, and a clean pole_b ending where the living owner asserts agency and the boat is sold as an ordinary vessel. The story can part early at N02, when the wheel first answers the logbook instead of the living owner.",
+        "seeds": 2
+      }
+    },
+    {
+      "iteration": 2,
+      "line": "T2",
+      "new_nodes": [
+        "T2N01",
+        "T2N02",
+        "T2N03"
+      ],
+      "judge": null
+    },
+    {
+      "iteration": 3,
+      "line": "T3",
+      "new_nodes": [
+        "T3N01"
+      ],
+      "judge": null
+    }
+  ],
+  "stop_reason": "reached --max-iterations (3)",
+  "warnings": []
+}

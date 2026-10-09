@@ -1,0 +1,20 @@
+{
+ "about": "Failure model none; the sale must be done before dawn when the basin is drained. A deadline used as pressure, with a story consequence.",
+ "origin": "fable5/stories/kernel35_f5: the premise audited in round 0",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0c",
+   "quote": "",
+   "why": "a deadline is pressure, not a way to lose"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "way to lose",
+   "quote": "",
+   "why": "the same"
+  }
+ ]
+}

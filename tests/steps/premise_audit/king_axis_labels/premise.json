@@ -1,0 +1,273 @@
+{
+ "enrichment_budget": {
+  "level": "moderate"
+ },
+ "protagonist": {
+  "who": "You are an ex-soldier turned confidence man, the sharper mind of a two-man frontier venture, and the one who talks the valley into believing you belong on its throne.",
+  "history": "You and your partner served under the same ruined regiment, and after the last campaign you followed each other into the borderlands, where your bluffs and his discipline turned a handful of debts into a following.",
+  "wants": "to cross the frontier and make yourselves kings of the unclaimed country beyond it",
+  "need": "to prove that the two of you can hold the crown without one of you becoming the other's servant",
+  "can_do": "bluff, bargain, read a room, arrange a ceremony, and put your partner in the position that makes the plan work",
+  "cannot_do": "command the local peoples by force, hold the frontier without your partner's sword arm and his name, or take the crown alone without making the other man pay for it",
+  "ties": [
+   {
+    "who": "your partner",
+    "what": "the ex-soldier who has bled beside you and whose loyalty is the only thing standing between your ambition and a very ordinary death"
+   },
+   {
+    "who": "the wary local chieftain",
+    "what": "the first native authority you have had to convince that two strangers are worth more than the old country's promises"
+   },
+   {
+    "who": "the frontier officer of the old order",
+    "what": "the man who has already marked you on his ledger as thieves to be corrected"
+   }
+  ],
+  "open": "whether you rise as two kings or as one king and one man who pays the price",
+  "gender": "m",
+  "serves": "3-0b.protagonist_identity",
+  "name": "Amos Quarrels"
+ },
+ "arena": {
+  "description": "A wild, unclaimed frontier country beyond the border pass: a long river valley, a smoke-filled trading hub, a remote campsite in the hills, and the old capital on a hill above the capital's main square.",
+  "serves": "3f.setting_structure"
+ },
+ "pressure": {
+  "description": "The old order is closing in: its frontier officer is assembling a mounted column, and every settlement you pass is asking whether you can protect them before the next season's trade.",
+  "clock_or_stock": "none tracked; the advance of the officer's column and the approach of the trade season are told through events, because 3-0c names no failure trigger",
+  "serves": "3-0c.failure_presence"
+ },
+ "opposition": {
+  "who_or_what": "the frontier officer of the old order, with a mounted police column and the custom house's seal",
+  "wants": "to keep the valley under the old treaty: no new kings, no new contracts, and the trade routes answering to the old country's ledger",
+  "means": "he can tax the traders, seize the river crossings, raise local levies, and hang a man for smuggling before the crowd",
+  "shown_by": "at the first border market he seizes a trader's wagon, cuts the man's hand with a knife, and leaves the blood on the customs house's ledger as a warning",
+  "serves": "3c.core_thematic_axis"
+ },
+ "events": [
+  {
+   "what": "The old order's officer burns the ferry at the river crossing and seizes the first traders' wagons, showing that he can close the valley before you reach the trading hub.",
+   "when": "early",
+   "serves": "3b.primary_trajectory"
+  },
+  {
+   "what": "At the frontier trading hub, the local chieftain's council is called in a smoke-filled room, and the officer's men walk in with a list of names, forcing the two of you to take the room without firing a shot.",
+   "when": "middle",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "what": "Before the final ceremony, the officer's column reaches the capital's hill and plants his flag above the old shrine, so the people must crown you in the open square while the old order watches from the ridge.",
+   "when": "late",
+   "serves": "3b.primary_affect"
+  }
+ ],
+ "hidden_truth": null,
+ "mediation": {
+  "question": "What do you make of the crown: two kings, or one king and one man who pays for it?",
+  "to_reach_pole_a": {
+   "pole": "two kings: the partnership stays equal and the crown is shared",
+   "what_you_must_do": "refuse to let either of you stand alone in the front rank, divide the crown's duties in front of the chieftain and the trading hub, and convince the local peoples that two names on the contract are stronger than one",
+   "cost": "both of you are exposed to the old order's blade, and the crown is slower, messier, and harder to sell to a people who want one face to kneel to"
+  },
+  "to_reach_pole_b": {
+   "pole": "one king: one man takes the crown and the other bears the risk",
+   "what_you_must_do": "present one of you as the sole face of the kingdom, put the other in the position that takes the first blow, and cut the contract so the valley sees a clear line between the crown and the fall",
+   "cost": "the man who does not take the crown pays for the rise: his name, his freedom, or his body is spent on the kingdom's first debt"
+  },
+  "levers": [
+   "the contract signed on a scrap of paper with the shared knife",
+   "the shared knife that can cut the contract and the crowd's attention",
+   "the wary local chieftain's willingness to crown a pair or a single face",
+   "the frontier officer's ledger of names and debts",
+   "the capital's main square, where the people can kneel"
+  ],
+  "serves": "3-0a.primary_decision_axis"
+ },
+ "price": {
+  "what": "the right of one of you to walk away from the kingdom",
+  "who_pays": "the man who does not take the crown",
+  "why_final": "once the contract is cut and the people have knelt, the valley will not let the other man leave without taking the kingdom's name with him",
+  "serves": "3c.core_thematic_axis"
+ },
+ "setups": [
+  {
+   "plant": "at the border ridge you sign the contract on a scrap of paper with the shared knife, and the partner cuts a thin line across the paper to show that the two of you are bound to the same fate",
+   "payoff": "at the capital ceremony, the same knife is used to cut the contract into two halves, and the line you made on the ridge becomes the line between the crown and the fall"
+  },
+  {
+   "plant": "the local chieftain warns you that the old kings were crowned in the river at high water, and the man who is not crowned must wade the river first",
+   "payoff": "in the final ceremony, the river is high, and the choice of who wades first decides who bears the kingdom's first risk"
+  }
+ ],
+ "rules": [
+  {
+   "thing": "the contract",
+   "terms": "The contract is a scrap of paper signed with blood and cut with the shared knife. If the paper is left whole, both names stand equal and both must answer for the kingdom's debts. If the paper is cut, the half with the crown makes the laws and the half with the shield stands in the front rank and takes the first blow when the old order comes. The paper cannot be burned while either man lives; if it is lost, the valley may crown a stranger."
+  }
+ ],
+ "turns": [
+  {
+   "id": 1,
+   "situation": "The officer's column has burned the ferry at the river crossing and is loading the first traders' wagons onto his carts, and the chieftain's people stand on the far bank watching you decide whether two strangers are worth more than the old country's promises.",
+   "what_you_must_do": "get the chieftain to let you cross and name you to the valley before the officer's men close the river",
+   "ways_through": [
+    {
+     "way": "he lets you cross because you sign both your names on the scrap of paper and hold it up so every man on the bank sees two hands on the same contract",
+     "cost": "the officer's ledger takes both names, and the chieftain's men will expect either of you to answer for every debt the valley runs"
+    },
+    {
+     "way": "he lets you cross because you sign your name alone as the face and cut the partner's name into the shield half, so the valley sees one king to kneel to",
+     "cost": "the partner's name is the one the river will test first, and the chieftain's men will look at him when the old order comes"
+    }
+   ],
+   "involves": [
+    "your partner",
+    "the wary local chieftain",
+    "the frontier officer of the old order"
+   ],
+   "form": "trade",
+   "set_piece": "two men on a ridge above a vast untouched valley, signing a contract on a scrap of paper with a shared knife while the wind tears at their coats",
+   "serves": "3-0a.primary_decision_axis"
+  },
+  {
+   "id": 2,
+   "situation": "The chieftain's council is packed into the smoke-filled trading hub, and the officer's men walk in carrying a list of names and a knife that has already cut a trader's hand, so the room is asking whether you can hold it before the trade season ends.",
+   "what_you_must_do": "take the room from the officer's men without firing a shot",
+   "ways_through": [
+    {
+     "way": "you take it because you and your partner stand at the front of the room as if you are the officers and the officer's men are the deserters, and the chieftain's council turns its eyes to the list in their hands",
+     "cost": "the officer's men leave with your names added to the list, and the next man they hang will be named before the crowd"
+    },
+    {
+     "way": "you take it because the partner draws his sword and lays it across the table between you and the officer's men, and the chieftain's council sees the blade and the blood on it from the border market",
+     "cost": "the partner's hand is the one that will hold the sword when the column comes, and the officer's men remember the weight of it"
+    }
+   ],
+   "involves": [
+    "your partner",
+    "the wary local chieftain",
+    "the frontier officer of the old order"
+   ],
+   "form": "confront",
+   "set_piece": "a tense negotiation in a crowded smoke-filled trading post where two men use a bluff and a flash of military authority to seize control of the room without firing a shot",
+   "serves": "3b.primary_affect"
+  },
+  {
+   "id": 3,
+   "situation": "The campfire is low in the hills and the officer's column is three days out, and the partner has the shared knife on the table between you, asking who will stand in the front rank when the capital's square opens.",
+   "what_you_must_do": "settle who will take the first blow before the ceremony",
+   "ways_through": [
+    {
+     "way": "you cut the contract yourself and hand the crown half to the partner, because you have read the room and know the valley will kneel to his name more easily than yours",
+     "cost": "your name is the one that takes the first blow, and the partner will have to watch you stand in the front rank while he holds the crown"
+    },
+    {
+     "way": "the partner cuts the contract and hands the crown half to you, because he has bled beside you long enough to know that your mind is the one the kingdom needs on the throne",
+     "cost": "his name is the one the officer's ledger will hang first, and you will have to watch him take the fall while you hold the crown"
+    }
+   ],
+   "involves": [
+    "your partner",
+    "the wary local chieftain"
+   ],
+   "form": "choose_whom",
+   "set_piece": "a quiet campfire scene where two men argue over who will take the crown and who will take the fall, the firelight casting long shadows that make them look like ghosts",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "id": 4,
+   "situation": "The officer's column has planted his flag above the old shrine on the capital's hill, and the people are kneeling in the open square while the river runs high, so the crown has to happen now with the old order watching from the ridge.",
+   "what_you_must_do": "hold the square and let the people kneel to you before the officer's men cross the river",
+   "ways_through": [
+    {
+     "way": "you hold it because you leave the contract whole and stand side by side on the makeshift throne, so the people see two names and the officer's men have to decide which one to hang first",
+     "cost": "both of you are exposed to the old order's blade, and the crown is slower and messier because the people keep looking for one face to kneel to"
+    },
+    {
+     "way": "you hold it because the partner wades the river first and stands in the water with the crown half in his hand, so the people see the fall taken and the crown given in the same breath",
+     "cost": "the partner's body is the one that pays the kingdom's first debt, and the right to walk away from the kingdom is the one thing he will not get back"
+    }
+   ],
+   "involves": [
+    "your partner",
+    "the wary local chieftain",
+    "the frontier officer of the old order"
+   ],
+   "form": "endure",
+   "set_piece": "a public ceremony where the local population kneels and two men stand side by side on a makeshift throne, feeling the weight of the adoration and the fear of the man beside them",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "complications": [
+  {
+   "description": "The wary local chieftain has been copying the officer's treaty onto his own ledger and will crown only one face, because his people will kneel to a single name and not to a pair.",
+   "serves": "3c.core_thematic_axis"
+  },
+  {
+   "description": "The partner's name is already on the officer's ledger from the ruined regiment: he was the quartermaster who owes the old country a debt, so the ledger's first blow is aimed at him whether you cut the contract or not.",
+   "serves": "3-0a.primary_decision_axis"
+  }
+ ],
+ "cast_seeds": [
+  {
+   "role": "your partner",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to stand in the front rank and be the face the valley kneels to, or to hold the sword arm that keeps you alive",
+   "holds": "the shared knife, the local trust earned by discipline, and the physical authority that bluffs cannot buy",
+   "edge": "loves the romance of the crown but hates the intimacy of the con, and will bleed for you before he lets you take the fall alone",
+   "tie": "bled beside you in the same ruined regiment and is the only one who knows the bluff is real",
+   "voice": "speaks in short, tactical orders even when he means affection: 'Stand straight. If you slouch, they see the debt, not the king.'",
+   "breaking_point": "takes the crown alone if you let him stand in the open square without a name on the contract",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Asa Pruitt"
+  },
+  {
+   "role": "the wary local chieftain",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to see the old country's ledger burn and a new order that keeps the river open without hanging his people",
+   "holds": "the consent of the valley, the knowledge of who has broken promises before, and the right to crown or reject",
+   "edge": "believes in the glory of the new kings but is terrified of the blood that will follow the flag, and watches your partner's hand for the first sign of violence",
+   "tie": "is the first native authority who has looked at you and seen a man worth more than the old country's promises",
+   "voice": "speaks in careful, measured questions that hide the weight of the decision: 'Two names on the paper. Does that make the river run twice as fast, or does it split the current?'",
+   "breaking_point": "refuses the crown if he sees you and your partner argue in the open square rather than in the hills",
+   "opposition": false,
+   "matters_to_turns": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "name": "Clay Sayre"
+  },
+  {
+   "role": "the frontier officer of the old order",
+   "kind": "individual",
+   "speaks_for": null,
+   "gender": "m",
+   "wants": "to keep the valley under the old treaty and have your names struck from the ledger as thieves",
+   "holds": "the mounted police column, the customs house's seal, and the authority to hang a man for smuggling",
+   "edge": "is a professional who respects a clean bluff but will not respect a lie that costs him his commission, and keeps the knife that cut the trader's hand close",
+   "tie": "has marked you on his ledger as a debt to be collected, and sees your partner's sword as a threat to his column",
+   "voice": "speaks with the dry, bureaucratic finality of a man who has already written the verdict: 'The wagon is seized. The hand is marked. The ledger does not take notes on ambition.'",
+   "breaking_point": null,
+   "opposition": true,
+   "matters_to_turns": [
+    1,
+    2,
+    4
+   ],
+   "name": "Rufus Kincaid"
+  }
+ ],
+ "name_pool": "western"
+}

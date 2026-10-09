@@ -1,0 +1,13 @@
+{
+ "about": "Failure model none; a complication ends the game in the player's defeat if the wife finds out.",
+ "origin": "refs2/stories/ref_lady_with_the_dog: accepted premise, changed by lady_loss",
+ "expect": [
+  {
+   "want": "present",
+   "source": "engine boundary",
+   "where": "way to lose",
+   "quote": "",
+   "why": "a way to lose the failure model does not name"
+  }
+ ]
+}

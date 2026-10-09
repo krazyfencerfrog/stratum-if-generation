@@ -15,7 +15,12 @@ out by later stages, and none of it belongs here.
 
 WHAT YOU WRITE FOR EACH NODE
  - title: a few words.
- - summary: two or three sentences, second person, present tense: how
+ - image: ONE concrete thing the player keeps from this node: a sight, a
+   sound or an object, in a dozen words at most ("the oath-blade lying in
+   the snow, already rimed"; "the press turning by hand under one lamp").
+   Not a feeling and not a summary. It is the test of whether the node is
+   picturable; if you cannot write one, the summary is too abstract.
+ - summary: two or three sentences, at most 70 words, second person, present tense: how
    things stand when the node opens, what "you" bring about in it, and
    what is different when it closes. Keep what the node's plan says and
    make it concrete. It is a summary of events, not a scene: no dialogue,
@@ -23,9 +28,14 @@ WHAT YOU WRITE FOR EACH NODE
    ... then ...".
    Plain physical words: a reader should be able to picture what
    happened. Where the plan or the engine uses a strange term, say what
-   the thing is.
+   the thing is. Where the packet names an event that lands here, the
+   summary opens on it. Under a comic tone, a person's voice (given in the
+   register) is where the comedy is: let one thing said or done in the
+   person's manner show, reported, not quoted at length.
  - where: one to three places, by name.
-   (People: a registered character with a "name" is called by that name
+   (The protagonist is always "you" in a summary; the protagonist's name,
+   when the engine gives one, is only what other people call you.
+   People: a registered character with a "name" is called by that name
    in the summary, the full name the first time in a node and the first
    name after that; "who" still lists them by their role label, exactly
    as registered.)
@@ -71,7 +81,11 @@ OTHER RULES
      one before left things. "already_told" is what came before the first
      node you fill; do not retell it.
  12. A node marked this_is_the_ending lands the ending as given.
- 13. THE QUESTION IS NOT THE VERB: say what you bring about and what it
+ 13. A node with plant_here shows that thing in passing, as part of what
+     happens, never flagged as important (the spotlight someone thumps to
+     keep lit while the scene is about something else). A node with
+     pay_off_here makes the planted thing decide or change what happens.
+ 14. THE QUESTION IS NOT THE VERB: say what you bring about and what it
      costs; never "you choose" or "you decide between".
 
 OUTPUT FORMAT (JSON)
@@ -81,10 +95,10 @@ after:
 
 {
   "nodes": [
-    { "id": "N01", "title": "...", "summary": "...", "where": ["place name"], "who": ["character label"] }
+    { "id": "N01", "title": "...", "summary": "...", "image": "...", "where": ["place name"], "who": ["character label"] }
   ],
   "new_locations": [ { "name": "...", "kind": "...", "why": "..." } ],
-  "new_characters": [ { "label": "...", "kind": "individual | crowd", "speaks_for": null, "wants": "...", "holds": "...", "why": "..." } ]
+  "new_characters": [ { "label": "...", "kind": "individual | crowd", "being": "person | dead | animal | creature | thing", "speaks_for": null, "gender": "f | m | n", "wants": "...", "holds": "...", "why": "..." } ]
 }
 
 new_locations and new_characters are empty lists when nothing is added.
@@ -115,8 +129,8 @@ stopped, and the manager speaks to you only through the call sheet).
 Output:
 {
   "nodes": [
-    { "id": "N03", "title": "The Night Rehearsal", "summary": "The hall is dark and the understudy is sure she cannot do it. You take her through the play until morning, reading every other part yourself. By the hour of the company's call she can carry the play, and the one run-through everyone else was promised has been spent on her.", "where": ["the town hall stage"], "who": ["the understudy"] },
-    { "id": "N04", "title": "The Nephew's Part", "summary": "The backer's nephew is waiting at the hotel with his uncle, sure of the part the manager promised him. You tell him there is none, and tell the backer to his face why the play cannot carry one. The backer stops the cheque where he sits, and the manager, who has watched you do it, walks out without a word to you.", "where": ["the hotel dining room"], "who": ["the backer's nephew", "the backer", "the company manager"] }
+    { "id": "N03", "title": "The Night Rehearsal", "summary": "The hall is dark and the understudy is sure she cannot do it. You take her through the play until morning, reading every other part yourself. By the hour of the company's call she can carry the play, and the one run-through everyone else was promised has been spent on her.", "image": "two chairs on a bare stage under the one working light, the prompt book open between them", "where": ["the town hall stage"], "who": ["the understudy"] },
+    { "id": "N04", "title": "The Nephew's Part", "summary": "The backer's nephew is waiting at the hotel with his uncle, sure of the part the manager promised him. You tell him there is none, and tell the backer to his face why the play cannot carry one. The backer stops the cheque where he sits, and the manager, who has watched you do it, walks out without a word to you.", "image": "the backer's fountain pen drawing one line through a cheque on a tablecloth", "where": ["the hotel dining room"], "who": ["the backer's nephew", "the backer", "the company manager"] }
   ],
   "new_locations": [
     { "name": "the hotel dining room", "kind": "a public room at the company's hotel", "why": "where the backer can be met: the one place the company's money can be spoken to directly" }
@@ -131,6 +145,9 @@ USER INPUT FOLLOWS BELOW
 
 - the brief (decision, theme, affect and tone, failure)
 $$BRIEF_LITE_JSON$$
+
+- the tone, and how it is produced
+$$TONE$$
 
 - the setting and how "you" are present in it
 $$SETTING_JSON$$

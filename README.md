@@ -2,13 +2,17 @@
 story/content generator for the stratum-if engine
 
 A user supplies a short story premise (a kernel); a multi-step pipeline of
-local-LLM prompts analyzes it, builds a premise with a real obstacle, chooses
-a story framework, and then outlines the story one line at a time (a main
-line, then lines that leave it and end differently). The result is a story
-graph: nodes with short summaries, where and who; plain-language branch
-triggers; and rough character and location registers. See
-`docs/outline_design.md` for the pipeline, `docs/fable_response_4.md` for why
-it has this shape, and `CLAUDE.md` for the file conventions.
+local-LLM prompts analyzes it, reads it for what its genre's audience
+expects, builds a premise with a real obstacle (an opposition, events the
+world brings about on its own, a cast with voices and breaking points),
+chooses a story framework, and then outlines the story one line at a time (a
+main line, then a plan of every divergence, then the lines that leave it and
+end in different worlds). The result is a story graph: nodes with short
+summaries and one image each, where and who; plain-language branch triggers;
+rough character and location registers; and a computed evaluation. See
+`docs/outline_design.md` for the pipeline, `docs/fable_response_5.md` for
+the quality pass and the first-live-run checklist, `docs/fable_response_4.md`
+for why the loop has this shape, and `CLAUDE.md` for the file conventions.
 
 Everything runs on a local model through Ollama. The stages after the outline
 (beat expansion, character and setting buildout, reconciliation, per-node room
@@ -62,12 +66,29 @@ python probe_ollama.py               # a couple of minutes: what your Ollama ser
 cd generator
 python main.py --story-id=kernel1 < ../tests/kernels/kernel1.txt       # whole pipeline
 python main.py --story-id=foo --rating=PG-13 --stop-after=3.5 < k.txt   # rating filter, stop after 3.5
-python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap the outline at two lines (default 4)
+python main.py --story-id=kernel1 --max-iterations=2 < ...             # cap the outline at two lines (default: from the Kernel's ending tier)
 python main.py --story-id=kernel1 --framework=seven_point < ...        # choose the story framework yourself
+python main.py --story-id=kernel1 --branching=judge --no-promises < ... # the pre-2026-10-04 behaviour, for comparison
 python report.py kernel1 --baseline ../docs/baseline_kernel1_run_stats.json   # time and trace size per stage
-./todo.sh                                                              # all 32 test kernels
+./todo.sh                                                              # all 35 test kernels
 STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt   # no model
 ```
+
+To compare two versions of the prompts on the same phase-3 output (phase 3
+is half the run and does not change between them):
+
+```
+cd generator
+python ab.py run --variant plan  --kernels eval -- --branching=plan          # stories/<kernel>_plan/ for the 8 evaluation kernels
+python ab.py run --variant judge --kernels eval -- --branching=judge --no-promises
+python ab.py compare --variants plan,judge --kernels eval                    # metrics, judge scores and minutes side by side
+```
+
+`--kernels eval` is `tests/kernels/EVAL_SET.txt`; each kernel needs a
+`stories/<kernel>/` directory that has run at least through phase 3. Every
+finished outline also gets `<id>_eval.json`: computed metrics (where the
+lines fork, how many distinct ending worlds, repeated phrases, promise
+coverage, ...) and one cheap scoring call.
 
 Output lands in `stories/<story_id>/`. The outline is `<id>_story.md` (to
 read) and `<id>_story.json` (the document later stages build on). Every model

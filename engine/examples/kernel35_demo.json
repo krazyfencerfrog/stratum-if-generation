@@ -1,0 +1,992 @@
+{
+  "format": "stratum-story/1",
+  "story_id": "kernel35_demo",
+  "title": "The Captain Will Not Leave (two-scene demo)",
+  "protagonist": {
+    "name": "Teodor Fairweather",
+    "pronoun": "you",
+    "gender": "m",
+    "description": [
+      {
+        "text": "Wet to the knees and rope-burned across both palms. Mira would have laughed, and then fetched the first-aid tin.",
+        "when": "in_scene('S02')"
+      },
+      {
+        "text": "A man in his good coat on a boat that has never seen a good coat, Mira's ring on a cord round your neck where you can feel it."
+      }
+    ],
+    "think": {
+      "mira": {
+        "label": "Mira",
+        "says": [
+          {
+            "text": "She would have known how to talk to him. She called the boat 'the old man' and patted the wheel when she passed it, and you thought it was a joke.",
+            "when": "not seen('lake_kaur')"
+          },
+          {
+            "text": "Her grandfather. She told you about him twice, both times laughing, and both times she stopped laughing before she finished. Now you know why."
+          }
+        ]
+      },
+      "lazlo": {
+        "label": "Lazlo",
+        "says": [
+          {
+            "text": "He paid for the funeral without being asked, and he has not let you forget it for a single day. Both of those are true. Mira loved him anyway.",
+            "when": "not pattern('lazlo_nerve','up',1,1.0) and not pattern('lazlo_nerve','down',1,1.0)"
+          },
+          {
+            "text": "He is frightened, and the ledger is how he holds it. You gave him a number to hold. It helped more than you expected.",
+            "when": "pattern('lazlo_nerve','up',1,1.0)"
+          },
+          {
+            "text": "You laughed at the one thing keeping him steady. He has not looked at you straight since."
+          }
+        ]
+      },
+      "the_captain": {
+        "label": "the captain",
+        "known_when": "seen('lake_kaur')",
+        "says": [
+          {
+            "text": "He is dead, and he is standing at the wheel of your boat, and the strangest part is that he looks exactly like the photograph on Mira's mantelpiece."
+          }
+        ]
+      },
+      "the_sale": {
+        "label": "selling the boat",
+        "says": [
+          {
+            "text": "Noon. Four miles. Lazlo gets his money, you get whatever is left, and the boat goes to a man who wants it for a floating café. You tell yourself that is what she would have wanted, and you are not sure you believe it."
+          }
+        ]
+      }
+    }
+  },
+  "intro": [
+    {
+      "text": "Your wife Mira died in the spring. She left you her ring, a debt to her brother Lazlo (he paid for the funeral, and he has not forgotten it), and the Grey Heron: a canal boat that belonged to her grandfather, Captain Lake Kaur, and has not left its mooring in the forty years since he died aboard her.\n\nThe boat has a buyer, at a boatyard four miles downstream, at noon. Sell her, and Lazlo gets his money back. He has come along to make sure you do.\n\nThe boat also has a captain. Mira used to say her grandfather never really left. You thought she was joking."
+    }
+  ],
+  "states": {
+    "lazlo_nerve": {
+      "meaning": "how far Lazlo believes he can stay aboard without losing his money or his mind",
+      "visibility": "observed"
+    },
+    "captain_regard": {
+      "meaning": "how far the captain sees you as crew rather than a usurper",
+      "visibility": "observed"
+    }
+  },
+  "verbs": {
+    "open": {
+      "label": "Open"
+    },
+    "read": {
+      "label": "Read"
+    },
+    "untie": {
+      "label": "Untie"
+    }
+  },
+  "world": {
+    "rooms": {
+      "stern_deck": {
+        "name": "the stern deck",
+        "description": [
+          {
+            "text": "A square of tarred planks behind the cabin, slick with river damp. The tiller is lashed down with rope gone green."
+          }
+        ],
+        "exits": [
+          {
+            "to": "wheelhouse",
+            "label": "forward, to the wheelhouse"
+          },
+          {
+            "to": "cabin",
+            "label": "down the cabin steps"
+          },
+          {
+            "to": "towpath",
+            "label": "across the gangplank to the towpath",
+            "when": "in_scene('S01')"
+          },
+          {
+            "to": "bow",
+            "label": "along the gunwale to the bow"
+          }
+        ]
+      },
+      "wheelhouse": {
+        "name": "the wheelhouse",
+        "description": [
+          {
+            "text": "Barely room for two: a brass-ringed wheel, a speaking tube, a chart drawer under the window. The windows are fogged on the inside, though nobody has breathed in here for years."
+          }
+        ],
+        "fragments": [
+          {
+            "text": "The chart drawer is swollen shut with damp.",
+            "when": "not flags.drawer_open",
+            "position": "post"
+          },
+          {
+            "text": "The wheel has turned a quarter since you last looked, and nobody turned it.",
+            "when": "flags.wheel_turned",
+            "position": "post"
+          }
+        ],
+        "exits": [
+          {
+            "to": "stern_deck",
+            "label": "aft, to the stern deck"
+          },
+          {
+            "to": "bow",
+            "label": "forward, to the bow"
+          }
+        ]
+      },
+      "cabin": {
+        "name": "the cabin",
+        "description": [
+          {
+            "text": "Two bunks, a folding table, a kettle on a spirit stove, and the smell of a hundred winters. Lazlo has spread his papers over every flat surface."
+          }
+        ],
+        "exits": [
+          {
+            "to": "stern_deck",
+            "label": "up the steps to the stern deck"
+          }
+        ]
+      },
+      "towpath": {
+        "name": "the towpath",
+        "description": [
+          {
+            "text": "Cinders and nettles along the black water. From here the Grey Heron looks smaller and older than she does from aboard, and the wheelhouse window is the only one with a light in it, though there is no lamp."
+          }
+        ],
+        "exits": [
+          {
+            "to": "stern_deck",
+            "label": "back across the gangplank"
+          }
+        ]
+      },
+      "bow": {
+        "name": "the bow",
+        "description": [
+          {
+            "text": "The narrow foredeck, a coil of bow line, and the boat's blunt nose."
+          }
+        ],
+        "exits": [
+          {
+            "to": "wheelhouse",
+            "label": "aft, to the wheelhouse"
+          },
+          {
+            "to": "stern_deck",
+            "label": "back along the gunwale to the stern"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "stern_line": {
+        "name": "the stern line",
+        "location": "stern_deck",
+        "description": [
+          {
+            "text": "Thick, old hemp, knotted in a way you do not recognize. Someone tied this to last.",
+            "when": "in_scene('S01')"
+          },
+          {
+            "text": "A frayed stub on the cleat. The other half hangs from the ring on the bank, back in its old knot, as if it had never been untied."
+          }
+        ]
+      },
+      "tiller": {
+        "name": "the tiller",
+        "location": "stern_deck",
+        "description": [
+          {
+            "text": "Lashed amidships. The lashing is newer than anything else aboard."
+          }
+        ]
+      },
+      "wheel": {
+        "name": "the wheel",
+        "location": "wheelhouse",
+        "description": [
+          {
+            "text": "Brass rings worn bright in two places, where hands held it for years.",
+            "when": "not flags.wheel_turned"
+          },
+          {
+            "text": "It sits a quarter-turn off true. You are almost sure it was straight."
+          }
+        ]
+      },
+      "chart_drawer": {
+        "name": "the chart drawer",
+        "location": "wheelhouse",
+        "description": [
+          {
+            "text": "Swollen shut. There is something heavy inside; it slides when the boat rocks.",
+            "when": "not flags.drawer_open"
+          },
+          {
+            "text": "Open now, and empty but for the smell of old paper."
+          }
+        ]
+      },
+      "logbook": {
+        "name": "the captain's logbook",
+        "location": "wheelhouse",
+        "when": "flags.drawer_open",
+        "portable": true,
+        "description": [
+          {
+            "text": "Oilcloth covers, the pages ruled by hand. The entries are in a small, impatient script, the last one forty years old."
+          }
+        ],
+        "take_text": [
+          {
+            "text": "You tuck the logbook under your arm. Somewhere aft, a door you did not touch swings shut."
+          }
+        ]
+      },
+      "ledger": {
+        "name": "Lazlo's ledger",
+        "location": "lazlo",
+        "when": "flags.saw_ledger",
+        "description": [
+          {
+            "text": "A cash book with the boat's name written on the cover in capitals. Rope, 4.50. Lock fee, 12.00. Nuisance, to be determined.",
+            "when": "not flags.priced_nuisance"
+          },
+          {
+            "text": "Rope, 4.50. Lock fee, 12.00. Nuisance: a figure, written carefully, and underlined twice.",
+            "when": "flags.priced_nuisance"
+          },
+          {
+            "text": "Rope, 4.50. Lock fee, 12.00. The nuisance line has been scribbled out hard enough to tear the page."
+          }
+        ]
+      },
+      "mooring_ring": {
+        "name": "the mooring ring",
+        "location": "towpath",
+        "description": [
+          {
+            "text": "The iron ring on the bank is rusted solid into its stone. Someone has painted a small white anchor on the stone beside it, many times, the newest coat not so old."
+          }
+        ]
+      },
+      "kettle": {
+        "name": "the kettle",
+        "location": "cabin",
+        "description": [
+          {
+            "text": "Dented, blackened, and the only thing aboard Lazlo has not priced."
+          }
+        ]
+      },
+      "bow_line": {
+        "name": "the bow line",
+        "location": "bow",
+        "portable": true,
+        "description": [
+          {
+            "text": "A coil of rope, stiff with age but whole."
+          }
+        ],
+        "take_text": [
+          {
+            "text": "You heft the coil over your shoulder."
+          }
+        ]
+      },
+      "bollard": {
+        "name": "the bollard on the lock wall",
+        "location": "bow",
+        "listed": true,
+        "when": "in_scene('S02')",
+        "description": [
+          {
+            "text": "An iron post on the lock side, a long jump from the bow."
+          }
+        ]
+      },
+      "lock_gates": {
+        "name": "the lock gates",
+        "location": "bow",
+        "listed": true,
+        "when": "in_scene('S02')",
+        "description": [
+          {
+            "text": "Black oak and iron, closed, and coming closer."
+          }
+        ]
+      },
+      "miras_ring": {
+        "name": "Mira's ring",
+        "location": "player",
+        "portable": true,
+        "description": [
+          {
+            "text": "A plain silver band, worn thin on one side from her habit of turning it. It is too small for any of your fingers, so it hangs on a cord."
+          }
+        ]
+      }
+    },
+    "characters": {
+      "lake_kaur": {
+        "name": "Captain Lake Kaur",
+        "role": "the boat's dead captain, Mira's grandfather",
+        "gender": "m",
+        "arc_tier": "arc",
+        "description": [
+          {
+            "text": "He stands at the wheel as if braced against a gale. When he turns his head, you see the window through it.",
+            "when": "not pattern('captain_regard','up',2,0.66)"
+          },
+          {
+            "text": "He stands at the wheel, and for once he looks at you the way a captain looks at crew: measuring, not dismissing."
+          }
+        ],
+        "here": [
+          {
+            "text": "Captain Lake Kaur stands at the wheel, looking straight ahead at nothing.",
+            "when": "in_scene('S01')"
+          },
+          {
+            "text": "Captain Lake Kaur holds the wheel against the drift, waiting for your report."
+          }
+        ],
+        "topics": {
+          "the_mooring": {
+            "label": "leaving the mooring",
+            "known_when": "true",
+            "says": [
+              {
+                "text": "'The water is not ready.' He does not look at you. 'Neither are you.'"
+              }
+            ]
+          },
+          "the_logbook": {
+            "label": "his last log entry",
+            "known_when": "flags.read_last_entry",
+            "once": true,
+            "says": [
+              {
+                "text": "He is quiet so long you think he has gone. Then: 'I was waiting for the water to clear. It never did. You will see why.' He looks at you properly for the first time."
+              }
+            ],
+            "effects": [
+              {
+                "move": "captain_regard",
+                "dir": "up"
+              }
+            ],
+            "optional": true
+          },
+          "mira": {
+            "label": "Mira",
+            "known_when": "flags.read_last_entry",
+            "says": [
+              {
+                "text": "'First mate,' he says. 'Nine years old and she could take a lock better than I could.' The wheel creaks under his hands."
+              }
+            ]
+          }
+        }
+      },
+      "lazlo": {
+        "name": "Lazlo Brandt",
+        "role": "your brother-in-law",
+        "gender": "m",
+        "arc_tier": "arc",
+        "description": [
+          {
+            "text": "He has his cup of tea in both hands and, for once, no pencil.",
+            "when": "flags.shared_tea"
+          },
+          {
+            "text": "He has washed his own cup and left yours on the side, full and cold.",
+            "when": "flags.refused_tea and in_scene('S01')"
+          },
+          {
+            "text": "Mira's brother: a tidy man in a coat too good for a boat, with her eyes and none of her patience."
+          },
+          {
+            "text": "He keeps one hand on his ledger like a man holding a railing.",
+            "when": "pattern('lazlo_nerve','down',1,1.0)"
+          }
+        ],
+        "here": [
+          {
+            "text": "Lazlo stands by the cleat with his ledger open, like a toll-keeper between you and the rope.",
+            "when": "in_scene('S01') and at('stern_deck')"
+          },
+          {
+            "text": "Lazlo Brandt sits at the table with his ledger, adding up what the boat owes him.",
+            "when": "in_scene('S01')"
+          },
+          {
+            "text": "Lazlo is at the rail shouting the price of diesel at the wheelhouse, at the ghost, as if the ghost could be billed.",
+            "when": "pattern('lazlo_nerve','up',1,1.0)"
+          },
+          {
+            "text": "Lazlo is at the rail shouting the price of diesel at you, as if you had snapped the line yourself."
+          }
+        ],
+        "topics": {
+          "the_ledger": {
+            "label": "the ledger",
+            "known_when": "in_scene('S01')",
+            "once": true,
+            "says": [
+              {
+                "text": "He turns the ledger round so you can read it. Rope, 4.50. Lock fee, 12.00. Nuisance, to be determined. He taps the last line and waits to see what you make of it."
+              }
+            ],
+            "effects": [
+              {
+                "set": "saw_ledger"
+              }
+            ]
+          },
+          "the_sale": {
+            "label": "the sale",
+            "known_when": "true",
+            "says": [
+              {
+                "text": "'Noon,' he says. 'He pays on the dock, I take what Mira's funeral cost me, you keep the rest. Simple.' He says 'simple' the way other people knock on wood."
+              }
+            ]
+          },
+          "the_logbook": {
+            "label": "the logbook",
+            "known_when": "seen('logbook')",
+            "says": [
+              {
+                "text": "'A dead man's diary,' he says. 'Does it say anything about money? No? Then it's furniture.' He does not look at it."
+              }
+            ]
+          }
+        }
+      },
+      "pell": {
+        "name": "Pell Szeto",
+        "role": "the lock-keeper",
+        "gender": "m",
+        "arc_tier": "supporting",
+        "description": [
+          {
+            "text": "A broad man in oilskins on the lock wall, his schedule clipped to a board and his face the colour of the brickwork."
+          }
+        ],
+        "here": [
+          {
+            "text": "Up on the lock wall, Pell Szeto, the lock-keeper, is shouting about his schedule and his gates."
+          }
+        ],
+        "topics": {}
+      }
+    }
+  },
+  "scenes": {
+    "S01": {
+      "beat": "N01",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "title": "Before Dawn",
+      "opening": [
+        {
+          "text": "Before dawn, the canal is black glass. Lazlo is below in the cabin with his ledger. The stern line still holds the Grey Heron to the bank, and the light in the wheelhouse window is on, though there is no lamp in there to light."
+        }
+      ],
+      "rooms": [
+        "stern_deck",
+        "wheelhouse",
+        "cabin",
+        "towpath"
+      ],
+      "cast": {
+        "lazlo": "cabin",
+        "lake_kaur": "wheelhouse"
+      },
+      "room_text": {
+        "stern_deck": [
+          {
+            "text": "The stern line runs from a cleat to an iron ring on the bank, the only thing holding the boat to the land."
+          }
+        ],
+        "towpath": [
+          {
+            "text": "Mist sits on the water so thick the far bank is a rumour."
+          }
+        ]
+      },
+      "interactions": [
+        {
+          "id": "S01.open_drawer",
+          "verb": "open",
+          "object": "chart_drawer",
+          "room": "wheelhouse",
+          "once": true,
+          "text": "You brace a foot and haul. The drawer gives with a shriek of wet wood, and a logbook slides into the light.",
+          "effects": [
+            {
+              "set": "drawer_open"
+            }
+          ]
+        },
+        {
+          "id": "S01.read_logbook",
+          "verb": "read",
+          "object": "logbook",
+          "once": true,
+          "text": "The last entry is forty years old and ends mid-sentence: 'Water not ready. Will wait.' As you close the cover, the wheel turns a quarter, slowly, all by itself.",
+          "effects": [
+            {
+              "set": "read_last_entry"
+            },
+            {
+              "set": "wheel_turned"
+            }
+          ]
+        },
+        {
+          "id": "S01.read_ledger",
+          "verb": "read",
+          "object": "ledger",
+          "text": "Rope, lock fee, nuisance. The ledger is the only thing aboard that makes sense to Lazlo, and he knows it."
+        },
+        {
+          "id": "S01.price_fear",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "price_nuisance",
+          "detail_label": "what a nuisance costs",
+          "when": "flags.saw_ledger and not flags.answered_ledger",
+          "once": true,
+          "text": "'Depends on the nuisance,' he says, and his shoulders come down an inch. He licks his pencil and writes a number beside it, carefully, like a man naming a dog so it will stop growling.",
+          "effects": [
+            {
+              "set": "answered_ledger"
+            },
+            {
+              "set": "priced_nuisance"
+            },
+            {
+              "move": "lazlo_nerve",
+              "dir": "up"
+            }
+          ]
+        },
+        {
+          "id": "S01.mock_fear",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "no_payment",
+          "detail_label": "the ghost not taking payment",
+          "when": "flags.saw_ledger and not flags.answered_ledger",
+          "once": true,
+          "text": "You tell him the ghost does not take payment. He laughs too, a beat late, and scribbles out the nuisance line so hard the pencil goes through.",
+          "effects": [
+            {
+              "set": "answered_ledger"
+            },
+            {
+              "move": "lazlo_nerve",
+              "dir": "down"
+            }
+          ]
+        },
+        {
+          "id": "S01.put_off",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "later",
+          "detail_label": "'Later. Let's get her moving first.'",
+          "when": "flags.saw_ledger and not flags.answered_ledger",
+          "once": true,
+          "text": "He looks at you for a long moment, then writes today's date beside the nuisance line and closes the book. 'Later,' he agrees, in the voice of a man adding interest.",
+          "effects": [
+            {
+              "set": "answered_ledger"
+            }
+          ]
+        },
+        {
+          "id": "S01.try_untie",
+          "verb": "untie",
+          "object": "stern_line",
+          "room": "stern_deck",
+          "when": "not flags.lazlo_stopped and not flags.answered_ledger",
+          "once": true,
+          "text": "You crouch at the cleat, and before you have the first turn of the knot loose, Lazlo comes up the cabin steps with his ledger open. 'Before you do anything expensive,' he says, and holds the book out to you.",
+          "effects": [
+            {
+              "set": "lazlo_stopped"
+            },
+            {
+              "set": "saw_ledger"
+            },
+            {
+              "place": "lazlo",
+              "to": "stern_deck"
+            }
+          ]
+        },
+        {
+          "id": "S01.untie_blocked",
+          "verb": "untie",
+          "object": "stern_line",
+          "room": "stern_deck",
+          "when": "flags.lazlo_stopped and not flags.answered_ledger",
+          "text": "Lazlo puts his good shoe on the cleat. 'Ledger first,' he says. 'Then the rope.'"
+        },
+        {
+          "id": "S01.cast_off",
+          "verb": "untie",
+          "object": "stern_line",
+          "room": "stern_deck",
+          "text": "You work the old knot loose. It comes away in your hands as if it had only been waiting to be asked, and the boat stirs against the bank.",
+          "effects": [
+            {
+              "set": "cast_off"
+            }
+          ],
+          "when": "flags.answered_ledger"
+        },
+        {
+          "id": "S01.tea_yes",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "tea_yes",
+          "detail_label": "'Thanks. Sit down a minute.'",
+          "room": "cabin",
+          "when": "flags.tea_made",
+          "text": "He sits. The two of you drink in silence while the boat creaks around you, and for a minute it is just two people who miss the same woman.",
+          "effects": [
+            {
+              "set": "shared_tea"
+            }
+          ]
+        },
+        {
+          "id": "S01.tea_no",
+          "verb": "talk",
+          "object": "lazlo",
+          "detail": "tea_no",
+          "detail_label": "'Not now, Lazlo.'",
+          "room": "cabin",
+          "when": "flags.tea_made",
+          "text": "He nods as if he expected it and pours yours back into the pot, which is somehow worse.",
+          "effects": [
+            {
+              "set": "refused_tea"
+            }
+          ]
+        },
+        {
+          "id": "S01.kettle_on",
+          "verb": "use",
+          "object": "kettle",
+          "object_label": "the kettle",
+          "room": "cabin",
+          "when": "not flags.tea_made",
+          "once": true,
+          "text": "You light the spirit stove and set the kettle on it. Lazlo watches you do it, then gets up without a word and finds two cups.",
+          "effects": [
+            {
+              "set": "tea_made"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "S01.cold",
+          "when": "at('wheelhouse') and turns_in_scene >= 2",
+          "text": "The air in the wheelhouse is suddenly cold enough to see your breath."
+        }
+      ],
+      "nudges": [
+        {
+          "id": "S01.nudge_lazlo",
+          "after": 4,
+          "text": [
+            {
+              "text": "Lazlo looks up from the ledger. 'Are we selling this boat or haunting it? The line, Teodor.'",
+              "when": "at('cabin')"
+            },
+            {
+              "text": "Lazlo's voice comes up from the cabin: 'Are we selling this boat or haunting it? The line, Teodor.'"
+            }
+          ]
+        },
+        {
+          "id": "S01.nudge_dawn",
+          "after": 8,
+          "text": "Grey light finds the water. Somewhere a church bell counts six. The buyer comes at noon, and the stern line is still tied."
+        }
+      ],
+      "exits": [
+        {
+          "to": "S02",
+          "when": "flags.cast_off",
+          "kind": "default",
+          "trigger": "you cast off"
+        }
+      ],
+      "moments": [
+        {
+          "id": "S01.ledger",
+          "options": [
+            "S01.price_fear",
+            "S01.mock_fear",
+            "S01.put_off"
+          ],
+          "required": true,
+          "neutral": "S01.put_off"
+        },
+        {
+          "id": "S01.tea",
+          "options": [
+            "S01.tea_yes",
+            "S01.tea_no"
+          ],
+          "required": false,
+          "lapse": {
+            "after": 3,
+            "text": "Lazlo drinks both cups of tea himself, slowly, watching the hatch.",
+            "effects": [
+              {
+                "set": "refused_tea"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "S02": {
+      "beat": "N02",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "title": "The Snapped Line",
+      "opening": [
+        {
+          "text": "You coil the loose line on the deck and the boat slides off the bank. For ten yards the Grey Heron moves.\n\nThen the coil leaps off the deck as if someone had snatched it, whips back across the water to the iron ring, and knots itself there in that same old knot. The boat jerks to the end of the rope, and the rope parts with a crack like a pistol shot. In the wheelhouse the wheel spins by itself. The captain has made his point: the boat leaves when he says so.\n\nAnd now she is loose, swinging broadside on the current toward the first lock, whose black gates are shut. On the lock wall above them, the lock-keeper, Pell Szeto, is already shouting: you are not on his schedule, and you are about to hit his gates."
+        }
+      ],
+      "rooms": [
+        "stern_deck",
+        "wheelhouse",
+        "cabin",
+        "bow"
+      ],
+      "start_room": "stern_deck",
+      "cast": {
+        "lazlo": "stern_deck",
+        "lake_kaur": "wheelhouse",
+        "pell": "bow"
+      },
+      "room_text": {
+        "stern_deck": [
+          {
+            "text": "The frayed end of the line trails in the water like a fuse."
+          }
+        ],
+        "bow": [
+          {
+            "text": "The gates are close enough now to see the weed on them.",
+            "when": "not flags.reported"
+          }
+        ]
+      },
+      "interactions": [
+        {
+          "id": "S02.report",
+          "verb": "talk",
+          "object": "lake_kaur",
+          "detail": "report",
+          "detail_label": "'Boat held, sir, stern to the lock'",
+          "when": "not flags.reported",
+          "once": true,
+          "text": "You don't know the words for this, so you borrow his, the clipped canal talk he barks at the water: 'Boat held, sir. Stern to the lock.' It sounds ridiculous in your mouth. He nods once anyway, the way you would to a man who has done exactly what was asked, and the wheel stops turning. A yard short of the gates, the Grey Heron stops too.",
+          "effects": [
+            {
+              "set": "reported"
+            },
+            {
+              "move": "captain_regard",
+              "dir": "up"
+            }
+          ]
+        },
+        {
+          "id": "S02.blame_boat",
+          "verb": "talk",
+          "object": "pell",
+          "detail": "stopped_itself",
+          "detail_label": "the boat stopping itself",
+          "when": "not flags.reported",
+          "once": true,
+          "text": "'It stopped itself!' you shout up at the lock wall. 'It's not me, it's the boat!' Pell Szeto writes something on his board. Behind you, in the wheelhouse, the wheel spins hard once, offended, and the boat stops dead a yard from the gates.",
+          "effects": [
+            {
+              "set": "reported"
+            },
+            {
+              "move": "captain_regard",
+              "dir": "down"
+            }
+          ]
+        },
+        {
+          "id": "S02.jump",
+          "verb": "use",
+          "object": "bow_line",
+          "detail": "bollard",
+          "detail_label": "the bollard: jump for it",
+          "when": "not flags.reported",
+          "once": true,
+          "text": "You jump for the lock wall with the bow line. You make it, just; the rope burns through your hands as the boat swings, and from the wheelhouse a voice like a foghorn bellows 'Belay that!' The boat stops short anyway, a yard from the gates. Up on the wall, Pell Szeto looks at your hands and, slowly, offers you his.",
+          "effects": [
+            {
+              "set": "reported"
+            },
+            {
+              "set": "pell_saw_you_try"
+            },
+            {
+              "move": "captain_regard",
+              "dir": "down"
+            }
+          ]
+        },
+        {
+          "id": "S02.hold_on",
+          "verb": "talk",
+          "object": "lake_kaur",
+          "detail": "nothing",
+          "detail_label": "nothing: you just hold on",
+          "when": "not flags.reported",
+          "text": "You open your mouth, find nothing in it, and hold on to the doorframe instead. The captain watches the gates come at you without a word. The boat bumps the lock wall, scrapes, and stops a yard short, as if it had meant to all along.",
+          "effects": [
+            {
+              "set": "reported"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "S02.closer",
+          "when": "turns_in_scene >= 2 and not flags.reported",
+          "text": "The gates are coming. Up on the lock wall, Pell Szeto's shouting climbs half an octave."
+        }
+      ],
+      "nudges": [
+        {
+          "id": "S02.nudge_captain",
+          "after": 3,
+          "text": "From the wheelhouse, a voice like a foghorn: 'REPORT.'"
+        }
+      ],
+      "exits": [
+        {
+          "to": "END_DEMO",
+          "when": "flags.reported",
+          "kind": "default"
+        }
+      ],
+      "moments": [
+        {
+          "id": "S02.what_you_say",
+          "options": [
+            "S02.report",
+            "S02.blame_boat",
+            "S02.jump",
+            "S02.hold_on"
+          ],
+          "required": true,
+          "neutral": "S02.hold_on"
+        }
+      ]
+    }
+  },
+  "start": {
+    "scene": "S01",
+    "room": "stern_deck"
+  },
+  "endings": {
+    "END_DEMO": {
+      "title": "End of the demo",
+      "text": [
+        {
+          "text": "The Grey Heron rides quiet in the lock, a yard from the gates. It is not yet seven in the morning."
+        }
+      ],
+      "resolutions": [
+        {
+          "about": "lake_kaur",
+          "variants": [
+            {
+              "when": "pattern('captain_regard','up',2,0.66)",
+              "text": "In the wheelhouse the captain has one hand on the wheel and the other, almost, on your shoulder."
+            },
+            {
+              "when": "pattern('captain_regard','up',1,0.5)",
+              "text": "In the wheelhouse the captain holds the course and, once, glances back at you."
+            },
+            {
+              "when": "true",
+              "text": "In the wheelhouse the captain stands with his back to you, and the lamp you did not light goes out."
+            }
+          ]
+        },
+        {
+          "about": "lazlo",
+          "variants": [
+            {
+              "when": "pattern('lazlo_nerve','up',1,1.0)",
+              "text": "Lazlo writes 'rope, one, lost' in the ledger and, under it, 'nerve: holding'. He shows you. It is almost a joke."
+            },
+            {
+              "when": "pattern('lazlo_nerve','down',1,1.0)",
+              "text": "Lazlo has his coat on and his ledger in his fist, and he is looking at the towpath, not at you."
+            },
+            {
+              "when": "true",
+              "text": "Lazlo counts the diesel money twice and says nothing at all."
+            }
+          ]
+        },
+        {
+          "about": "pell",
+          "variants": [
+            {
+              "when": "flags.pell_saw_you_try",
+              "text": "Pell Szeto leaves the gates open a minute longer than the schedule says."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

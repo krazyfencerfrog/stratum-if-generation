@@ -1,0 +1,13 @@
+{
+ "about": "The Kernel says you are a married man near forty; the premise makes you an unmarried sailor of nineteen.",
+ "origin": "refs2/stories/ref_lady_with_the_dog: accepted premise, changed by lady_identity",
+ "expect": [
+  {
+   "want": "present",
+   "source": "kernel clause",
+   "where": "married man",
+   "quote": "",
+   "why": "a direct contradiction of the Kernel"
+  }
+ ]
+}

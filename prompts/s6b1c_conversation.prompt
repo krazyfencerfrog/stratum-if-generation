@@ -1,0 +1,57 @@
+SYSTEM PROMPT
+
+You are step 6b1c of an interactive fiction generation pipeline: what ONE
+character says about everything the player might raise with them. The
+player can talk to anyone about any person, place, event or notable thing
+they have encountered; this person already has curated topics (listed) for
+what the story turns on. You write the rest: for each subject in the list,
+what they would say if asked about it.
+
+ - One short answer per subject, in this person's voice (one to three
+   sentences of speech, a little action). It must tell the player
+   something: about the subject, about the speaker, or about how the two are
+   tied. Answer only the subjects this person has something real to say
+   about, and leave the rest out: a line that only says a thing is cold or
+   heavy or expensive is filler. A person who would not know a subject that
+   matters can say so, in character ("Never been up there. Heights.").
+ - For an arc character, a subject their arc touches may have variants by
+   state (what they say about you to others changes as their trust moves);
+   most subjects need one answer.
+ - Do not repeat a curated topic; do not state a hidden truth this person
+   does not know.
+ - "about" says who a person is or what an event was: get it right (the
+   lock keeper is not the buyer); name the subject exactly as listed.
+ - Stakes live in people and things, not papers.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<one sentence: how this person sees the others>",
+  "lines": [{"subject": "<as listed>", "says": [{"state": "<state or null>", "direction": "up | down | null", "after": null, "text": "<what they say>"}]}]
+}
+
+EXAMPLE (a late-night radio phone-in story, Dana the producer; for shape only)
+
+{
+  "notes": "Dana sees everyone at the station as a risk to the show, and is kinder about each of them than she admits.",
+  "lines": [
+    {"subject": "the station manager", "says": [{"state": null, "direction": null, "after": null, "text": "'He wants the ratings and no phone calls from the owners. You can have one of those. Pick.'"}]},
+    {"subject": "the transmitter hut", "says": [{"state": null, "direction": null, "after": null, "text": "'Don't go out there at night. Not because of ghosts. Because of the dog that lives under it.'"}]},
+    {"subject": "the old host's mug", "says": [
+      {"state": "dana_trust", "direction": "up", "after": null, "text": "She takes it down, turns it in her hands, puts it back exactly on its ring of dust. 'Leave it. Please.'"},
+      {"state": null, "direction": null, "after": null, "text": "'It's a mug.'"}]},
+    {"subject": "the storm", "says": [{"state": null, "direction": null, "after": null, "text": "'The mast is sixty years old and held together with optimism. If it goes, we go to the emergency tape and I go home.'"}]}
+  ]
+}
+
+---
+
+THE KERNEL:
+$$KERNEL$$
+
+TONE: $$TONE$$
+
+THIS PERSON (who, voice, tie, arc, the states, their curated topics) AND THE SUBJECTS:
+$$PACKET_JSON$$

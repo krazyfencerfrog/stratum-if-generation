@@ -1,0 +1,257 @@
+{
+  "enrichment_budget": {
+    "level": "minimal"
+  },
+  "protagonist": {
+    "who": "You are the new owner of a narrow, leaking narrowboat, the only living person aboard while a dead captain still keeps the log.",
+    "history": "You inherited the boat from your late sister, who kept it as a summer house and left you the keys, the unpaid canal dues, and a brother-in-law who paid to clear the title and now wants that money back.",
+    "wants": "to get the boat under way and to a place where it can be sold before your brother-in-law's patience runs out.",
+    "need": "to find out whether owning a boat means you can move it, or whether you must answer to everyone who ever kept it.",
+    "can_do": "steer when the wheel will turn, re-tie the mooring line if it lets you, read the logbook, talk to the ghost and your brother-in-law, carry the sale papers and coins, set the galley table, and make the boat physically ready to move.",
+    "cannot_do": "make the ghost obey, cut the mooring line while it is bound, sell the boat without a buyer reaching the stern, or move the boat without the wheel, ropes, and line cooperating.",
+    "ties": [
+      {
+        "who": "your brother-in-law",
+        "what": "your sister's husband, the man who paid to clear the title and now counts every coin as if your safety were a line item."
+      },
+      {
+        "who": "the ghost captain",
+        "what": "the dead man in the rotting uniform who still checks the logs and complains about the bilge water as if you were both still on duty."
+      }
+    ],
+    "open": "whether you learn to command the boat as a living owner or let the dead captain's protocol decide your terms.",
+    "gender": "f",
+    "serves": "3-0b.protagonist_identity",
+    "name": "Ingrid Kowalczyk"
+  },
+  "arena": {
+    "description": "A decrepit narrowboat moored stern-to-towpath on a quiet canal, with a narrow stern deck at the mooring ring, a low-ceilinged galley, and a bow where the mooring line is tied to a bollard.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "Your brother-in-law will not wait past the evening to see the boat sold, and the canal's low water is already pulling at the hull as if the boat were meant to move tonight.",
+    "clock_or_stock": "none tracked; the urgency is told through the brother-in-law's impatience, the falling light, and the water's pull, because 3-0c names no failure trigger",
+    "serves": "3e.timeline_structure"
+  },
+  "opposition": {
+    "who_or_what": "the ghost captain",
+    "wants": "to remain the boat's captain and to have it move only under his orders, with the logbook kept true and the bilge water answered to.",
+    "means": "he can seize the steering wheel, tighten the ropes, make the mooring line refuse the knife, set the galley table, stand behind you where the light will not hold, and speak with his mouth slightly out of sync with his voice.",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "A distant walker stops at the stern mooring ring and asks if the boat is for sale; your brother-in-law begins a bargain while the ghost stands directly behind you, blocking the view of the boat's interior.",
+      "when": "early",
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "what": "The galley table sets itself for a meal the ghost insists on eating, and your brother-in-law's sandwich keeps sliding off the plate under the low ceiling.",
+      "when": "middle",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "what": "The mooring line at the bow snaps not with a bang but with a wet, organic sound, as if it were a tendon, and the boat slips into the current; just below the hull, the ghost's face looks up, not angry but disappointed.",
+      "when": "late",
+      "serves": "3b.primary_affect"
+    }
+  ],
+  "hidden_truth": null,
+  "mediation": {
+    "question": "Who has the right to make this boat move: the dead captain who keeps the log, or the living owner who holds the key?",
+    "to_reach_pole_a": {
+      "pole": "answer the ghost's captain's terms",
+      "what_you_must_do": "let him remain captain: acknowledge his authority in the logbook, set the galley table for his meal, use the brass whistle to give the order to move, and let him choose the first leg of the journey.",
+      "cost": "you surrender some of your ownership, your brother-in-law watches you bargain with a corpse and doubts the sale, and the boat moves on the dead man's schedule rather than yours."
+    },
+    "to_reach_pole_b": {
+      "pole": "assert the living owner's agency",
+      "what_you_must_do": "work around or defy the ghost: get the sale papers and your brother-in-law's coins into your hands, find a buyer or passerby who will pay for the boat as property, and physically free the mooring line, the wheel, or the ropes so the boat moves without his order.",
+      "cost": "the boat resists with tightening ropes, a seizing wheel, and a mooring line that will not cut, and your brother-in-law's safety and patience are tested as the cold and the dark close in."
+    },
+    "levers": [
+      "the captain's logbook",
+      "the brass whistle",
+      "the mooring line and bollard at the bow",
+      "the steering wheel",
+      "your brother-in-law's sale papers and coin purse",
+      "the galley table"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "situation": "The steering wheel will not turn, the logbook lies open on the galley table, and the ghost captain demands the bilge be sounded before any order to move is given; your brother-in-law is on the stern deck counting coins and asking for a price.",
+      "what_you_must_do": "find out what the boat's first move requires under the ghost's captaincy",
+      "ways_through": [
+        {
+          "way": "you learn it from the logbook, because you read the standing orders and find that the ghost requires a log entry, a whistle call, and a meal set before the wheel will answer",
+          "cost": "the brother-in-law hears you reading to the dead and asks whether the sale is still possible"
+        },
+        {
+          "way": "you learn it from the ghost, because you answer his complaint about the bilge water and he tells you the order to move will come only after the meal",
+          "cost": "the wheel seizes again while you are speaking to him, and the brother-in-law's coin purse slips into the bilge"
+        }
+      ],
+      "involves": [
+        "the ghost captain",
+        "your brother-in-law"
+      ],
+      "form": "discover",
+      "set_piece": null,
+      "serves": "3c.core_thematic_axis"
+    },
+    {
+      "id": 2,
+      "situation": "A distant walker stops at the stern mooring ring and asks if the boat is for sale; your brother-in-law begins a bargain while the ghost stands directly behind you, blocking the view of the boat's interior.",
+      "what_you_must_do": "get the walker to agree to buy the boat before he walks on",
+      "ways_through": [
+        {
+          "way": "the walker agrees, because your brother-in-law names a price low enough that the ghost's shadow does not scare him off the towpath",
+          "cost": "the brother-in-law gets less than his money back and the ghost stands closer to the sale papers"
+        },
+        {
+          "way": "the walker agrees, because you let the ghost block the view and the walker pays for the boat on faith, asking no questions",
+          "cost": "the brother-in-law's coins are in your hand, but he does not trust what you sold him"
+        },
+        {
+          "way": "the walker agrees, because you show him the logbook and the standing order, and he pays for the boat as a captain's vessel",
+          "cost": "the ghost's terms are now the buyer's terms, and the first leg is his to choose"
+        }
+      ],
+      "involves": [
+        "the distant walker",
+        "your brother-in-law",
+        "the ghost captain"
+      ],
+      "form": "trade",
+      "set_piece": "the brother-in-law trying to sell the boat to a passerby on the towpath while the ghost stands directly behind the player, blocking the view of the boat's interior",
+      "serves": "3-0a.primary_decision_axis"
+    },
+    {
+      "id": 3,
+      "situation": "The galley table sets itself for a meal the ghost insists on eating, and your brother-in-law's sandwich keeps sliding off the plate under the low ceiling.",
+      "what_you_must_do": "get the galley quiet enough to make the boat ready for the first leg",
+      "ways_through": [
+        {
+          "way": "the galley quiets, because you set the table for the ghost's meal and the plates stop moving",
+          "cost": "the brother-in-law's sandwich is ruined, and he asks what else you intend to pay for"
+        },
+        {
+          "way": "the galley quiets, because you move your brother-in-law to the stern deck and let the ghost eat alone",
+          "cost": "the brother-in-law is colder and farther from the sale papers, and the ghost's voice is slightly out of sync with his mouth"
+        },
+        {
+          "way": "the galley quiets, because you use the brass whistle to call the meal off and the table stops setting itself",
+          "cost": "the ghost turns his back to the galley, and the wheel will not turn until he is faced again"
+        }
+      ],
+      "involves": [
+        "the ghost captain",
+        "your brother-in-law"
+      ],
+      "form": "endure",
+      "set_piece": "the galley table setting itself for a meal the ghost insists on eating, while the brother-in-law tries to eat a sandwich that keeps sliding off the plate",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "id": 4,
+      "situation": "The mooring line at the bow snaps not with a bang but with a wet, organic sound, as if it were a tendon, and the boat slips into the current; just below the hull, the ghost's face looks up, not angry but disappointed.",
+      "what_you_must_do": "get the boat under way before the current takes it past the next junction",
+      "ways_through": [
+        {
+          "way": "the boat moves, because you sound the brass whistle and let the ghost give the order, and he chooses the first leg",
+          "cost": "you have surrendered the boat's schedule to the dead captain, and the brother-in-law watches you bargain with a corpse"
+        },
+        {
+          "way": "the boat moves, because you free the mooring line with the knife while the ghost's hand is off it, and the brother-in-law holds the wheel",
+          "cost": "the ropes tighten around your hands, and the brother-in-law's coins are wet with canal water"
+        },
+        {
+          "way": "the boat moves, because you hand the sale papers to the distant walker on the towpath and let him take the bow line",
+          "cost": "the walker has the boat's first leg, and the ghost's face in the water looks up with disappointment"
+        }
+      ],
+      "involves": [
+        "the ghost captain",
+        "your brother-in-law",
+        "the distant walker"
+      ],
+      "form": "confront",
+      "set_piece": "the mooring line snapping not with a bang but with a wet, organic sound, as if it were a tendon, releasing the boat into the current, with the ghost's face visible in the dark water below the hull",
+      "serves": "3-0a.primary_decision_axis"
+    }
+  ],
+  "complications": [
+    {
+      "description": "The brass whistle, the ghost's order lever, is in the brother-in-law's coin purse because he took it as collateral for his money.",
+      "serves": "3-0a.secondary_decision_axes"
+    },
+    {
+      "description": "The distant walker will pay only for a boat that can be seen moving, not one that is moored; the sale papers must be signed at the stern before the first leg.",
+      "serves": "3c.core_thematic_axis"
+    }
+  ],
+  "cast_seeds": [
+    {
+      "role": "the ghost captain",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to retain command of the vessel by enforcing strict maritime protocol and maintaining the logbook's integrity",
+      "holds": "the steering wheel, the mooring line's tension, and the authority of the dead captain's log",
+      "edge": "insists on the dignity of the rank while his physical form rots, treating the living owner as a subordinate who has failed to sound the bilge",
+      "tie": "served the boat before the sister inherited it and views the sister's legacy as a dereliction of duty that must be corrected",
+      "voice": "speaks with a mouth slightly out of sync with the voice, issuing orders with the weary patience of a man who has been waiting for a reply for decades: 'The bilge. Sound the bilge. You are not in command until you have answered to the water.'",
+      "breaking_point": null,
+      "opposition": true,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Pieter Oyelaran"
+    },
+    {
+      "role": "your brother-in-law",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "m",
+      "wants": "to recover the money he spent clearing the title and to leave the boat before the cold sets in",
+      "holds": "the sale papers, the coin purse, and the only living perspective on the absurdity of the situation",
+      "edge": "counts every coin as if the protagonist's safety were a line item, refusing to acknowledge the ghost's presence as anything other than a draft or a trick of the light",
+      "tie": "was the sister's husband and paid to clear the title, and now treats the protagonist's hesitation as a personal financial liability",
+      "voice": "talks in quick, practical fragments that cut through the eerie silence: 'The line's frayed, the roof's leaking, and I'm standing in a draft. Give me a price or give me a way out.'",
+      "breaking_point": "leaves the boat the moment he sees the protagonist prioritize the ghost's protocol over the sale papers",
+      "opposition": false,
+      "matters_to_turns": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "name": "Ivo Gutierrez"
+    },
+    {
+      "role": "the distant walker",
+      "kind": "individual",
+      "speaks_for": null,
+      "gender": "n",
+      "wants": "to purchase the boat or simply observe it, acting as the catalyst that forces the transaction to close",
+      "holds": "the potential buyer's interest and the physical presence at the stern that blocks the view",
+      "edge": "stops at the mooring ring with a casual curiosity that makes the protagonist's internal struggle visible to an outsider",
+      "tie": "has no prior connection to the protagonist but is bound to the story by the act of asking if the boat is for sale",
+      "voice": "speaks with a polite, detached curiosity that ignores the supernatural tension: 'Is this one for sale? It looks like it's seen a bit of water, but the hull seems sound.'",
+      "breaking_point": null,
+      "opposition": false,
+      "matters_to_turns": [
+        2,
+        4
+      ],
+      "name": "Kwame Nakashima"
+    }
+  ],
+  "name_pool": "modern"
+}

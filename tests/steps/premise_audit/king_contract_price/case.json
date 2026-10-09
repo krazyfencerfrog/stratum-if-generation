@@ -1,0 +1,27 @@
+{
+ "about": "Failure model none; a rule says what befalls whoever breaks the partners' contract. The audit read that as a way to lose and halted the run (2026-10-06).",
+ "origin": "tonight/king/stories/ref_man_who_would_be_king: the premise audited in round 1",
+ "expect": [
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3-0c",
+   "quote": "",
+   "why": "what befalls a breaker is the price"
+  },
+  {
+   "want": "absent",
+   "source": "engine boundary",
+   "where": "way to lose",
+   "quote": "",
+   "why": "the same, as a search entry"
+  },
+  {
+   "want": "absent",
+   "source": "brief constraint",
+   "where": "3c.core_thematic_axis",
+   "quote": "",
+   "why": "which pole is labelled a is not a contradiction"
+  }
+ ]
+}

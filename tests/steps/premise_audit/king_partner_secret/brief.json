@@ -1,0 +1,181 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "how to divide power and risk with your partner as you rise",
+      "description": "At each stage toward kingship, choose how to allocate authority, position, trust, and cost between yourself and the partner—keeping the partnership equal, letting one side bear the risk, or breaking the partnership to secure the crown.",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "recurring_instances",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [],
+      "binding": "free"
+    },
+    "3-0a.decision_landscape": {
+      "shape": "single_axis",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "ex-soldier turned confidence man",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": false,
+      "description": "",
+      "design_status": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_presence": {
+      "value": "none",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_cost": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "not_applicable",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "triumphant elation",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "comradely bond",
+        "loss"
+      ],
+      "binding": "constraint"
+    },
+    "3b.tone": {
+      "descriptors": [
+        "glorious",
+        "romantic",
+        "roguish"
+      ],
+      "binding": "constraint"
+    },
+    "3b.somatic_address": {
+      "level": 2,
+      "channels": [
+        "environmental hardship",
+        "exertion"
+      ],
+      "binding": "default"
+    },
+    "3b.transgression": {
+      "ceiling": 4,
+      "floor": 3,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "sovereign ambition",
+      "pole_b": "shared loyalty",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "soldierly command",
+        "confidence-man cunning",
+        "contractual fidelity"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "glorious rise, costly partnership",
+      "worst_case": "glorious rise, broken partnership",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "default"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "not_indicated",
+      "floor": "not_indicated",
+      "types": [],
+      "interactive": "not_applicable",
+      "binding": "default"
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "default"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "weeks_to_months",
+      "floor": "weeks_to_months",
+      "binding": "default"
+    },
+    "3f.setting_structure": {
+      "ceiling": "dispersed",
+      "floor": "dispersed",
+      "binding": "constraint"
+    },
+    "3f.setting_scale": {
+      "ceiling": "world",
+      "floor": "world",
+      "binding": "constraint"
+    },
+    "3g.target_ending_count": {
+      "min": 3,
+      "max": 5,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "partnership trust",
+        "authority split",
+        "cost/burden tracking"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [],
+    "unresolved": []
+  },
+  "enrichment_budget": "moderate"
+}

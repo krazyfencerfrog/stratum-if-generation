@@ -5,49 +5,55 @@ CONTEXT: A short Kernel was analyzed into structural decisions, and separate con
 
 YOU DO NOT FIX ANYTHING AND YOU DO NOT BUILD ANYTHING. You answer a fixed list of yes/no questions, each with one sentence of reasoning. A separate repair step acts on the failures. Finding nothing wrong is a legitimate and common result. You are not a critic: whether the premise is good or original is not your question.
 
-Counting and bookkeeping (how many turns, whether two share a form, whether every group has someone who speaks for it, whether a tag names a real field) have already been checked by the pipeline. Do not check them again.
+Counting and bookkeeping (how many turns, whether two share a form, whether every group has someone who speaks for it, whether a tag names a real field) have already been checked by the pipeline, and whether the premise keeps the Kernel's own words is checked by a separate call. Do not check them again.
 
---- THREE LISTS AND ONE SEARCH ---
+--- THE DEFINITIONS YOU AUDIT BY ---
 
-LIST 1, KERNEL CLAUSES. The Kernel has been cut into numbered clauses below. For each one: does the premise CONTRADICT it? A contradiction is a direct incompatibility, not a difference of emphasis, and not something the premise merely leaves out. NEGATIVE CLAUSES DESERVE A SECOND LOOK ("nothing is stolen", "nobody leaves the island", "nothing supernatural"): genre convention pushes hardest against these, and they are the ones most often broken while every positive clause is honored. When contradiction is true, quote the premise's own words that do it. When it is false, quote is "".
+$$TERM_PRICE$$
 
-LIST 2, CONSTRAINTS. The numbered lines below are the extracted fields the premise may not contradict. For each one: is it violated? If you cannot quote incompatible words from the premise, it is not violated. A field the premise is thin on, silent on, or simply does not elaborate is not violated, and a constraint that something is ABSENT (no hidden truth, no failure) is satisfied by a premise that does not build the thing.
+$$TERM_ENGINE$$
 
-LIST 3, ENGINE CHECKS. The numbered checks below ask whether the dramatic engine is really there. They exist because a real earlier run produced a premise in which every turn was the story's question handed to the player as a two-button choice, and the story built on it was a menu. For each check: does it hold? When it does not, quote the words that fail it.
+$$TERM_RULES$$
 
-THE SEARCH, MECHANICS. Does the premise require a system the engine lacks (combat or skill checks, puzzle minigames, an economy or a reputation score the player watches), or a way to lose that the failure model below does not name? Report each such thing with the premise's words. Two things are permitted and are NOT reported: a tracked clock or stock that one of the failure model's triggers, or the Kernel's own words, licenses; and a person whose stance changes because of named things the player did (that is a flag, which the engine has). What is reported is a QUANTITY the player is expected to watch and push past a threshold. If there is nothing, mechanics is an empty list.
+$$TERM_HIDDEN$$
+
+--- TWO LISTS AND ONE SEARCH ---
+
+LIST 1, CONSTRAINTS. The numbered lines below are the extracted fields the premise may not contradict. For each one: is it violated? If you cannot quote incompatible words from the premise, it is not violated. A field the premise is thin on, silent on, or simply does not elaborate is not violated, and a constraint that something is ABSENT (no hidden truth, no failure) is satisfied by a premise that does not build the thing. A failure model is violated only by a way to lose, never by the price (see LOSING AND THE PRICE).
+
+LIST 2, ENGINE CHECKS. The numbered checks below ask whether the dramatic engine is really there. They exist because a real earlier run produced a premise in which every turn was the story's question handed to the player as a two-button choice, and the story built on it was a menu. For each check: does it hold? When it does not, quote the words that fail it.
+
+THE SEARCH, SYSTEMS AND LOSSES. Using the definitions above, look through the premise for anything that needs a system the engine lacks, or that ends the game in the player's defeat in a way the failure model below does not name. Give each thing you look at one kind:
+ - "number": a number the player is shown or must watch;
+ - "system": rules the engine cannot run;
+ - "loss": a way for the PLAYER to lose that the failure model does not name: the game ends in their defeat, including when an unlicensed clock or stock runs out (no failure trigger, no words of the Kernel). A deadline whose passing only changes what happens and what it costs is fiction;
+ - "fiction": anything else, which the engine can hold: an object, a document, a relationship, a deadline used as pressure, the story's price, a rule's terms or its if_broken.
+Write the note first, then the kind. Only number, system and loss go to the repair; fiction entries record what you checked. If there is nothing to look at, mechanics is an empty list.
 
 --- OUTPUT FORMAT ---
-Output ONLY valid JSON, no markdown code fences, no commentary before or after. In every entry "note" comes before the verdict: one sentence saying what in the premise you looked at and why the verdict follows. Mind the direction of each verdict: "contradiction" and "violated" are true when something is WRONG; "holds" is true when the check is SATISFIED. A quote is the premise's own words, copied from one place.
+Output ONLY valid JSON, no markdown code fences, no commentary before or after. In every entry "note" comes before the verdict: one sentence saying what in the premise you looked at and why the verdict follows. Mind the direction of each verdict: "violated" is true when something is WRONG; "holds" is true when the check is SATISFIED. A quote is the premise's own words, copied from one place.
 
 {
-  "clauses": [ {"n": integer, "note": string, "contradiction": boolean, "quote": string} ],
   "constraints": [ {"n": integer, "note": string, "violated": boolean, "quote": string} ],
   "engine": [ {"id": string, "note": string, "holds": boolean, "quote": string} ],
-  "mechanics": [ {"material": string, "note": string} ]
+  "mechanics": [ {"material": string, "note": string, "kind": "number" | "system" | "loss" | "fiction"} ]
 }
 
-One entry for every numbered clause, every numbered constraint and every engine check, in order, including the ones that are fine.
+One entry for every numbered constraint and every engine check, in order, including the ones that are fine.
 
 --- CALIBRATION EXAMPLES ---
 Entry shapes only, on trimmed inputs.
 
-A hard negative broken by genre convention.
-Clause 2: "Nothing supernatural actually happens." Premise: pressure.description = "the dead keeper's footsteps cross the gallery every night at the hour he fell".
-{"n": 2, "note": "The pressure is a haunting that really occurs each night, which is a supernatural event however it is later explained.", "contradiction": true, "quote": "the dead keeper's footsteps cross the gallery every night at the hour he fell"}
-
-A clause the premise simply does not touch.
-Clause 4: "Wry, dry tone." Premise: no field sets a tone.
-{"n": 4, "note": "Nothing in the premise sets a tone, and nothing in it is incompatible with a wry one.", "contradiction": false, "quote": ""}
-
 An absence constraint, satisfied.
-Constraint 6: "3-0b.epistemic_gap [constraint]: present false". Premise: one turn is a discover turn, "find out which of the two clerks signed the order", and nothing else is hidden.
+Constraint 6: "3-0b.epistemic_gap [constraint]: present false". Premise: one turn is a discover turn, "find out which of the two guards opened the gate", and nothing else is hidden.
 {"n": 6, "note": "An epistemic gap is a central truth about who you are or what is really happening that the story is built to keep from you; finding out a fact to get through one turn is not one, and the premise builds no such truth.", "violated": false, "quote": ""}
 
-A permitted clock beside a violation.
-Failure model: 3-0c.failure_triggers [constraint]: types time_pressure. Premise: pressure.clock_or_stock = "the tide, which covers the causeway twice a day"; complications include "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough".
-"mechanics": [ {"material": "the crew's trust in you rises or falls with each favor, and they only open the seaward gate if it is high enough", "note": "A quantity the player is expected to watch and push past a threshold; the engine has no such system and no extracted field licenses it."} ]
-(The tide is a clock for the extracted time_pressure trigger, so it is not reported.)
+A licensed clock, a number, a loss and the price.
+Failure model: 3-0c.failure_triggers [constraint]: types time_pressure. Premise: pressure.clock_or_stock = "the tide, which covers the causeway twice a day"; complications include "the crew's goodwill is scored from 0 to 10 after every scene, and they open the seaward gate at 7"; price.what = "the pilot's hands, burned on the beacon chain".
+"mechanics": [ {"material": "the tide, which covers the causeway twice a day", "note": "A clock the player can run out of, licensed by the extracted time_pressure trigger.", "kind": "fiction"},
+               {"material": "the crew's goodwill is scored from 0 to 10 after every scene, and they open the seaward gate at 7", "note": "A number the player is shown and must push past a threshold; the engine shows a relationship through what people do, never as a score.", "kind": "number"},
+               {"material": "the pilot's hands, burned on the beacon chain", "note": "What the story costs one of its people; the game does not end in the player's defeat, so it is the price.", "kind": "fiction"} ]
+With a failure model of none, "if you are still on the causeway when the tide turns, the story ends with you drowned" would be {"note": "The game ends in the player's defeat, and the failure model names no way to lose.", "kind": "loss"}.
 
 The engine missing.
 Check E3: "mediation.to_reach_pole_a.what_you_must_do is an action in the world with a cost. It is not the pole restated." Premise: to_reach_pole_a = {"pole": "let the family through", "what_you_must_do": "choose to let them through", "cost": "your post"}.
@@ -55,13 +61,10 @@ Check E3: "mediation.to_reach_pole_a.what_you_must_do is an action in the world 
 Check T2: "turn 2 is not the decision axis handed over as a pick." Premise: turns[1].ways_through = [{"way": "let the family through", "cost": "your post"}, {"way": "turn the family back", "cost": "their safety"}].
 {"id": "T2", "note": "The two ways are the two poles with nothing to do to reach either; the turn is a two-button choice.", "holds": false, "quote": "let the family through"}
 
---- LIST 1: KERNEL CLAUSES ---
-$$CLAUSES$$
-
---- LIST 2: CONSTRAINTS ---
+--- LIST 1: CONSTRAINTS ---
 $$CONSTRAINTS$$
 
---- LIST 3: ENGINE CHECKS ---
+--- LIST 2: ENGINE CHECKS ---
 $$ENGINE_CHECKS$$
 
 --- THE FAILURE MODEL (for the mechanics search) ---
