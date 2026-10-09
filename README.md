@@ -121,7 +121,7 @@ Playable Story Package (<id>_package_prose.json)
 ## 4. Setup & Generator Configuration
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.11+ (Standard Library only — **no third-party Python dependencies** required to run or play)
 - [Ollama](https://ollama.com/) running locally (typically with ROCm or CUDA acceleration).
 
 ### Local Model Configuration
@@ -197,10 +197,10 @@ python batch.py status
 
 ## 6. Repository Layout & Further Reading
 
-- [`engine/`](file:///home/krazy/claude/stratum-if-generation/engine/): The interactive fiction runtime, CLI player, curses TUI, and automated playtest verifier.
-- [`generator/`](file:///home/krazy/claude/stratum-if-generation/generator/): The multi-stage narrative generation pipeline, Ollama client, and validators.
-- [`prompts/`](file:///home/krazy/claude/stratum-if-generation/prompts/): System prompts and few-shot calibration fixtures for all generation stages.
-- [`tests/kernels/`](file:///home/krazy/claude/stratum-if-generation/tests/kernels/): Curated test kernels across multiple genres and structural challenges.
-- [`CLAUDE.md`](file:///home/krazy/claude/stratum-if-generation/CLAUDE.md): Detailed architectural and operational manual for code development.
-- [`docs/engine_design.md`](file:///home/krazy/claude/stratum-if-generation/docs/engine_design.md): Deep-dive into engine mechanics, disclosure design, and UI layout.
-- [`docs/outline_design.md`](file:///home/krazy/claude/stratum-if-generation/docs/outline_design.md): Design document for the outline generation loop and story graph invariants.
+- [`engine/`](engine/): The interactive fiction runtime, CLI player, curses TUI, and automated playtest verifier.
+- [`generator/`](generator/): The multi-stage narrative generation pipeline, Ollama client, and validators.
+- [`prompts/`](prompts/): System prompts and few-shot calibration fixtures for all generation stages.
+- [`tests/kernels/`](tests/kernels/): Curated test kernels across multiple genres and structural challenges.
+- [`CLAUDE.md`](CLAUDE.md): Detailed architectural and operational manual for code development.
+- [`docs/engine_design.md`](docs/engine_design.md): Deep-dive into engine mechanics, disclosure design, and UI layout.
+- [`docs/outline_design.md`](docs/outline_design.md): Design document for the outline generation loop and story graph invariants.
