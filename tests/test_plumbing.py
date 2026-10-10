@@ -1744,6 +1744,10 @@ class FakeOllama(BaseHTTPRequestHandler):
 
 @test
 def ollama_client_against_fake_server():
+    for k in ('no_proxy', 'NO_PROXY'):
+        curr = os.environ.get(k, '')
+        if '127.0.0.1' not in curr:
+            os.environ[k] = f"{curr},127.0.0.1,localhost".strip(',')
     server = ThreadingHTTPServer(('127.0.0.1', 0), FakeOllama)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     host = f'http://127.0.0.1:{server.server_port}'
