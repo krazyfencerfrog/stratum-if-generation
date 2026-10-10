@@ -347,6 +347,8 @@ class SceneCompiler:
                 return None
             if not a.get('object') and a.get('detail'):   # "go" + "up the plank gangway": the detail is what it acts on
                 a = dict(a, object=a['detail'], detail=None)
+            elif not a.get('object') and a.get('label'):   # "go" + "out the lower doors": the label is what it acts on
+                a = dict(a, object=a['label'], detail=None)
             obj = self.resolve(a.get('object'), names, open_, props) if a.get('object') else None
             free = None
             if a.get('object') and not obj:      # not a thing in the world ("salute the water"): the menu shows its words

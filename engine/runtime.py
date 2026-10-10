@@ -31,7 +31,7 @@ CHAIN_LIMIT = 10                      # scene changes or event rounds in one act
 SAVE_FORMAT = 'stratum-save/1'
 COLLAPSE_MODES = ('trivial', 'all')
 WAY_HINT = 2                           # idle actions past the scene's last nudge before the way on is marked
-ALONE = {'look': 'around'}             # an objectless option beside others, by verb ("Look › around"); else the verb
+ALONE = {'look': 'around', 'go': 'on', 'leave': 'now'} # an objectless option beside others, by verb ("Look › around"); else fallback
 EXAMINE_GROUPS = (('people', 'people'), ('carried', 'things you carry'), ('here', 'things here'))
 MORE = 'more…'
 PARAPHRASE_SHARE = 0.8                 # ... or whose content words mostly were (a paraphrase of the opening)
@@ -181,7 +181,10 @@ class Engine:
             if detail_label is None and it.get('object') in s.characters and it.get('detail'):
                 topic = (s.characters[it['object']].get('topics') or {}).get(it['detail'])
                 detail_label = (topic or {}).get('label')
-            add(authored, it['id'], it['verb'], it.get('object'), it.get('detail'), it.get('object_label'),
+            obj_label = it.get('object_label')
+            if obj_label is None and it.get('object') is None and it.get('label'):
+                obj_label = it['label']
+            add(authored, it['id'], it['verb'], it.get('object'), it.get('detail'), obj_label,
                 detail_label, source=('interaction', it), weight=it.get('weight'), group=it.get('group'))
 
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
@@ -251,7 +254,8 @@ class Engine:
             for obj, opts in objects.items():
                 if obj is None:
                     for o in opts:
-                        vnode['children'].append(dict({'label': None, 'id': o['id']},
+                        lbl = o.get('object_label') or o.get('detail_label')
+                        vnode['children'].append(dict({'label': lbl, 'id': o['id']},
                                                       **({'weight': o['weight']} if o.get('weight') else {}),
                                                       **({'new': True} if o.get('new') else {}),
                                                       **({'way': True} if o.get('way') else {})))
@@ -287,8 +291,8 @@ class Engine:
                 kinds.append(self._kind(obj))
             if len(vnode['children']) > 1:
                 for c in vnode['children']:
-                    if c.get('label') is None:
-                        c['label'] = ALONE.get(verb, vnode['label'])
+                    if c.get('label') is None or c.get('label') == vnode['label']:
+                        c['label'] = ALONE.get(verb, f"just {vnode['label'].lower()}")
             if verb == 'examine' and len(vnode['children']) > GROUP_AT:
                 vnode['children'] = _group_examine(vnode['children'], kinds)
             root['children'].append(vnode)
@@ -412,8 +416,10 @@ class Engine:
         if opt['object_label']:
             parts.append(opt['object_label'])
         if opt['detail_label']:
-            parts.append(_unechoed(detail_text(opt['verb'], opt['detail_label'], opt.get('detail_free')), parts[0],
-                                   opt['object_label']))
+            tail = _unechoed(detail_text(opt['verb'], opt['detail_label'], opt.get('detail_free')), parts[0],
+                             opt['object_label'])
+            if tail and tail != opt.get('object_label'):
+                parts.append(tail)
         return ' › '.join(parts)
 
     def _free_text(self, opt):
@@ -910,15 +916,20 @@ def _collapse(node, mode):
         return node
     node = dict(node, children=[_collapse(c, mode) for c in node['children']])
     # an unlabelled child is no choice at all (Wait, or an object with one way
-    # to act on it): it always merges; a labelled only child merges under 'all'
-    if len(node['children']) == 1 and (node['children'][0]['label'] is None or mode == 'all'):
+    # to act on it): it always merges; a child repeating its parent's label
+    # merges without echoing; a labelled only child merges under 'all'
+    if len(node['children']) == 1:
         child = node['children'][0]
-        label = node['label'] if not child['label'] else f"{node['label']} › {child['label']}"
-        merged = dict(child, label=label)
-        return merged
+        if child.get('label') is None:
+            return dict(child, label=node['label'])
+        if child.get('label') == node.get('label'):
+            return dict(child, label=node['label'])
+        if mode == 'all':
+            label = node['label'] if not child['label'] else f"{node['label']} › {child['label']}"
+            return dict(child, label=label)
     for c in node['children']:
-        if c['label'] is None:
-            c['label'] = node['label']      # an objectless option beside others: its verb's own name
+        if c.get('label') is None or c.get('label') == node.get('label'):
+            c['label'] = ALONE.get(node.get('label', '').lower(), f"just {node.get('label', '').lower()}")
     return node
 
 

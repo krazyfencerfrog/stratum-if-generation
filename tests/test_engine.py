@@ -691,6 +691,56 @@ def menus_read_as_actions_and_fit_their_keys():
 
 
 @test
+def submenus_eliminate_redundant_and_echoing_labels():
+    import runtime
+    # 1. _collapse eliminates repeating child label in multi-child node
+    tree = {'label': 'Go', 'children': [{'label': 'Go', 'id': 'g1'}, {'label': 'the antechamber', 'id': 'g2'}]}
+    collapsed = runtime._collapse(tree, mode='trivial')
+    labels = [c['label'] for c in collapsed['children']]
+    check('Go' not in labels and 'on' in labels, f'Go was not replaced by ALONE in _collapse: {labels}')
+
+    # 2. _collapse merges single child repeating parent label
+    single_repeat = {'label': 'Ann Lee', 'children': [{'label': 'Ann Lee', 'id': 'c1'}]}
+    collapsed_single = runtime._collapse(single_repeat, mode='trivial')
+    check('children' not in collapsed_single or len(collapsed_single.get('children') or []) == 0,
+          f'repeating single child did not merge: {collapsed_single}')
+    check(collapsed_single['label'] == 'Ann Lee', f'label changed: {collapsed_single}')
+
+    # 3. Engine menu integration
+    data = mini()
+    data.setdefault('verbs', {})['speak'] = {'label': 'Speak'}
+    # Add an objectless go interaction with a label to S1
+    data['scenes']['S1']['interactions'].append({
+        'id': 'S1.go_labeled', 'verb': 'go', 'label': 'out the lower doors',
+        'text': 'You step out.', 'room': 'deck'
+    })
+    # Add an objectless go interaction with NO label to S1
+    data['scenes']['S1']['interactions'].append({
+        'id': 'S1.go_unlabeled', 'verb': 'go',
+        'text': 'You go on.', 'room': 'deck'
+    })
+    # Add an interaction where detail repeats object
+    data['scenes']['S1']['interactions'].append({
+        'id': 'S1.speak_echo', 'verb': 'speak', 'object': 'ann', 'detail': 'ann',
+        'object_label': 'Ann Lee', 'detail_label': 'Ann Lee',
+        'text': 'You speak to Ann.', 'room': 'deck'
+    })
+
+    eng = Engine(Story(data))
+    eng.start()
+    paths = {' › '.join(p): i for p, i in leaves(eng.menu())}
+    check('Go › out the lower doors' in paths, f'Go labeled missing: {paths}')
+    check('Go › on' in paths, f'Go unlabeled fallback missing: {paths}')
+    check('Go › Go' not in paths, f'Go › Go appeared: {paths}')
+    check('Speak › Ann Lee' in paths, f'Speak Ann Lee missing: {paths}')
+    check('Speak › Ann Lee › Ann Lee' not in paths, f'Speak Ann Lee Ann Lee appeared: {paths}')
+
+    # 4. label_of does not duplicate echoing detail
+    opt_echo = next(o for o in eng.options() if o['id'] == 'S1.speak_echo')
+    check(eng.label_of(opt_echo) == 'Speak › Ann Lee', f'label_of returned {eng.label_of(opt_echo)!r}')
+
+
+@test
 def room_text_says_only_what_is_true_now():
     eng = Engine(Story(mini()))
     v = eng.start()
