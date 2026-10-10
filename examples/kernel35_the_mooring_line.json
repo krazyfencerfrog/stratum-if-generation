@@ -2906,7 +2906,7 @@
           "text": "You give {C01} the date, loud enough to keep the rain off the words. He stops tapping and writes it on his wrist, which is the closest he gets to calming down. {C02}'s hand moves an inch away from the mooring line, as if the number had been a proper order.",
           "object": "C01",
           "detail": "by_the_deadline_we_sign_when_the",
-          "detail_label": "'By the deadline. We sign when the buyer is ready.'",
+          "detail_label": "'By the deadline. We sign when ready.'",
           "room": "stern_deck",
           "effects": [
             {
@@ -3940,7 +3940,7 @@
           "text": "You put the letter before {C02}'s cup and say the boat is sold. {C01}'s thumb stops on the buyer's name, but he does not press call. The tiller gives a soft lock, and the cabin waits for the boat to move.",
           "object": "solicitor_s_letter",
           "detail": "boat_is_sold",
-          "detail_label": "put the letter before {C02}'s cup and say the boat is sold",
+          "detail_label": "put the letter before {C02}'s cup",
           "effects": [
             {
               "set": "go_S_N04__S_N05"

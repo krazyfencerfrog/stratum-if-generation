@@ -68,6 +68,9 @@ Rules:
    same verb, object and detail.
  - Every option and action is something done or said, never a moral label
    ("be kind"). A detail that is a line to say goes in quotation marks.
+ - Menu labels must be concise action phrases or short spoken lines, strictly
+   under 40 characters (e.g. "put the letter on the table", "make two teas").
+   Never write full narrative sentences or compound descriptions as labels.
  - Stakes live in bodies, places and things; paper only where the story is
    about it.
  - Keep each text short: this is a placeholder a later prose pass rewrites,
@@ -84,9 +87,9 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "placement": [{"who": "<name>", "room": "<room>"}],
   "room_text": [{"room": "<room>", "variants": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node or null>", "text": "<text>"}]}],
   "moments": [{"node": "<opportunity node id>",
-               "options": [{"verb": "<verb>", "object": "<name>", "detail": "<name, or a line in quotes, or null>", "label": "<menu label for the detail>", "room": "<room or null>", "text": "<what happens>", "neutral": false}],
+               "options": [{"verb": "<verb>", "object": "<name>", "detail": "<name, or a line in quotes, or null>", "label": "<concise menu label for the detail, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "neutral": false}],
                "lapse": {"after": 4, "text": "<what passing it looks like>"}}],
-  "actions": [{"verb": "<verb>", "object": "<name or null>", "detail": "<or null>", "label": "<menu label>", "room": "<room or null>", "text": "<what happens>", "reveals": ["<revelation node id>"], "leads_to": "<target from leaving, or null>", "once": false}],
+  "actions": [{"verb": "<verb>", "object": "<name or null>", "detail": "<or null>", "label": "<concise menu label, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "reveals": ["<revelation node id>"], "leads_to": "<target from leaving, or null>", "once": false}],
   "events": [{"text": "<what happens>", "after_turns": 2, "after": null}],
   "nudges": [{"after": 4, "text": "<placeless>"}],
   "props": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": true}]

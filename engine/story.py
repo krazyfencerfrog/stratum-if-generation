@@ -353,6 +353,10 @@ def validate(story):
                     if not (isinstance(it.get(part + '_label'), str)):
                         errors.append(f'{iw}: {part} {x!r} is not an object, character, room or topic '
                                       f'(give a {part}_label to use free text)')
+            for part in ('detail_label', 'object_label'):
+                lbl = it.get(part)
+                if lbl and len(str(lbl)) > 60:
+                    notes.append(f'{iw}: {part} {lbl!r} is {len(str(lbl))} characters (over 60; menu labels should be concise)')
             if it.get('room') is not None and it['room'] not in rooms:
                 errors.append(f"{iw}: room {it['room']!r} is not one of the scene's rooms")
             if it.get('object') is None and it.get('detail') is not None:

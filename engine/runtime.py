@@ -950,19 +950,25 @@ def _group_examine(children, kinds):
     return out
 
 
-def _fit(node, limit=len(KEYS)):
+def _fit(node, limit=len(KEYS), max_label=60):
     """A level with more entries than there are keys to pick them with ends
     in a 'more…' entry holding the rest (a front end shows only what it can
-    key; the plain player dropped the 29th entry and on before 2026-10-08)."""
+    key; the plain player dropped the 29th entry and on before 2026-10-08).
+    Labels exceeding max_label are truncated with an ellipsis so they fit
+    constrained 80x24 displays."""
+    node = dict(node)
+    lbl = node.get('label')
+    if lbl and max_label and len(lbl) > max_label:
+        node['label'] = lbl[:max_label - 1].rstrip() + '…'
     if 'children' not in node:
         return node
-    kids = [_fit(c, limit) for c in node['children']]
+    kids = [_fit(c, limit, max_label) for c in node['children']]
     if len(kids) > limit:
         rest = {'label': MORE, 'children': kids[limit - 1:]}
         for mark in ('new', 'way'):
             if any(c.get(mark) for c in rest['children']):
                 rest[mark] = True
-        kids = kids[:limit - 1] + [_fit(rest, limit)]
+        kids = kids[:limit - 1] + [_fit(rest, limit, max_label)]
     return dict(node, children=kids)
 
 

@@ -3346,7 +3346,7 @@
           "text": "{C03} writes the date in the ledger without a pause. The kitchen's lateness stays unpriced, and the drawer under the notice remains open.",
           "object": "C03",
           "detail": "city_start_is_in_a_week_last_ser",
-          "detail_label": "'City start is in a week. Last service is the same day.'",
+          "detail_label": "'City start is in a week.'",
           "room": "manager_s_office",
           "effects": [
             {
@@ -3365,7 +3365,7 @@
           "text": "Her pen uncaps. The erased date on the page looks less like a correction and more like a question she is waiting for you to ask.",
           "object": "C03",
           "detail": "give_the_kitchen_a_margin_before",
-          "detail_label": "'Give the kitchen a margin before you mark it late.'",
+          "detail_label": "'Give the kitchen a margin.'",
           "room": "manager_s_office",
           "effects": [
             {
@@ -3723,7 +3723,7 @@
           "text": "{C01} turns the plate away from the window. The candle gutters, and the question settles between you like a plate set too close.",
           "object": "C01",
           "detail": "city_start_date_is_why_the_pass_",
-          "detail_label": "'The city start date is why the pass is quiet, isn't it?'",
+          "detail_label": "'Is the city date why it's quiet?'",
           "effects": [
             {
               "move": "gideon_openness",

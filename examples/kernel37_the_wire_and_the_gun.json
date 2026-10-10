@@ -6268,7 +6268,7 @@
           "text": "You step behind the stone pillar and shield {C03}'s call. The guard's lamp catches your shoulder for a second, but {C03} keeps his voice low and the channel stays open; his eyes find you instead of the sheet.",
           "object": "stone_pillar",
           "detail": "shield_mack_s_call",
-          "detail_label": "step behind the pillar and shield {C03}'s call",
+          "detail_label": "shield {C03}'s call",
           "room": "guard_post_turn",
           "effects": [
             {

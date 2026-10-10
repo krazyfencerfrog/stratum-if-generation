@@ -397,6 +397,14 @@ def world_and_scenes_are_checked_for_how_they_read():
     check(len(found) == 7, f'taking a pen is fine: {found}')
     scene['opening'] = [{'text': 'The boat will not move until you sign.'}]
     check(not any('narrates' in f for f in c.reading_problems(scene, {}, {})), 'a condition is not a deed')
+    long_action = {'id': 'f', 'verb': 'use', 'object': 'pen', 'detail_label': "put the letter before Hugh Calloway's cup and say the boat is sold"}
+    found_long = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [long_action], 'opening': []}, {}, {})
+    check(any('menu labels must be concise action phrases under 40 characters' in f for f in found_long),
+          f'long interaction label caught: {found_long}')
+    found_parsed = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [], 'opening': []},
+                                      {'actions': [{'label': 'a' * 55}]}, {})
+    check(any('menu labels must be concise action phrases under 40 characters' in f for f in found_parsed),
+          f'parsed action long label caught: {found_parsed}')
 
 
 @test

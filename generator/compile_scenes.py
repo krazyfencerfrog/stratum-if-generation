@@ -259,6 +259,26 @@ class SceneCompiler:
             elif it['verb'] in ENGINE_VERBS:
                 out.append(f"verb {it['verb']!r} on {label!r}: the engine makes {it['verb']} itself; give this action "
                            f"a verb of its own")
+            for lk in ('detail_label', 'object_label'):
+                lbl = it.get(lk)
+                if lbl and len(str(lbl)) > 50:
+                    msg = f"label {lbl!r} is {len(str(lbl))} chars: menu labels must be concise action phrases under 40 characters"
+                    if msg not in out:
+                        out.append(msg)
+        for a in as_list((parsed or {}).get('actions')):
+            if isinstance(a, dict) and a.get('label') and len(str(a['label'])) > 50:
+                lbl = str(a['label'])
+                msg = f"label {lbl!r} is {len(lbl)} chars: menu labels must be concise action phrases under 40 characters"
+                if msg not in out:
+                    out.append(msg)
+        for m in as_list((parsed or {}).get('moments')):
+            if isinstance(m, dict):
+                for o in as_list(m.get('options')):
+                    if isinstance(o, dict) and o.get('label') and len(str(o['label'])) > 50:
+                        lbl = str(o['label'])
+                        msg = f"label {lbl!r} is {len(lbl)} chars: menu labels must be concise action phrases under 40 characters"
+                        if msg not in out:
+                            out.append(msg)
         opening = ' '.join(v.get('text', '') for v in scene.get('opening') or [])
         m = example_guard.player_deed(opening)
         if m:

@@ -742,6 +742,35 @@ def submenus_eliminate_redundant_and_echoing_labels():
 
 
 @test
+def menu_labels_are_constrained_and_fitted_to_screen():
+    import runtime
+    # 1. runtime._fit truncates node labels exceeding max_label
+    long_txt = "put the letter before Hugh Calloway's cup and say the boat is sold"
+    tree = {'label': 'Put', 'children': [{'label': long_txt, 'id': 'a1'}]}
+    fitted = runtime._fit(tree, max_label=60)
+    lbl = fitted['children'][0]['label']
+    check(len(lbl) <= 60 and lbl.endswith('…'), f'_fit did not truncate long label: {lbl!r} (len={len(lbl)})')
+    check(lbl == long_txt[:59].rstrip() + '…', f'unexpected truncated label: {lbl!r}')
+
+    # 2. Engine menu integrates max_label truncation
+    data = mini()
+    data['scenes']['S1']['interactions'].append({
+        'id': 'S1.long_act', 'verb': 'use', 'object': 'saddle', 'detail': 'boat_is_sold',
+        'detail_label': long_txt, 'text': 'You do it.', 'room': 'deck'
+    })
+    eng = Engine(Story(data))
+    eng.start()
+    paths = {' › '.join(p): i for p, i in leaves(eng.menu())}
+    check(any(p.endswith('…') and len(p.split(' › ')[-1]) <= 60 for p, i in paths.items() if i == 'S1.long_act'),
+          f'Engine.menu() did not truncate long label: {paths}')
+
+    # 3. Story validator emits craft note for labels over 60 chars
+    _, notes = validate(Story(data))
+    check(any('over 60; menu labels should be concise' in n for n in notes),
+          f'validator did not note label > 60 chars: {notes}')
+
+
+@test
 def room_text_says_only_what_is_true_now():
     eng = Engine(Story(mini()))
     v = eng.start()
