@@ -6,10 +6,11 @@ so the player can walk from one to another, and you add the connective
 places a real geography needs between them (the stairs, the yard, the lane,
 the landing).
 
- - adjacent: pairs of rooms in different locations that join directly, each
-   with a label for the menu both ways ("down the iron stairs to the car
-   park"). Join what the story's scenes move between (scene_order lists the
-   places each scene uses, in story order), in a way the place makes sense.
+ - adjacent: pairs of rooms in different locations that join directly.
+   - label / back_label: concise menu actions ("through the fire door", "back into the corridor").
+   - text / back_text: transitional prose for moving between the spaces.
+     * Connective routes and cross-location boundaries are physical passages (stairs, yards, alleys, fire doors, weather thresholds): provide exactly ONE concise sentence (10-25 words) describing the physical act or sensation of passing through (the draught, the footing, rain, the sound of the gate or door).
+     * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
  - connective: places to add between locations where the geography wants
    them. Add them fairly freely, but never as empty skeletons: each needs a
    description of three or four specific sentences that contributes to the
@@ -28,7 +29,9 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "connective": [{"name": "<place>", "description": "<three or four sentences>",
                   "examinable": [{"name": "<thing>", "description": "<one or two sentences>"}]}],
   "adjacent": [{"from_room": "<room or connective place>", "to_room": "<room or connective place>",
-                "label": "<from -> to>", "back_label": "<to -> from>"}]
+                "label": "<from -> to>", "back_label": "<to -> from>",
+                "text": "<one concise sentence describing the physical crossing>",
+                "back_text": "<one concise sentence describing the return crossing>"}]
 }
 
 EXAMPLE (a late-night radio phone-in story; for shape only)
@@ -40,8 +43,12 @@ EXAMPLE (a late-night radio phone-in story; for shape only)
      "examinable": [{"name": "the coffee tin", "description": "Full of cigarette ends, all the same brand, all smoked to the filter. Dana's brand."}]}
   ],
   "adjacent": [
-    {"from_room": "the corridor", "to_room": "the fire stairs", "label": "through the fire door", "back_label": "back into the corridor"},
-    {"from_room": "the fire stairs", "to_room": "the car park", "label": "down and out to the car park", "back_label": "up the fire stairs"}
+    {"from_room": "the corridor", "to_room": "the fire stairs", "label": "through the fire door", "back_label": "back into the corridor",
+     "text": "The push-bar gives with a hollow clang, letting you onto the cold concrete landing.",
+     "back_text": "The fire door latches behind you, sealing the draught off from the carpet."},
+    {"from_room": "the fire stairs", "to_room": "the car park", "label": "down and out to the car park", "back_label": "up the fire stairs",
+     "text": "The exit bar yields and cold night rain catches you in the face as you hit the wet asphalt.",
+     "back_text": "You push back inside, the door shuddering behind you in the draught."}
   ]
 }
 

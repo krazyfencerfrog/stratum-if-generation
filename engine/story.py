@@ -267,6 +267,8 @@ def validate(story):
                 errors.append(f"room {rid}: exit to unknown room {ex.get('to')!r}")
             if 'when' in ex:
                 check_expr(f"room {rid} exit to {ex.get('to')}", ex['when'])
+            if ex.get('text'):
+                check_variants(f"room {rid} exit to {ex.get('to')} text", ex['text'])
     char_names = {}
     for cid, ch in s.characters.items():
         name = ch.get('name')

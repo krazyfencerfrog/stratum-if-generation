@@ -1121,6 +1121,40 @@ def menu_deduplicates_by_display_label_and_suppresses_matching_topics():
     check(len(purr_entries) == 1, f"expected built topic to be suppressed by authored interaction, got {len(purr_entries)}")
 
 
+@test
+def room_exit_transitions_and_clean_feedback():
+    data = mini()
+    # Add room exits: one with transition text, one without
+    data['world']['rooms']['deck']['exits'] = [
+        {'to': 'cabin', 'label': 'down the companionway', 'text': 'The brass hatch groans as you duck inside.'}
+    ]
+    data['world']['rooms']['cabin'] = {
+        'name': 'the cabin',
+        'description': [{'text': 'A warm, narrow cabin.'}],
+        'exits': [
+            {'to': 'deck', 'label': 'up to the deck'}  # text is absent/None
+        ]
+    }
+    data['scenes']['S1']['rooms'].append('cabin')
+
+    eng = Engine(Story(data))
+    eng.start()
+    check(eng.state.room == 'deck', 'start room should be deck')
+
+    # 1. Moving through exit with text queues the transitional prose
+    view1 = eng.act('go:cabin')
+    check(eng.state.room == 'cabin', 'should have moved to cabin')
+    check(view1.get('text') == ['The brass hatch groans as you duck inside.'],
+          f'expected exit transition text, got: {view1.get("text")}')
+    check(view1.get('room', {}).get('name') == 'the cabin', 'room name should be cabin')
+
+    # 2. Moving through exit without text leaves view text clean (no synthetic filler)
+    view2 = eng.act('go:deck')
+    check(eng.state.room == 'deck', 'should have moved to deck')
+    check(view2.get('text') == [], f'expected empty view text for open exit, got: {view2.get("text")}')
+    check(view2.get('room', {}).get('name') == 'the stern deck', 'room name should be the stern deck')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

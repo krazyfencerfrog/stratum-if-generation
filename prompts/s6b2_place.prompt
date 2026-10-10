@@ -13,9 +13,13 @@ For each room:
    changes: something that breaks, opens, burns or is taken during the story
    does not go in the base text (a later step writes how the room is in each
    scene). Make it particular to this story, not a generic room.
- - exits between this location's rooms, each with a label for the menu
-   ("through the soundproof door"); the other location's rooms are joined
-   later.
+ - exits between this location's rooms:
+   - label: concise menu action ("through the heavy door", "into the booth").
+   - back_label: menu action in reverse ("into the studio", "out to the corridor").
+   - text / back_text: transitional prose describing the crossing.
+     * When there is a physical threshold, barrier, or distinct portal (a heavy door, a hatch, a ladder, a dark passage, elevation change): exactly ONE concise sentence (10-25 words) describing the physical act or sensation of crossing (the sound of the latch, ducking under pipes, the temperature shift, footing on the rungs).
+     * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
+     * For a simple open doorway, adjoining alcove, or unobstructed space with no threshold: use null. Never invent filler ("You make your way to...").
 
 Build only THIS location. other_locations are built separately and
 rooms_already_built exist: never make a room with one of those names. A
@@ -45,7 +49,9 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
 {
   "notes": "<two sentences: how the rooms divide the location, and what the player will want to look at>",
   "rooms": [{"name": "<room>", "description": "<permanent base text>"}],
-  "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>"}],
+  "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>",
+             "text": "<one concise sentence for physical threshold transit, or null if open doorway>",
+             "back_text": "<one concise sentence for return transit, or null if open doorway>"}],
   "objects": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": false, "story": false}]
 }
 
@@ -59,8 +65,12 @@ EXAMPLE (a late-night radio phone-in story, the station building; for shape only
     {"name": "the corridor", "description": "Strip lights, framed gold records from the station's one good decade, and a vending machine that hums in E flat. The floor is worn pale outside the studio door from people waiting."}
   ],
   "exits": [
-    {"from": "the studio", "to": "the corridor", "label": "out through the heavy door", "back_label": "into the studio"},
-    {"from": "the corridor", "to": "the control booth", "label": "into the booth", "back_label": "out to the corridor"}
+    {"from": "the studio", "to": "the corridor", "label": "out through the heavy door", "back_label": "into the studio",
+     "text": "The heavy soundproof door thuds shut behind you, cutting off the hot dust of the booth.",
+     "back_text": "You pull the soundproof door open and step back into the dry warmth of the studio."},
+    {"from": "the corridor", "to": "the control booth", "label": "into the booth", "back_label": "out to the corridor",
+     "text": "You push through the low booth door, amber cue lights immediately at your elbows.",
+     "back_text": "You duck back out into the strip-lit corridor."}
   ],
   "objects": [
     {"name": "the microphone", "room": "the studio", "description": "A big ribbon microphone with a sock of grey foam, worn through where twenty years of hosts leaned in.", "portable": false, "story": true},

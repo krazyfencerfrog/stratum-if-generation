@@ -248,12 +248,12 @@ WORLD_CHARACTER = obj(
 WORLD_FUNCTIONAL = obj(note=S, people=arr(obj(who=S, description=S, here=S, topics=arr(obj(label=S, says=S)))))
 WORLD_PLACE = obj(
     notes=S, rooms=arr(obj(name=S, description=S)),
-    exits=arr(obj(**{'from': S}, to=S, label=S, back_label=S)),
+    exits=arr(obj(**{'from': S}, to=S, label=S, back_label=S, text=STR_OR_NULL, back_text=STR_OR_NULL)),
     objects=arr(obj(name=S, room=S, description=S, portable=B, story=B)),
 )
 WORLD_MAP = obj(
     notes=S, connective=arr(obj(name=S, description=S, examinable=arr(obj(name=S, description=S)))),
-    adjacent=arr(obj(from_room=S, to_room=S, label=S, back_label=S)),
+    adjacent=arr(obj(from_room=S, to_room=S, label=S, back_label=S, text=STR_OR_NULL, back_text=STR_OR_NULL)),
 )
 WORLD_CONVERSATION = obj(notes=S, lines=arr(obj(subject=S, says=arr(VARIANT))))
 WORLD_YOU = obj(

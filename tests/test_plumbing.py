@@ -2036,7 +2036,101 @@ def downstream_paper_and_example_guards():
     check(any('interactions turn on paper' in p for p in problems), f'heavy paper interactions unflagged: {problems}')
 
 
+@test
+def exit_transitions_and_movement_feedback():
+    import world
+    from errors import SoftReject
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from story import validate, Story
+
+    class Gen:
+        kernel = 'A stormy night at sea.'
+        analysis = {}
+
+    w = world.WorldBuilder.__new__(world.WorldBuilder)
+    w.world = {
+        'rooms': {
+            'deck': {'name': 'the stern deck', 'exits': [], 'description': [{'text': 'Rain lashes the deck.'}]},
+            'cabin': {'name': 'the cabin', 'exits': [], 'description': [{'text': 'A warm, cramped cabin.'}]},
+        },
+        'objects': {},
+    }
+    w.chars = {}
+    w.gen = Gen()
+    w.locations = {'L01': {'name': 'the boat', 'kind': 'ship'}}
+    w.location_rooms = {'L01': ['deck', 'cabin']}
+    w.premise = {}
+
+    # 1. link() records text and back_text when provided
+    w.link('deck', 'cabin', 'down the companionway', 'up to the deck',
+           text='The brass-bound hatch groans as you duck out of the wind.',
+           back_text='You climb the narrow ladder back into the spray.')
+    check(w.world['rooms']['deck']['exits'][0].get('text') == 'The brass-bound hatch groans as you duck out of the wind.',
+          'exit text not stored by link()')
+    check(w.world['rooms']['cabin']['exits'][0].get('text') == 'You climb the narrow ladder back into the spray.',
+          'exit back_text not stored by link()')
+
+    # 2. b2_validator rejects generic filler ("You make your way to...")
+    validator = w.b2_validator('L01')
+    desc_deck = 'Rain lashes the narrow wooden planks of the stern deck while river spray foams white beneath the heavy iron rudder chains.'
+    desc_cabin = 'A warm, narrow cabin smelling of boiled tea and paraffin lamps with three small berths built into the curved wooden bulkhead.'
+    filler_place = {
+        'notes': 'Two rooms.',
+        'rooms': [
+            {'name': 'the stern deck', 'description': desc_deck},
+            {'name': 'the cabin', 'description': desc_cabin}
+        ],
+        'exits': [
+            {'from': 'the stern deck', 'to': 'the cabin', 'label': 'into the cabin', 'back_label': 'to the deck',
+             'text': 'You make your way to the cabin.'}
+        ],
+        'objects': [{'name': f'the deck fitting {i}', 'room': 'the stern deck', 'description': 'An iron fitting.'} for i in range(4)] +
+                   [{'name': f'the cabin stove {i}', 'room': 'the cabin', 'description': 'An iron stove.'} for i in range(4)]
+    }
+    try:
+        validator(filler_place)
+        check(False, 'generic filler exit transition should be rejected')
+    except ValueError as e:
+        check('generic filler' in str(e), f'wrong rejection for filler: {e}')
+
+    # 3. b2_validator rejects verbose transition paragraphs (> 35 words)
+    long_place = dict(filler_place)
+    long_place['exits'] = [
+        {'from': 'the stern deck', 'to': 'the cabin', 'label': 'into the cabin', 'back_label': 'to the deck',
+         'text': 'You spend several minutes carefully navigating the treacherous, slippery ropes and brass fittings across the length of the wooden planks while watching out for any falling debris from the damaged mast that creaks ominously overhead in the gale.'}
+    ]
+    try:
+        validator(long_place)
+        check(False, 'overly long exit transition should be rejected')
+    except ValueError as e:
+        check('too long' in str(e), f'wrong rejection for long transition: {e}')
+
+    # 4. Valid concise transitions pass validator
+    valid_place = dict(filler_place)
+    valid_place['exits'] = [
+        {'from': 'the stern deck', 'to': 'the cabin', 'label': 'into the cabin', 'back_label': 'to the deck',
+         'text': 'The hatch clatters open and you duck inside away from the gale.',
+         'back_text': 'You shove open the hatch into the rain.'}
+    ]
+    try:
+        validator(valid_place)
+    except SoftReject:
+        pass  # SoftRejects on items/layout are allowed, hard ValueError is not
+
+    # 5. Null transitions for simple doorways pass validator
+    open_place = dict(filler_place)
+    open_place['exits'] = [
+        {'from': 'the stern deck', 'to': 'the cabin', 'label': 'into the cabin', 'back_label': 'to the deck',
+         'text': None, 'back_text': None}
+    ]
+    try:
+        validator(open_place)
+    except SoftReject:
+        pass
+
+
 # ---------------------------------------------------------------- runner
+
 
 def main():
     parser = argparse.ArgumentParser()

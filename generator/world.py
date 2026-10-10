@@ -371,6 +371,14 @@ class WorldBuilder:
             for e in as_list(parsed.get('exits')):
                 if norm(e.get('from')) not in names or norm(e.get('to')) not in names:
                     problems.append(f"exit {e.get('from')!r} -> {e.get('to')!r} names a room this location does not have")
+                for tk in ('text', 'back_text'):
+                    txt = str(e.get(tk) or '').strip()
+                    if txt:
+                        if len(txt) > 250 or len(txt.split()) > 35:
+                            problems.append(f"exit {e.get('from')!r} {tk} is too long ({len(txt.split())} words); exit transitions must be one concise sentence under 25 words")
+                        low = txt.lower()
+                        if low.startswith(('you make your way to', 'you head to', 'you walk to', 'you go to')):
+                            problems.append(f"exit {e.get('from')!r} {tk} is generic filler ({txt!r}); describe the physical sensation or threshold of crossing, or use null")
             if problems:
                 raise ValueError('; '.join(problems))
             for r in rooms:
@@ -416,7 +424,7 @@ class WorldBuilder:
         for e in as_list(answer.get('exits')):
             a, b = by_name.get(norm(e.get('from'))), by_name.get(norm(e.get('to')))
             if a and b:
-                self.link(a, b, e.get('label'), e.get('back_label'))
+                self.link(a, b, e.get('label'), e.get('back_label'), e.get('text'), e.get('back_text'))
         made = {norm(o['name']) for o in self.world['objects'].values()}
         for o in as_list(answer.get('objects')):
             if not isinstance(o, dict) or not o.get('name'):
@@ -432,12 +440,18 @@ class WorldBuilder:
                 'story': bool(o.get('story'))}
         self.location_rooms[lid] = list(dict.fromkeys(by_name.values()))
 
-    def link(self, a, b, label=None, back=None):
+    def link(self, a, b, label=None, back=None, text=None, back_text=None):
         rooms = self.world['rooms']
         if not any(x['to'] == b for x in rooms[a]['exits']):
-            rooms[a]['exits'].append({'to': b, 'label': label or f"to {rooms[b]['name']}"})
+            ex = {'to': b, 'label': label or f"to {rooms[b]['name']}"}
+            if text and str(text).strip():
+                ex['text'] = str(text).strip()
+            rooms[a]['exits'].append(ex)
         if not any(x['to'] == a for x in rooms[b]['exits']):
-            rooms[b]['exits'].append({'to': a, 'label': back or f"to {rooms[a]['name']}"})
+            ex = {'to': a, 'label': back or f"to {rooms[a]['name']}"}
+            if back_text and str(back_text).strip():
+                ex['text'] = str(back_text).strip()
+            rooms[b]['exits'].append(ex)
 
     def b2_map(self):
         """Which locations adjoin, and the connective places between them."""
@@ -456,6 +470,14 @@ class WorldBuilder:
                     if norm(a.get(k)) not in room_names and not any(
                             norm(a.get(k)) == norm(c.get('name')) for c in as_list(parsed.get('connective'))):
                         problems.append(f"adjacent: {k} {a.get(k)!r} is neither a room nor a connective place")
+                for tk in ('text', 'back_text'):
+                    txt = str(a.get(tk) or '').strip()
+                    if txt:
+                        if len(txt) > 250 or len(txt.split()) > 35:
+                            problems.append(f"adjacent {a.get('from_room')!r} {tk} is too long ({len(txt.split())} words); exit transitions must be one concise sentence under 25 words")
+                        low = txt.lower()
+                        if low.startswith(('you make your way to', 'you head to', 'you walk to', 'you go to')):
+                            problems.append(f"adjacent {a.get('from_room')!r} {tk} is generic filler ({txt!r}); describe the physical sensation or threshold of crossing")
             for c in as_list(parsed.get('connective')):
                 if len(str(c.get('description') or '').split()) < 15 or not as_list(c.get('examinable')):
                     problems.append(f"connective place {c.get('name')!r} is a skeleton: give it specific details and "
@@ -473,7 +495,7 @@ class WorldBuilder:
         for a in as_list(answer.get('adjacent')):
             x, y = room_names.get(norm(a.get('from_room'))), room_names.get(norm(a.get('to_room')))
             if x and y and x != y:
-                self.link(x, y, a.get('label'), a.get('back_label'))
+                self.link(x, y, a.get('label'), a.get('back_label'), a.get('text'), a.get('back_text'))
 
     # ------------------------------------------------------------ B1c
 
