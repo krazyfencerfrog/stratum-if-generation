@@ -226,3 +226,7 @@ stories/batch_queue.json*
 stories/batch_report.md
 stories/*/*_batch.log
 *.lock
+
+# Stratum run scratch, traces, and telemetry
+stories/
+*.lock
