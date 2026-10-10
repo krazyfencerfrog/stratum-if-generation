@@ -39,6 +39,7 @@ import sys
 import checks
 from checks import as_list
 import example_guard
+import paper
 import schemas
 from errors import SoftReject
 
@@ -219,6 +220,12 @@ class WorldBuilder:
                     soft.append(f"nothing varies with {own['name']}, this person's own arc state: let at least the "
                                 f"description or a topic change as it moves")
             soft += self.placed_here(parsed.get('here'))
+            kernel = getattr(self.gen, 'kernel', '')
+            brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {}
+            context = [kernel, json.dumps(brief), json.dumps(self.premise)]
+            copied = example_guard.copied_phrases(parsed, ['s6b1_character.prompt', 's6b1f_functional.prompt', 's6b1c_conversation.prompt'], context)
+            if len(copied) >= 2:
+                soft.append(f"character copies the prompt's illustration ({len(copied)} phrases: {'; '.join(copied[:3])}); write this story's own details")
             if soft:
                 raise SoftReject('; '.join(soft))
         return validate
@@ -284,6 +291,12 @@ class WorldBuilder:
             if missing:
                 raise ValueError(f'no entry for {missing}')
             soft = [c for x in got.values() for c in self.placed_here([x.get('here')])]
+            kernel = getattr(self.gen, 'kernel', '')
+            brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {}
+            context = [kernel, json.dumps(brief), json.dumps(self.premise)]
+            copied = example_guard.copied_phrases(parsed, ['s6b1f_functional.prompt'], context)
+            if len(copied) >= 2:
+                soft.append(f"functional characters copy the prompt's illustration ({len(copied)} phrases: {'; '.join(copied[:3])}); write this story's own people")
             if soft:
                 raise SoftReject('; '.join(soft))
         answer = self.gen.run_prompt('s6b1_functional', 'functional', {
@@ -371,6 +384,16 @@ class WorldBuilder:
                 lonely = [r['name'] for r in rooms if norm(r['name']) not in linked]
                 if lonely:
                     soft.append(f'rooms with no exit inside the location: {lonely}')
+            kernel = getattr(self.gen, 'kernel', '')
+            items = [(o.get('name'), o.get('name')) for o in things]
+            paper_hits = paper.heavy(items, kernel)
+            if paper_hits:
+                soft.append(paper.complaint(paper_hits, len(things), 'objects in this location'))
+            brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {}
+            context = [kernel, json.dumps(brief), json.dumps(self.premise)]
+            copied = example_guard.copied_phrases(parsed, ['s6b2_place.prompt', 's6b2m_map.prompt'], context)
+            if len(copied) >= 2:
+                soft.append(f"place copies the prompt's illustration ({len(copied)} phrases: {'; '.join(copied[:3])}); write this story's own details")
             if soft:
                 raise SoftReject('; '.join(soft))
         return validate

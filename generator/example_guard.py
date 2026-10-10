@@ -61,11 +61,11 @@ def strings(obj):
 def split_prompt(text):
     """(instructions, examples) of a prompt template."""
     lines = text.splitlines()
-    start = next((i for i, l in enumerate(lines) if re.match(r'\s*(---\s*)?(CALIBRATION|ILLUSTRATION)', l)), None)
+    start = next((i for i, l in enumerate(lines) if re.match(r'\s*(---\s*)?(CALIBRATION|ILLUSTRATION|EXAMPLE)', l)), None)
     if start is None:
         return text, ''
     end = next((i for i in range(start + 1, len(lines))
-                if lines[i].startswith('--- THE') or lines[i].startswith('USER INPUT FOLLOWS') or '$$' in lines[i]),
+                if lines[i].startswith('--- THE') or lines[i].startswith('USER INPUT') or lines[i].startswith('---') or '$$' in lines[i]),
                len(lines))
     return '\n'.join(lines[:start] + lines[end:]), '\n'.join(lines[start:end])
 
@@ -77,7 +77,10 @@ def example_phrases(prompt_files):
     if key not in _cache:
         examples, instructions = set(), set()
         for pf in prompt_files:
-            with open(os.path.join(PROMPT_DIR, pf), encoding='utf-8') as f:
+            path = os.path.join(PROMPT_DIR, pf)
+            if not os.path.exists(path):
+                continue
+            with open(path, encoding='utf-8') as f:
                 ins, ex = split_prompt(terms.expand(f.read()))
             examples |= ngrams(ex)
             instructions |= ngrams(ins)
@@ -85,16 +88,27 @@ def example_phrases(prompt_files):
     return _cache[key]
 
 
-def copied_phrases(output, prompt_files, context_texts=()):
+def all_example_phrases():
+    """4-grams that occur in the examples of any prompt template and nowhere in
+    its instructions."""
+    if '__all__' not in _cache:
+        pfs = sorted([f for f in os.listdir(PROMPT_DIR) if f.endswith('.prompt')])
+        _cache['__all__'] = example_phrases(pfs)
+    return _cache['__all__']
+
+
+def copied_phrases(output, prompt_files=None, context_texts=()):
     """The example phrases this output reuses that its context does not
-    explain, sorted; a copy when len(result) >= MIN_HITS."""
+    explain, sorted; a copy when len(result) >= MIN_HITS. If prompt_files is None,
+    checks across all prompt templates globally."""
     allowed = set()
     for t in context_texts:
         allowed |= ngrams(t)
     out = set()
     for s in strings(output):
         out |= ngrams(s)
-    return sorted(' '.join(g) for g in (out & example_phrases(prompt_files)) - allowed)
+    target = all_example_phrases() if prompt_files is None else example_phrases(prompt_files)
+    return sorted(' '.join(g) for g in (out & target) - allowed)
 
 
 # ---------------------------------------------------------------- the brief's own wording

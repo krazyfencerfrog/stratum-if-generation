@@ -122,7 +122,7 @@ Output:
     "question": "Does this company stay together under you, or does each act go where it is wanted?",
     "to_reach_pole_a": {"pole": "together: the company finishes the season as one", "what_you_must_do": "keep the tent crew, the flyers and the horses through towns that will not pay, when the rival can outbid you for any one of them", "cost": "you play every town at a loss, and the people you keep are the ones you could not pay to stay"},
     "to_reach_pole_b": {"pole": "apart: each act goes where it is wanted", "what_you_must_do": "get each act to the place that wants it, the flyers to the rival's big ring, the horses to a riding school, and play the last town with whoever is left", "cost": "the circus she left you ends on your watch"},
-    "levers": ["the founder's practice bar, still rigged in the horse tent", "the strongman and his tent crew", "the rival owner's offer to the flyers", "the night's takings in the cash box"],
+    "levers": ["the founder's practice bar, still rigged in the horse tent", "the strongman and his tent crew", "the rival owner's offer to the flyers", "the season's route through the valley"],
     "serves": "3-0a.primary_decision_axis"
   },
   "price": {"what": "the strongman's back, broken holding the king pole in the gale", "who_pays": "the founder's nephew, the strongman", "why_final": "he will never lift again, on any line where the big top goes up that night", "serves": "3b.primary_affect"},

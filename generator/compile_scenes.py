@@ -37,6 +37,7 @@ import checks
 import schemas
 from errors import SoftReject
 import example_guard
+import paper
 from world import compile_variants, slug, as_list, compact
 
 norm = checks.norm
@@ -302,6 +303,21 @@ class SceneCompiler:
             g = example_guard.ngrams(str((ev or {}).get('text') or '')) if isinstance(ev, dict) else set()
             if len(g) >= 3 and len(g & grams) >= 0.5 * len(g):
                 out.append(f'event {k} retells the opening; an event is something new that happens later')
+        interactions = scene.get('interactions', [])
+        act_items = [(it.get('label') or it.get('detail_label') or it.get('id'),
+                      f"{it.get('label', '')} {it.get('detail_label', '')} {it.get('verb', '')}")
+                     for it in interactions if isinstance(it, dict)]
+        kernel = getattr(self.gen, 'kernel', '') if hasattr(self, 'gen') and self.gen else getattr(self, 'kernel', '')
+        paper_hits = paper.heavy(act_items, kernel)
+        if paper_hits:
+            out.append(paper.complaint(paper_hits, len(interactions), 'scene interactions'))
+        brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {} if hasattr(self, 'gen') and self.gen else {}
+        premise = getattr(self, 'premise', {})
+        world = getattr(self, 'world', {})
+        context = [kernel, json.dumps(brief), json.dumps(premise), json.dumps(world.get('objects', {}))]
+        copied = example_guard.copied_phrases(parsed, ['s7d_scene.prompt'], context)
+        if len(copied) >= 2:
+            out.append(f"scene copies the prompt's illustration ({len(copied)} phrases: {'; '.join(copied[:3])}); write this story's own actions")
         return out
 
     def resolve(self, name, names, open_rooms, extra=()):

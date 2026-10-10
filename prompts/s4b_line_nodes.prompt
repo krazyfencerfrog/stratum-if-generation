@@ -112,7 +112,7 @@ Character register: the company manager; the dresser; the understudy; the
 backer; the backer's nephew; the old character man; the company (crowd;
 the old character man speaks for it).
 Location register: the town hall stage (the hired hall where the play
-will open); the stage door office (where the call sheet and the cash box
+will open); the stage door office (where the call sheet and the wardrobe trunks
 are kept).
 Already told: N01, the morning call with the leading actress missing;
 N02, her dresser tells you she is not coming back.
@@ -124,13 +124,13 @@ run-through the rest of the company was promised has gone to her), N04
 (midpoint; turn 3, the way "he is refused and the backer is told why";
 the turn involves the backer's nephew, the backer and the company
 manager; plan: the backer's nephew arrives for the part the manager
-promised him; you refuse him and tell the backer why; the cheque is
-stopped, and the manager speaks to you only through the call sheet).
+promised him; you refuse him and tell the backer why; the backer walks
+out, and the manager speaks to you only through the call sheet).
 Output:
 {
   "nodes": [
     { "id": "N03", "title": "The Night Rehearsal", "summary": "The hall is dark and the understudy is sure she cannot do it. You take her through the play until morning, reading every other part yourself. By the hour of the company's call she can carry the play, and the one run-through everyone else was promised has been spent on her.", "image": "two chairs on a bare stage under the one working light, the prompt book open between them", "where": ["the town hall stage"], "who": ["the understudy"] },
-    { "id": "N04", "title": "The Nephew's Part", "summary": "The backer's nephew is waiting at the hotel with his uncle, sure of the part the manager promised him. You tell him there is none, and tell the backer to his face why the play cannot carry one. The backer stops the cheque where he sits, and the manager, who has watched you do it, walks out without a word to you.", "image": "the backer's fountain pen drawing one line through a cheque on a tablecloth", "where": ["the hotel dining room"], "who": ["the backer's nephew", "the backer", "the company manager"] }
+    { "id": "N04", "title": "The Nephew's Part", "summary": "The backer's nephew is waiting at the hotel with his uncle, sure of the part the manager promised him. You tell him there is none, and tell the backer to his face why the play cannot carry one. The backer stands up and walks out, and the manager, who has watched you do it, leaves without a word to you.", "image": "the backer's gloves and walking cane left on the dining table", "where": ["the hotel dining room"], "who": ["the backer's nephew", "the backer", "the company manager"] }
   ],
   "new_locations": [
     { "name": "the hotel dining room", "kind": "a public room at the company's hotel", "why": "where the backer can be met: the one place the company's money can be spoken to directly" }

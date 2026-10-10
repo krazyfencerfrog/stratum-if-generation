@@ -142,10 +142,10 @@ else)
 Engine (trimmed): you are the stage manager of a touring theatre company,
 two nights before it opens in a provincial town; you can rewrite the call
 sheet, hold or release the hall, and speak to anyone; you cannot put
-anyone on a stage who refuses to go on, or spend the company's money
-without the manager's signature. Opposition: the company manager, who
-wants the bill played exactly as printed so that the backer stays, and
-who holds the contracts and the cash box. Events: 1 (early) the town's
+anyone on a stage who refuses to go on, or dismiss the hall's crew.
+Opposition: the company manager, who wants the bill played exactly as
+printed so that the backer stays, and who controls the wardrobe trunks
+and the dressing room keys. Events: 1 (early) the town's
 paper prints the star's name across the front page; 2 (middle) the backer
 arrives a day early, with his nephew; 3 (late) the hall's owner lets the
 second week to a travelling circus. Companions: the understudy (breaking
@@ -162,10 +162,10 @@ with their ways:
    tells you. Way 2: you read the letter she left for the manager.
  2 (persuade) the understudy, who has never carried a play. Way 1: she
    goes on because you rehearsed her yourself all night. Way 2: she goes
-   on because the manager threatened her contract.
+   on because the manager threatened to bar her from the stage door.
  3 (trade) the backer's nephew, who has been promised a part. Way 1: he
-   gets his part and the backer's cheque clears. Way 2: he is refused and
-   the backer is told why.
+   gets his part and the backer's support stays. Way 2: he is refused and
+   the backer leaves.
  4 (conceal_or_reveal) the opening-night house, which paid to see the
    star. Way 1: the audience is told before the curtain. Way 2: the
    playbill stands and the understudy plays under the star's name.
@@ -185,9 +185,9 @@ Output:
     { "beat": "setup", "turn": null, "way": null, "event": 1, "plants": [1], "pays": [], "adapted": "At the morning call in the town hall you read out the day's sheet under a spotlight the old character man has to thump to keep lit; the leading actress's place is empty, and the town's paper is on every chair with her name across the front. The company manager tells the company she has a cold, and tells you the bill stays as printed." },
     { "beat": "inciting_incident", "plants": [], "pays": [], "turn": 1, "way": 1, "event": null, "adapted": "Her dresser tells you what she has told nobody: the actress has gone to a rival management over unpaid salary and is not coming back. You have the truth, and the dresser has spent the one confidence she had to trade." },
     { "beat": "commitment", "plants": [], "pays": [], "turn": 2, "way": 1, "event": null, "adapted": "You rehearse the understudy yourself through the night in the empty hall. By morning she can carry the part, and the run-through the rest of the company was promised has gone to her; the old character man, who gave up his sleep to read opposite her, has decided you are worth following." },
-    { "beat": "midpoint", "plants": [], "pays": [], "turn": 3, "way": 2, "event": 2, "adapted": "The backer arrives a day early with his nephew, who has come for the part the manager promised him. You refuse him and tell the backer why; the cheque is stopped where he stands, and from then on the manager speaks to you only through the call sheet." },
-    { "beat": "crisis", "plants": [], "pays": [], "turn": null, "way": null, "event": 3, "adapted": "With no cheque, the manager lets the hall's owner give the second week to the circus, and posts a notice that the star will appear as billed. You are left holding a company that has read both, half of it packing, and a circus unloading elephants in the yard." },
-    { "beat": "climax", "turn": 4, "way": 1, "event": null, "plants": [], "pays": [1], "adapted": "An hour before the curtain you go out in front of it and tell the house who is playing tonight, and the lights die in the uproar; the old character man thumps the spotlight on and the understudy steps into it. Half the house asks for its money back, and the manager pays it out of the cash box himself because you have left him no other way to open." },
+    { "beat": "midpoint", "plants": [], "pays": [], "turn": 3, "way": 2, "event": 2, "adapted": "The backer arrives a day early with his nephew, who has come for the part the manager promised him. You refuse him and tell the backer why; the backer walks out where he stands, and from then on the manager speaks to you only through the call sheet." },
+    { "beat": "crisis", "plants": [], "pays": [], "turn": null, "way": null, "event": 3, "adapted": "With no backer, the manager lets the hall's owner give the second week to the circus, and posts a notice that the star will appear as billed. You are left holding a company that has read both, half of it packing, and a circus unloading elephants in the yard." },
+    { "beat": "climax", "turn": 4, "way": 1, "event": null, "plants": [], "pays": [1], "adapted": "An hour before the curtain you go out in front of it and tell the house who is playing tonight, and the lights die in the uproar; the old character man thumps the spotlight on and the understudy steps into it. Half the house walks out in protest, and the manager locks the stage door in fury because you have left him no other way to open." },
     { "beat": "resolution", "plants": [], "pays": [], "turn": null, "way": null, "event": null, "adapted": "The understudy plays to the half of the house that stayed knowing who she was. You close the prompt book on a tour that is a week shorter and a backer poorer, with her name on the bills for the next town." }
   ]
 }

@@ -580,8 +580,10 @@ class OutlineBuilder:
         """Reject an answer that reuses the prompt's illustration (see
         example_guard.py). The kernel, the brief and the premise are the
         context the answer may legitimately echo."""
+        stage4_prompts = sorted(set([prompt_file, 's4a_main_line.prompt', 's4b_line_nodes.prompt',
+                                     's4c_divergence.prompt', 's4d_next_line.prompt', 's4p_branch_plan.prompt']))
         hits = example_guard.copied_phrases(
-            parsed, [prompt_file],
+            parsed, stage4_prompts,
             [self.gen.kernel or '', json.dumps(self.gen.analysis.get('s3_brief') or {}), json.dumps(self.premise)])
         if len(hits) >= example_guard.MIN_HITS:
             problems.append(f"the answer copies the prompt's illustration ({len(hits)} of its phrases, e.g. "

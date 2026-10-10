@@ -1953,6 +1953,89 @@ def report_script():
     check(proc.returncode == 0 and b'rebuilt from log timestamps' in proc.stdout, 'report --from-logs')
 
 
+@test
+def downstream_paper_and_example_guards():
+    import world, compile_scenes as cs, example_guard, paper
+    from errors import SoftReject
+
+    # 1. example_guard splits EXAMPLE prompt headers across stages 5-7
+    for pf in ('s5a0_arc_cast.prompt', 's6b1_character.prompt', 's6b2_place.prompt', 's7d_scene.prompt'):
+        ins, ex = example_guard.split_prompt(open(os.path.join(ROOT, 'prompts', pf)).read())
+        check(ex and '$$' not in ex and len(ex.splitlines()) >= 10, f'example section not found in {pf}')
+    all_phrases = example_guard.all_example_phrases()
+    check(len(all_phrases) > 10000, f'expected global phrases: {len(all_phrases)}')
+
+    # 2. world.py b2_validator flags heavy paper objects unless kernel allows it
+    w = world.WorldBuilder.__new__(world.WorldBuilder)
+    class Gen:
+        kernel = 'A ghost story on a canal boat.'
+        analysis = {}
+    w.gen = Gen()
+    w.premise = {'hidden_truth': None}
+    w.world = {'rooms': {}, 'objects': {}, 'characters': {}}
+    validator = w.b2_validator([])
+
+    paper_parsed = {
+        'rooms': [{'name': 'the cabin', 'description': 'A dark wood-lined room with a low ceiling and a coal stove in the corner.'}],
+        'exits': [],
+        'objects': [
+            {'name': 'the deed', 'room': 'the cabin', 'description': 'A yellowed deed.'},
+            {'name': 'the contract', 'room': 'the cabin', 'description': 'A legal contract.'},
+            {'name': 'the ledger', 'room': 'the cabin', 'description': 'A thick ledger.'},
+            {'name': 'the receipt', 'room': 'the cabin', 'description': 'A signed receipt.'},
+            {'name': 'the kettle', 'room': 'the cabin', 'description': 'An iron kettle.'},
+            {'name': 'the lamp', 'room': 'the cabin', 'description': 'An oil lamp.'},
+        ]
+    }
+    try:
+        validator(paper_parsed)
+        check(False, 'heavy paper objects should trigger a SoftReject')
+    except SoftReject as e:
+        check('turn on paper' in str(e), f'wrong paper rejection: {e}')
+
+    # In a legal story, kernel allowance permits more paper
+    w.gen.kernel = 'Two lawyers fight over a contract and a deed in court.'
+    try:
+        validator(paper_parsed)
+    except SoftReject as e:
+        check('turn on paper' not in str(e), f'legal kernel should allow paper objects: {e}')
+
+    # 3. world.py b2_validator flags copied phrases from prompt illustration
+    copied_place = {
+        'rooms': [{'name': 'the cabin', 'description': 'A box of grey foam and brown carpet with a jointed arm and hot dust valves.'}],
+        'exits': [],
+        'objects': [
+            {'name': 'the clock', 'room': 'the cabin', 'description': 'One rung is wrapped in a strip of tape under it.'},
+            {'name': 'the desk', 'room': 'the cabin', 'description': 'Twelve bulbs left on the desk beside it in a dark room.'},
+            {'name': 'the kettle', 'room': 'the cabin', 'description': 'An iron kettle.'},
+            {'name': 'the lamp', 'room': 'the cabin', 'description': 'An oil lamp.'},
+        ]
+    }
+    w.gen.kernel = 'A ghost boat.'
+    try:
+        validator(copied_place)
+        check(False, 'copied place illustration should trigger a SoftReject')
+    except SoftReject as e:
+        check('copies the prompt' in str(e), f'wrong example copy rejection: {e}')
+
+    # 4. compile_scenes.py reading_problems flags heavy paper interactions
+    c = cs.SceneCompiler.__new__(cs.SceneCompiler)
+    c.world = {'rooms': {'deck': {'name': 'the stern deck'}}, 'objects': {}, 'characters': {}}
+    c.gen = Gen()
+    c.premise = {}
+    scene = {
+        'rooms': ['deck'], 'cast': {}, 'opening': [{'text': 'Rain falls on the deck.'}],
+        'interactions': [
+            {'id': 'a1', 'verb': 'use', 'object': 'pen', 'detail_label': 'sign the contract'},
+            {'id': 'a2', 'verb': 'use', 'object': 'desk', 'detail_label': 'file the deed'},
+            {'id': 'a3', 'verb': 'use', 'object': 'stamp', 'detail_label': 'seal the papers'},
+            {'id': 'a4', 'verb': 'use', 'object': 'kettle', 'detail_label': 'warm the hands'}
+        ]
+    }
+    problems = c.reading_problems(scene, {}, {})
+    check(any('interactions turn on paper' in p for p in problems), f'heavy paper interactions unflagged: {problems}')
+
+
 # ---------------------------------------------------------------- runner
 
 def main():
