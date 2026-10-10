@@ -1021,7 +1021,7 @@
         "listed": true,
         "description": [
           {
-            "text": "The water-warped ledger lists boats through the lock. The last entry is in {C03}'s careful hand: 'the boat – will not move.'"
+            "text": "The water-warped ledger lists boats through the lock. The last entry is in {C03}'s careful hand: 'the boat \u2013 will not move.'"
           }
         ]
       },
@@ -1143,17 +1143,6 @@
         "description": [
           {
             "text": "A solicitor's letter in {C01}'s hand, the deadline underlined twice; you have folded it into a small, papery coin in your pocket."
-          }
-        ]
-      },
-      "cat": {
-        "name": "the cat",
-        "location": "player",
-        "portable": true,
-        "listed": true,
-        "description": [
-          {
-            "text": "Your sister's cat, grey and audit-faced, rides on your lap or your shoulder; when the boat creaks, it looks at you with the expression of someone who has already read the will."
           }
         ]
       },
@@ -1289,7 +1278,7 @@
                 "when": "pattern('emerson_trust','up',1,0.6)"
               },
               {
-                "text": "'I paid for repairs, not a séance.' He checks the date on his wrist. 'If the papers aren't done by that, I'm calling the solicitor and the boat's a problem.'",
+                "text": "'I paid for repairs, not a s\u00e9ance.' He checks the date on his wrist. 'If the papers aren't done by that, I'm calling the solicitor and the boat's a problem.'",
                 "when": "pattern('emerson_trust','down',1,0.6)"
               },
               {
@@ -3005,7 +2994,7 @@
           "id": "S_N01.N01b.2",
           "verb": "use",
           "text": "You let {C04} block the bench and the view. {C01} photographs {C04} first, then says nothing else, which is either very good for the sale or very bad for your nerves. {C04} blinks slowly, as if it has just taken the listing fee.",
-          "object": "cat",
+          "object": "C04",
           "detail": "bench",
           "room": "cabin",
           "effects": [
@@ -3352,7 +3341,7 @@
           "verb": "use",
           "text": "{C04} opens one eye, regards the cold behind {C01}, and goes back to sleep. {C04}'s tail twitches once, as if the fog is an inconvenience it has already ruled out.",
           "object": "stern_rail",
-          "detail": "cat",
+          "detail": "C04",
           "room": "stern_deck",
           "once": true
         }
@@ -3479,7 +3468,7 @@
           "id": "S_N03.N03a.1",
           "verb": "use",
           "text": "You leave the cat where it is, and the line loosens under its weight. {C02} does not correct you, and the silence is worse than a correction.",
-          "object": "cat",
+          "object": "C04",
           "detail": "stern_knot",
           "detail_label": "let the cat stay on the knot",
           "room": "mooring_platform",
@@ -3498,7 +3487,7 @@
           "id": "S_N03.N03a.2",
           "verb": "use",
           "text": "You lift the cat to the bow. It tolerates the carry, and the line tightens again, though its tail flicks as if the favor has been noted.",
-          "object": "cat",
+          "object": "C04",
           "detail": "bow",
           "room": "stern_deck",
           "effects": [
@@ -3580,7 +3569,7 @@
           "id": "S_N03.N03c.1",
           "verb": "use",
           "text": "You lift the cat gently to the cabin bench. The line tightens again, and {C01}'s phone call sounds more official, as if the boat has briefly become a property again.",
-          "object": "cat",
+          "object": "C04",
           "detail": "cabin_bench",
           "detail_label": "lift the cat gently to the cabin bench",
           "room": "stern_deck",
@@ -3599,7 +3588,7 @@
           "id": "S_N03.N03c.2",
           "verb": "talk",
           "text": "You leave the cat on the knot and call it a cat. {C02}'s cold hand passes over the tiller, and the line stays loose, as if the cat has been given a temporary promotion.",
-          "object": "cat",
+          "object": "C04",
           "detail": "you_re_a_cat",
           "detail_label": "call it a cat",
           "room": "mooring_platform",
@@ -3988,7 +3977,7 @@
           "id": "S_N04.a4",
           "verb": "give",
           "text": "You tear a scrap of bread from the table and hold it out. {C04} takes it from your fingers without looking, then sits a little closer to {C02}'s knee, as if approving of the arrangement.",
-          "object": "cat",
+          "object": "C04",
           "detail": "here",
           "detail_label": "offer the cat a scrap from the table",
           "room": "cabin",
@@ -4271,7 +4260,7 @@
           "id": "S_N05.a3",
           "verb": "talk",
           "text": "{C04} blinks and sits on the mat, which is as much company as this boat gives.",
-          "object": "cat",
+          "object": "C04",
           "detail": "stay_with_me",
           "detail_label": "'Stay with me.'",
           "once": true
@@ -4483,7 +4472,7 @@
           "verb": "show",
           "text": "{C02}'s pale fingers pause over the knot. His eyes go to {C04} in the cabin, and the hull creaks less. The fog around the bollard thins for a moment.",
           "object": "C02",
-          "detail": "cat",
+          "detail": "C04",
           "room": "slip",
           "effects": [
             {
@@ -4504,7 +4493,7 @@
           "id": "S_T2N01.a3",
           "verb": "talk",
           "text": "{C04} watches the cold place and does not answer. Its eyes go to the fresh line, then back to the hatch, and the bench creaks under its weight.",
-          "object": "cat",
+          "object": "C04",
           "detail": "you_re_not_going_out_are_you",
           "detail_label": "'You're not going out, are you?'",
           "room": "cabin"
@@ -4878,7 +4867,7 @@
           "id": "S_T2N03.a2",
           "verb": "give",
           "text": "You put {C04} in the bow. It settles by the nameplate as if the name were a bed, and the boat leans a little farther out of the slip.",
-          "object": "cat",
+          "object": "C04",
           "detail": "bow",
           "room": "bow",
           "once": true
@@ -5131,7 +5120,7 @@
           "id": "S_T3N01.a5",
           "verb": "talk",
           "text": "{C04} looks at you, then at {C02}, and decides you are both furniture. It blinks once, very slowly, and goes back to pretending it is not in charge of the situation.",
-          "object": "cat",
+          "object": "C04",
           "detail": "well",
           "detail_label": "'Well?'"
         }

@@ -267,6 +267,13 @@ def validate(story):
                 errors.append(f"room {rid}: exit to unknown room {ex.get('to')!r}")
             if 'when' in ex:
                 check_expr(f"room {rid} exit to {ex.get('to')}", ex['when'])
+    char_names = {}
+    for cid, ch in s.characters.items():
+        name = ch.get('name')
+        if name:
+            key = re.sub(r'^(the|a|an)\s+', '', name.strip().lower())
+            char_names[key] = cid
+
     for oid, obj in s.objects.items():
         loc = obj.get('location')
         if loc not in (None, 'player', *s.rooms, *s.characters):
@@ -278,6 +285,11 @@ def validate(story):
             notes.append(f'object {oid}: nothing to say when examined')
         if oid in s.rooms or oid in s.characters:
             errors.append(f'object {oid}: id also used by a room or character')
+        name = obj.get('name')
+        if name:
+            key = re.sub(r'^(the|a|an)\s+', '', name.strip().lower())
+            if key in char_names:
+                errors.append(f"object {oid}: name {name!r} is also used by character {char_names[key]}")
     for cid, ch in s.characters.items():
         for key in ('unnamed', 'unnamed_short'):
             if key in ch and not (isinstance(ch[key], str) and ch[key].strip()):

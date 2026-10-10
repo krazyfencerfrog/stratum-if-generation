@@ -131,6 +131,7 @@ def validator_catches_broken_packages():
     broken(lambda d: d['scenes']['S02']['interactions'][0]['effects'].append({'move': 'lazlo_nerve'}), "dir 'up' or 'down'")
     broken(lambda d: d['scenes']['S02']['interactions'].append(dict(d['scenes']['S02']['interactions'][0])), 'duplicate id')
     broken(lambda d: d['world']['objects']['kettle'].update(location='attic'), "location 'attic'")
+    broken(lambda d: d['world']['objects']['kettle'].update(name='Pell Szeto'), "name 'Pell Szeto' is also used by character pell")
 
 
 # ---------------------------------------------------------------- the menu
@@ -1047,6 +1048,48 @@ def tui_runs_under_curses():
         os.kill(pid, 9)
     check(status == 0, f'tui.py under curses exited with {status}: {out[-400:]!r}')
     check(b'Quit?' in out and os.path.isfile(save), 'the curses run did not draw the quit prompt or save')
+
+
+@test
+def menu_deduplicates_by_display_label_and_suppresses_matching_topics():
+    data = demo_data()
+    # 1. Consolidate built-in topics and authored interactions for the same entity under one Talk submenu
+    data['world']['characters']['cat_char'] = {
+        'name': 'the cat', 'role': 'the cat',
+        'topics': {'purr': {'label': 'listen to purr'}}
+    }
+    data['scenes']['S01'].setdefault('cast', {})['cat_char'] = 'stern_deck'
+    data['scenes']['S01']['interactions'].append({
+        'id': 'S01.talk_cat_hello', 'verb': 'talk', 'object': 'cat_char',
+        'detail': 'hello', 'detail_label': 'say hello',
+        'text': 'The cat blinks.'
+    })
+    story = Story(data)
+    eng = Engine(story)
+    eng.start(seed=1)
+    menu = eng.menu()
+    talk = next((c for c in menu['children'] if c.get('label') == 'Talk'), None)
+    check(talk is not None, 'Talk verb missing from menu')
+    cat_submenus = [c for c in talk['children'] if c.get('label') == 'the cat']
+    check(len(cat_submenus) == 1, f"expected exactly 1 'the cat' submenu under Talk, got {len(cat_submenus)}")
+    cat_node = cat_submenus[0]
+    cat_action_labels = [c.get('label') for c in cat_node['children']]
+    check(any('purr' in l for l in cat_action_labels), f"missing purr topic: {cat_action_labels}")
+    check(any('say hello' in l for l in cat_action_labels), f"missing say hello authored interaction: {cat_action_labels}")
+
+    # 2. Suppress built-in topic when authored interaction provides the same display label
+    data['scenes']['S01']['interactions'].append({
+        'id': 'S01.talk_cat_purr_authored', 'verb': 'talk', 'object': 'cat_char',
+        'detail': 'purr_authored_detail', 'detail_label': 'listen to purr',
+        'text': 'The cat purrs loudly.'
+    })
+    eng2 = Engine(Story(data))
+    eng2.start(seed=1)
+    m2 = eng2.menu()
+    talk2 = next(c for c in m2['children'] if c.get('label') == 'Talk')
+    cat_node2 = next(c for c in talk2['children'] if c.get('label') == 'the cat')
+    purr_entries = [c for c in cat_node2['children'] if 'purr' in (c.get('label') or '')]
+    check(len(purr_entries) == 1, f"expected built topic to be suppressed by authored interaction, got {len(purr_entries)}")
 
 
 def main():

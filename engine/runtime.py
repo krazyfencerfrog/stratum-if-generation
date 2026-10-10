@@ -188,7 +188,9 @@ class Engine:
                 detail_label, source=('interaction', it), weight=it.get('weight'), group=it.get('group'))
 
         taken = {(o['verb'], o['object'], o['detail']) for o in authored}
-        return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken] + authored
+        taken_labels = {(o['verb'], o.get('object_label'), o.get('detail_label')) for o in authored}
+        return [o for o in built if (o['verb'], o['object'], o['detail']) not in taken
+                and (o['verb'], o.get('object_label'), o.get('detail_label')) not in taken_labels] + authored
 
     def hint_due(self):
         """The player has done nothing that matters for a while, past every
@@ -249,7 +251,8 @@ class Engine:
             vnode = {'label': s.verbs.get(verb, verb), 'children': []}
             objects = {}
             for o in verbs[verb]:
-                objects.setdefault(o['object'], []).append(o)
+                key = (o['object_label'] or o['object']) if o['object'] is not None else None
+                objects.setdefault(key, []).append(o)
             kinds = []                        # what each object node is, for grouping a long Examine
             for obj, opts in objects.items():
                 if obj is None:
@@ -288,7 +291,8 @@ class Engine:
                         if c.get('label') is None:
                             c['label'] = f"{vnode['label'].lower()} it"
                 vnode['children'].append(onode)
-                kinds.append(self._kind(obj))
+                first_obj = next((o['object'] for o in opts if o['object'] in s.characters), opts[0]['object'])
+                kinds.append(self._kind(first_obj))
             if len(vnode['children']) > 1:
                 for c in vnode['children']:
                     if c.get('label') is None or c.get('label') == vnode['label']:

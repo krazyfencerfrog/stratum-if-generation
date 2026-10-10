@@ -605,6 +605,8 @@ class WorldBuilder:
                 if o.get('description'):
                     x['description'] = [{'text': o['description']}]
             elif isinstance(o, dict) and o.get('name'):
+                if self.resolve(o['name']):
+                    continue
                 oid = slug(o['name'], taken)
                 taken.add(oid)
                 self.world['objects'][oid] = {'name': o['name'], 'location': 'player', 'portable': True, 'listed': True,

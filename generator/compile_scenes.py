@@ -73,7 +73,7 @@ class SceneCompiler:
     def names(self):
         """Every nameable thing: rooms, objects, characters, by normalized name."""
         out = {}
-        for table in ('rooms', 'objects', 'characters'):
+        for table in ('characters', 'rooms', 'objects'):
             for xid, x in self.world[table].items():
                 out.setdefault(norm(x.get('name')), xid)
                 if table == 'characters' and x.get('role'):
