@@ -32,6 +32,11 @@ WHAT YOU WRITE FOR EACH NODE
    summary opens on it. Under a comic tone, a person's voice (given in the
    register) is where the comedy is: let one thing said or done in the
    person's manner show, reported, not quoted at length.
+   Vary your imagery: do not repeat identical figurative phrases, metaphors
+   or verbal formulas across nodes (e.g. "the chain around your neck", "a
+   wound in the earth"). If a motif recurs across beats, show it through
+   different concrete actions, sights, or changes rather than repeating
+   the same wording.
  - where: one to three places, by name.
    (The protagonist is always "you" in a summary; the protagonist's name,
    when the engine gives one, is only what other people call you.
@@ -87,6 +92,9 @@ OTHER RULES
      pay_off_here makes the planted thing decide or change what happens.
  14. THE QUESTION IS NOT THE VERB: say what you bring about and what it
      costs; never "you choose" or "you decide between".
+ 15. NO VERBAL TICS: Vary imagery across nodes. Do not reuse identical
+     poetic phrases, figurative formulas, or stock metaphors across
+     multiple summaries (e.g. "chain around your neck", "wound in the earth").
 
 OUTPUT FORMAT (JSON)
 

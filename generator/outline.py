@@ -1201,20 +1201,25 @@ class OutlineBuilder:
             self.check_example_copy(parsed, 's4b_line_nodes.prompt', problems)
             if problems:
                 raise ValueError('; '.join(problems))
-            # verbal tics: a phrase in three or more summaries along this line, the path one player reads
+            # verbal tics: a phrase in three or more summaries across the outline so far
             new = {x['id']: x.get('summary') or '' for x in got}
-            path = [(nid, new.get(nid) or (self.nodes.get(nid) or {}).get('summary') or '') for nid in line['path']]
-            exempt = [self.gen.kernel or '', json.dumps(self.premise)] + [
+            all_node_texts = [(nid, new.get(nid) or (self.nodes.get(nid) or {}).get('summary') or '')
+                              for nid in {**self.nodes, **new}]
+            exempt = [self.gen.kernel or ''] + [
                 f"{c.get('name') or ''} {c.get('label') or ''}" for c in self.characters.values()]
             name_words = [w for c in self.characters.values() for k in ('name', 'label')
                           for w in str(c.get(k) or '').split()]
-            tics = example_guard.repeated_tics(path, new_ids, exempt, name_words=name_words)
+            name_words += [w for loc in self.locations.values() for w in str(loc.get('name') or '').split()]
+            name_words += [w for loc in parsed.get('new_locations', []) for w in str(loc.get('name') or '').split()]
+            for lev in (self.premise or {}).get('mediation', {}).get('levers') or []:
+                name_words += str(lev).split()
+            tics = example_guard.repeated_tics(all_node_texts, new_ids, exempt, min_nodes=3, name_words=name_words)
             voices = example_guard.described_voices(new, self.characters.values())
             complaints = []
             if tics:
-                complaints.append('these phrases would appear in three or more node summaries on this line, a verbal '
+                complaints.append('these phrases would appear in three or more node summaries across the outline, a verbal '
                                   'tic the player notices: ' + '; '.join(f'"{p}" ({", ".join(ids)})' for p, ids in tics[:5])
-                                  + '. In the new nodes, show the moment in its own words, or something new happening')
+                                  + '. In the new nodes, show the moment in its own words, or something new happening, rather than repeating identical phrasing')
             if voices:
                 complaints.append('these summaries narrate a person with their cast sketch\'s description, which is '
                                   'direction for the writer, not story text: ' + '; '.join(

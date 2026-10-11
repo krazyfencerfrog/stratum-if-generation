@@ -767,6 +767,33 @@ def verbal_tics_count_along_a_path():
 
 
 @test
+def outline_verbal_tics_across_nodes():
+    import example_guard as eg
+    # Across divergent lines, repeated poetic phrases should be caught
+    nodes = [
+        ('N01', 'You meet the old steward at the gates.'),
+        ('N02', 'You sign the registry and the signet draws chain around your neck.'),
+        ('N03', 'The core turns the chain around your neck in the cold vault.'),
+        ('T2N01', 'You take the engine key and let the steam crews hold the door.'),
+        ('T2N02', 'You stand at the throne with the chain around your neck in triumph.'),
+    ]
+    # At line 2 (T2N02 is new): 'chain around your neck' appears in N02, N03, T2N02 (3 nodes across outline)
+    tics = eg.repeated_tics(nodes, ['T2N02'], exempt_texts=['the old steward'], name_words=['steward', 'gates'])
+    check(any('chain around your neck' in p and ids == ['N02', 'N03', 'T2N02'] for p, ids in tics),
+          f'across-line tic not caught: {tics}')
+
+    # Legitimate repeated mentions of registered characters, locations, and concrete props do not trigger false positives
+    nodes_with_props = [
+        ('N01', 'You enter the great ballroom and inspect the brass key.'),
+        ('N02', 'In the great ballroom the loyal servant takes the brass key.'),
+        ('N03', 'The loyal servant turns the brass key in the great ballroom lock.'),
+    ]
+    name_words = ['great', 'ballroom', 'loyal', 'servant', 'brass', 'key']
+    prop_tics = eg.repeated_tics(nodes_with_props, ['N03'], exempt_texts=[], name_words=name_words)
+    check(not prop_tics, f'legitimate entity names triggered false positive: {prop_tics}')
+
+
+@test
 def stage_a_expands_arcs():
     import arcs
     # the threshold math: "3 of 4, three quarters" is met by random play 31% of the time (the design note)
