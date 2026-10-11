@@ -1155,6 +1155,111 @@ def room_exit_transitions_and_clean_feedback():
     check(view2.get('room', {}).get('name') == 'the stern deck', 'room name should be the stern deck')
 
 
+@test
+def visual_frames_validation_export_and_cli():
+    sample_frame = {
+        'composition': 'Wide establishing shot looking toward the stern',
+        'subjects': ['Ann Lee', 'the fountain pen'],
+        'environment': 'Rain slicked wooden planks in overcast daylight',
+        'palette_mood': 'Slate blue and grey; cold and quiet',
+        'prompt_summary': '16-bit pixel art of rainy boat deck with Ann Lee'
+    }
+
+    # 1. Validation passes on valid frames across story entities
+    data = mini()
+    data['world']['rooms']['deck']['frame'] = dict(sample_frame)
+    data['world']['characters']['C01']['portrait'] = dict(sample_frame, composition='Close-up portrait framed at chest level')
+    data['scenes']['S1']['frame'] = dict(sample_frame, composition='Medium staging shot')
+    data['scenes']['S1']['interactions'][0]['frame'] = dict(sample_frame, composition='Action close-up of hands')
+    data['endings']['E1']['frame'] = dict(sample_frame, composition='Panoramic closing plate')
+
+    story = Story(data)
+    errors, notes = validate(story)
+    check(not errors, f'valid frames should not have validation errors: {errors}')
+
+    # 2. Validation catches broken frames
+    bad_data = mini()
+    bad_data['world']['rooms']['deck']['frame'] = {'composition': 'missing fields'}
+    errs, _ = validate(Story(bad_data))
+    check(any("frame missing or empty 'environment'" in e for e in errs), f'did not catch missing environment: {errs}')
+    check(any("frame subjects must be a non-empty list of strings" in e for e in errs), f'did not catch missing subjects: {errs}')
+
+    bad_subjects = mini()
+    bad_subjects['world']['rooms']['deck']['frame'] = dict(sample_frame, subjects='not a list')
+    errs, _ = validate(Story(bad_subjects))
+    check(any("frame subjects must be a non-empty list of strings" in e for e in errs), f'did not catch non-list subjects: {errs}')
+
+    empty_subjects = mini()
+    empty_subjects['world']['rooms']['deck']['frame'] = dict(sample_frame, subjects=[])
+    errs, _ = validate(Story(empty_subjects))
+    check(any("frame subjects must be a non-empty list of strings" in e for e in errs), f'did not catch empty subjects: {errs}')
+
+    bad_sub_item = mini()
+    bad_sub_item['world']['rooms']['deck']['frame'] = dict(sample_frame, subjects=[''])
+    errs, _ = validate(Story(bad_sub_item))
+    check(any("frame subjects must contain non-empty strings" in e for e in errs), f'did not catch non-string subject item: {errs}')
+
+    # 3. Export frames extracts all tiers
+    exported = story.export_frames()
+    check('deck' in exported['rooms'], 'room frame missing from export')
+    check('C01' in exported['characters'], 'character portrait missing from export')
+    check('S1' in exported['scenes'], 'scene frame missing from export')
+    check('S1.a1' in exported['actions'], 'action frame missing from export')
+    check('E1' in exported['endings'], 'ending frame missing from export')
+
+    # 4. Runtime view surfaces room/scene frame and ending frame
+    eng = Engine(story)
+    view = eng.start()
+    check(view.get('frame') == data['world']['rooms']['deck']['frame'], 'runtime view did not surface room frame')
+    # Ending view surfaces ending frame
+    view_end = eng.act('S1.end')
+    check(view_end.get('ending') == 'E1', 'should have reached ending E1')
+    check(view_end.get('frame') == data['endings']['E1']['frame'], 'runtime view did not surface ending frame')
+
+    # Fallback to scene frame when room has no frame
+    fallback_data = mini()
+    fallback_data['scenes']['S1']['frame'] = dict(sample_frame, composition='Scene wide establishing')
+    eng_fb = Engine(Story(fallback_data))
+    view_fb = eng_fb.start()
+    check(view_fb.get('frame') == fallback_data['scenes']['S1']['frame'], 'did not fall back to scene frame')
+
+    # Backward compatibility: legacy package without frames exports empty dicts and yields None frame
+    legacy_story = Story(demo_data())
+    legacy_frames = legacy_story.export_frames()
+    check(not legacy_frames['rooms'] and not legacy_frames['scenes'] and not legacy_frames['characters'],
+          'legacy package should export empty frame dicts')
+    eng_legacy = Engine(legacy_story)
+    view_legacy = eng_legacy.start(seed=1)
+    check(view_legacy.get('frame') is None, 'legacy package view frame should be None')
+
+    # 5. CLI format_frame renders ASCII card and show() with show_frames=True works cleanly
+    card = cli.format_frame(sample_frame)
+    check('Wide establishing shot' in card, 'format_frame missing composition')
+    check('Ann Lee' in card, 'format_frame missing subjects')
+    check('Slate blue' in card, 'format_frame missing palette_mood')
+
+    buf = io.StringIO()
+    cli.show(view, buf, show_frames=True)
+    check('Wide establishing shot' in buf.getvalue(), 'cli.show did not print frame')
+
+    # 6. CLI export-frames flag
+    with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as tf:
+        out_path = tf.name
+    with tempfile.NamedTemporaryFile(suffix='.json', mode='w', delete=False, encoding='utf-8') as pkg_file:
+        json.dump(data, pkg_file)
+        pkg_path = pkg_file.name
+    try:
+        rc = cli.main([pkg_path, '--export-frames', out_path])
+        check(rc == 0, f'cli.main --export-frames failed with exit code {rc}')
+        with open(out_path, encoding='utf-8') as f:
+            dumped = json.load(f)
+        check('deck' in dumped.get('rooms', {}), 'exported json missing deck frame')
+        check('C01' in dumped.get('characters', {}), 'exported json missing C01 portrait')
+    finally:
+        os.unlink(out_path)
+        os.unlink(pkg_path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

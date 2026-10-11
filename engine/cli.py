@@ -15,6 +15,7 @@ the plain one, and the one scripts and the playtest drive. At a real terminal a 
 """
 
 import argparse
+import json
 import os
 import select
 import sys
@@ -55,7 +56,40 @@ def wrap(text):
     return '\n'.join(textwrap.fill(p, WIDTH) for p in text.split('\n'))
 
 
-def show(view, out):
+def format_frame(frame, title="VISUAL FRAME"):
+    comp = str(frame.get('composition') or '').strip()
+    subs = ', '.join(frame.get('subjects') or []) if isinstance(frame.get('subjects'), list) else str(frame.get('subjects') or '')
+    env = str(frame.get('environment') or '').strip()
+    palette = str(frame.get('palette_mood') or '').strip()
+    summary = str(frame.get('prompt_summary') or '').strip()
+
+    hdr = f"┌─ [ {title.upper()} ] "
+    hdr += "─" * max(0, WIDTH - len(hdr) - 1) + "┐"
+    lines = [hdr]
+
+    parts = []
+    if comp:
+        parts.append(f"Composition: {comp}")
+    if subs:
+        parts.append(f"Subjects: {subs}")
+    if env:
+        parts.append(f"Environment: {env}")
+    if palette:
+        parts.append(f"Palette/Mood: {palette}")
+    if summary and not (comp or subs or env):
+        parts.append(summary)
+
+    for p in parts:
+        for b in textwrap.fill(p, WIDTH - 4).split('\n'):
+            lines.append(f"│ {b:<{WIDTH - 4}} │")
+    lines.append("└" + "─" * (WIDTH - 2) + "┘")
+    return '\n'.join(lines)
+
+
+def show(view, out, show_frames=False):
+    if show_frames and view.get('frame'):
+        name = view.get('room', {}).get('name') if view.get('room') else 'Scene'
+        print(format_frame(view['frame'], name) + '\n', file=out)
     for t in view['text']:
         print(wrap(t) + '\n', file=out)
     if view.get('ending'):
@@ -122,7 +156,7 @@ def history(engine, ask, out):
     return view
 
 
-def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None):
+def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None, show_frames=False):
     """Run the loop. `picks` (a list of strings) replaces input when given.
     `keys`: one press per choice; by default, when stdin is a terminal."""
     feed = iter(picks) if picks is not None else None
@@ -143,7 +177,7 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
             return 'q'
 
     view = engine.start()
-    show(view, out)
+    show(view, out, show_frames=show_frames)
     while not view.get('ending'):
         stack = [(view['menu'], [])]
         while True:
@@ -161,7 +195,7 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
                 try:
                     view = engine.rewind()
                     print('(unwound)\n', file=out)
-                    show(view, out)
+                    show(view, out, show_frames=show_frames)
                 except EngineError as e:
                     print(f'({e})', file=out)
                 break
@@ -182,7 +216,7 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
                 try:
                     view = engine.load(save_path)
                     print('(loaded)\n', file=out)
-                    show(view, out)
+                    show(view, out, show_frames=show_frames)
                 except (OSError, SaveMismatch) as e:
                     print(f'({e})', file=out)
                 break
@@ -195,7 +229,7 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
             if 'id' in child:
                 print(file=out)
                 view = engine.act(child['id'])
-                show(view, out)
+                show(view, out, show_frames=show_frames)
                 break
             stack.append((child, path + [child['label']]))
     return view
@@ -205,6 +239,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('package')
     ap.add_argument('--check', action='store_true', help='validate the package and stop')
+    ap.add_argument('--frames', action='store_true', help='render visual keyframe descriptions on scene/room arrival')
+    ap.add_argument('--export-frames', help='export all visual keyframes across the story to a JSON file and stop')
     ap.add_argument('--script', help='comma-separated menu picks to play instead of reading input')
     ap.add_argument('--save', default=os.path.join(os.getcwd(), 'stratum.save'))
     ap.add_argument('--collapse', choices=('trivial', 'all'), default='trivial',
@@ -218,9 +254,16 @@ def main(argv=None):
         print(f'ERROR: {e}')
     if errors or args.check:
         return 1 if errors else 0
+    if args.export_frames:
+        frames = story.export_frames()
+        with open(args.export_frames, 'w', encoding='utf-8') as f:
+            json.dump(frames, f, ensure_ascii=False, indent=2)
+        count = sum(len(v) for k, v in frames.items() if isinstance(v, dict))
+        print(f'Exported {count} frames to {args.export_frames}')
+        return 0
     print(f'== {story.title} ==\n')
     picks = args.script.split(',') if args.script else None
-    play(Engine(story, collapse=args.collapse), picks, save_path=args.save)
+    play(Engine(story, collapse=args.collapse), picks, save_path=args.save, show_frames=args.frames)
     return 0
 
 

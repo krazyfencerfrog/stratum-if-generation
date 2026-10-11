@@ -417,6 +417,8 @@ class SceneCompiler:
                 problems.append(f'{where}: no text')
             if effects:
                 it['effects'] = effects
+            if a.get('frame'):
+                it['frame'] = a['frame']
             if verb not in CORE_VERBS:
                 self.verbs.add(verb)
             return it
@@ -533,12 +535,14 @@ class SceneCompiler:
                 nudges.append({'id': f'{sid}.n{k}', 'after': int(nd.get('after') or 4), 'text': nd['text']})
         if not nudges:
             problems.append('no nudge: give one or two, for a player who has done nothing for a while')
-        return {'scene': {'beat': sc['major'], 'lines': sc['lines'], 'title': sc['title'],
-                          'opening': [{'text': str(answer.get('opening') or '').strip()}] if answer.get('opening') else [],
-                          'rooms': open_, 'start_room': start, 'cast': cast, 'room_text': room_text,
-                          'interactions': interactions, 'moments': moments, 'events': events, 'nudges': nudges,
-                          'exits': [{k: v for k, v in x.items() if k != 'kind'} for x in exits]},
-                'props': new_objects}
+        sc_data = {'beat': sc['major'], 'lines': sc['lines'], 'title': sc['title'],
+                   'opening': [{'text': str(answer.get('opening') or '').strip()}] if answer.get('opening') else [],
+                   'rooms': open_, 'start_room': start, 'cast': cast, 'room_text': room_text,
+                   'interactions': interactions, 'moments': moments, 'events': events, 'nudges': nudges,
+                   'exits': [{k: v for k, v in x.items() if k != 'kind'} for x in exits]}
+        if answer.get('frame'):
+            sc_data['frame'] = answer['frame']
+        return {'scene': sc_data, 'props': new_objects}
 
     # ------------------------------------------------------------ assembly
 
@@ -549,9 +553,12 @@ class SceneCompiler:
             if not sc:
                 continue
             end = (self.story['lines'][l].get('ending') or {})
-            out[f"E_{e['node']}"] = {'title': e.get('title') or end.get('title'),
-                                     'text': [{'text': end.get('summary') or ''}],
-                                     'resolutions': [{'about': g['about'], 'variants': g['variants']} for g in e.get('groups') or []]}
+            entry = {'title': e.get('title') or end.get('title'),
+                     'text': [{'text': end.get('summary') or ''}],
+                     'resolutions': [{'about': g['about'], 'variants': g['variants']} for g in e.get('groups') or []]}
+            if e.get('frame'):
+                entry['frame'] = e['frame']
+            out[f"E_{e['node']}"] = entry
         return out
 
     def package(self):

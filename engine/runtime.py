@@ -755,10 +755,17 @@ class Engine:
                'ending': st.ending, 'room': None, 'menu': None}
         if st.ending:                     # one line per person: alike is not a repeat here, so only tidied
             out['text'] = [DOUBLED.sub(r'\1', t) for t in out['text']]
-            out['ending_title'] = self.story.render(self.story.endings[st.ending].get('title'), st)
+            end = self.story.endings.get(st.ending) or {}
+            out['ending_title'] = self.story.render(end.get('title'), st)
+            if end.get('frame'):
+                out['frame'] = end['frame']
             return out
         out['room'] = self.describe(full, told) if show_room else None
         if out['room']:
+            r = self.story.rooms.get(st.room) or {}
+            sc = self.scene()
+            if r.get('frame') or sc.get('frame'):
+                out['frame'] = r.get('frame') or sc.get('frame')
             texts = _unrepeated(out['text'] + [out['room']['text']])
             out['text'], out['room'] = texts[:-1], dict(out['room'], text=texts[-1] if texts else '')
         else:

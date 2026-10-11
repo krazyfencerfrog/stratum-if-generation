@@ -920,6 +920,8 @@ def stage_b_builds_an_engine_world():
            'start': {'scene': 'S1', 'room': rooms[0]}, 'endings': {'END': {'text': [{'text': 'end'}]}}}
     errors, _ = engine_validate(EngineStory(pkg))
     check(not errors, f'the world is not valid engine data: {errors[:5]}')
+    check(all(r.get('frame') for r in w['rooms'].values()), 'room frames missing in Stage B world')
+    check(all(c.get('portrait') for c in w['characters'].values()), 'character portraits missing in Stage B world')
 
 
 @test
@@ -970,6 +972,9 @@ def the_prose_pass_revises_text_and_keeps_structure():
           'every scene should have a journal entry')
     errors, _ = engine_validate(EngineStory(after))
     check(not errors, f'the prose package does not validate: {errors[:5]}')
+    check(all(sc.get('frame') for sc in after['scenes'].values()), 'prose pass dropped scene frames')
+    check(all(r.get('frame') for r in after['world']['rooms'].values()), 'prose pass dropped room frames')
+    check(all(c.get('portrait') for c in after['world']['characters'].values()), 'prose pass dropped character portraits')
     eng = Engine(EngineStory(after))
     view = eng.start(seed=1)
     shown = ' '.join(view['text']) + (view['room'] or {}).get('text', '')
@@ -1018,6 +1023,13 @@ def stages_c_and_d_compile_a_playable_package():
     check(len(package['scenes']) == len(outline['nodes']), 'a scene per major node')
     check(set(package['endings']) == {f"E_{outline['lines'][l]['path'][-1]}" for l in outline['line_order']},
           f"endings: {sorted(package['endings'])}")
+    check(all(sc.get('frame') for sc in package['scenes'].values()), 'scene frames missing from compiled scenes')
+    check(all(r.get('frame') for r in package['world']['rooms'].values()), 'room frames missing from compiled rooms')
+    check(all(c.get('portrait') for c in package['world']['characters'].values()), 'character portraits missing')
+    exported_frames = story.export_frames()
+    check(len(exported_frames['scenes']) == len(package['scenes']), 'exported scene frames count mismatch')
+    check(len(exported_frames['rooms']) == len(package['world']['rooms']), 'exported room frames count mismatch')
+    check(len(exported_frames['characters']) == len(package['world']['characters']), 'exported character portraits count mismatch')
     moments = [m for sc in package['scenes'].values() for m in sc.get('moments') or []]
     check(moments and all(m['options'] for m in moments), 'no moments compiled')
     check(any(m['required'] and m.get('neutral') for m in moments), 'no required moment with a neutral option')

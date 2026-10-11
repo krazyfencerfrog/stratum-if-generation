@@ -14,8 +14,9 @@ the landing).
  - connective: places to add between locations where the geography wants
    them. Add them fairly freely, but never as empty skeletons: each needs a
    description of three or four specific sentences that contributes to the
-   story's feel, and one or two things worth examining. Join them with
-   adjacent entries (a connective place's name may be used as a room).
+   story's feel, one or two things worth examining, and a visual frame plate
+   (composition, subjects, environment, palette_mood, prompt_summary (e.g. 16-bit retro pixel art, graphic novel plate)). Join them
+   with adjacent entries (a connective place's name may be used as a room).
  - rooms_target says how many rooms the whole world should have; rooms_so_far
    how many it has. Use connective places to bring the world toward the
    target, never past its maximum.
@@ -27,6 +28,9 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
 {
   "notes": "<two sentences: how the world fits together>",
   "connective": [{"name": "<place>", "description": "<three or four sentences>",
+                  "frame": {"composition": "<camera perspective>", "subjects": ["<focal fixture>"],
+                            "environment": "<lighting, materials>", "palette_mood": "<colors, mood>",
+                            "prompt_summary": "<dense multimodal prompt>"},
                   "examinable": [{"name": "<thing>", "description": "<one or two sentences>"}]}],
   "adjacent": [{"from_room": "<room or connective place>", "to_room": "<room or connective place>",
                 "label": "<from -> to>", "back_label": "<to -> from>",
@@ -40,6 +44,11 @@ EXAMPLE (a late-night radio phone-in story; for shape only)
   "notes": "The station building and the car park are joined by the fire stairs, which is where people go to say what they cannot say in the booth; the transmitter hut is across the car park.",
   "connective": [
     {"name": "the fire stairs", "description": "Concrete steps painted battleship grey, a window on each landing that does not open. Somebody has been smoking here for years and leaving the ends in a coffee tin. The door at the bottom is propped with a fire extinguisher.",
+     "frame": {"composition": "High-angle vertical shot looking down concrete stairwell zig-zags",
+               "subjects": ["Battleship grey metal railings", "Overflowing cigarette tin on painted landing", "Fire extinguisher wedged against heavy door"],
+               "environment": "Cold drafts whistling through cracked window caulking, damp concrete dust, stark sodium shadow",
+               "palette_mood": "Battleship grey, rusted orange accents, dirty asphalt black; utilitarian, clandestine",
+               "prompt_summary": "16-bit retro pixel art, dingy stairwell with grey concrete steps, cigarette butt tin on landing, dim emergency light"},
      "examinable": [{"name": "the coffee tin", "description": "Full of cigarette ends, all the same brand, all smoked to the filter. Dana's brand."}]}
   ],
   "adjacent": [

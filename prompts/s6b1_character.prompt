@@ -29,6 +29,12 @@ What you write:
    dana_trust down); most do not.
  - history (arc characters only): two or three sentences on what they bring
    into the story, concretely.
+ - portrait: the character's visual portrait and physical silhouette profile for multimodal rendering and spatial grounding:
+   * composition: portrait framing (bust or medium portrait, angle, posture)
+   * subjects: [name/role, age, build, facial features, distinctive marks, gaze]
+   * environment: clothing, fabric wear, accessories, silhouette
+   * palette_mood: dominant color swatches, personal lighting, expression/mood
+   * prompt_summary: dense prompt for multimodal character portrait (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
 
 Rules:
  - Write what they SAY in their own voice (the sketch gives it, with a
@@ -52,7 +58,10 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "here": [{"state": null, "direction": null, "after": null, "text": "<one sentence>"}],
   "topics": [{"label": "<what the menu shows>", "known_after": "<node id or null>",
               "says": [{"state": "<state or null>", "direction": "up | down | null", "after": null, "text": "<what they say>"}],
-              "moves": [{"state": "<state>", "direction": "up | down"}]}]
+              "moves": [{"state": "<state>", "direction": "up | down"}]}],
+  "portrait": {"composition": "<bust or medium framing>", "subjects": ["<features, expression>"],
+               "environment": "<costume, accessories>", "palette_mood": "<colors, mood>",
+               "prompt_summary": "<dense portrait prompt>"}
 }
 
 EXAMPLE (a late-night radio phone-in story; for shape only)
@@ -60,6 +69,13 @@ EXAMPLE (a late-night radio phone-in story; for shape only)
 {
   "notes": "Dana's trust shows in what she does: the talkback key, which way she faces, whether she cues your records. The topic the story turns on is the caller she keeps screening out.",
   "history": "Dana produced the overnight show for nine years before you, for a host who drank. She covered for him on air until the night she could not, and she has not forgiven herself for the night she could.",
+  "portrait": {
+    "composition": "Close-up bust portrait angled three-quarters toward the studio glass",
+    "subjects": ["Dana", "Fifty years old", "Tired sharp hazel eyes with dark circles", "Pencil tucked behind left ear", "Short salt-and-pepper hair"],
+    "environment": "Heavy grey wool cardigan over faded cotton blouse, foam studio headphones clamped around neck",
+    "palette_mood": "Amber valve glow from fader console, soft sepia, slate grey; weary, sharp, guarded",
+    "prompt_summary": "16-bit retro pixel art, portrait of a tired 50-year-old female radio producer with pencil behind ear and studio headphones around neck, amber console glow"
+  },
   "description": [
     {"state": "dana_trust", "direction": "up", "after": null, "text": "She has pulled her chair round to face the glass instead of the board, and when she catches you looking she lifts two fingers off the fader: go on."},
     {"state": "dana_trust", "direction": "down", "after": null, "text": "She sits side-on to the glass with her coat still on, one hand near the reject switch, the other near the phone to the station manager."},

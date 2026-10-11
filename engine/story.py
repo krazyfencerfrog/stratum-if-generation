@@ -72,6 +72,34 @@ class Story:
             self.verbs[vid] = (v or {}).get('label') or vid.capitalize()
         self.hash = package_hash(data)
 
+    def export_frames(self):
+        """Extract all visual frames across scenes, rooms, characters, endings and actions."""
+        out = {
+            'story_id': self.id,
+            'title': self.title,
+            'scenes': {},
+            'rooms': {},
+            'characters': {},
+            'endings': {},
+            'actions': {}
+        }
+        for sid, sc in self.scenes.items():
+            if sc.get('frame'):
+                out['scenes'][sid] = sc['frame']
+            for it in sc.get('interactions') or []:
+                if it.get('frame'):
+                    out['actions'][it['id']] = it['frame']
+        for rid, r in self.rooms.items():
+            if r.get('frame'):
+                out['rooms'][rid] = r['frame']
+        for cid, ch in self.characters.items():
+            if ch.get('portrait'):
+                out['characters'][cid] = ch['portrait']
+        for eid, end in self.endings.items():
+            if end.get('frame'):
+                out['endings'][eid] = end['frame']
+        return out
+
     @staticmethod
     def load(path):
         with open(path, encoding='utf-8') as f:
@@ -190,6 +218,21 @@ def validate(story):
             if isinstance(v, dict) and 'when' in v:
                 check_expr(f'{where}[{i}]', v['when'])
 
+    def check_frame(where, frame):
+        if frame is None:
+            return
+        if not isinstance(frame, dict):
+            errors.append(f'{where}: frame must be an object')
+            return
+        for key in ('composition', 'environment', 'palette_mood', 'prompt_summary'):
+            if not str(frame.get(key) or '').strip():
+                errors.append(f'{where}: frame missing or empty {key!r}')
+        subjects = frame.get('subjects')
+        if not isinstance(subjects, list) or not subjects:
+            errors.append(f'{where}: frame subjects must be a non-empty list of strings')
+        elif not all(isinstance(x, str) and x.strip() for x in subjects):
+            errors.append(f'{where}: frame subjects must contain non-empty strings')
+
     def check_effects(where, effects):
         for eff in effects or []:
             keys = [k for k in EFFECT_KEYS if k in eff]
@@ -258,6 +301,7 @@ def validate(story):
     # world
     for rid, room in s.rooms.items():
         check_variants(f'room {rid} description', room.get('description'))
+        check_frame(f'room {rid}', room.get('frame'))
         if not room.get('description'):
             notes.append(f'room {rid}: no description')
         for i, frag in enumerate(room.get('fragments') or []):
@@ -300,6 +344,7 @@ def validate(story):
             errors.append(f'character {cid}: unnamed_short without unnamed')
         check_variants(f'character {cid} description', ch.get('description'))
         check_variants(f'character {cid} here', ch.get('here'))
+        check_frame(f'character {cid}', ch.get('portrait'))
         if not ch.get('description'):
             notes.append(f'character {cid}: nothing to say when examined')
         if cid in s.rooms:
@@ -316,6 +361,7 @@ def validate(story):
     graph = {}
     for sid, sc in s.scenes.items():
         where = f'scene {sid}'
+        check_frame(where, sc.get('frame'))
         rooms = sc.get('rooms') or []
         if not rooms:
             errors.append(f'{where}: opens no rooms')
@@ -338,6 +384,7 @@ def validate(story):
         for it in sc.get('interactions') or []:
             iid = it.get('id')
             iw = f'{where} interaction {iid}'
+            check_frame(iw, it.get('frame'))
             if not iid:
                 errors.append(f'{where}: an interaction has no id ({it.get("verb")} {it.get("object")})')
             elif iid in ids:
@@ -430,6 +477,7 @@ def validate(story):
         if eid in s.scenes:
             errors.append(f'ending {eid}: id also used by a scene')
         check_variants(f'ending {eid} text', end.get('text'))
+        check_frame(f'ending {eid}', end.get('frame'))
         for gi, group in enumerate(ending_groups(end)):
             check_variants(f'ending {eid} resolution {gi}', group.get('variants'))
         if not end.get('text'):

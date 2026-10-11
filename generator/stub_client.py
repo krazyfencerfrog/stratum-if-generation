@@ -980,6 +980,16 @@ class StubClient(LlmClient):
     def v(text, state=None, direction=None, after=None):
         return {"state": state, "direction": direction, "after": after, "text": text}
 
+    @staticmethod
+    def frame(summary, subjects=None):
+        return {
+            "composition": "Eye-level medium shot with balanced framing",
+            "subjects": subjects or ["a focal figure"],
+            "environment": "Cold dim daylight and quiet atmosphere",
+            "palette_mood": "Muted slate gray and weathered brown; somber",
+            "prompt_summary": f"16-bit retro pixel art, {summary}"
+        }
+
     def p_s6b1(self, p):
         pk = self.section(p, 'THIS PERSON (') or {}
         who = pk.get('who', 'someone')
@@ -991,7 +1001,8 @@ class StubClient(LlmClient):
         topics = [{"label": f"{who.split(' (')[0]} topic {k + 1}", "known_after": first_node if k == n - 1 else None,
                    "says": [self.v(f"stub: what {who.split(' (')[0]} says about thing {k + 1}")], "moves": []} for k in range(n)]
         return {"notes": "stub", "history": "stub: a past that matters" if pk.get('tier') == 'arc' else None,
-                "description": desc, "here": [self.v(f"stub: {who.split(' (')[0]} is here.")], "topics": topics}
+                "description": desc, "here": [self.v(f"stub: {who.split(' (')[0]} is here.")], "topics": topics,
+                "portrait": self.frame(f"portrait of {who}", [who])}
 
     def p_s6b1f(self, p):
         people = self.section(p, 'THE PEOPLE (') or []
@@ -1003,7 +1014,8 @@ class StubClient(LlmClient):
         pk = self.section(p, 'THIS LOCATION (') or {}
         name = (pk.get('location') or {}).get('name') or 'the place'
         n = max(1, min(4, int(pk.get('rooms_wanted') or 1)))
-        rooms = [{"name": f"{name}, part {i + 1}", "description": "stub: " + " ".join(["a particular corner of " + name] * 4)}
+        rooms = [{"name": f"{name}, part {i + 1}", "description": "stub: " + " ".join(["a particular corner of " + name] * 4),
+                  "frame": self.frame(f"{name}, part {i + 1}", [f"{name}, part {i + 1}"])}
                  for i in range(n)]
         built = pk.get('rooms_already_built') or []
         if os.environ.get('STUB_DUP_ROOM') and built and 'another location or a room already built' not in p:
@@ -1024,6 +1036,7 @@ class StubClient(LlmClient):
         for a, b in zip(locs, locs[1:]):
             cname = f"the way from {a['name']} to {b['name']}"
             connective.append({"name": cname, "description": "stub: " + " ".join(["a path that smells of the story"] * 4),
+                               "frame": self.frame(cname, [cname]),
                                "examinable": [{"name": f"a mark on {cname}", "description": "stub: someone passed here"}]})
             adjacent += [{"from_room": a['rooms'][0], "to_room": cname, "label": "along the way", "back_label": "back"},
                          {"from_room": cname, "to_room": b['rooms'][0], "label": "on", "back_label": "back along the way"}]
@@ -1110,5 +1123,6 @@ class StubClient(LlmClient):
                 "placement": [{"who": x, "room": rooms[0]['name']} for x in people], "room_text": [],
                 "moments": moments, "actions": actions,
                 "events": [{"text": "stub: something happens on its own", "after_turns": 2, "after": None}],
-                "nudges": [{"after": 4, "text": "stub: a voice from somewhere asks what you are waiting for"}], "props": []}
+                "nudges": [{"after": 4, "text": "stub: a voice from somewhere asks what you are waiting for"}], "props": [],
+                "frame": self.frame(f"establishing shot of scene {sid}", people or ['the traveler'])}
 

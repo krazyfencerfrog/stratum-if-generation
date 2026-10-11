@@ -417,6 +417,17 @@ class ProseWriter:
             node = (self.story.get('nodes') or {}).get(sid[2:] if sid.startswith('S_') else sid) or {}
             part.update(happens=node.get('summary'),
                         people_here=['{' + c + '}' for c in sorted(self.pkg['scenes'][unit['of']].get('cast') or {})])
+            if self.pkg['scenes'][sid].get('frame'):
+                part['frame'] = self.pkg['scenes'][sid]['frame']
+        elif kind == 'place':
+            lid = unit['of']
+            rf = {rid: r['frame'] for rid, r in self.pkg['world']['rooms'].items() if r.get('location') == lid and r.get('frame')}
+            if rf:
+                part['room_frames'] = rf
+        elif kind == 'person':
+            cid = unit['of']
+            if self.chars.get(cid, {}).get('portrait'):
+                part['portrait'] = self.chars[cid]['portrait']
         answer = self.gen.run_prompt(f's8b_{uid}', 'edit', {
             '$$UNIT_GUIDANCE$$': GUIDANCE[kind],
             '$$STYLE_JSON$$': json.dumps(self.style_sheet, ensure_ascii=False, indent=1),

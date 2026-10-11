@@ -272,12 +272,15 @@ class WorldBuilder:
                 topic['once'] = True
             topics[tid] = topic
         c = self.chars[cid]
-        self.world['characters'][cid] = {
+        ch_entry = {
             'name': c.get('name') or c.get('label'), 'role': c.get('label'), 'gender': c.get('gender'),
             'arc_tier': self.tiers.get(cid),
             'description': compile_variants(answer.get('description'), self.states, self.nodes, problems, 'description'),
             'here': compile_variants(answer.get('here'), self.states, self.nodes, problems, 'here'),
             'topics': topics, 'history': answer.get('history')}
+        if answer.get('portrait'):
+            ch_entry['portrait'] = answer['portrait']
+        self.world['characters'][cid] = ch_entry
 
     def b1_functional(self, cids):
         if not cids:
@@ -305,9 +308,21 @@ class WorldBuilder:
         for x in as_list(answer.get('people')):
             cid = self.resolve(x.get('who'))
             if cid:
-                self.add_character(cid, {'description': [{'text': x.get('description')}], 'here': [{'text': x.get('here')}],
-                                         'topics': [{'label': t.get('label'), 'says': [{'text': t.get('says')}]}
-                                                    for t in as_list(x.get('topics')) if isinstance(t, dict)]})
+                c = self.chars[cid]
+                name = c.get('name') or c.get('label') or cid
+                self.add_character(cid, {
+                    'description': [{'text': x.get('description')}],
+                    'here': [{'text': x.get('here')}],
+                    'topics': [{'label': t.get('label'), 'says': [{'text': t.get('says')}]}
+                               for t in as_list(x.get('topics')) if isinstance(t, dict)],
+                    'portrait': {
+                        'composition': 'Medium close-up portrait',
+                        'subjects': [name],
+                        'environment': 'Neutral backdrop suited to their role',
+                        'palette_mood': 'Natural lighting; functional and grounded',
+                        'prompt_summary': f'Portrait of {name}',
+                    },
+                })
 
     def resolve(self, name):
         key = norm(re.sub(r'\(.*?\)', '', str(name or '')))
@@ -419,8 +434,11 @@ class WorldBuilder:
             rid = slug(r['name'], taken)
             taken.add(rid)
             by_name[norm(r['name'])] = rid
-            self.world['rooms'][rid] = {'name': r['name'], 'location': lid, 'description': [{'text': r.get('description')}],
-                                        'exits': []}
+            r_entry = {'name': r['name'], 'location': lid, 'description': [{'text': r.get('description')}],
+                       'exits': []}
+            if r.get('frame'):
+                r_entry['frame'] = r['frame']
+            self.world['rooms'][rid] = r_entry
         for e in as_list(answer.get('exits')):
             a, b = by_name.get(norm(e.get('from'))), by_name.get(norm(e.get('to')))
             if a and b:
@@ -488,7 +506,8 @@ class WorldBuilder:
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
         }, prompt_file='s6b2m_map.prompt', validator=validate, klass='build', schema=schemas.WORLD_MAP)
         for c in as_list(answer.get('connective')):
-            self.add_place(None, {'rooms': [{'name': c['name'], 'description': c.get('description')}],
+            self.add_place(None, {'rooms': [{'name': c['name'], 'description': c.get('description'),
+                                            'frame': c.get('frame')}],
                                   'objects': [{'name': x.get('name'), 'room': c['name'], 'description': x.get('description')}
                                               for x in as_list(c.get('examinable')) if isinstance(x, dict)]})
         room_names = {norm(r['name']): rid for rid, r in self.world['rooms'].items()}

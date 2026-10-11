@@ -57,6 +57,12 @@ What you write, naming rooms, people and things exactly as the packet does:
    cushion to jam into a crack), with its room. Something that is not a
    thing at all (the water, the course, the dark) can be an action's object
    as it is: the menu shows its words.
+ - frame: the scene's establishing keyframe plate for multimodal rendering and spatial grounding (the starting tableau in start_room):
+   * composition: camera perspective and framing looking from start_room
+   * subjects: characters present in the scene, their physical poses, proximity, active gestures
+   * environment: time of day, weather, active lighting, ambient atmosphere
+   * palette_mood: dominant color palette, contrast, dramatic tension
+   * prompt_summary: dense prompt for multimodal scene art (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
 
 Rules:
  - Verbs: prefer the core verbs (talk, use, give, show, take); add a story
@@ -92,7 +98,10 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "actions": [{"verb": "<verb>", "object": "<name or null>", "detail": "<or null>", "label": "<concise menu label, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "reveals": ["<revelation node id>"], "leads_to": "<target from leaving, or null>", "once": false}],
   "events": [{"text": "<what happens>", "after_turns": 2, "after": null}],
   "nudges": [{"after": 4, "text": "<placeless>"}],
-  "props": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": true}]
+  "props": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": true}],
+  "frame": {"composition": "<camera perspective from start_room>", "subjects": ["<who is here, their poses>"],
+            "environment": "<time of day, lighting, weather>", "palette_mood": "<colors, mood>",
+            "prompt_summary": "<dense scene illustration prompt>"}
 }
 
 EXAMPLE (a late-night radio phone-in story, one scene; for shape only)
@@ -102,6 +111,13 @@ EXAMPLE (a late-night radio phone-in story, one scene; for shape only)
   "opening": "Two in the morning. Line four has been lit for six minutes and Dana has not put it through. She is watching you through the glass with her hand on the reject switch.",
   "start_room": "the studio",
   "placement": [{"who": "Dana Pryce", "room": "the control booth"}],
+  "frame": {
+    "composition": "Wide eye-level shot looking through the double-pane soundproof studio window into the dimly-lit control booth",
+    "subjects": ["Dana Pryce sitting stiffly with hand hovering over red reject toggle", "Pulsing white light from call board line four"],
+    "environment": "Two in the morning, darkened radio studio, harsh blinking indicator bulb piercing the amber valve glow",
+    "palette_mood": "Muted amber, dark mahogany foam, cold blinking white bulb; suspended, claustrophobic, fraught",
+    "prompt_summary": "16-bit retro pixel art, looking through a glass studio window at 2 AM into a radio control booth, producer hand hovering over switch, blinking white phone light"
+  },
   "room_text": [{"room": "the control booth", "variants": [
     {"state": "dana_trust", "direction": "down", "after": null, "text": "The talkback key is off. Whatever Dana is saying to the station phone, she does not want you to hear it."},
     {"state": null, "direction": null, "after": null, "text": "Line four's bulb blinks on the call board, steady as a pulse."}]}],
