@@ -961,12 +961,12 @@ def tui_draws_every_pane_at_any_size():
         check(want in text, f'the wide layout lacks {want!r}')
     y, x = wide.surface.find('1 Look')
     check(wide.surface.style_at(y, x + 2) == 'selected', 'the selected entry is highlighted')
-    narrow = App(s, MemorySurface(24, 64))
+    narrow = App(s, MemorySurface(24, 80))
     narrow.draw()
     check('What do you do?' in narrow.surface.text() and '┌─ Here' not in narrow.surface.text(), 'narrow: menu below, no side panel')
     tiny = App(s, MemorySurface(10, 40))
     tiny.draw()
-    check('make it at least' in tiny.surface.text(), 'a terminal too small says so')
+    check('Terminal too small' in tiny.surface.text(), 'a terminal too small says so')
     for key, title in (('j', 'The story so far'), ('h', 'History: go back'), ('?', 'Help'), ('q', 'Quit?')):
         wide.handle(key)
         wide.draw()
@@ -975,6 +975,60 @@ def tui_draws_every_pane_at_any_size():
     wide.handle('tab')
     wide.draw()
     check('┌─ Here' not in wide.surface.text(), 'Tab hides the side panel')
+
+
+@test
+def tui_handles_terminal_resize_and_sub_80x24_bounds():
+    from ui.app import App
+    from ui.surface import MemorySurface
+    s = tui_session()
+    ms = MemorySurface(24, 80)
+    app = App(s, ms)
+    app.draw()
+    text = app.surface.text()
+    check('What do you do?' in text, 'initial 80x24 draw failed')
+    initial_items = list(s.items())
+    initial_index = s.level()['index']
+
+    # 1. Resize below 80x24 (e.g. 72x20)
+    ms.resize(20, 72)
+    app.handle('resize')
+    app.draw()
+    text = ms.text()
+    check('Terminal too small: 72x20 (requires 80x24)' in text and 'Please expand window to continue.' in text,
+          f'too_small message missing or wrong format: {text!r}')
+    check('What do you do?' not in text, 'panes were drawn while under minimum bounds')
+
+    # 2. Input while too small does not mutate session state
+    app.handle('down')
+    app.handle('enter')
+    check(s.items() == initial_items and s.level()['index'] == initial_index,
+          'input while too small mutated session state')
+
+    # 3. Resize back to 80x24 restores panes cleanly without losing session state
+    ms.resize(24, 80)
+    app.handle('resize')
+    app.draw()
+    text = ms.text()
+    check('What do you do?' in text and 'Terminal too small' not in text,
+          'restored 80x24 failed to redraw panes cleanly')
+    check(s.level()['index'] == initial_index, 'restored 80x24 lost menu selection')
+
+    # 4. Resize while an overlay (e.g. journal) is active preserves overlay upon restoration
+    app.handle('j')
+    app.draw()
+    check('The story so far' in ms.text(), 'overlay did not open')
+    ms.resize(18, 70)
+    app.handle('resize')
+    app.draw()
+    check('Terminal too small: 70x18 (requires 80x24)' in ms.text(), 'overlay hid advisory when too small')
+    ms.resize(24, 80)
+    app.handle('resize')
+    app.draw()
+    check('The story so far' in ms.text(), 'overlay was lost upon restoring terminal size')
+    app.handle('esc')
+    app.draw()
+    check('The story so far' not in ms.text(), 'overlay did not close')
 
 
 @test

@@ -45,6 +45,9 @@ class Surface:
     def refresh(self):
         pass
 
+    def on_resize(self):
+        pass
+
     def fill(self, y, x, h, w, style='normal'):
         for row in range(y, y + h):
             self.put(row, x, ' ' * w, style)
@@ -55,6 +58,13 @@ class MemorySurface(Surface):
 
     def __init__(self, height, width):
         self.h, self.w = height, width
+        self.clear()
+
+    def resize(self, height, width):
+        self.h, self.w = height, width
+        self.clear()
+
+    def on_resize(self):
         self.clear()
 
     def size(self):
@@ -135,11 +145,25 @@ class CursesSurface(Surface):
                 attr |= flags[n]
             self.attrs[style] = attr
 
+    def on_resize(self):
+        try:
+            if hasattr(self.curses, 'update_lines_cols'):
+                self.curses.update_lines_cols()
+            if hasattr(self.curses, 'resizeterm'):
+                h, w = self.scr.getmaxyx()
+                self.curses.resizeterm(h, w)
+            self.scr.clear()
+        except self.curses.error:
+            pass
+
     def size(self):
         return self.scr.getmaxyx()
 
     def clear(self):
-        self.scr.erase()
+        try:
+            self.scr.erase()
+        except self.curses.error:
+            pass
 
     def put(self, y, x, text, style='normal'):
         h, w = self.size()
@@ -152,4 +176,7 @@ class CursesSurface(Surface):
             pass
 
     def refresh(self):
-        self.scr.refresh()
+        try:
+            self.scr.refresh()
+        except self.curses.error:
+            pass

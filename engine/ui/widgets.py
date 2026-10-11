@@ -238,4 +238,12 @@ def overlay(surface, r, session):
 
 
 def too_small(surface, h, w):
-    surface.put(h // 2, 0, T.ellipsize(f'The window is {w}×{h}; make it at least 48×14.', w), 'warn')
+    line1 = f"Terminal too small: {w}x{h} (requires 80x24)"
+    line2 = "Please expand window to continue."
+    msg = f"{line1}. {line2}"
+    if h >= 4 and w < len(msg):
+        y = max(0, h // 2 - 1)
+        surface.put(y, max(0, (w - T.width(line1)) // 2), T.ellipsize(line1, w), 'warn')
+        surface.put(y + 1, max(0, (w - T.width(line2)) // 2), T.ellipsize(line2, w), 'normal')
+    else:
+        surface.put(max(0, h // 2), max(0, (w - T.width(msg)) // 2), T.ellipsize(msg, w), 'warn')

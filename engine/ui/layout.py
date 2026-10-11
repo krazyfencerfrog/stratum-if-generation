@@ -23,7 +23,7 @@ from collections import namedtuple
 
 Rect = namedtuple('Rect', 'y x h w')
 
-MIN_H, MIN_W = 14, 48
+MIN_H, MIN_W = 24, 80
 WIDE = 90
 
 

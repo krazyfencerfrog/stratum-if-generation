@@ -27,25 +27,28 @@ class App:
 
     def draw(self):
         sf, s = self.surface, self.s
-        sf.clear()
-        h, w = sf.size()
-        rects = layout(h, w, self.sidebar, len(self.s.items()))
-        self.rects = rects
-        if rects['too_small']:
-            W.too_small(sf, h, w)
+        try:
+            sf.clear()
+            h, w = sf.size()
+            rects = layout(h, w, self.sidebar, len(self.s.items()))
+            self.rects = rects
+            if rects['too_small']:
+                W.too_small(sf, h, w)
+                sf.refresh()
+                return
+            here = s.here()
+            W.header(sf, rects['header'], here)
+            W.story(sf, rects['story'], s)
+            self.menu_hits = W.menu(sf, rects['menu'], s)
+            if rects['side']:
+                W.side(sf, rects['side'], here)
+            W.status(sf, rects['status'], s)
+            W.footer(sf, rects['footer'], s)
+            if s.overlay:
+                self.overlay_lines = W.overlay(sf, rects['overlay'], s)
             sf.refresh()
-            return
-        here = s.here()
-        W.header(sf, rects['header'], here)
-        W.story(sf, rects['story'], s)
-        self.menu_hits = W.menu(sf, rects['menu'], s)
-        if rects['side']:
-            W.side(sf, rects['side'], here)
-        W.status(sf, rects['status'], s)
-        W.footer(sf, rects['footer'], s)
-        if s.overlay:
-            self.overlay_lines = W.overlay(sf, rects['overlay'], s)
-        sf.refresh()
+        except getattr(getattr(sf, 'curses', None), 'error', ()):
+            pass
 
     # ------------------------------------------------------------ keys
 
@@ -57,9 +60,17 @@ class App:
         """One key. Returns False when the app should stop."""
         s = self.s
         if isinstance(key, tuple) and key and key[0] == 'mouse':
+            if self.rects and self.rects.get('too_small'):
+                return self.running
             self.mouse(*key[1:])
             return self.running
         if key == 'resize':
+            if hasattr(self.surface, 'on_resize'):
+                self.surface.on_resize()
+            return self.running
+        if self.rects and self.rects.get('too_small'):
+            if key == 'q':
+                self.running = False
             return self.running
         s.note('')                          # a message lasts until the next key
         if s.overlay:
@@ -214,7 +225,11 @@ def run(session, keys=None, mouse=True):
                 try:
                     key = translate(curses, stdscr, stdscr.get_wch())
                 except curses.error:
-                    continue
+                    h, w = stdscr.getmaxyx()
+                    if hasattr(curses, 'is_term_resized') and curses.is_term_resized(h, w):
+                        key = 'resize'
+                    else:
+                        continue
                 except KeyboardInterrupt:
                     break
             if key is not None:
