@@ -1,5 +1,7 @@
 # Stratum IF
 
+[![CI](https://github.com/krazyfencerfrog/stratum-if-generation/actions/workflows/ci.yml/badge.svg)](https://github.com/krazyfencerfrog/stratum-if-generation/actions/workflows/ci.yml)
+
 An end-to-end system for room-based, second-person interactive fiction.
 
 Stratum brings together two distinct systems:
