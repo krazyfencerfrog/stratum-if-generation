@@ -613,12 +613,69 @@ class SceneCompiler:
         errors, notes = validate(story)
         report = {'errors': errors, 'notes': notes, 'playtest': None}
         if errors:
+            report['playtest'] = {
+                'errors': [],
+                'notes': [],
+                'text': '',
+                'metrics': {
+                    'states_explored': 0,
+                    'scenes_total': len(package.get('scenes') or {}),
+                    'scenes_reached': 0,
+                    'scenes_reachability': 0.0,
+                    'endings_total': len(package.get('endings') or {}),
+                    'endings_reached': 0,
+                    'endings_reachability': 0.0,
+                    'stuck_states': 0,
+                    'errors_count': len(errors),
+                    'notes_count': len(notes),
+                    'errors': list(errors),
+                    'notes': list(notes),
+                    'plays': {},
+                },
+            }
             return report
         out = io.StringIO()
         result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
                                      styled_runs=10 if quick else None, scene_states=1500 if quick else None)
-        report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue()}
+        metrics = extract_playtest_metrics(story, result)
+        report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report
+
+    def compile_and_verify(self, runs=None, max_states=None):
+        """Compiles the package, runs the engine validator and playtest.
+        Records reachability metrics in run_stats.json and writes package.md.
+        If validation or playtest finds errors, removes any existing package.json
+        and raises PipelineHalt. Only emits package.json on clean verification."""
+        package = self.run()
+        report = self.check(package, runs=runs, max_states=max_states)
+
+        # Save inspection report markdown
+        self.gen.save_story_file('package.md', report_markdown(self.gen.story_id, self.findings, report))
+
+        # Record playtest reachability metrics in run_stats.json
+        metrics = (report.get('playtest') or {}).get('metrics')
+        if metrics and hasattr(self.gen, 'stats') and self.gen.stats:
+            self.gen.stats.record_extra('playtest', metrics)
+
+        validator_errors = report.get('errors') or []
+        play_errors = (report.get('playtest') or {}).get('errors') or []
+        fatal_errors = validator_errors + play_errors
+
+        if fatal_errors:
+            pkg_path = self.gen.story_file_path('package.json')
+            if os.path.exists(pkg_path):
+                os.remove(pkg_path)
+            for e in self.findings + fatal_errors:
+                print(f'  - {e}', file=sys.stderr)
+            from main import PipelineHalt
+            raise PipelineHalt(
+                f"Stage D package verification failed with {len(fatal_errors)} error(s): "
+                + "; ".join(fatal_errors[:3])
+            )
+
+        # Clean verification: emit package.json
+        self.gen.save_story_json('package.json', package)
+        return package, report
 
     def run(self):
         """Reconcile and compile; returns the package (check it with check())."""
@@ -628,13 +685,69 @@ class SceneCompiler:
         return self.package()
 
 
+def extract_playtest_metrics(story, result):
+    explore = result.get('explore') or {}
+    scenes_total = len(story.scenes)
+    endings_total = len(story.endings)
+
+    if 'scenes' in explore and isinstance(explore['scenes'], dict):
+        scenes_reached = len(explore['scenes'])
+        states_explored = sum(len(r.get('states', [])) for r in explore['scenes'].values())
+        stuck_count = sum(len(r.get('stuck', [])) for r in explore['scenes'].values())
+    else:
+        scenes_reached = len(explore.get('scenes', []))
+        states_explored = len(explore.get('states', []))
+        stuck_count = len(explore.get('stuck', []))
+
+    endings_reached_set = set(explore.get('endings', {}).keys())
+    plays = result.get('plays') or []
+    for p in plays:
+        endings_reached_set.update((p.get('endings') or {}).keys())
+    endings_reached = len(endings_reached_set)
+    play_summaries = {}
+    for p in plays:
+        play_summaries[p['style']] = {
+            'runs': p.get('runs', 0),
+            'unfinished': p.get('unfinished', 0),
+            'mean_actions': p.get('mean_actions', 0),
+            'endings': dict(p.get('endings', {})),
+        }
+
+    return {
+        'states_explored': states_explored,
+        'scenes_total': scenes_total,
+        'scenes_reached': scenes_reached,
+        'scenes_reachability': round(scenes_reached / max(1, scenes_total), 3),
+        'endings_total': endings_total,
+        'endings_reached': endings_reached,
+        'endings_reachability': round(endings_reached / max(1, endings_total), 3),
+        'stuck_states': stuck_count,
+        'errors_count': len(result.get('errors') or []),
+        'notes_count': len(result.get('notes') or []),
+        'errors': list(result.get('errors') or []),
+        'notes': list(result.get('notes') or []),
+        'plays': play_summaries,
+    }
+
+
 def report_markdown(story_id, findings, report):
     out = [f'# {story_id}: the compiled package', '']
     out += ['## Stage C'] + ([f'- {f}' for f in findings] or ['- no findings']) + ['']
     out += ['## Engine validator'] + ([f'- ERROR {e}' for e in report['errors']] or ['- no errors'])
     out += [f'- note {n}' for n in report['notes']] + ['']
-    if report.get('playtest'):
-        out += ['## Playtest', '```', report['playtest']['text'].rstrip(), '```']
+    play = report.get('playtest') or {}
+    metrics = play.get('metrics') or {}
+    if metrics:
+        out += ['## Playtest Reachability']
+        out += [
+            f"- States explored: {metrics.get('states_explored', 0)}",
+            f"- Scenes: {metrics.get('scenes_reached', 0)}/{metrics.get('scenes_total', 0)} ({metrics.get('scenes_reachability', 0):.0%})",
+            f"- Endings: {metrics.get('endings_reached', 0)}/{metrics.get('endings_total', 0)} ({metrics.get('endings_reachability', 0):.0%})",
+            f"- Stuck states: {metrics.get('stuck_states', 0)}",
+            '',
+        ]
+    if play.get('text'):
+        out += ['## Playtest Log', '```', play['text'].rstrip(), '```']
     return '\n'.join(out) + '\n'
 
 
@@ -642,7 +755,7 @@ def main(argv=None):
     """python compile_scenes.py <story_id>: stages C and D on a directory with
     the outline, stage A and stage B. Writes <id>_package.json and .md; play
     it with python ../engine/cli.py ../stories/<id>/<id>_package.json"""
-    from main import StoryGenerator
+    from main import StoryGenerator, PipelineHalt
     import scenes
     ap = argparse.ArgumentParser(description=main.__doc__)
     ap.add_argument('story_id')
@@ -660,10 +773,11 @@ def main(argv=None):
             gen.analysis[key] = load(suffix)
     plan = load('scenes.json') or scenes.plan(story, arcs, gen.analysis.get('s3_brief'))
     comp = SceneCompiler(gen, story, arcs, plan, world)
-    package = comp.run()
-    gen.save_story_json('package.json', package)
-    report = comp.check(package)
-    gen.save_story_file('package.md', report_markdown(args.story_id, comp.findings, report))
+    try:
+        package, report = comp.compile_and_verify()
+    except PipelineHalt as halt:
+        print(f"\nPIPELINE HALTED: {halt}", file=sys.stderr)
+        return 2
     print(f"package: {len(package['scenes'])} scenes; validator {len(report['errors'])} error(s); playtest "
           f"{len((report.get('playtest') or {}).get('errors') or [])} error(s)")
     return 0

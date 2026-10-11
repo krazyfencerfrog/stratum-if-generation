@@ -1850,10 +1850,7 @@ class StoryGenerator:
         world_result = world_result or load('world.json')
         plan = scenes.plan(story, arcs_result, self.analysis.get('s3_brief'), self.analysis.get('s3_4_promises'))
         comp = compile_scenes.SceneCompiler(self, story, arcs_result, plan, world_result)
-        package = comp.run()
-        self.save_story_json('package.json', package)
-        report = comp.check(package)
-        self.save_story_file('package.md', compile_scenes.report_markdown(self.story_id, comp.findings, report))
+        package, report = comp.compile_and_verify()
         play = report.get('playtest') or {}
         print(f"package: {len(package['scenes'])} scenes; {len(comp.findings)} reconciliation finding(s); validator "
               f"{len(report['errors'])} error(s); playtest {len(play.get('errors') or [])} error(s), "

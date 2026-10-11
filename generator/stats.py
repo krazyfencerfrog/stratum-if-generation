@@ -145,13 +145,21 @@ class RunStats:
         self.path = path
         self.story_id = story_id
         self.calls = []
+        self.extra = {}
         if os.path.isfile(path):
             try:
                 with open(path, encoding='utf-8') as f:
-                    self.calls = (json.load(f) or {}).get('calls') or []
+                    data = json.load(f) or {}
+                    self.calls = data.get('calls') or []
+                    self.extra = {k: v for k, v in data.items() if k not in ('schema_version', 'story_id', 'calls')}
             except (json.JSONDecodeError, OSError):
                 self.calls = []
+                self.extra = {}
         self.session_start = len(self.calls)
+
+    def record_extra(self, key, value):
+        self.extra[key] = value
+        self.save()
 
     def record(self, **rec):
         profile = call_profile(rec.get('klass'))
@@ -170,8 +178,9 @@ class RunStats:
 
     def save(self):
         with open(self.path, 'w', encoding='utf-8') as f:
-            json.dump({'schema_version': SCHEMA_VERSION, 'story_id': self.story_id, 'calls': self.calls},
-                      f, indent=1, ensure_ascii=False)
+            data = {'schema_version': SCHEMA_VERSION, 'story_id': self.story_id, 'calls': self.calls}
+            data.update(self.extra)
+            json.dump(data, f, indent=1, ensure_ascii=False)
 
     def session(self):
         return self.calls[self.session_start:]

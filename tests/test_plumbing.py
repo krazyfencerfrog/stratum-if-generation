@@ -24,6 +24,7 @@ import glob
 import io
 import json
 import os
+from pathlib import Path
 import py_compile
 import shutil
 import subprocess
@@ -1058,6 +1059,80 @@ def stages_c_and_d_compile_a_playable_package():
         eng.act(pick['id'])
     check(eng.state.ending, f'the package did not play to an ending (stuck in {eng.state.scene})')
     check(load('staged', 'package.md').startswith('# '), 'no package report')
+    stats = load('staged', 'run_stats.json')
+    check('playtest' in stats, 'playtest stats missing from run_stats.json')
+    pt = stats['playtest']
+    check(pt['endings_reachability'] == 1.0, f"endings_reachability: {pt.get('endings_reachability')}")
+    check(pt['stuck_states'] == 0, f"stuck_states: {pt.get('stuck_states')}")
+    check(pt['errors_count'] == 0, f"playtest errors_count: {pt.get('errors_count')}")
+
+
+@test
+def stage_d_blocks_and_halts_on_unreachable_scenes_or_stuck_states():
+    from main import StoryGenerator, PipelineHalt
+    from compile_scenes import SceneCompiler
+    import scenes
+
+    if not os.path.isdir(story_dir('staged')):
+        run('staged', args=['--stage-d'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
+
+    halt_name = 'staged_halt'
+    shutil.rmtree(story_dir(halt_name), ignore_errors=True)
+    shutil.copytree(story_dir('staged'), story_dir(halt_name))
+    for f in os.listdir(story_dir(halt_name)):
+        if f.startswith(f'{PREFIX}staged_'):
+            os.rename(os.path.join(story_dir(halt_name), f),
+                      os.path.join(story_dir(halt_name), f.replace(f'{PREFIX}staged_', f'{PREFIX}{halt_name}_')))
+
+    gen = StoryGenerator(story_id=f'{PREFIX}{halt_name}')
+    pkg_path = gen.story_file_path('package.json')
+    with open(pkg_path, 'w', encoding='utf-8') as f:
+        f.write('{"stale": true}')
+
+    story = json.loads(Path(gen.story_file_path('story.json')).read_text(encoding='utf-8'))
+    arcs = json.loads(Path(gen.story_file_path('arcs.json')).read_text(encoding='utf-8'))
+    world = json.loads(Path(gen.story_file_path('world.json')).read_text(encoding='utf-8'))
+
+    # Strip exits leaving N01 so S_N01 has no exits and remaining scenes become unreachable
+    story['edges'] = [e for e in story.get('edges', []) if e.get('from') != 'N01']
+    Path(gen.story_file_path('story.json')).write_text(json.dumps(story), encoding='utf-8')
+
+    plan = scenes.plan(story, arcs)
+    for sc in plan['scenes']:
+        if sc['major'] == 'N01':
+            sc['next'] = []
+    Path(gen.story_file_path('scenes.json')).write_text(json.dumps(plan), encoding='utf-8')
+
+    sc0_path = gen.story_file_path('s7d_S_N01_scene.json')
+    sc0 = json.loads(Path(sc0_path).read_text(encoding='utf-8'))
+    for a in sc0.get('actions', []):
+        a.pop('leads_to', None)
+    Path(sc0_path).write_text(json.dumps(sc0), encoding='utf-8')
+
+    comp = SceneCompiler(gen, story, arcs, plan, world)
+    halted = False
+    try:
+        comp.compile_and_verify(runs=5, max_states=100)
+    except PipelineHalt as e:
+        halted = True
+        check('Stage D package verification failed' in str(e), f'unexpected halt message: {e}')
+
+    check(halted, 'compile_and_verify did not raise PipelineHalt on broken graph')
+    check(not os.path.exists(pkg_path), 'package.json was not removed upon verification failure')
+    md_path = gen.story_file_path('package.md')
+    check(os.path.exists(md_path) and '# ' in Path(md_path).read_text(encoding='utf-8'),
+          'package.md was not written on verification failure')
+    stats = json.loads(Path(gen.story_file_path('run_stats.json')).read_text(encoding='utf-8'))
+    check('playtest' in stats and stats['playtest']['errors_count'] > 0,
+          f'run_stats.json did not record playtest errors: {stats.get("playtest")}')
+
+    # Also test compile_scenes.py CLI invocation exits with code 2
+    proc = subprocess.run([sys.executable, 'compile_scenes.py', f'{PREFIX}{halt_name}'],
+                          cwd=GEN, capture_output=True, text=True, env=dict(os.environ, STRATUM_PLAYTEST='quick'))
+    check(proc.returncode == 2, f'compile_scenes CLI exit code {proc.returncode}, expected 2: {proc.stderr}')
+    check('PIPELINE HALTED' in proc.stderr, f'compile_scenes CLI did not print PIPELINE HALTED: {proc.stderr}')
+
+    shutil.rmtree(story_dir(halt_name), ignore_errors=True)
 
 
 @test
