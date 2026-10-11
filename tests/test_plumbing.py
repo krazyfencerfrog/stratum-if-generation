@@ -1312,6 +1312,77 @@ def malformed_premise_sections_are_rejected_early():
     check(pipeline.as_bool('true') and not pipeline.as_bool('false') and pipeline.as_bool(None, default=True), 'as_bool')
 
 
+@test
+def menu_verb_does_not_flag_third_person_decisions():
+    sys.path.insert(0, GEN)
+    import main as pipeline
+
+    # Must NOT match third-person decision clauses or player actions forcing NPC decisions
+    must_not = [
+        "you step inside, so the regent must decide whether to acknowledge you",
+        "forcing the captain to choose between his ship and his crew",
+        "the crowd decides to turn back",
+        "you step into the council chamber and sit where the child can see you, so the regent must decide whether to acknowledge you in front of the council",
+        "you confront the magistrate, forcing him to choose between his honor and his office",
+        "you corner the guard, who decides to drop his weapon",
+        "leaving the duke to decide whether to attack",
+        "you pick it up and burn it in the corridor's brazier, because it is the cook's complaint about the child's supper",
+        "the regent lets you choose the step, because you hand him the contract",
+        "you pick the lock to the storehouse",
+        "you pick your way across the frozen mud",
+        "you choose your words carefully before answering the magistrate",
+    ]
+    for s in must_not:
+        check(not pipeline.MENU_VERB.search(s), f"MENU_VERB false positive on: {s!r}")
+
+    # Must match second-person picks and imperative menu choices
+    must_match = [
+        "you decide whether to enter",
+        "you choose to burn the letter",
+        "decide between staying and leaving",
+        "choose to surrender",
+        "you can choose to leave",
+        "you must decide whether to help",
+        "To choose to surrender",
+        "Either choose to surrender or fight",
+        "Wait outside; decide whether to enter",
+        "Option: decide between two paths",
+    ]
+    for s in must_match:
+        check(bool(pipeline.MENU_VERB.search(s)), f"MENU_VERB missed pick: {s!r}")
+
+    # Also check through premise_computed_findings
+    gen = pipeline.StoryGenerator.__new__(pipeline.StoryGenerator)
+    gen.analysis = {}
+    gen.budget = lambda: 'medium'
+    gen.kernel = ''
+    premise_valid = {
+        'turns': [{
+            'id': 1, 'form': 'discover',
+            'ways_through': [
+                {'way': 'you step into the council chamber and sit where the child can see you, so the regent must decide whether to acknowledge you in front of the council', 'cost': 'exposure'},
+                {'way': 'you hold back behind the curtain and wait for the reading of the decree', 'cost': 'delay'},
+            ]
+        }]
+    }
+    findings = gen.premise_computed_findings(premise_valid)
+    menu_findings = [f for f in findings if 'written as a pick' in f.get('problem', '')]
+    check(not menu_findings, f"premise_computed_findings false positive: {menu_findings}")
+
+    premise_pick = {
+        'turns': [{
+            'id': 1, 'form': 'discover',
+            'ways_through': [
+                {'way': 'choose to surrender', 'cost': 'captivity'},
+                {'way': 'fight to the end', 'cost': 'death'},
+            ]
+        }]
+    }
+    findings = gen.premise_computed_findings(premise_pick)
+    menu_findings = [f for f in findings if 'written as a pick' in f.get('problem', '')]
+    check(len(menu_findings) == 1, f"premise_computed_findings failed to flag pick: {menu_findings}")
+
+
 # ---------------------------------------------------------------- pure helpers
 
 @test

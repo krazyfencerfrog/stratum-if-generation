@@ -238,8 +238,12 @@ KIN = re.compile(r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|
 # a role that names a group (one that needs someone to speak for it), not one being
 GROUP_WORD = re.compile(r"\b(?:\w+[^s\W]s|crew|family|families|crowd|council|staff|people|folk|mob|guests?|"
                         r"household|village|town|court|congregation|gang|band|company|guild|army|troop|police)\b", re.I)
-MENU_VERB = re.compile(r"\byou (?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\b|"
-                       r"\b(?:choose|decide|elect|opt) (?:to|whether|between)\b", re.I)
+MENU_VERB = re.compile(
+    r"\byou\s+(?:(?:can|could|may|might|must|shall|should|will|would)\s+)?"
+    r"(?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\s+(?:to|whether|between)\b|"
+    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b",
+    re.I,
+)
 
 
 
