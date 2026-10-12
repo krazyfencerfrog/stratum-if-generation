@@ -19,7 +19,7 @@ class AgyClient(LlmClient):
 
     def __init__(self, model=None, effort=None, agy_path=None, echo=True):
         super().__init__()
-        self.model = model or os.environ.get("AGY_MODEL", os.environ.get("STRATUM_MODEL", "gemini-3.1-pro-high"))
+        self.model = model or os.environ.get("AGY_MODEL", os.environ.get("STRATUM_MODEL", "gemini-3.8-flash-high"))
         self.effort = effort or os.environ.get("AGY_EFFORT")
         self.agy_path = agy_path or os.environ.get("AGY_PATH") or shutil.which("agy") or "/home/krazy/.local/bin/agy"
         self.echo = echo
@@ -113,6 +113,7 @@ class AgyClient(LlmClient):
                 if attempt < max_attempts:
                     if "not recognized as a known model" in err_msg and model_to_use and "pro" in model_to_use:
                         fallback_model = "gemini-3.8-flash-low" if think is False else "gemini-3.8-flash-high"
+                        self.model = fallback_model
                         if self.echo:
                             print(f"  [agy] Model {model_to_use} temporarily unavailable, switching to {fallback_model}")
                         if "--model" in cmd:
