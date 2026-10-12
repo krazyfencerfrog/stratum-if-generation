@@ -7,6 +7,7 @@ network, about a second.
 """
 
 import argparse
+import copy
 import io
 import json
 import os
@@ -409,6 +410,76 @@ def names_show_only_once_the_player_knows_them():
     bad['world']['characters']['lazlo']['unnamed_short'] = 'x'
     errors, _ = validate(Story(bad))
     check(any('{nobody}' in e for e in errors) and any('unnamed_short without unnamed' in e for e in errors), f'validator: {errors}')
+
+
+@test
+def possessive_formatting_on_unintroduced_character_handles():
+    data = demo_data()
+    # Add unintroduced characters with complex prepositional handles
+    data['world']['characters']['caregiver'] = {
+        'name': 'Wanjiru Ferrante',
+        'unnamed': 'the grey-blue caregiver at the nursery latch',
+        'description': [{'text': 'A tired caregiver.'}],
+        'portrait': {
+            'composition': 'medium portrait',
+            'environment': 'nursery',
+            'palette_mood': 'dim',
+            'prompt_summary': 'caregiver portrait',
+            'subjects': ['caregiver'],
+        },
+    }
+    data['world']['characters']['elder'] = {
+        'name': 'Kit Achebe',
+        'unnamed': 'the stooped elder before the chapel lens',
+        'description': [{'text': 'A quiet elder.'}],
+        'portrait': {
+            'composition': 'medium portrait',
+            'environment': 'chapel',
+            'palette_mood': 'dim',
+            'prompt_summary': 'elder portrait',
+            'subjects': ['elder'],
+        },
+    }
+    story = Story(data)
+    errors, _ = validate(story)
+    check(not errors, f'clean story validation failed: {errors}')
+
+    st = GameState()
+    st.introduced = set()
+    # 1. Unintroduced possessive rendering with curly and ascii apostrophes
+    rendered_curly = story.render("{caregiver}’s hand does not leave the wheel.", st)
+    check("The grey-blue caregiver’s hand does not leave the wheel." == rendered_curly,
+          f"expected head noun phrase possessive, got: {rendered_curly!r}")
+    check("latch’s" not in rendered_curly, f"ungrammatical latch’s found in {rendered_curly!r}")
+
+    rendered_ascii = story.render("{caregiver}'s hand does not leave the wheel.", st)
+    check("The grey-blue caregiver's hand does not leave the wheel." == rendered_ascii,
+          f"expected head noun phrase possessive, got: {rendered_ascii!r}")
+    check("latch's" not in rendered_ascii, f"ungrammatical latch's found in {rendered_ascii!r}")
+
+    # Mid-sentence unintroduced possessive
+    rendered_mid = story.render("Through the grille, {caregiver}’s breath is slow.", st)
+    check("Through the grille, the grey-blue caregiver’s breath is slow." == rendered_mid,
+          f"expected lowercase head noun phrase mid-sentence, got: {rendered_mid!r}")
+
+    # Preposition "before" cut properly
+    rendered_elder = story.render("{elder}'s bread sits on the altar.", st)
+    check("The stooped elder's bread sits on the altar." == rendered_elder,
+          f"expected stooped elder possessive, got: {rendered_elder!r}")
+    check("lens's" not in rendered_elder, f"ungrammatical lens's found in {rendered_elder!r}")
+
+    # 2. Known / introduced character possessive rendering
+    st.introduced.add('caregiver')
+    rendered_known = story.render("{caregiver}’s hand does not leave the wheel.", st)
+    check("Wanjiru Ferrante’s hand does not leave the wheel." == rendered_known,
+          f"expected named character possessive, got: {rendered_known!r}")
+
+    # 3. Package validation flags literal ungrammatical possessives on prepositional handles
+    bad_data = copy.deepcopy(data)
+    bad_data['scenes']['S01']['text'] = [{'text': "The grey-blue caregiver at the nursery latch's hand is cold."}]
+    bad_errs, _ = validate(Story(bad_data))
+    check(any('text attaches possessive to unintroduced handle' in e for e in bad_errs),
+          f"expected validation error for prepositional handle possessive, got: {bad_errs}")
 
 
 @test

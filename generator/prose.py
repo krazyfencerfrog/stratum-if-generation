@@ -429,6 +429,10 @@ class ProseWriter:
                     soft.append(f'{i}: a game word ("{MECHANICS.search(t).group(0)}")')
                 if ANNOUNCED.search(t) and not ANNOUNCED.search(originals[i] or '') or (k == 'ending' and ANNOUNCED.search(t)):
                     soft.append(f'{i}: names the craft ("{ANNOUNCED.search(t).group(0)}"); show what is lost instead')
+                for cid, c in self.chars.items():
+                    unnamed = c.get('unnamed')
+                    if unnamed and re.search(r'\b' + re.escape(unnamed) + r"['’]s\b", t, re.I):
+                        soft.append(f"{i}: ungrammatical possessive on unintroduced handle ({unnamed!r}); use head noun or person code")
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')

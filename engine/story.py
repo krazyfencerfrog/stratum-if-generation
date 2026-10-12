@@ -23,7 +23,10 @@ CORE_VERBS = {
 VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce')
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')     # a person in text: {C02}, rendered by what the player knows
-SHORT_CUT = re.compile(r"\s+(in|with|on|at|from|of|by|who|that|whose|near|under|beside)\s|,")
+SHORT_CUT = re.compile(
+    r"\s+(in|with|on|at|from|of|by|for|about|into|through|after|before|behind|between|under|over|above|below|across|against|along|around|near|beside|toward|towards|upon|within|without|who|whom|whose|which|that|holding|wearing|carrying|standing|sitting|leaning|watching)\b|[,;—]",
+    re.IGNORECASE,
+)
 
 
 class StoryError(ValueError):
@@ -129,7 +132,12 @@ class Story:
         label = ch.get('unnamed') or ''
         m = SHORT_CUT.search(label)
         cut = label[:m.start()].strip() if m else label
-        return cut if len(cut.split()) >= 2 else label
+        if len(cut.split()) >= 2:
+            return cut
+        words = label.split()
+        if words and words[0].lower() in ('the', 'a', 'an') and cut:
+            return f"{words[0]} {cut}"
+        return cut or label
 
     def known(self, cid, state):
         """Whether the player knows this person's name: introduced in play,
@@ -140,7 +148,7 @@ class Story:
     def render(self, text, state, sentence=True, told=None, short=False):
         """Text with each {Cxx} replaced by the name the player knows the
         person by. An unnamed label is given in full the first time a text
-        names the person and short after that, and short before "'s" ("the
+        names the person and short after that, and short before "'s" / "’s" ("the
         captain in the wet canvas coat" five times in one paragraph; "the wet
         lock-keeper with a wrench's papers"); `told`, a set shared across the
         paragraphs of one view, carries who has been named in full already,
@@ -155,8 +163,14 @@ class Story:
             cid = m.group(1)
             if cid not in self.characters:
                 return m.group(0)
-            long_form = not short and cid not in told and not text.startswith("'s", m.end())
+            is_poss = bool(re.match(r"^['’ʼ]s\b", text[m.end():]))
+            long_form = not short and cid not in told and not is_poss
             name = self.name_of(cid, state, short=not long_form)
+            if is_poss and state is not None and not self.known(cid, state):
+                pm = SHORT_CUT.search(name)
+                if pm:
+                    cut = name[:pm.start()].strip()
+                    name = cut if len(cut.split()) >= 2 else (f"the {cut}" if not cut[:1].isupper() else cut)
             told.add(cid)
             before = text[:m.start()].rstrip(' \'"‘“')
             if sentence and (not before or before[-1] in '.!?:—'):
@@ -275,6 +289,26 @@ def validate(story):
                 yield from codes(v)
     for code in sorted(set(codes(s.data)) - set(s.characters)):
         errors.append(f'text names {{{code}}}, which is not a character')
+
+    def all_strings(x):
+        if isinstance(x, str):
+            yield x
+        elif isinstance(x, dict):
+            for v in x.values():
+                yield from all_strings(v)
+        elif isinstance(x, list):
+            for v in x:
+                yield from all_strings(v)
+
+    strings = list(all_strings(s.data))
+    for cid, ch in s.characters.items():
+        unnamed = ch.get('unnamed')
+        if unnamed and SHORT_CUT.search(unnamed):
+            bad_poss = re.compile(r'\b' + re.escape(unnamed) + r"['’]s\b", re.I)
+            for t in strings:
+                if bad_poss.search(t):
+                    errors.append(f"character {cid}: text attaches possessive to unintroduced handle with prepositional modifier ({unnamed!r})")
+                    break
 
     # start
     if s.start.get('scene') not in s.scenes:
