@@ -31,6 +31,7 @@ import sys
 
 import example_guard
 import schemas
+import checks
 from errors import SoftReject
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -431,6 +432,25 @@ class ProseWriter:
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
+                if i.startswith('t') and i[1:].isdigit():
+                    idx = int(i[1:]) - 1
+                    if 0 <= idx < len(paths):
+                        p = paths[idx]
+                        if p[0] == 'endings' and len(p) >= 6 and p[2] == 'resolutions':
+                            eid, gi, vi = p[1], p[3], p[5]
+                            end_obj = self.pkg['endings'].get(eid) or {}
+                            base_text = ' '.join(x.get('text', '') for x in (end_obj.get('text') or []) if isinstance(x, dict))
+                            base_id = next((f't{b_idx + 1}' for b_idx, path in enumerate(paths) if path[:3] == ('endings', eid, 'text')), None)
+                            if base_id and base_id in got:
+                                base_text = got[base_id]
+                            resolutions = end_obj.get('resolutions') or []
+                            if gi < len(resolutions):
+                                cid = resolutions[gi].get('about')
+                                char_info = self.pkg['world']['characters'].get(cid) or {}
+                                contr = checks.resolution_liveness_contradiction(
+                                    base_text, t, char_label=cid, char_name=char_info.get('name'))
+                                if contr:
+                                    soft.append(f'{i}: resolution text contradicts ending summary: {contr}')
             if earlier:
                 for i in ids:
                     w = words(CODE.sub(' ', got[i]))

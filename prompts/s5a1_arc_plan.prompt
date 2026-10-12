@@ -24,6 +24,17 @@ For each character in the arc cast:
    as lost does not. A state-dependent resolution is the story's way of
    letting the player's accumulated choices decide what the line could
    not.
+   CRITICAL LIVENESS INVARIANT: Respect the physical status established in the
+   line's ending summary. If the summary describes a character surviving,
+   stepping back, watching, or remaining alive, your resolution must NOT state
+   that they die or were killed. If the summary describes them as dead or killed,
+   your resolution must NOT portray them alive. "lost" means they no longer
+   stand with you (alienated, broken, incapacitated, or dead as specified by the
+   summary); do not invent a death that contradicts an alive summary.
+   Furthermore, resolutions for direction down (and fallbacks) must describe
+   the character's resulting stance or distance without falsely asserting
+   specific unchosen player actions (e.g., describe their withdrawal or lost
+   trust, not "because you never spoke to them").
 
 For each supporting character, a light arc: where they start, one or two
 moments (node ids), where they end. No state.

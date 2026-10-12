@@ -2681,6 +2681,42 @@ def non_agent_entity_and_consumable_prop_cast_invariants():
     check(len(findings) == 1 and 'the maintenance drone' in findings[0], f'check_story should tag non_agent_cast_entity: {findings}')
 
 
+@test
+def ending_resolution_liveness_contradictions_are_caught():
+    # 1. checks.resolution_liveness_contradiction
+    # Alive in summary, dead in resolution -> caught
+    c1 = checks.resolution_liveness_contradiction(
+        "Uriel Castell steps back from the wheel alive with burned hands.",
+        "He dies before the valve finishes opening.",
+        char_label="{C01}", char_name="Uriel Castell"
+    )
+    check(c1 and "died" in c1, f"expected contradiction, got: {c1}")
+
+    # Dead in summary, alive in resolution -> caught
+    c2 = checks.resolution_liveness_contradiction(
+        "Castell is killed when the deck collapses.",
+        "He steps back alive and watches the dawn.",
+        char_label="C01", char_name="Castell"
+    )
+    check(c2 and "survived" in c2, f"expected contradiction, got: {c2}")
+
+    # Alive in summary, non-death resolution -> valid
+    c3 = checks.resolution_liveness_contradiction(
+        "Uriel Castell steps back from the wheel with burned hands.",
+        "He walks into the lower corridors and will not speak to you.",
+        char_label="C01", char_name="Uriel Castell"
+    )
+    check(c3 is None, f"expected None, got: {c3}")
+
+    # Other character dead in summary does not flag this character
+    c4 = checks.resolution_liveness_contradiction(
+        "The captain dies in the fire while Uriel Castell steps back.",
+        "He turns away from the bridge.",
+        char_label="C01", char_name="Uriel Castell"
+    )
+    check(c4 is None, f"expected None, got: {c4}")
+
+
 # ---------------------------------------------------------------- runner
 
 

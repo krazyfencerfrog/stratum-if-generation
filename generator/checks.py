@@ -682,3 +682,50 @@ def late_forks(lines):
         return (f'every divergent line leaves the main line in its second half (at {", ".join(sorted(set(forks)))}, '
                 f'of {len(path)} nodes): one road with a choice of endings')
     return None
+
+
+DEATH_WORDS = re.compile(r'\b(dies|died|killed|perished|succumbed|dead|death)\b', re.I)
+SURVIVAL_WORDS = re.compile(r'\b(survives|survived|alive|steps back|remains|still standing|keeps breathing|watches|stands|flees|leaves|steps away)\b', re.I)
+
+
+def resolution_liveness_contradiction(summary_text, resolution_text, char_label=None, char_name=None):
+    """Checks if an ending summary describes a character's physical state (alive or dead)
+    and a resolution variant directly contradicts it. Returns an error string or None."""
+    if not summary_text or not resolution_text:
+        return None
+
+    name_patterns = []
+    if char_label:
+        name_patterns.append(re.escape(str(char_label)))
+        m = re.match(r'\{([A-Za-z0-9_]+)\}', str(char_label))
+        if m:
+            name_patterns.append(re.escape(m.group(1)))
+    if char_name:
+        name_patterns.append(re.escape(str(char_name)))
+        first = str(char_name).split()[0]
+        if len(first) > 2:
+            name_patterns.append(re.escape(first))
+
+    char_re = re.compile(r'\b(' + '|'.join(name_patterns) + r')\b', re.I) if name_patterns else None
+
+    sentences = [s.strip() for s in re.split(r'[.!?]+', summary_text) if s.strip()]
+    if char_re:
+        relevant = [s for s in sentences if char_re.search(s)]
+    else:
+        relevant = sentences
+
+    char_summary = ' '.join(relevant)
+    if not char_summary:
+        return None
+
+    summary_says_dead = bool(DEATH_WORDS.search(char_summary))
+    summary_says_alive = bool(SURVIVAL_WORDS.search(char_summary)) and not DEATH_WORDS.search(char_summary)
+
+    res_says_dead = bool(DEATH_WORDS.search(resolution_text))
+    res_says_alive = bool(SURVIVAL_WORDS.search(resolution_text)) and not DEATH_WORDS.search(resolution_text)
+
+    if summary_says_alive and res_says_dead:
+        return f'summary describes character alive ({char_summary!r}), but resolution says they died ({resolution_text!r})'
+    if summary_says_dead and res_says_alive:
+        return f'summary describes character dead ({char_summary!r}), but resolution says they survived ({resolution_text!r})'
+    return None

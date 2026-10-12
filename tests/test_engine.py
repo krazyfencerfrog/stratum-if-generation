@@ -133,6 +133,11 @@ def validator_catches_broken_packages():
     broken(lambda d: d['world']['objects']['kettle'].update(location='attic'), "location 'attic'")
     broken(lambda d: d['world']['objects']['kettle'].update(name='Pell Szeto'), "name 'Pell Szeto' is also used by character pell")
 
+    def make_ending_contradiction(d):
+        d['endings']['END_DEMO']['text'] = [{'text': 'The captain watches from the lock, still standing.'}]
+        d['endings']['END_DEMO']['resolutions'][0]['variants'][0]['text'] = 'The captain dies before the lock opens.'
+    broken(make_ending_contradiction, 'contradicts ending text')
+
 
 # ---------------------------------------------------------------- the menu
 
