@@ -27,6 +27,10 @@ SHORT_CUT = re.compile(
     r"\s+(in|with|on|at|from|of|by|for|about|into|through|after|before|behind|between|under|over|above|below|across|against|along|around|near|beside|toward|towards|upon|within|without|who|whom|whose|which|that|holding|wearing|carrying|standing|sitting|leaning|watching)\b|[,;—]",
     re.IGNORECASE,
 )
+EPILOGUE_FORMULA_PATTERN = re.compile(
+    r",\s+(?:that|this|his|her|their|[A-Za-z_]+['’]s)\s+[a-z]+\s+(?:broken|shaken|thinned|abandoned|chose|chosen|shattered|lost|severed|frayed|hollowed|spent|ended|withdrawn|ruined|surrendered)\b",
+    re.I,
+)
 
 
 class StoryError(ValueError):
@@ -532,16 +536,21 @@ def validate(story):
         check_variants(f'ending {eid} text', end.get('text'))
         check_frame(f'ending {eid}', end.get('frame'))
         base_combined = ' '.join(t.get('text', '') for t in (end.get('text') or []) if isinstance(t, dict) and t.get('text'))
+        ending_res_texts = []
         for gi, group in enumerate(ending_groups(end)):
             check_variants(f'ending {eid} resolution {gi}', group.get('variants'))
             cid = group.get('about')
             char_obj = s.characters.get(cid) or {}
             for vi, v in enumerate(group.get('variants') or []):
                 vt = v.get('text', '')
+                ending_res_texts.append(vt)
                 contr = resolution_liveness_contradiction(
                     base_combined, vt, char_label=cid, char_name=char_obj.get('name'))
                 if contr:
                     errors.append(f'ending {eid} resolution {gi} (variant {vi}): contradicts ending text: {contr}')
+        formula_hits = [m.group(0).strip(', ') for vt in ending_res_texts for m in [EPILOGUE_FORMULA_PATTERN.search(str(vt))] if m]
+        if len(formula_hits) >= 2:
+            notes.append(f'ending {eid}: repetitive formulaic epilogue syntax ({len(formula_hits)} occurrences: {", ".join(formula_hits[:3])})')
         if not end.get('text'):
             errors.append(f'ending {eid}: no text')
 

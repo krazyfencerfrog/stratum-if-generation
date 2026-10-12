@@ -35,6 +35,14 @@ For each character in the arc cast:
    the character's resulting stance or distance without falsely asserting
    specific unchosen player actions (e.g., describe their withdrawal or lost
    trust, not "because you never spoke to them").
+   SYNTACTIC & RHETORICAL VARIETY IN RESOLUTIONS:
+   Never reduce character resolutions to a repetitive formula across lines or characters.
+   Do NOT append identical causal tags (e.g. ", that/her/his [noun] [participle] because [clause]").
+   Employ varied sentence structures, lengths, and rhetorical rhythms:
+   - Direct sensory observation: "Castell keeps his palms off the wheel now; the skin never quite uncurled."
+   - Fronted dependent clauses: "Without the children's names on the board, Ferrante does not look into the camera."
+   - Terse declarative clauses: "The chapel offering table sits empty. Kit Achebe stopped bringing bread when the third pump seized."
+   - Elliptical physical details: "Still behind the glass at dawn, cueing your last record herself."
 
 For each supporting character, a light arc: where they start, one or two
 moments (node ids), where they end. No state.

@@ -1410,6 +1410,39 @@ def protagonist_somatic_drift_warning():
     check(not any('somatic drift' in n for n in notes2), f'embodied human got somatic drift note: {notes2}')
 
 
+@test
+def ending_epilogue_formulaic_syntax_warning():
+    data = demo_data()
+    data['endings']['END_DEMO']['resolutions'] = [
+        {'about': 'C01', 'variants': [
+            {'when': 'true', 'text': 'He dies at the wheel, that wheel abandoned because you opened the valve.'}
+        ]},
+        {'about': 'C01', 'variants': [
+            {'when': 'true', 'text': 'He walks away in silence, that faith shaken because the engine failed.'}
+        ]},
+    ]
+    story = Story(data)
+    errors, notes = validate(story)
+    check(not errors, f'epilogue repetition should not be a hard error, got: {errors}')
+    check(any('repetitive formulaic epilogue syntax' in n and 'END_DEMO' in n for n in notes),
+          f'expected formulaic epilogue warning note, got: {notes}')
+
+    # Diverse resolutions do not trigger warning
+    data2 = demo_data()
+    data2['endings']['END_DEMO']['resolutions'] = [
+        {'about': 'C01', 'variants': [
+            {'when': 'true', 'text': 'Castell keeps his palms off the wheel now; the skin never quite uncurled.'}
+        ]},
+        {'about': 'C01', 'variants': [
+            {'when': 'true', 'text': 'Without a word to the booth, she leaves the cassette on the control desk.'}
+        ]},
+    ]
+    story2 = Story(data2)
+    errors2, notes2 = validate(story2)
+    check(not any('repetitive formulaic epilogue syntax' in n for n in notes2),
+          f'diverse epilogues got warning note: {notes2}')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

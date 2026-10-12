@@ -459,6 +459,18 @@ class ProseWriter:
                                     base_text, t, char_label=cid, char_name=char_info.get('name'))
                                 if contr:
                                     soft.append(f'{i}: resolution text contradicts ending summary: {contr}')
+            ending_res_texts = []
+            for i in ids:
+                if i.startswith('t') and i[1:].isdigit():
+                    idx = int(i[1:]) - 1
+                    if 0 <= idx < len(paths):
+                        p = paths[idx]
+                        if p[0] == 'endings' and len(p) >= 6 and p[2] == 'resolutions':
+                            ending_res_texts.append(got[i])
+            if ending_res_texts:
+                rep = checks.check_epilogue_syntactic_repetition(ending_res_texts)
+                if rep:
+                    soft.append(f"endings: {rep}")
             if earlier:
                 for i in ids:
                     w = words(CODE.sub(' ', got[i]))

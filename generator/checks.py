@@ -758,3 +758,34 @@ def check_somatic_drift(text, embodiment):
             return f"somatic drift for {emb} protagonist: {m.group(0)!r} (use telemetry, sensor, or network mechanics instead)"
     return None
 
+
+EPILOGUE_FORMULA_PATTERN = re.compile(
+    r",\s+(?:that|this|his|her|their|[A-Za-z_]+['’]s)\s+[a-z]+\s+(?:broken|shaken|thinned|abandoned|chose|chosen|shattered|lost|severed|frayed|hollowed|spent|ended|withdrawn|ruined|surrendered)\b",
+    re.I
+)
+
+
+def epilogue_formulaic_clause(text):
+    """Detects formulaic participial heads in ending resolutions (e.g. ', that trust broken',
+    ', his faith thinned'). Returns the matched clause snippet or None."""
+    if not text:
+        return None
+    m = EPILOGUE_FORMULA_PATTERN.search(str(text))
+    if m:
+        return m.group(0).strip(', ')
+    return None
+
+
+def check_epilogue_syntactic_repetition(texts):
+    """Checks a collection of ending character resolution texts for formulaic pattern collapse.
+    Returns finding string if 2 or more resolutions exhibit the formulaic participial head, else None."""
+    hits = []
+    for t in texts or []:
+        clause = epilogue_formulaic_clause(t)
+        if clause:
+            hits.append(clause)
+    if len(hits) >= 2:
+        return f"repetitive formulaic epilogue syntax ({len(hits)} occurrences: {', '.join(hits[:3])}); vary sentence structures"
+    return None
+
+

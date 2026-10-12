@@ -2755,6 +2755,50 @@ def protagonist_embodiment_and_somatic_drift():
           "NPC somatic actions should not flag protagonist somatic drift")
 
 
+@test
+def epilogue_resolution_syntactic_variety():
+    # 1. epilogue_formulaic_clause detection
+    h1 = checks.epilogue_formulaic_clause("The grey-blue caregiver dies after sealing the nursery bulkheads, that trust broken by the moment you chose the core.")
+    check(h1 and "that trust broken" in h1, f"expected formula hit, got: {h1}")
+
+    h2 = checks.epilogue_formulaic_clause("The stooped elder stands before the lens without offering, that faith thinned because the core chose the workers.")
+    check(h2 and "that faith thinned" in h2, f"expected formula hit, got: {h2}")
+
+    h3 = checks.epilogue_formulaic_clause("Uriel Castell dies before the valve finishes opening, that wheel abandoned because you let the arithmetic speak.")
+    check(h3 and "that wheel abandoned" in h3, f"expected formula hit, got: {h3}")
+
+    h4 = checks.epilogue_formulaic_clause("The stooped elder leaves no food at the lens, that faith shaken because the ship chose hands.")
+    check(h4 and "that faith shaken" in h4, f"expected formula hit, got: {h4}")
+
+    # Varied rhetorical structures return None
+    check(checks.epilogue_formulaic_clause("Castell keeps his palms off the wheel now; the skin never quite uncurled.") is None,
+          "direct sensory observation should not be flagged")
+    check(checks.epilogue_formulaic_clause("Without the children's names on the board, Ferrante does not look into the camera.") is None,
+          "fronted dependent clause should not be flagged")
+    check(checks.epilogue_formulaic_clause("The chapel offering table sits empty. Kit Achebe stopped bringing bread when the third pump seized.") is None,
+          "terse declarative clause should not be flagged")
+    check(checks.epilogue_formulaic_clause("Still behind the glass at dawn, cueing your last record herself.") is None,
+          "elliptical phrase should not be flagged")
+
+    # 2. check_epilogue_syntactic_repetition
+    repetitive_set = [
+        "The caregiver dies, that trust broken by your choice.",
+        "The elder leaves, that faith shaken because the ship chose hands.",
+        "Still behind the glass at dawn, cueing your last record herself."
+    ]
+    rep = checks.check_epilogue_syntactic_repetition(repetitive_set)
+    check(rep and "repetitive formulaic epilogue syntax" in rep and "2 occurrences" in rep,
+          f"expected repetition finding, got: {rep}")
+
+    diverse_set = [
+        "Castell keeps his palms off the wheel now; the skin never quite uncurled.",
+        "Without the children's names on the board, Ferrante does not look into the camera.",
+        "The elder leaves, that faith shaken because the ship chose hands."
+    ]
+    check(checks.check_epilogue_syntactic_repetition(diverse_set) is None,
+          "diverse set with at most one formulaic line should not trigger repetition finding")
+
+
 # ---------------------------------------------------------------- runner
 
 
