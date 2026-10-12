@@ -262,8 +262,9 @@ def get_client():
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
-                 branching='plan', outline_judge=True, stories_root=None):
+                 branching='plan', outline_judge=True, stories_root=None, author='Anonymous'):
         self.story_id = story_id
+        self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
         self.think_steps = set(think_steps or ())
@@ -1944,6 +1945,7 @@ if __name__ == "__main__":
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--story-id", default='', help="identifier for the story, used for directory and file naming (note will be slugified)")
+    parser.add_argument("--author", default="Anonymous", help="author name or credit for story package metadata")
     parser.add_argument("--rating", default=DEFAULT_RATING, help="(step2 input) US Film Rating to respect for generated story")
     parser.add_argument("--max-repairs", type=int, default=DEFAULT_MAX_REPAIRS,
                         help="repair rounds allowed in the 3.5 build/verify loop before halting (default 2)")
@@ -2000,7 +2002,8 @@ if __name__ == "__main__":
                              no_think_steps=csv(args.no_think_steps), think_steps=csv(args.think_steps),
                              breakers=not args.no_breakers, framework_override=args.framework.strip() or None,
                              force_answer=not args.no_force_answer, promises=not args.no_promises,
-                             branching=args.branching, outline_judge=not args.no_outline_judge)
+                             branching=args.branching, outline_judge=not args.no_outline_judge,
+                             author=args.author)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)

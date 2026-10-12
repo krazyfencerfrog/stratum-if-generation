@@ -789,3 +789,169 @@ def check_epilogue_syntactic_repetition(texts):
     return None
 
 
+MA_VIOLENCE_RE = re.compile(
+    r'\b(dismember\w*|decapitat\w*|eviscerat\w*|entrails|tortur\w*|mutilat\w*|'
+    r'severed\s+(?:head|limb|arm|leg|throat|flesh)|pools?\s+of\s+gore|viscera\w*|masochis\w*|'
+    r'gouge\w*\s+(?:eyes?|flesh)|flay\w*)\b',
+    re.IGNORECASE
+)
+
+STRONG_VIOLENCE_RE = re.compile(
+    r'\b(blood\w*|bleed\w*|slaughter\w*|murder\w*|bullet\s+wound\w*|stab\w*|strangl\w*|'
+    r'suffocat\w*|asphyxiat\w*|execut\w*|corpses?|carcass\w*|grenade|shrapnel|combat|wound\w*|'
+    r'casualt\w*|fatal\w*|lethal|weapon\w*|gunfire|blaster\s+fire|rifle|knif\w*|blade|killing)\b',
+    re.IGNORECASE
+)
+
+MILD_VIOLENCE_RE = re.compile(
+    r'\b(danger|peril|threat\w*|struck|alarm|strike|bruis\w*|scratched|tumble\w*|struggle\w*|chase\w*|pursu\w*|confront\w*)\b',
+    re.IGNORECASE
+)
+
+MA_LANGUAGE_RE = re.compile(
+    r'\b(fuck\w*|motherfuck\w*|cunt\w*|cock\w*|twat\w*)\b',
+    re.IGNORECASE
+)
+
+STRONG_LANGUAGE_RE = re.compile(
+    r'\b(shit\w*|bullshit|bitch\w*|bastard\w*|asshole\w*|dick\w*|dipshit)\b',
+    re.IGNORECASE
+)
+
+MILD_LANGUAGE_RE = re.compile(
+    r'\b(damn\w*|hell\b|crap|piss\w*|ass\b)\b',
+    re.IGNORECASE
+)
+
+MA_SEXUAL_RE = re.compile(
+    r'\b(orgasm\w*|genital\w*|copulat\w*|erect\s+penis|vagina|erotic\w*|explicit\s+sex|intercourse)\b',
+    re.IGNORECASE
+)
+
+SUGGESTIVE_RE = re.compile(
+    r'\b(seduce\w*|seductiv\w*|undress\w*|caress\w*|fondl\w*|intimacy|kiss\w*|lust\w*|carnal|bedroom)\b',
+    re.IGNORECASE
+)
+
+MA_THEMES_RE = re.compile(
+    r'\b(suicid\w*|kill\s+(?:himself|herself|themselves|myself|yourself)|slit\s+(?:his|her|their|your)\s+wrists?|hang\w*\s+(?:himself|herself|themselves))\b',
+    re.IGNORECASE
+)
+
+MATURE_THEMES_RE = re.compile(
+    r'\b(dystopi\w*|oppression|totalitarian|sacrifice|abandonment|existential|starvat\w*|famine|plague|decay|rot\w*)\b',
+    re.IGNORECASE
+)
+
+
+def derive_content_rating(package_or_story_data):
+    """Derives a TV Parental Guidelines content rating (TV-G, TV-PG, TV-14, TV-MA),
+    descriptor tags (V, L, S, D), and advisory text by scanning text in a story document or package."""
+    def collect_strings(node):
+        if isinstance(node, str):
+            yield node
+        elif isinstance(node, dict):
+            for k, v in node.items():
+                if k not in ('id', 'format', 'story_id', 'when', 'known_when', 'after'):
+                    yield from collect_strings(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from collect_strings(v)
+
+    full_text = ' '.join(collect_strings(package_or_story_data))
+
+    has_ma_v = bool(MA_VIOLENCE_RE.search(full_text))
+    has_strong_v = bool(STRONG_VIOLENCE_RE.search(full_text))
+    has_mild_v = bool(MILD_VIOLENCE_RE.search(full_text))
+
+    has_ma_l = bool(MA_LANGUAGE_RE.search(full_text))
+    has_strong_l = bool(STRONG_LANGUAGE_RE.search(full_text))
+    has_mild_l = bool(MILD_LANGUAGE_RE.search(full_text))
+
+    has_ma_s = bool(MA_SEXUAL_RE.search(full_text))
+    has_sugg_d = bool(SUGGESTIVE_RE.search(full_text))
+
+    has_ma_theme = bool(MA_THEMES_RE.search(full_text))
+    has_mature_theme = bool(MATURE_THEMES_RE.search(full_text))
+
+    if has_ma_v or has_ma_l or has_ma_s or has_ma_theme:
+        rating = 'TV-MA'
+    elif has_strong_v or has_strong_l or has_sugg_d or has_mature_theme:
+        rating = 'TV-14'
+    elif has_mild_v or has_mild_l:
+        rating = 'TV-PG'
+    else:
+        rating = 'TV-G'
+
+    descriptors = []
+    if has_ma_v or has_strong_v:
+        descriptors.append('V')
+    elif has_mild_v and rating in ('TV-PG', 'TV-14'):
+        descriptors.append('V')
+
+    if has_ma_l or has_strong_l or has_mild_l:
+        descriptors.append('L')
+
+    if has_ma_s:
+        descriptors.append('S')
+    elif has_sugg_d:
+        descriptors.append('D')
+
+    if rating == 'TV-G':
+        descriptors = []
+
+    if rating == 'TV-MA':
+        causes = []
+        if has_ma_v:
+            causes.append('graphic violence')
+        elif has_strong_v:
+            causes.append('violence')
+        if has_ma_l:
+            causes.append('explicit language')
+        elif has_strong_l:
+            causes.append('coarse language')
+        if has_ma_s:
+            causes.append('explicit sexual situations')
+        if has_ma_theme:
+            causes.append('disturbing themes')
+        if not causes:
+            causes.append('mature content')
+    elif rating == 'TV-14':
+        causes = []
+        if has_strong_v:
+            causes.append('intense sci-fi violence and peril')
+        elif has_mild_v:
+            causes.append('thematic peril')
+        if has_strong_l:
+            causes.append('coarse language')
+        elif has_mild_l:
+            causes.append('mild language')
+        if has_sugg_d:
+            causes.append('suggestive dialogue')
+        if has_mature_theme:
+            causes.append('dark thematic elements')
+        if not causes:
+            causes.append('thematic material')
+    elif rating == 'TV-PG':
+        causes = []
+        if has_mild_v:
+            causes.append('mild peril and fantasy violence')
+        if has_mild_l:
+            causes.append('mild language')
+        if not causes:
+            causes.append('thematic elements')
+    else:
+        causes = []
+
+    if causes:
+        advisory = f"Rated {rating} for {', '.join(causes[:-1]) + (' and ' if len(causes) > 1 else '') + causes[-1]}."
+    else:
+        advisory = f"Rated {rating} suitable for general audiences."
+
+    return {
+        'rating': rating,
+        'rating_descriptors': descriptors,
+        'rating_advisory': advisory,
+    }
+
+

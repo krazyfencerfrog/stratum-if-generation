@@ -50,7 +50,8 @@ def box(surface, r, title=None, focused=False):
 
 def header(surface, r, here):
     surface.fill(r.y, r.x, 1, r.w, 'header')
-    right = f" turn {here['turn']} "
+    rating_badge = f"[{here['rating']}] " if here.get('rating') else ""
+    right = f" {rating_badge}turn {here['turn']} "
     chapter = here['chapter'] if str(here['chapter']).strip().lower() != str(here['title']).strip().lower() else None
     parts = [here['title'], chapter, cap(here['room'])]          # a first chapter named like the story is said once
     left = ' ' + ' · '.join(p for p in parts if p) + ' '

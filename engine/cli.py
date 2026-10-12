@@ -235,10 +235,38 @@ def play(engine, picks=None, out=sys.stdout, save_path='stratum.save', keys=None
     return view
 
 
+def show_info(story, out=sys.stdout):
+    sep = '=' * WIDTH
+    print(sep, file=out)
+    print(story.title, file=out)
+    sub = []
+    if story.author:
+        sub.append(f'by {story.author}')
+    if story.rating:
+        desc = f": {','.join(story.rating_descriptors)}" if story.rating_descriptors else ""
+        sub.append(f'[{story.rating}{desc}]')
+    if sub:
+        print(' '.join(sub), file=out)
+    if story.tagline:
+        print(f'"{story.tagline}"', file=out)
+    print('-' * WIDTH, file=out)
+    if story.rating_advisory:
+        print(f'Rating Advisory : {story.rating_advisory}', file=out)
+    if story.model:
+        print(f'Model           : {story.model}', file=out)
+    print(f'Scenes          : {len(story.scenes)}', file=out)
+    print(f'Rooms           : {len(story.rooms)}', file=out)
+    print(f'Endings         : {len(story.endings)}', file=out)
+    print(f'Characters      : {len(story.characters)}', file=out)
+    print(f'Objects         : {len(story.objects)}', file=out)
+    print(sep, file=out)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('package')
     ap.add_argument('--check', action='store_true', help='validate the package and stop')
+    ap.add_argument('--info', action='store_true', help='display story package metadata, overview, and statistics, then stop')
     ap.add_argument('--frames', action='store_true', help='render visual keyframe descriptions on scene/room arrival')
     ap.add_argument('--export-frames', help='export all visual keyframes across the story to a JSON file and stop')
     ap.add_argument('--script', help='comma-separated menu picks to play instead of reading input')
@@ -254,6 +282,9 @@ def main(argv=None):
         print(f'ERROR: {e}')
     if errors or args.check:
         return 1 if errors else 0
+    if args.info:
+        show_info(story, out=sys.stdout)
+        return 0
     if args.export_frames:
         frames = story.export_frames()
         with open(args.export_frames, 'w', encoding='utf-8') as f:
@@ -261,7 +292,20 @@ def main(argv=None):
         count = sum(len(v) for k, v in frames.items() if isinstance(v, dict))
         print(f'Exported {count} frames to {args.export_frames}')
         return 0
-    print(f'== {story.title} ==\n')
+    print(f'== {story.title} ==')
+    sub = []
+    if story.author and story.author != 'Anonymous':
+        sub.append(f'by {story.author}')
+    if story.rating:
+        desc = f": {','.join(story.rating_descriptors)}" if story.rating_descriptors else ""
+        sub.append(f'[{story.rating}{desc}]')
+    if sub:
+        print(' '.join(sub))
+    if story.tagline:
+        print(f'"{story.tagline}"')
+    if story.rating_advisory:
+        print(f'({story.rating_advisory})')
+    print()
     picks = args.script.split(',') if args.script else None
     play(Engine(story, collapse=args.collapse), picks, save_path=args.save, show_frames=args.frames)
     return 0

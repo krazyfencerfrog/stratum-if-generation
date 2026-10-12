@@ -74,6 +74,13 @@ class Story:
         self.states = data.get('states') or {}
         self.start = data.get('start') or {}
         self.protagonist = data.get('protagonist') or {}
+        self.metadata = data.get('metadata') or {}
+        self.author = (self.metadata.get('author') or 'Anonymous').strip()
+        self.tagline = (self.metadata.get('tagline') or '').strip()
+        self.model = (self.metadata.get('model') or '').strip()
+        self.rating = (self.metadata.get('rating') or 'TV-PG').strip()
+        self.rating_descriptors = list(self.metadata.get('rating_descriptors') or [])
+        self.rating_advisory = (self.metadata.get('rating_advisory') or '').strip()
         self.verbs = dict(CORE_VERBS)
         for vid, v in (data.get('verbs') or {}).items():
             self.verbs[vid] = (v or {}).get('label') or vid.capitalize()
@@ -315,6 +322,20 @@ def validate(story):
                 if bad_poss.search(t):
                     errors.append(f"character {cid}: text attaches possessive to unintroduced handle with prepositional modifier ({unnamed!r})")
                     break
+
+    # metadata
+    if 'metadata' in s.data and s.data['metadata'] is not None:
+        meta = s.data['metadata']
+        if not isinstance(meta, dict):
+            errors.append('metadata must be an object')
+        else:
+            if 'rating' in meta and meta['rating'] not in ('TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'):
+                errors.append(f"metadata: rating {meta['rating']!r} must be one of TV-Y, TV-Y7, TV-G, TV-PG, TV-14, TV-MA")
+            if 'rating_descriptors' in meta:
+                if not isinstance(meta['rating_descriptors'], list):
+                    errors.append('metadata: rating_descriptors must be a list of strings')
+                elif not all(isinstance(x, str) for x in meta['rating_descriptors']):
+                    errors.append('metadata: rating_descriptors must contain only strings')
 
     # start
     if s.start.get('scene') not in s.scenes:

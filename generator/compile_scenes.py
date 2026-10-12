@@ -624,9 +624,42 @@ class SceneCompiler:
         main = self.story['lines'][(self.story.get('line_order') or ['T1'])[0]]
         first = self.scene_of.get(main['path'][0])
         prot = self.premise_protagonist()
+
+        author = getattr(self.gen, 'author', None) or 'Anonymous'
+        model_name = ''
+        if hasattr(self.gen, 'client') and self.gen.client:
+            model_name = getattr(self.gen.client, 'model', '') or getattr(self.gen.client, 'model_name', '')
+        if not model_name:
+            model_name = 'local-27b'
+
+        tagline = ''
+        if self.story.get('tagline'):
+            tagline = str(self.story['tagline']).strip()
+        elif main.get('motivation'):
+            m = str(main['motivation']).strip()
+            first_sent = re.split(r'(?<=[.!?])\s+', m)[0]
+            tagline = first_sent if len(first_sent) <= 140 else first_sent[:137] + '...'
+        elif prot.get('wants'):
+            tagline = f"A story of wanting {prot['wants'].strip().rstrip('.')}."
+
+        endings = self.endings()
+        rating_info = checks.derive_content_rating({
+            'world': self.world, 'protagonist': self.protagonist, 'scenes': scenes, 'endings': endings
+        })
+
+        metadata = {
+            'author': author,
+            'tagline': tagline,
+            'model': model_name,
+            'rating': rating_info['rating'],
+            'rating_descriptors': rating_info['rating_descriptors'],
+            'rating_advisory': rating_info['rating_advisory'],
+        }
+
         return {
             'format': 'stratum-story/1', 'story_id': self.story.get('story_id'),
             'title': main.get('title') or self.story.get('story_id'),
+            'metadata': metadata,
             'intro': [{'text': ' '.join(x for x in (prot.get('who'), prot.get('history')) if x)}],
             'protagonist': self.protagonist,
             'states': {k: {'meaning': v.get('meaning')} for k, v in (self.arcs.get('states') or {}).items()},
@@ -634,7 +667,7 @@ class SceneCompiler:
             'world': {'rooms': self.world['rooms'], 'objects': objects, 'characters': self.world['characters']},
             'scenes': scenes,
             'start': {'scene': first, 'room': (scenes.get(first) or {}).get('start_room')},
-            'endings': self.endings(),
+            'endings': endings,
         }
 
     def premise_protagonist(self):

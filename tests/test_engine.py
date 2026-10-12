@@ -1553,6 +1553,79 @@ def companion_movement_and_dynamic_accompaniment():
     check(eng.state.placements['lazlo'] == 'stern_deck', 'unaccompanied companion should remain in previous room')
 
 
+@test
+def story_package_metadata_and_discovery_info():
+    data = demo_data()
+    # 1. Unannotated package has defaults
+    story_default = Story(data)
+    check(story_default.author == 'Anonymous', f"expected Anonymous author, got {story_default.author}")
+    check(story_default.rating == 'TV-PG', f"expected TV-PG default, got {story_default.rating}")
+    check(story_default.tagline == '', f"expected empty tagline, got {story_default.tagline}")
+    check(story_default.model == '', f"expected empty model, got {story_default.model}")
+    check(story_default.rating_descriptors == [], f"expected empty descriptors, got {story_default.rating_descriptors}")
+    check(story_default.rating_advisory == '', f"expected empty advisory, got {story_default.rating_advisory}")
+
+    # 2. Package with valid metadata
+    data['metadata'] = {
+        'author': 'Krazy Frog',
+        'tagline': 'A test of endurance under harsh conditions.',
+        'model': 'qwen3.8-27b',
+        'rating': 'TV-14',
+        'rating_descriptors': ['V', 'L'],
+        'rating_advisory': 'Rated TV-14 for intense peril and coarse language.'
+    }
+    story = Story(data)
+    check(story.author == 'Krazy Frog', f"expected 'Krazy Frog', got {story.author}")
+    check(story.rating == 'TV-14', f"expected 'TV-14', got {story.rating}")
+    check(story.tagline == 'A test of endurance under harsh conditions.', f"tagline mismatch")
+    check(story.model == 'qwen3.8-27b', f"model mismatch")
+    check(story.rating_descriptors == ['V', 'L'], f"descriptors mismatch")
+    check('intense peril' in story.rating_advisory, f"advisory mismatch")
+
+    errors, _ = validate(story)
+    check(not errors, f"expected no errors on valid metadata, got: {errors}")
+
+    # 3. Validation catches invalid ratings
+    data_bad_rating = copy.deepcopy(data)
+    data_bad_rating['metadata']['rating'] = 'TV-INVALID'
+    story_bad_rating = Story(data_bad_rating)
+    errors, _ = validate(story_bad_rating)
+    check(any('metadata: rating' in e for e in errors), f"expected invalid rating error, got: {errors}")
+
+    # 4. Validation catches invalid descriptors
+    data_bad_desc = copy.deepcopy(data)
+    data_bad_desc['metadata']['rating_descriptors'] = 'not-a-list'
+    story_bad_desc = Story(data_bad_desc)
+    errors, _ = validate(story_bad_desc)
+    check(any('rating_descriptors must be a list' in e for e in errors), f"expected descriptors list error, got: {errors}")
+
+    # 5. cli.show_info formats metadata and stats
+    buf = io.StringIO()
+    cli.show_info(story, out=buf)
+    output = buf.getvalue()
+    check('Krazy Frog' in output, 'author missing from show_info')
+    check('[TV-14: V,L]' in output, 'rating badge missing from show_info')
+    check('A test of endurance under harsh conditions.' in output, 'tagline missing from show_info')
+    check('Scenes          : 2' in output, 'scene count missing from show_info')
+    check('Rating Advisory : Rated TV-14' in output, 'advisory missing from show_info')
+
+    # 6. cli.main with --info flag
+    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False, encoding='utf-8') as f:
+        json.dump(data, f)
+        pkg_path = f.name
+    try:
+        old_stdout = sys.stdout
+        sys.stdout = buf = io.StringIO()
+        try:
+            rc = cli.main([pkg_path, '--info'])
+        finally:
+            sys.stdout = old_stdout
+        check(rc == 0, f"expected rc == 0 from cli.main --info, got {rc}")
+        check('Krazy Frog' in buf.getvalue(), 'cli.main --info output missing author')
+    finally:
+        os.unlink(pkg_path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

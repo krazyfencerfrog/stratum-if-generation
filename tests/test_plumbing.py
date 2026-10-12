@@ -2907,6 +2907,74 @@ def opening_scene_scoping_invariants():
         check('the opening node must happen in one or two places' in str(e), f"got: {e}")
 
 
+@test
+def content_rating_derivation_and_package_metadata():
+    # 1. Pure derive_content_rating checks
+    # Extreme violence -> TV-MA with V
+    res_ma_v = checks.derive_content_rating({'intro': 'The assassin was tortured and his body dismembered in the cellar.'})
+    check(res_ma_v['rating'] == 'TV-MA', f"expected TV-MA, got {res_ma_v['rating']}")
+    check('V' in res_ma_v['rating_descriptors'], "expected 'V' descriptor")
+    check('graphic violence' in res_ma_v['rating_advisory'], f"expected graphic violence in advisory, got {res_ma_v['rating_advisory']}")
+
+    # Strong sci-fi violence -> TV-14 with V
+    res_14_v = checks.derive_content_rating({'text': 'Gunfire erupted across the hangar deck, leaving a bleeding corpse by the airlock.'})
+    check(res_14_v['rating'] == 'TV-14', f"expected TV-14, got {res_14_v['rating']}")
+    check('V' in res_14_v['rating_descriptors'], "expected 'V' descriptor")
+
+    # Severe profanity -> TV-MA with L
+    res_ma_l = checks.derive_content_rating({'dialogue': 'Get out of my way, you fucking idiot.'})
+    check(res_ma_l['rating'] == 'TV-MA', f"expected TV-MA, got {res_ma_l['rating']}")
+    check('L' in res_ma_l['rating_descriptors'], "expected 'L' descriptor")
+
+    # Moderate profanity -> TV-14 with L
+    res_14_l = checks.derive_content_rating({'dialogue': 'What total bullshit, you bastard.'})
+    check(res_14_l['rating'] == 'TV-14', f"expected TV-14, got {res_14_l['rating']}")
+    check('L' in res_14_l['rating_descriptors'], "expected 'L' descriptor")
+
+    # Mild peril and language -> TV-PG
+    res_pg = checks.derive_content_rating({'text': 'Damn it, the alarm sounds as danger approaches.'})
+    check(res_pg['rating'] == 'TV-PG', f"expected TV-PG, got {res_pg['rating']}")
+
+    # Mild benign text -> TV-G
+    res_g = checks.derive_content_rating({'text': 'The morning sun rose over the quiet library garden.'})
+    check(res_g['rating'] == 'TV-G', f"expected TV-G, got {res_g['rating']}")
+    check(res_g['rating_descriptors'] == [], f"expected empty descriptors for TV-G, got {res_g['rating_descriptors']}")
+
+    # 2. Package compilation includes metadata
+    import compile_scenes
+    class MockGen:
+        author = 'Test Author'
+        client = None
+    gen = MockGen()
+    story_doc = {
+        'story_id': 'test_pkg_meta',
+        'tagline': 'A test tagline for compilation.',
+        'lines': {'T1': {'id': 'T1', 'title': 'Main Line Title', 'motivation': 'Test motivation text.', 'path': ['N01']}},
+        'line_order': ['T1'],
+        'nodes': {'N01': {'id': 'N01', 'title': 'Node 1'}},
+        'premise': {'protagonist': {'who': 'A traveler', 'history': 'Long road.', 'wants': 'to arrive home'}}
+    }
+    arcs_doc = {'states': {}}
+    plan_doc = {'scenes': [{'id': 'S01', 'nodes': ['N01']}]}
+    world_doc = {
+        'world': {'rooms': {'r1': {'name': 'Room 1'}}, 'objects': {}, 'characters': {}},
+        'protagonist': {'name': 'Traveler', 'embodiment': 'humanoid'}
+    }
+    compiler = compile_scenes.SceneCompiler(gen, story_doc, arcs_doc, plan_doc, world_doc)
+    compiler.compiled['S01'] = {
+        'scene': {'start_room': 'r1', 'events': [{'effects': []}]},
+        'props': {}
+    }
+    pkg = compiler.package()
+    check('metadata' in pkg, 'package missing metadata field')
+    meta = pkg['metadata']
+    check(meta['author'] == 'Test Author', f"author mismatch: {meta['author']}")
+    check(meta['tagline'] == 'A test tagline for compilation.', f"tagline mismatch: {meta['tagline']}")
+    check(meta['rating'] in ('TV-G', 'TV-PG', 'TV-14', 'TV-MA'), f"rating mismatch: {meta['rating']}")
+    check(isinstance(meta['rating_descriptors'], list), 'descriptors not a list')
+    check(bool(meta['rating_advisory']), 'advisory empty')
+
+
 # ---------------------------------------------------------------- runner
 
 

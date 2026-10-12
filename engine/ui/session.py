@@ -211,7 +211,8 @@ class Session:
         carried = [o for o, loc in st.locations.items() if loc == 'player']
         things = [o for o in e.visible_objects() if st.locations.get(o) == st.room
                   and s.objects[o].get('listed', s.objects[o].get('portable', False))]
-        return {'title': s.title, 'chapter': scene.get('title') or st.scene, 'room': room.get('name') or st.room,
+        return {'title': s.title, 'author': s.author, 'rating': s.rating, 'tagline': s.tagline,
+                'chapter': scene.get('title') or st.scene, 'room': room.get('name') or st.room,
                 'people': [s.name_of(c, st) for c in e.present()], 'things': [s.name_of(o, st) for o in things],
                 'carrying': [s.name_of(o, st) for o in carried], 'turn': st.turns,
                 'ending': self.view.get('ending_title') if self.ended else None}
