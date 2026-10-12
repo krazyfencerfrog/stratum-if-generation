@@ -102,6 +102,23 @@ class Engine:
         """Characters in the player's room."""
         return [c for c, r in self.state.placements.items() if r == self.state.room]
 
+    def accompanies(self):
+        """Characters currently traveling with the player."""
+        st = self.state
+        active = set(getattr(st, 'accompanies', set()))
+        for cid, ch in self.story.characters.items():
+            if ch.get('accompanies') and evaluate(ch.get('accompanies_when', 'true'), st):
+                active.add(cid)
+        return [cid for cid in active if cid in self.story.characters]
+
+    def _can_follow(self, cid, ex):
+        ch = self.story.characters.get(cid) or {}
+        if evaluate(ch.get('detained_when', 'false'), self.state):
+            return False
+        if ex.get('alone') or cid in (ex.get('leaves_behind') or []):
+            return False
+        return True
+
     def visible_objects(self):
         """Objects in the player's room, carried, or held by someone here,
         whose `when` (if any) holds."""
@@ -391,11 +408,18 @@ class Engine:
                 st.used.add(f'talk:{cid}:{tid}')
         elif opt['verb'] == 'go':
             ex = src[1]
+            room_from = st.room
             if ex.get('text'):
                 self.queue.append(pick_text(ex['text'], st))
             st.room = ex['to']
             st.visited.add(st.room)
             moved_room = True
+            for cid in self.accompanies():
+                if st.placements.get(cid) == room_from and self._can_follow(cid, ex):
+                    st.placements[cid] = st.room
+                    follow_msg = pick_text((s.characters.get(cid) or {}).get('follow_text'), st, f'{cid}.follow')
+                    if follow_msg:
+                        self.queue.append(s.render(follow_msg, st))
         elif opt['verb'] == 'examine':
             thing = opt['object']
             table = s.objects if thing in s.objects else s.characters
@@ -468,6 +492,10 @@ class Engine:
                 st.visited.add(st.room)
             elif 'introduce' in eff:
                 st.introduced.add(eff['introduce'])
+            elif 'accompany' in eff:
+                st.accompanies.add(eff['accompany'])
+            elif 'stop_accompany' in eff:
+                st.accompanies.discard(eff['stop_accompany'])
 
     def _fire_events(self):
         st = self.state
@@ -610,6 +638,8 @@ class Engine:
         st.idle = 0
         st.visited.add(sid)
         st.placements = dict(sc.get('cast') or {})
+        for cid in sc.get('accompanies') or []:
+            st.accompanies.add(cid)
         rooms = sc.get('rooms') or []
         room = room or sc.get('start_room')
         if room:
@@ -617,6 +647,9 @@ class Engine:
         elif st.room not in rooms and rooms:
             st.room = rooms[0]
         st.visited.add(st.room)
+        for cid in list(st.accompanies):
+            if cid not in (sc.get('cast') or {}):
+                st.placements[cid] = st.room
         if sc.get('opening'):
             self.queue.append(pick_text(sc['opening'], st, sid))
 
@@ -696,6 +729,10 @@ class Engine:
         cabin", read on the deck); None when there is none (the room then says
         plainly who is here, in one sentence)."""
         s, st = self.story, self.state
+        if cid in self.accompanies():
+            acc_here = pick_text(s.characters[cid].get('accompanies_here'), st, cid)
+            if acc_here:
+                return acc_here
         others = self._other_room_names()
         elsewhere = self._words_elsewhere()
         for v in s.characters[cid].get('here') or []:

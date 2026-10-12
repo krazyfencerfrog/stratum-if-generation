@@ -19,6 +19,7 @@ class GameState:
         self.arcs = {}                # state name -> {'up': n, 'down': n}
         self.locations = {}           # object id -> room id, character id, 'player' or None
         self.placements = {}          # character id -> room id (set by the scene)
+        self.accompanies = set()       # character IDs currently traveling with the player
         self.visited = set()          # rooms and scenes entered
         self.used = set()             # interaction ids of `once` interactions already used
         self.fired = set()            # event and nudge ids already fired
@@ -65,7 +66,7 @@ class GameState:
         c.__dict__.update(self.__dict__)
         for key in ('flags', 'stats', 'locations', 'placements'):
             setattr(c, key, dict(getattr(self, key)))
-        for key in ('visited', 'used', 'fired', 'seen', 'heard', 'introduced'):
+        for key in ('visited', 'used', 'fired', 'seen', 'heard', 'introduced', 'accompanies'):
             setattr(c, key, set(getattr(self, key)))
         c.arcs = {k: dict(v) for k, v in self.arcs.items()}
         c.moments = dict(self.moments)
@@ -74,7 +75,8 @@ class GameState:
     def to_dict(self):
         return {'scene': self.scene, 'room': self.room, 'ending': self.ending, 'flags': dict(self.flags),
                 'stats': dict(self.stats), 'arcs': copy.deepcopy(self.arcs), 'locations': dict(self.locations),
-                'placements': dict(self.placements), 'visited': sorted(self.visited), 'used': sorted(self.used),
+                'placements': dict(self.placements), 'accompanies': sorted(self.accompanies),
+                'visited': sorted(self.visited), 'used': sorted(self.used),
                 'fired': sorted(self.fired), 'seen': sorted(self.seen), 'heard': sorted(self.heard), 'introduced': sorted(self.introduced), 'moments': dict(self.moments),
                 'turns': self.turns, 'turns_in_scene': self.turns_in_scene,
                 'idle': self.idle, 'actions': self.actions, 'seed': self.seed}
@@ -89,6 +91,7 @@ class GameState:
         s.arcs = copy.deepcopy(data.get('arcs') or {})
         s.locations = dict(data.get('locations') or {})
         s.placements = dict(data.get('placements') or {})
+        s.accompanies = set(data.get('accompanies') or [])
         s.visited = set(data.get('visited') or [])
         s.used = set(data.get('used') or [])
         s.fired = set(data.get('fired') or [])

@@ -21,7 +21,7 @@ CORE_VERBS = {
     'show': 'Show', 'use': 'Use', 'think': 'Think', 'wait': 'Wait', 'inventory': 'Inventory',
 }
 VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'drop', 'give', 'show', 'use', 'think', 'wait', 'inventory')
-EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce')
+EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce', 'accompany', 'stop_accompany')
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')     # a person in text: {C02}, rendered by what the player knows
 SHORT_CUT = re.compile(
     r"\s+(in|with|on|at|from|of|by|for|about|into|through|after|before|behind|between|under|over|above|below|across|against|along|around|near|beside|toward|towards|upon|within|without|who|whom|whose|which|that|holding|wearing|carrying|standing|sitting|leaning|watching)\b|[,;—]",
@@ -280,6 +280,8 @@ def validate(story):
                 errors.append(f'{where}: moves the player to unknown room {v!r}')
             elif k == 'introduce' and v not in s.characters:
                 errors.append(f'{where}: introduces unknown character {v!r}')
+            elif k in ('accompany', 'stop_accompany') and v not in s.characters:
+                errors.append(f'{where}: {k} names unknown character {v!r}')
 
     # people in text are codes that name characters
     def codes(x):

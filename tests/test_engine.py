@@ -1507,6 +1507,52 @@ def drop_action_portable_inventory_management():
     check('You can see the brass lamp.' in room_text, f'dropped object should be listed in room text: {room_text}')
 
 
+@test
+def companion_movement_and_dynamic_accompaniment():
+    data = demo_data()
+    data['scenes']['S01']['cast']['lazlo'] = 'stern_deck'
+    data['scenes']['S01']['accompanies'] = ['lazlo']
+    data['world']['characters']['lazlo']['follow_text'] = '{lazlo} steps after you.'
+    data['world']['characters']['lazlo']['accompanies_here'] = '{lazlo} stands beside you, watching.'
+    data['world']['characters']['lazlo']['detained_when'] = 'flags.detained'
+    data['scenes']['S01']['interactions'].append({
+        'id': 'stop_following',
+        'verb': 'talk',
+        'object': 'lazlo',
+        'effects': [{'stop_accompany': 'lazlo'}]
+    })
+
+    eng = Engine(Story(data))
+    eng.start()
+    check(eng.state.room == 'stern_deck', 'player starts on stern_deck')
+    check(eng.state.placements['lazlo'] == 'stern_deck', 'lazlo starts on stern_deck')
+    check('lazlo' in eng.present(), 'lazlo is present initially')
+    check('lazlo' in eng.accompanies(), 'lazlo is in accompanies')
+
+    # Go to wheelhouse: lazlo accompanies player
+    view = eng.act('go:wheelhouse')
+    check(eng.state.room == 'wheelhouse', 'player moved to wheelhouse')
+    check(eng.state.placements['lazlo'] == 'wheelhouse', 'lazlo should follow player to wheelhouse')
+    check('lazlo' in eng.present(), 'lazlo should be present in wheelhouse')
+    check(any('steps after you' in q for q in eng.queue), f'follow text expected in queue: {eng.queue}')
+    check('stands beside you, watching.' in view['room']['text'], f'accompanies_here in room text: {view["room"]["text"]}')
+
+    # Detention: detain lazlo in wheelhouse
+    eng.state.flags['detained'] = True
+    eng.act('go:stern_deck')
+    check(eng.state.room == 'stern_deck', 'player returned to stern_deck')
+    check(eng.state.placements['lazlo'] == 'wheelhouse', 'detained companion should stay in wheelhouse')
+    check('lazlo' not in eng.present(), 'detained companion should not be present on stern_deck')
+
+    # Release detention, move lazlo back, stop accompaniment
+    eng.state.flags['detained'] = False
+    eng.state.placements['lazlo'] = 'stern_deck'
+    eng.act('stop_following')
+    check('lazlo' not in eng.accompanies(), 'lazlo should no longer accompany player')
+    eng.act('go:wheelhouse')
+    check(eng.state.placements['lazlo'] == 'stern_deck', 'unaccompanied companion should remain in previous room')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')
