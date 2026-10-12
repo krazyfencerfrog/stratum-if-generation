@@ -33,6 +33,24 @@ def g(node, *path, default=None):
     return cur
 
 
+def derive_embodiment(p_type, p_role):
+    p_type = str(p_type or 'human').lower()
+    p_role = str(p_role or '').lower()
+    if p_type == 'systemic_entity' or any(w in p_role for w in ('ai', 'ship', 'network', 'subsystem', 'core intelligence', 'building intelligence')):
+        if any(w in p_role for w in ('swarm', 'hive', 'colony', 'nanite')):
+            return 'swarm'
+        if any(w in p_role for w in ('building', 'facility', 'hospital', 'station', 'sessile', 'anchored')):
+            return 'sessile_entity'
+        return 'distributed_network'
+    if p_type == 'non_human':
+        if any(w in p_role for w in ('swarm', 'pack', 'hive', 'flock')):
+            return 'swarm'
+        if any(w in p_role for w in ('sessile', 'plant', 'fungus')):
+            return 'sessile_entity'
+        return 'non_human_bounded'
+    return 'embodied_human'
+
+
 # brief field -> (bundle field id, extractor)
 # The keys keep the phase-3 ids so `serves` tags and the lessons doc still
 # name the same things.
@@ -60,6 +78,7 @@ def _fields(bundle):
         '3-0b.protagonist_identity': {
             'type': g(b, 'protagonist_identity', 'type'),
             'role': g(b, 'protagonist_identity', 'role_descriptor'),
+            'embodiment': derive_embodiment(g(b, 'protagonist_identity', 'type'), g(b, 'protagonist_identity', 'role_descriptor')),
         },
         '3-0b.epistemic_gap': {
             'present': g(b, 'epistemic_gap', 'present'),
@@ -206,7 +225,13 @@ def brief_lite(brief):
         'setting': {'structure': (f.get('3f.setting_structure') or {}).get('ceiling'),
                     'scale': (f.get('3f.setting_scale') or {}).get('ceiling')},
         'theme': pick('3c.core_thematic_axis', 'pole_a', 'pole_b'),
-        'protagonist': pick('3-0b.protagonist_identity', 'type', 'role'),
+        'protagonist': {
+            'type': (f.get('3-0b.protagonist_identity') or {}).get('type'),
+            'role': (f.get('3-0b.protagonist_identity') or {}).get('role'),
+            'embodiment': (f.get('3-0b.protagonist_identity') or {}).get('embodiment')
+                          or derive_embodiment((f.get('3-0b.protagonist_identity') or {}).get('type'),
+                                               (f.get('3-0b.protagonist_identity') or {}).get('role')),
+        },
         'affect': {
             'primary': (f.get('3b.primary_affect') or {}).get('label'),
             'trajectory': (f.get('3b.primary_trajectory') or {}).get('shape'),

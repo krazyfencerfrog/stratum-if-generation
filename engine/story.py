@@ -328,6 +328,25 @@ def validate(story):
     if 'you' in s.objects or 'you' in s.characters:
         errors.append('"you" is reserved for the player; no object or character may use it as an id')
 
+    embodiment = str(you.get('embodiment') or '').lower()
+    disembodied = {'distributed_network', 'ship_ai', 'sessile_entity', 'swarm', 'systemic_entity'}
+    if embodiment in disembodied:
+        somatic_patterns = [
+            re.compile(r"\byou\s+(?:step|steps|walk|walks|climb|climbs|run|runs|crawl|crawls|stride|strides|pace|paces|stumble|stumbles|trudge|trudges|creep|creeps|tiptoe|tiptoes)\b", re.I),
+            re.compile(r"\b(?:step|walk|climb|run|crawl)\s+(?:down|up|into|out|across|through|over|away)\b", re.I),
+            re.compile(r"\b(?:on\s+)?your\s+(?:feet|footing|heels|toes|legs|knees)\b", re.I),
+            re.compile(r"\b(?:in\s+)?your\s+(?:hands?|palms?|fingers?|fingertips?|arms?|shoulders?|chest|throat|neck|stomach|belly|spine|blood|veins|sweat|breath|lungs|ribs|flesh)\b", re.I),
+            re.compile(r"\b(?:in|into)\s+your\s+pockets?\b", re.I),
+            re.compile(r"\b(?:catch(?:ing)?|hold(?:ing)?|under)\s+your\s+breath\b", re.I),
+            re.compile(r"\b(?:pen\s+touches\s+(?:the|your)|sign(?:ing)?\s+your\s+name|you\s+sign\b)", re.I),
+        ]
+        for text in all_strings(you):
+            for pat in somatic_patterns:
+                m = pat.search(text)
+                if m:
+                    notes.append(f"protagonist: somatic drift for {embodiment} protagonist ({m.group(0)!r})")
+                    break
+
     for name, st in s.states.items():
         if not isinstance(st, dict) or not st.get('meaning'):
             notes.append(f'state {name}: no meaning given')

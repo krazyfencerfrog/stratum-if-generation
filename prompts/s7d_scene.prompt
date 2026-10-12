@@ -44,7 +44,10 @@ What you write, naming rooms, people and things exactly as the packet does:
       door, down a lane) is a go, where a player looks to leave, labelled
       with how ("out the front door"); a branch is the outline's trigger, done in
       the world, and people around it say what is at stake before it is
-      taken.
+      taken. If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET),
+      actions and movement represent telemetry, data bus queries, radio commands, or
+      sensor sweeps; never use human bipedal locomotion ("step down", "walk into", "climb")
+      or physical anatomy ("your hands", "in your pocket", "catch your breath").
  - events: the event_here (if any) and anything the scene does by itself,
    each with when it happens (after a number of turns, or after a node).
    An event is something new that happens later in the scene, never the

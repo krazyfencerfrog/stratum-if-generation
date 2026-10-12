@@ -23,6 +23,9 @@ can examine themselves and THINK about things; you write what they find.
    never an instruction to the player. Leave the open question open: say
    what pulls each way, not which way you go.
 
+EMBODIMENT INVARIANT:
+If the protagonist is non-human, disembodied, an AI, or a distributed system, do NOT give them human anatomy, hands, feet, pockets, or physical human gestures. Describe their sensors, telemetry, core housing, data buffers, or physical substrates.
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary.

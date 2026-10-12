@@ -10,6 +10,7 @@ the landing).
    - label / back_label: concise menu actions ("through the fire door", "back into the corridor").
    - text / back_text: transitional prose for moving between the spaces.
      * Connective routes and cross-location boundaries are physical passages (stairs, yards, alleys, fire doors, weather thresholds): provide exactly ONE concise sentence (10-25 words) describing the physical act or sensation of passing through (the draught, the footing, rain, the sound of the gate or door).
+     * EMBODIMENT INVARIANT: If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET), crossings represent signal rerouting, diagnostic sweeps, or sensor shifts, NEVER bipedal steps or physical footsteps.
      * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
    - one_way: optional boolean (default false). Set to true only for physical one-way barriers (e.g. a high drop, chute, or one-way security door). All locations must remain reachable from the story's start.
  - connective: places to add between locations where the geography wants

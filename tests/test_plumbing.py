@@ -2717,6 +2717,44 @@ def ending_resolution_liveness_contradictions_are_caught():
     check(c4 is None, f"expected None, got: {c4}")
 
 
+@test
+def protagonist_embodiment_and_somatic_drift():
+    # 1. derive_embodiment mapping
+    check(brief.derive_embodiment('systemic_entity', 'ship core intelligence') == 'distributed_network', 'systemic AI should be distributed_network')
+    check(brief.derive_embodiment('systemic_entity', 'station orbital hospital') == 'sessile_entity', 'systemic station should be sessile_entity')
+    check(brief.derive_embodiment('systemic_entity', 'nanite swarm') == 'swarm', 'systemic swarm should be swarm')
+    check(brief.derive_embodiment('human', 'detective') == 'embodied_human', 'human should be embodied_human')
+    check(brief.derive_embodiment('non_human', 'alien pack') == 'swarm', 'non_human pack should be swarm')
+    check(brief.derive_embodiment('non_human', 'sessile fungus') == 'sessile_entity', 'sessile non_human should be sessile_entity')
+    check(brief.derive_embodiment('non_human', 'android') == 'non_human_bounded', 'android should be non_human_bounded')
+
+    # 2. check_somatic_drift
+    # For embodied_human: never flags human somatic markers
+    check(checks.check_somatic_drift("You step across the threshold with cold hands in your pockets.", "embodied_human") is None,
+          "embodied_human should never flag somatic markers")
+
+    # For distributed_network: flags second-person somatic markers
+    d1 = checks.check_somatic_drift("You step across the threshold into the server room.", "distributed_network")
+    check(d1 and "you step" in d1.lower(), f"expected you step flag, got: {d1}")
+
+    d2 = checks.check_somatic_drift("Cold air blows over your hands.", "distributed_network")
+    check(d2 and "your hands" in d2.lower(), f"expected your hands flag, got: {d2}")
+
+    d3 = checks.check_somatic_drift("You catch your breath in the silence.", "distributed_network")
+    check(d3 and "your breath" in d3.lower(), f"expected your breath flag, got: {d3}")
+
+    d4 = checks.check_somatic_drift("You sign your name in the register.", "distributed_network")
+    check(d4 and "you sign" in d4.lower(), f"expected you sign flag, got: {d4}")
+
+    # Telemetry and sensor language is fine
+    check(checks.check_somatic_drift("Telemetry shows bus voltage dropping across Sector 4.", "distributed_network") is None,
+          "telemetry should be valid")
+
+    # Other character actions do not trigger false positives
+    check(checks.check_somatic_drift("Castell steps forward with trembling hands.", "distributed_network") is None,
+          "NPC somatic actions should not flag protagonist somatic drift")
+
+
 # ---------------------------------------------------------------- runner
 
 

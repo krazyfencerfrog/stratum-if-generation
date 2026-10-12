@@ -24,6 +24,7 @@ For each room:
    - back_label: menu action in reverse ("into the studio", "out to the corridor").
    - text / back_text: transitional prose describing the crossing.
      * When there is a physical threshold, barrier, or distinct portal (a heavy door, a hatch, a ladder, a dark passage, elevation change): exactly ONE concise sentence (10-25 words) describing the physical act or sensation of crossing (the sound of the latch, ducking under pipes, the temperature shift, footing on the rungs).
+     * EMBODIMENT INVARIANT: If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET), crossings are sensor routing, camera switching, or telemetry shifts, NEVER human bipedal locomotion ("your feet", "step down", "walk into", "climb").
      * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
      * For a simple open doorway, adjoining alcove, or unobstructed space with no threshold: use null. Never invent filler ("You make your way to...").
    - one_way: optional boolean (default false). Internal location exits are bidirectional by default; set to true ONLY for physical one-way barriers (a chute, steep drop, or locked one-way gate). Every room in the location must remain reachable from and have a path back to the starting room.

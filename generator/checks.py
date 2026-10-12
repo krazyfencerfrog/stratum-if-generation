@@ -729,3 +729,32 @@ def resolution_liveness_contradiction(summary_text, resolution_text, char_label=
     if summary_says_dead and res_says_alive:
         return f'summary describes character dead ({char_summary!r}), but resolution says they survived ({resolution_text!r})'
     return None
+
+
+DISENBODIED_EMBODIMENTS = {'distributed_network', 'ship_ai', 'sessile_entity', 'swarm', 'systemic_entity'}
+
+SOMATIC_DRIFT_PATTERNS = [
+    re.compile(r"\byou\s+(?:step|steps|walk|walks|climb|climbs|run|runs|crawl|crawls|stride|strides|pace|paces|stumble|stumbles|trudge|trudges|creep|creeps|tiptoe|tiptoes)\b", re.I),
+    re.compile(r"\b(?:step|walk|climb|run|crawl)\s+(?:down|up|into|out|across|through|over|away)\b", re.I),
+    re.compile(r"\b(?:on\s+)?your\s+(?:feet|footing|heels|toes|legs|knees)\b", re.I),
+    re.compile(r"\b(?:in\s+)?your\s+(?:hands?|palms?|fingers?|fingertips?|arms?|shoulders?|chest|throat|neck|stomach|belly|spine|blood|veins|sweat|breath|lungs|ribs|flesh)\b", re.I),
+    re.compile(r"\b(?:in|into)\s+your\s+pockets?\b", re.I),
+    re.compile(r"\b(?:catch(?:ing)?|hold(?:ing)?|under)\s+your\s+breath\b", re.I),
+    re.compile(r"\b(?:pen\s+touches\s+(?:the|your)|sign(?:ing)?\s+your\s+name|you\s+sign\b)", re.I),
+]
+
+
+def check_somatic_drift(text, embodiment):
+    """Flags forbidden human somatic markers in second-person text when the protagonist
+    is non-human, disembodied, or a distributed intelligence. Returns finding string or None."""
+    if not text or not embodiment:
+        return None
+    emb = str(embodiment).lower()
+    if emb not in DISENBODIED_EMBODIMENTS:
+        return None
+    for pattern in SOMATIC_DRIFT_PATTERNS:
+        m = pattern.search(text)
+        if m:
+            return f"somatic drift for {emb} protagonist: {m.group(0)!r} (use telemetry, sensor, or network mechanics instead)"
+    return None
+

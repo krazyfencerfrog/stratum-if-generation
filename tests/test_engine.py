@@ -1390,6 +1390,26 @@ def visual_frames_validation_export_and_cli():
         os.unlink(pkg_path)
 
 
+@test
+def protagonist_somatic_drift_warning():
+    data = demo_data()
+    data['protagonist']['embodiment'] = 'distributed_network'
+    data['protagonist']['description'] = [{'text': 'Your hands tremble on the brass wheel.'}]
+    story = Story(data)
+    errors, notes = validate(story)
+    check(not errors, f'somatic drift should not be hard error, got: {errors}')
+    check(any('somatic drift for distributed_network protagonist' in n and 'your hands' in n.lower() for n in notes),
+          f'expected somatic drift warning note, got: {notes}')
+
+    # Embodied human does not trigger warning
+    data2 = demo_data()
+    data2['protagonist']['embodiment'] = 'embodied_human'
+    data2['protagonist']['description'] = [{'text': 'Your hands tremble on the brass wheel.'}]
+    story2 = Story(data2)
+    errors2, notes2 = validate(story2)
+    check(not any('somatic drift' in n for n in notes2), f'embodied human got somatic drift note: {notes2}')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

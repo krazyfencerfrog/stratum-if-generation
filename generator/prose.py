@@ -408,6 +408,7 @@ class ProseWriter:
                 raise ValueError(f'codes that name nobody: {bad}; a person is written as their code from the people list')
             parsed['texts'] = {i: got[i] for i in ids}
             parsed['images_used'] = [str(x) for x in as_list(parsed.get('images_used')) if str(x).strip()][:5]
+            embodiment = (self.pkg.get('protagonist') or {}).get('embodiment') or (self.pkg.get('premise', {}).get('protagonist') or {}).get('embodiment')
             soft = []
             for i in ids:
                 t, k = got[i], kinds[i]
@@ -433,6 +434,9 @@ class ProseWriter:
                     unnamed = c.get('unnamed')
                     if unnamed and re.search(r'\b' + re.escape(unnamed) + r"['’]s\b", t, re.I):
                         soft.append(f"{i}: ungrammatical possessive on unintroduced handle ({unnamed!r}); use head noun or person code")
+                drift = checks.check_somatic_drift(t, embodiment)
+                if drift:
+                    soft.append(f'{i}: {drift}')
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
