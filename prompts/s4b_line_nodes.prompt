@@ -37,7 +37,8 @@ WHAT YOU WRITE FOR EACH NODE
    wound in the earth"). If a motif recurs across beats, show it through
    different concrete actions, sights, or changes rather than repeating
    the same wording.
- - where: one to three places, by name.
+ - where: one to three places, by name. (For the opening node N01, limit
+   to one or two places to prevent initial player overload).
    (The protagonist is always "you" in a summary; the protagonist's name,
    when the engine gives one, is only what other people call you.
    People: a registered character with a "name" is called by that name
@@ -51,7 +52,8 @@ RULES FOR PLACES
  1. A place is somewhere a section of play can happen, sized to the
     story's footprint: for a story inside one building, a room or a
     floor; for a ship or a town, a deck, a yard, a hall; for a region, a
-    town or a building in it.
+    town or a building in it. The opening node (N01) must take place in
+    at most one or two places.
  2. If the place is already in the location register, use its name
     exactly as written there. Reuse before you add: a whole story wants
     about four to eight places, and fewer when it is set inside one

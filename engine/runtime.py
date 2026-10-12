@@ -514,6 +514,15 @@ class Engine:
             self.queue.append(pick_text(n.get('text'), st, n['id']))
             self._apply(n.get('effects'))
             return
+        blocked_req = self._blocked_exit_moments()
+        if blocked_req and st.idle >= 2:
+            nudge_id = f"blocked_exit_{self.scene().get('id', '')}_{len(blocked_req)}"
+            if nudge_id not in st.fired:
+                st.fired.add(nudge_id)
+                count = len(blocked_req)
+                plural = "decisions remain" if count > 1 else "decision remains"
+                self.queue.append(f"The situation holds: unresolved crisis {plural} uncommitted before the way on opens.")
+                return
 
     def _note_seen(self):
         """Who and what the player has now encountered: the people in the room
@@ -565,6 +574,16 @@ class Engine:
                 if told:
                     del self.queue[before:]
                 told = told or len(self.queue) > before
+
+    def _blocked_exit_moments(self):
+        st = self.state
+        req = [m for m in self.moments() if m.get('required') and m['id'] not in st.used]
+        if not req:
+            return None
+        ready_exits = [ex for ex in self.scene().get('exits') or [] if evaluate(ex.get('when', 'true'), st)]
+        if ready_exits:
+            return req
+        return None
 
     def _exit_due(self):
         st = self.state

@@ -110,18 +110,33 @@ class SceneCompiler:
             found.add(sh.get('state'))
         return found
 
+    def is_start_scene(self, sc):
+        lines = (getattr(self, 'story', {}) or {}).get('lines') or {}
+        line_order = (getattr(self, 'story', {}) or {}).get('line_order') or ['T1']
+        main = lines.get(line_order[0], {})
+        first_node = (main.get('path') or ['N01'])[0]
+        scene_of = getattr(self, 'scene_of', {}) or {}
+        return sc.get('id') == scene_of.get(first_node) or sc.get('major') == first_node
+
     def open_rooms(self, sc):
         """The rooms a scene opens: its locations' rooms, plus the connective
-        rooms on the way between them."""
+        rooms on the way between them. The opening scene is bounded to at most
+        2-3 immediately accessible rooms to prevent initial menu overload."""
         rooms = []
-        for lid in sc['where']:
+        is_opening = self.is_start_scene(sc)
+        locations = sc.get('where', [])
+        if is_opening and len(locations) > 1:
+            locations = locations[:1]
+        for lid in locations:
             rooms += [r for r in self.location_rooms.get(lid, []) if r not in rooms]
-        if len(sc['where']) > 1:
+        if len(locations) > 1 and not is_opening:
             connective = {rid for rid, r in self.world['rooms'].items() if r.get('location') is None}
             for rid in list(rooms):
                 for e in self.world['rooms'][rid]['exits']:
                     if e['to'] in connective and e['to'] not in rooms:
                         rooms.append(e['to'])
+        if is_opening and len(rooms) > 3:
+            rooms = rooms[:3]
         return rooms or list(self.world['rooms'])[:1]
 
     def out_edges(self, sc):

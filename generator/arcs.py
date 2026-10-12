@@ -565,6 +565,11 @@ class ArcBuilder:
             if problems:
                 raise ValueError('; '.join(problems))
             # line-level rules, on the line as it would be with these nodes in
+            first_after = [x for x in got if x.get('after') == path[0]]
+            total_first = len(self.after.get(path[0], [])) + len(first_after)
+            if total_first > 2:
+                soft.append(f"the opening node {path[0]} has {total_first} minor nodes; limit the opening beat to at "
+                            f"most 2 minor nodes (distribute later opportunities to subsequent nodes)")
             trial = self.trial_path(line_id, got)
             opps = [(i, x) for i, x in enumerate(got) if x['kind'] == 'opportunity']
             for i, x in opps:

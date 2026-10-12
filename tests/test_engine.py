@@ -1443,6 +1443,28 @@ def ending_epilogue_formulaic_syntax_warning():
           f'diverse epilogues got warning note: {notes2}')
 
 
+@test
+def blocked_exit_crisis_signposting():
+    data = demo_data()
+    data['scenes']['S01']['moments'] = [{'id': 'm_crisis', 'required': True, 'options': ['act_crisis']}]
+    data['scenes']['S01']['interactions'].append({'id': 'act_crisis', 'verb': 'resolve', 'text': 'Crisis resolved.'})
+    data['scenes']['S01']['exits'] = [{'to': 'S02', 'when': 'true'}]
+    eng = Engine(Story(data))
+    eng.start()
+    check(not any('The situation holds: unresolved crisis' in msg for msg in eng.queue),
+          'should not signpost blocked exit immediately')
+    eng.queue.clear()
+    eng.act('wait')
+    check(eng.state.idle == 1, f"expected idle == 1, got {eng.state.idle}")
+    check(not any('The situation holds: unresolved crisis' in msg for msg in eng.queue),
+          'should not signpost at idle == 1')
+    eng.queue.clear()
+    eng.act('wait')
+    check(eng.state.idle >= 2, f"expected idle >= 2, got {eng.state.idle}")
+    check(any('The situation holds: unresolved crisis decision remains uncommitted' in msg for msg in eng.queue),
+          f"expected crisis signpost in queue, got: {eng.queue}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

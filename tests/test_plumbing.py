@@ -2799,6 +2799,109 @@ def epilogue_resolution_syntactic_variety():
           "diverse set with at most one formulaic line should not trigger repetition finding")
 
 
+@test
+def opening_scene_scoping_invariants():
+    import compile_scenes
+    import arcs
+    import outline
+
+    # 1. SceneCompiler opening scene bounding
+    compiler = compile_scenes.SceneCompiler.__new__(compile_scenes.SceneCompiler)
+    compiler.story = {'lines': {'T1': {'path': ['N01']}}, 'line_order': ['T1']}
+    compiler.scene_of = {'N01': 'S01'}
+    compiler.location_rooms = {'L01': ['R01', 'R02', 'R03', 'R04'], 'L02': ['R05', 'R06']}
+    compiler.world = {'rooms': {f'R0{i}': {'location': f'L0{1 if i<=4 else 2}', 'exits': []} for i in range(1, 7)}}
+
+    sc_start = {'id': 'S01', 'major': 'N01', 'where': ['L01', 'L02']}
+    open_start = compiler.open_rooms(sc_start)
+    check(len(open_start) <= 3, f"opening scene must have at most 3 rooms, got {open_start}")
+    check(compiler.is_start_scene(sc_start) is True, "must be identified as start scene")
+
+    sc_later = {'id': 'S02', 'major': 'N02', 'where': ['L01', 'L02']}
+    open_later = compiler.open_rooms(sc_later)
+    check(len(open_later) == 6, f"later scenes can open all location rooms, got {open_later}")
+
+    # 2. arcs.py a2_validator: rejects >2 minor nodes after opening major node
+    class DummyGen:
+        kernel = 'A test kernel'
+        def tone_line(self): return 'grounded'
+
+    dummy_gen = DummyGen()
+    dummy_story = {
+        'lines': {'T1': {'path': ['N01', 'N02']}},
+        'line_order': ['T1'],
+        'characters': {'C01': {'id': 'C01', 'label': 'the mechanic', 'name': 'Sam'}},
+        'nodes': {'N01': {'title': 'Start', 'where': ['L01'], 'who': ['the mechanic']},
+                  'N02': {'title': 'End', 'where': ['L01'], 'who': [], 'is_ending': True}},
+    }
+    planner = arcs.ArcBuilder(dummy_gen, dummy_story)
+    planner.plan = {
+        'arcs': [{'id': 'C01', 'state': {'name': 'trust'}, 'resolutions': [{'lines': ['T1'], 'direction': 'up'}]}],
+        'protagonist': {'T1': 'learns'}
+    }
+    validator = planner.a2_validator('T1')
+    parsed_overloaded = {
+        'minor_nodes': [
+            {'after': 'N01', 'kind': 'opportunity', 'title': 'First',
+             'summary': 'Thirty words to satisfy the summary limit: one two three four five six seven eight nine ten '
+                        'eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one.',
+             'image': 'a wrench', 'serves': ['C01'],
+             'options': [{'do': 'hand tool', 'moves': [{'state': 'trust', 'direction': 'up'}]}, {'do': 'wait', 'moves': []}],
+             'tell': {'at': 'N02', 'how': 'he smiles'}},
+            {'after': 'N01', 'kind': 'opportunity', 'title': 'Second',
+             'summary': 'Thirty words to satisfy the summary limit: one two three four five six seven eight nine ten '
+                        'eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one.',
+             'image': 'a bolt', 'serves': ['C01'],
+             'options': [{'do': 'tighten', 'moves': [{'state': 'trust', 'direction': 'down'}]}, {'do': 'leave', 'moves': []}],
+             'tell': {'at': 'N02', 'how': 'he frowns'}},
+            {'after': 'N01', 'kind': 'demonstration', 'title': 'Third',
+             'summary': 'Thirty words to satisfy the summary limit: one two three four five six seven eight nine ten '
+                        'eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one.',
+             'image': 'a gauge', 'serves': ['C01']}
+        ]
+    }
+    try:
+        validator(parsed_overloaded)
+        raise AssertionError("expected SoftReject for >2 minor nodes after opening node N01")
+    except arcs.SoftReject as e:
+        check('the opening node N01 has 3 minor nodes' in str(e), f"got: {e}")
+
+    # 3. outline.py fill validate closure: rejects N01 with >2 places
+    captured = {}
+    class MockGen:
+        kernel = 'kernel'
+        analysis = {}
+        def tone_line(self): return 'grounded'
+        def to_json(self, x): return '{}'
+        def run_prompt(self, prefix, step, subs, prompt_file=None, validator=None, **kwargs):
+            captured['validator'] = validator
+            return {'nodes': []}
+
+    outliner = outline.OutlineBuilder.__new__(outline.OutlineBuilder)
+    outliner.gen = MockGen()
+    outliner.premise = {}
+    outliner.characters = {'C01': {'id': 'C01', 'label': 'the mechanic', 'name': 'Sam'}}
+    outliner.locations = {}
+    outliner.nodes = {}
+    outliner.fill_packet = lambda line, new_ids: {}
+    outliner.register_view = lambda: {}
+    outliner.brief_lite_json = lambda: '{}'
+
+    outliner.fill(1, {'id': 'T1'}, ['N01'])
+    val = captured['validator']
+    parsed_b = {
+        'nodes': [
+            {'id': 'N01', 'title': 'Start', 'summary': 'You arrive at the cold station and look for your contact in silence.',
+             'image': 'an iron gate', 'where': ['Workshop', 'Yard', 'Alley'], 'who': ['the mechanic']}
+        ]
+    }
+    try:
+        val(parsed_b)
+        raise AssertionError("expected ValueError for N01 with >2 places")
+    except ValueError as e:
+        check('the opening node must happen in one or two places' in str(e), f"got: {e}")
+
+
 # ---------------------------------------------------------------- runner
 
 

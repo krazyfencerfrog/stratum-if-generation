@@ -64,6 +64,10 @@ Rules:
    image per node: a concrete thing the player keeps.
  - People: name only characters already in the story, by name. A new
    person may appear only as a passing role (a waiter, a guard).
+ - INTRODUCTORY SCOPING: The opening major node (the first node on the path)
+   should be followed by at most one or two minor nodes (one opportunity
+   and/or demonstration). Distribute subsequent opportunities and turns across
+   later nodes on the path to avoid front-loading the opening scene with excessive choices.
 
 OUTPUT FORMAT (JSON)
 

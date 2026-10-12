@@ -1244,7 +1244,10 @@ class OutlineBuilder:
                             if str(w).strip() and norm(w) not in ('you', 'yourself', 'protagonist', 'the protagonist')]
                 if not x['where']:
                     problems.append(f"node {x['id']}: where is empty; every node happens somewhere")
-                if len(x['where']) > 3:
+                if x['id'] == 'N01' and len(x['where']) > 2:
+                    problems.append(f"node {x['id']}: {len(x['where'])} places; the opening node must happen in one or "
+                                    f"two places to avoid cognitive overload")
+                elif len(x['where']) > 3:
                     problems.append(f"node {x['id']}: {len(x['where'])} places; a node plays in one to three")
                 unknown = [w for w in x['who'] if not self.match(w, trial, 'label', shortened=True)]
                 if unknown:
