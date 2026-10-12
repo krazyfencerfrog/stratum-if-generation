@@ -1877,10 +1877,15 @@ def helpers():
     targets = brief.shape_targets({'endings': {'tier': 'many'}, 'linearity': 'linear'})
     check(targets['through_lines'] == 6 and targets['default_max_iterations'] == 8, f'shape targets: {targets}')
     check(brief.shape_targets({'endings': {'tier': 'one'}})['default_max_iterations'] == 1, 'one ending, one line')
-    for stated, tier in (('6 or 7', 'several'), ('at least five', 'several'), ('a dozen', 'many'), ('one ending', 'one'),
-                         ('a single ending', 'one'), ('more than one ending', None), ('at least one of them happy', None),
-                         ('two or three', 'few'), ('the verdict should vary', None), ('', None)):
+    for stated, tier in (('6 or 7', 'many'), ('6-7', 'many'), ('half a dozen', 'many'), ('10', 'many'),
+                         ('at least 5', 'several'), ('at least five', 'several'), ('a dozen', 'many'),
+                         ('one ending', 'one'), ('a single ending', 'one'), ('more than one ending', None),
+                         ('at least one of them happy', None), ('two or three', 'few'), ('4-5', 'several'),
+                         ('the verdict should vary', None), ('unstated', None), ('a handful', None),
+                         ('multiple', None), ('', None)):
         check(brief.ending_tier_from_stated(stated) == tier, f'tier for {stated!r}')
+    check(brief.shape_targets({'endings': {'tier': 'several', 'stated': '6 or 7'}})['default_max_iterations'] == 6,
+          'stated 6 or 7 overrides several tier to many (6 lines)')
     b = load('basic', 's3_brief.json')
     lines = brief.brief_lines(b)
     check('3-0a.primary_decision_axis [constraint, inferred]' in lines and 'enrichment_budget' in lines, 'brief_lines lost a field')

@@ -382,20 +382,36 @@ _ONE_ENDING = re.compile(r'^\W*(only |just |exactly )?(a |the )?(one|single|1)\b
 
 
 def ending_tier_from_stated(stated):
-    """The ending tier as a lookup when the Kernel gave a number: the
-    smallest number stated ('6 or 7' -> 6 -> several), so a range never
-    rounds the story up. None when no number is stated."""
-    text = str(stated or '').lower()
-    numbers = [int(n) for n in re.findall(r'\d+', text) if int(n) > 1]
-    numbers += [v for w, v in _NUMBER_WORDS.items() if re.search(rf'\b{w}\b', text)]
+    """The ending tier as a lookup when the Kernel gave a number or range.
+    Uses the maximum number stated (e.g. '6 or 7' -> 7 -> many) so the outline
+    loop has headroom to reach the requested count. Returns None when no
+    specific number is stated."""
+    text = str(stated or '').lower().strip()
+    if not text or text in ('unstated', 'none', 'unknown', 'n/a'):
+        return None
+
+    numbers = []
+    if re.search(r'\bhalf\s+(?:a\s+)?dozen\b', text):
+        numbers.append(6)
+        text = re.sub(r'\bhalf\s+(?:a\s+)?dozen\b', ' ', text)
+
+    clean_text = re.sub(r'\b(?:more than|at least)\s+(?:one|1)\b', ' ', text)
+
+    digits = [int(n) for n in re.findall(r'\b\d+\b', clean_text)]
+    numbers += [n for n in digits if n > 1]
+    numbers += [v for w, v in _NUMBER_WORDS.items() if re.search(rf'\b{w}\b', clean_text)]
+
     if not numbers:
-        return 'one' if _ONE_ENDING.search(text) else None
-    n = min(numbers)
+        if _ONE_ENDING.search(text) or 1 in digits:
+            return 'one'
+        return None
+
+    n = max(numbers)
     if n <= 1:
         return 'one'
     if n <= 3:
         return 'few'
-    if n <= 6:
+    if n <= 5:
         return 'several'
     return 'many'
 
@@ -405,7 +421,8 @@ def shape_targets(shape):
     advisory numbers for the outline loop, never exact counts to hit."""
     shape = shape or {}
     endings = shape.get('endings') or {}
-    tier = str(endings.get('tier', 'unstated') or 'unstated').lower()
+    computed = ending_tier_from_stated(endings.get('stated'))
+    tier = computed or str(endings.get('tier', 'unstated') or 'unstated').lower()
     length = str(shape.get('length', 'unstated') or 'unstated').lower()
     linearity = str(shape.get('linearity', 'unstated') or 'unstated').lower()
     lo, hi = LENGTH_TO_NODES.get(length, LENGTH_TO_NODES['unstated'])
