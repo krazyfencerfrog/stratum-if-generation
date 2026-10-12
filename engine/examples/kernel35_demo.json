@@ -337,6 +337,7 @@
         "name": "Mira's ring",
         "location": "player",
         "portable": true,
+        "bound": true,
         "description": [
           {
             "text": "A plain silver band, worn thin on one side from her habit of turning it. It is too small for any of your fingers, so it hangs on a cord."

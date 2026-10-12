@@ -151,6 +151,9 @@ class Engine:
             obj = s.objects[oid]
             if obj.get('portable') and st.locations.get(oid) == st.room:
                 add(built, f'take:{oid}', 'take', oid)
+            if (obj.get('portable') and st.locations.get(oid) == 'player'
+                    and not obj.get('bound') and not obj.get('essential') and obj.get('droppable', True)):
+                add(built, f'drop:{oid}', 'drop', oid)
         you = s.protagonist
         if you.get('description'):
             add(built, 'examine:you', 'examine', 'you', obj_label='yourself', source=('self',))
@@ -402,6 +405,11 @@ class Engine:
             obj = s.objects[opt['object']]
             st.locations[opt['object']] = 'player'
             self.queue.append(pick_text(obj.get('take_text'), st) or f"You take {obj.get('name', opt['object'])}.")
+        elif opt['verb'] == 'drop':
+            obj = s.objects[opt['object']]
+            st.locations[opt['object']] = st.room
+            name = s.name_of(opt['object'], st) or obj.get('name', opt['object'])
+            self.queue.append(pick_text(obj.get('drop_text'), st) or f"You set down {name}.")
         elif opt['verb'] == 'wait':
             self.queue.append(pick_text(self.scene().get('wait_text'), st) or 'Time passes.')
         if takes_time is None:     # computed: time passes when something changed, you moved, or you waited

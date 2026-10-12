@@ -1465,6 +1465,48 @@ def blocked_exit_crisis_signposting():
           f"expected crisis signpost in queue, got: {eng.queue}")
 
 
+@test
+def drop_action_portable_inventory_management():
+    data = demo_data()
+    data['world']['objects']['O_LAMP'] = {
+        'name': 'the brass lamp',
+        'location': 'stern_deck',
+        'portable': True
+    }
+    data['world']['objects']['O_RING'] = {
+        'name': 'the silver ring',
+        'location': 'player',
+        'portable': True,
+        'bound': True
+    }
+
+    eng = Engine(Story(data))
+    eng.start()
+    opt_ids = [o['id'] for o in eng.options()]
+    check('take:O_LAMP' in opt_ids, 'portable lamp in room should have take option')
+    check('drop:O_RING' not in opt_ids, 'bound item should not have drop option')
+
+    # Take lamp
+    eng.act('take:O_LAMP')
+    check(eng.state.locations['O_LAMP'] == 'player', 'lamp should now be carried')
+    check(any('You take the brass lamp.' in q for q in eng.queue), f'take message: {eng.queue}')
+    opt_ids = [o['id'] for o in eng.options()]
+    check('take:O_LAMP' not in opt_ids, 'carried item should not have take option')
+    check('drop:O_LAMP' in opt_ids, 'carried portable item should have drop option')
+
+    # Drop lamp
+    eng.act('drop:O_LAMP')
+    check(eng.state.locations['O_LAMP'] == eng.state.room, 'lamp should be in room after drop')
+    check(any('You set down the brass lamp.' in q for q in eng.queue), f'drop message: {eng.queue}')
+    opt_ids = [o['id'] for o in eng.options()]
+    check('drop:O_LAMP' not in opt_ids, 'item in room should not have drop option')
+    check('take:O_LAMP' in opt_ids, 'dropped item should be takeable again')
+
+    # Room description shows dropped object
+    room_text = eng.view()['room']['text']
+    check('You can see the brass lamp.' in room_text, f'dropped object should be listed in room text: {room_text}')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')

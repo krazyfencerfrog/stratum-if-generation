@@ -17,10 +17,10 @@ from expressions import ExpressionError, references
 FORMAT = 'stratum-story/1'
 
 CORE_VERBS = {
-    'look': 'Look', 'examine': 'Examine', 'go': 'Go', 'talk': 'Talk', 'take': 'Take', 'give': 'Give',
+    'look': 'Look', 'examine': 'Examine', 'go': 'Go', 'talk': 'Talk', 'take': 'Take', 'drop': 'Drop', 'give': 'Give',
     'show': 'Show', 'use': 'Use', 'think': 'Think', 'wait': 'Wait', 'inventory': 'Inventory',
 }
-VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
+VERB_ORDER = ('look', 'examine', 'go', 'talk', 'take', 'drop', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 EFFECT_KEYS = ('set', 'clear', 'add', 'move', 'give', 'take', 'place', 'room', 'introduce')
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')     # a person in text: {C02}, rendered by what the player knows
 SHORT_CUT = re.compile(
