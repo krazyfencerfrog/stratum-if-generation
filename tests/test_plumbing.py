@@ -2501,6 +2501,90 @@ def stage_b_room_topology_reciprocity_and_scc_invariants():
         check('no return path to starting hub' in str(e), f'SoftReject missing return path complaint: {e}')
 
 
+@test
+def balanced_dilemma_representation_and_nameless_group_invariants():
+    import checks
+    import main as gen_main
+    from errors import SoftReject
+
+    # 1. validate_cast flags unrepresented competing dilemma sectors
+    dilemma_turns = [
+        {'id': 1, 'situation': 'The drone leaks outside Sector 7.', 'what_you_must_do': 'fix core',
+         'ways_through': [{'way': 'seal it', 'cost': 'time'}], 'involves': ['the drone']},
+        {'id': 2, 'situation': 'Stress fracture above Sector 4.', 'what_you_must_do': 'stop fracture',
+         'ways_through': [{'way': 'vent Sector 4', 'cost': 'lives'}, {'way': 'hold core', 'cost': 'air'}],
+         'involves': ['the sector leader of Sector 4']},
+    ]
+    asymmetric_seeds = [
+        {'role': 'the drone', 'kind': 'individual'},
+        {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
+    ]
+    issues = checks.validate_cast(asymmetric_seeds, dilemma_turns)
+    check(len(issues) == 1 and 'Sector 7' in issues[0], f'expected Sector 7 dilemma finding: {issues}')
+
+    balanced_seeds = [
+        {'role': 'the drone', 'kind': 'individual'},
+        {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
+        {'role': 'the engineer in Sector 7', 'kind': 'individual'},
+    ]
+    check(checks.validate_cast(balanced_seeds, dilemma_turns) == [], 'balanced cast should pass without issues')
+
+    # check_story notes unrepresented dilemma poles
+    fake_story = {
+        'lines': {'T1': {'path': ['N01']}}, 'nodes': {'N01': {'beat': 'opening', 'turn': 1, 'way': 1, 'who': ['C01'], 'where': ['L01']}},
+        'framework': {'beats': [{'id': 'opening', 'required': True}]},
+        'characters': {'C01': {'label': 'the sector leader of Sector 4', 'kind': 'individual', 'nodes': ['N01']}},
+        'locations': {'L01': {'name': 'the core', 'why': 'reason', 'nodes': ['N01']}},
+        'premise': {'turns': dilemma_turns, 'cast_seeds': asymmetric_seeds},
+    }
+    notes = [f['issue'] for f in checks.check_story(fake_story)['notes'] if f.get('kind') == 'unrepresented_dilemma_pole']
+    check(len(notes) == 1 and 'Sector 7' in notes[0], f'check_story should note unrepresented dilemma pole: {notes}')
+
+    # 2. validate_turns catches faceless collective victim nouns
+    faceless_turns = {
+        'turns': [
+            {'situation': 'Trouble in core.', 'what_you_must_do': 'choose', 'involves': ['the overseer'], 'form': 'choose_whom',
+             'ways_through': [{'way': 'vent the sector whose people are weakest', 'cost': 'lives'},
+                              {'way': 'hold margin', 'cost': 'core'}]},
+            {'situation': 'Stabilizing.', 'what_you_must_do': 'endure', 'involves': ['the overseer'], 'form': 'endure',
+             'ways_through': [{'way': 'wait', 'cost': 'wear'}]}
+        ]
+    }
+    try:
+        gen_main.StoryGenerator.validate_turns(faceless_turns, check_forms=True)
+        check(False, 'expected validate_turns to reject faceless collective noun')
+    except SoftReject as e:
+        check('faceless collective noun' in str(e), f'expected faceless complaint: {e}')
+
+    # 3. OutlineBuilder.plan_divergence catches faceless collective nouns and unrepresented groups
+    b = builder({'s4a_i1': plan(MAIN)})
+
+    # Test divergence with faceless noun
+    div_faceless = branch('N02', [entry('commitment')], rejoin='N04')
+    div_faceless['beats'][0]['adapted'] = 'you vent the sector whose people are weakest and leave them behind'
+    b.gen.answers['s4c_i2'] = div_faceless
+    b.gen.soft = None
+    b.divergence(2, {'diverges_at': 'N02'})
+    check(b.gen.soft and 'faceless collective noun' in b.gen.soft, f'SoftReject missing faceless noun: {b.gen.soft}')
+
+    # Test divergence shifting sacrifice to unrepresented Sector 7
+    div_unrep = branch('N02', [entry('commitment')], rejoin='N04')
+    div_unrep['beats'][0]['adapted'] = 'you mark Sector 7 for venting and bleed its air into the core'
+    b.gen.answers['s4c_i2'] = div_unrep
+    b.gen.soft = None
+    b.divergence(2, {'diverges_at': 'N02'})
+    check(b.gen.soft and 'Sector 7' in b.gen.soft and 'no character in the cast represents this group' in b.gen.soft,
+          f'SoftReject missing unrepresented group: {b.gen.soft}')
+
+    # Test divergence shifting sacrifice to represented cast member ('the life-support overseer')
+    div_rep = branch('N02', [entry('commitment')], rejoin='N04')
+    div_rep['beats'][0]['adapted'] = 'you sacrifice the life-support overseer to seal the airlock'
+    b.gen.answers['s4c_i2'] = div_rep
+    b.gen.soft = None
+    b.divergence(2, {'diverges_at': 'N02'})
+    check(b.gen.soft is None, f'divergence targeting represented cast member should not SoftReject: {b.gen.soft}')
+
+
 # ---------------------------------------------------------------- runner
 
 

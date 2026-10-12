@@ -73,7 +73,7 @@ setups: one or two things planted early that come back at the crisis and decide 
 rules: one entry for each magic, curse, bargain, oath, contract or mechanism the story runs on: the thing, its terms, and if_broken. Empty when the story runs on none.
 $$TERM_RULES$$
 
-mediation: the load-bearing field. Restate the decision axis as the question at stake. Then, for each pole, what the player has to DO in the world to bring it about, and what it costs. Then the levers: the people, objects, facts, and authorities that stand between the protagonist and either answer. Each lever will be placed somewhere or embodied by someone later, so name them as things that can exist. Serves 3-0a.primary_decision_axis.
+mediation: the load-bearing field. Restate the decision axis as the question at stake. Then, for each pole, what the player has to DO in the world to bring it about, and what it costs. Then the levers: the people, objects, facts, and authorities that stand between the protagonist and either answer. Each lever will be placed somewhere or embodied by someone later, so name them as things that can exist. When the decision axis contrasts competing factions, sectors, communities, or groups (triage, survival of one group vs another, rival families), name levers or representatives from BOTH competing sides: a moral choice between two factions requires both factions to be embodied, never one personified group against an abstract collective. Serves 3-0a.primary_decision_axis.
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys:

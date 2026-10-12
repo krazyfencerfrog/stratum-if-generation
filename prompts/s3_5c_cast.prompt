@@ -3,11 +3,12 @@ You are the cast-sketch step of an interactive fiction generation system. An ear
 
 RULES
  1. One cast seed for EVERY role in the list "ROLES THE TURNS NAME" below, with the role copied exactly as written there. Do not rename, merge or drop a listed role.
- 2. Add a seed beyond that list only when one is needed to satisfy rule 3 or rule 4.
+ 2. Add a seed beyond that list only when one is needed to satisfy rule 3, rule 4, or rule 4a.
  3. kind is "individual" or "crowd". A crowd (a crew, the families, the millhands) is never someone the player talks to: every crowd needs an individual seed whose speaks_for is the crowd's role, copied exactly. If a listed crowd has nobody who speaks for it, add that individual.
  3a. being says what this cast member is, one of:
 $$TERM_BEINGS$$
  4. opposition is true for each individual through whom the engine's opposition acts, false for everyone else. If the opposition is a person, that person has a seed. If it is a faction or an institution, the individual who runs it or speaks for it has one. If it is not a human agency at all (weather, distance, the protagonist's own failing body), nobody is marked.
+ 4a. BALANCED REPRESENTATION ACROSS DILEMMA POLES: If the dramatic turns pose trade-offs, triage, or conflict between competing groups, sectors, or factions (e.g. Sector 4 vs Sector 7), every competing group at stake must have at least one individual representative seed (with their own wants, voice, edge, and breaking point, or speaks_for naming that crowd). If the list of roles only personified one side, add an individual representative for the alternative side. Never leave one side of a moral dilemma personified while leaving the opposing side as an unrepresented, faceless collective.
  5. wants: what this person or group wants in this story, in their own interest, in one clause. Not "to help you" and not "to stop you".
  6. holds: what they have that the turns turn on: knowledge, authority, an object, labor, a vote, someone's trust. One clause.
  7. edge (individuals; null for a crowd): the one thing that makes this person more than their want, in one clause: a contradiction ("resents you for the ring and is the one who checks your rigging every night"), a flaw that costs them, or something they hide. If the engine states a hidden_truth and this person knows it, the edge says what they do about knowing it.

@@ -45,6 +45,7 @@ from brief import (build_brief, brief_lines, constraint_fields, kernel_clauses,
 from stats import RunStats, call_profile, sampler_for, step_of, SCHEMA_VERSION
 import frameworks
 import schemas
+import checks
 from outline import OutlineBuilder, compact_json, norm
 from craft_checks import spine_findings
 import evaluate
@@ -920,6 +921,16 @@ class StoryGenerator:
             ways = t.get('ways_through')
             if not isinstance(ways, list) or not all(isinstance(w, dict) and w.get('way') for w in ways):
                 problems.append(f'turn {i + 1}: ways_through must be a list of {{"way", "cost"}} objects')
+            elif check_forms:
+                for w in ways:
+                    if isinstance(w, dict):
+                        w_text = f"{w.get('way', '')} {w.get('cost', '')}"
+                        fm = checks.FACELESS_GROUP_RE.search(w_text)
+                        if fm:
+                            bad_forms.append(
+                                f"turn {i + 1}: ways_through uses a faceless collective noun as a dilemma pole/sacrifice ({fm.group(0)!r}); "
+                                f"name the specific competing group/sector and ensure its representative is listed in involves"
+                            )
             involves = t.get('involves')
             involves = involves if isinstance(involves, list) else ([involves] if involves else [])
             t['involves'] = [str(r).strip() for r in involves if str(r).strip()]
@@ -1019,11 +1030,17 @@ class StoryGenerator:
                                 f"{'; '.join(copied[:4])}); write this story's own people")
             if problems:
                 raise ValueError('; '.join(problems))
+            soft = []
             plotty = [s['role'] for s in seeds if norm(s['role']) not in wanted and FUNCTION_ROLE.search(str(s['role']))]
             if plotty:
-                raise SoftReject(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
-                                 f'Name each by what a reader would see or be told: an occupation, a relation, a '
-                                 f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
+                soft.append(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
+                            f'Name each by what a reader would see or be told: an occupation, a relation, a '
+                            f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
+            cast_issues = checks.validate_cast(seeds, turns)
+            if cast_issues:
+                soft.extend(cast_issues)
+            if soft:
+                raise SoftReject('; '.join(soft))
         return validate
 
     @staticmethod

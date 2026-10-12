@@ -37,6 +37,23 @@ def speaks_for(character, crowd):
 
 MENU_TRIGGER_RE = re.compile(r'^\s*you\s+(choose|chose|decide|decided|pick|picked|select|selected|opt|opted)\b', re.IGNORECASE)
 
+SECTOR_GROUP_RE = re.compile(
+    r'\b(?:sector|district|ward|block|deck|bay|vault|zone|squad|unit|division|clan|house)\s+([0-9]+|[a-z]\b)',
+    re.IGNORECASE
+)
+
+FACTION_GROUP_RE = re.compile(
+    r'\b(?:the\s+)?([A-Za-z0-9_\'-]+)\s+(?:faction|clan|guild|tribe|syndicate|union)\b',
+    re.IGNORECASE
+)
+
+FACELESS_GROUP_RE = re.compile(
+    r'\b(?:the\s+)?(?:other|nameless|weakest|unnamed|remaining|rest of the)\s+(?:sector|district|ward|block|deck|bay|vault|zone|faction|crew|family|miners|people|group|colonists|citizens|inhabitants)\b'
+    r'|\b(?:the\s+)?(?:sector|district|ward|block|deck|bay|vault|zone|faction|group|people)\s+whose\s+people\b'
+    r'|\b(?:the\s+)?(?:sector|district|ward|block|deck|bay|vault|zone|faction|group)\s+whose\s+(?:air|water|food|lives|margin|weakest)\b',
+    re.IGNORECASE
+)
+
 
 def as_list(value):
     if value is None:
@@ -44,6 +61,69 @@ def as_list(value):
     if isinstance(value, list):
         return value
     return [value]
+
+
+def competing_groups_in_turns(turns):
+    """Detects distinct groups, sectors, or factions referenced across turns.
+    Returns a dict mapping normalized group key -> display label (e.g. 'sector 4' -> 'Sector 4').
+    Only returns groups when 2 or more distinct groups of the same family are found, indicating
+    competing dilemma poles or trade-offs."""
+    sectors = {}
+    factions = {}
+    for t in as_list(turns):
+        texts = [t.get('situation', ''), t.get('what_you_must_do', '')]
+        for w in t.get('ways_through') or []:
+            if isinstance(w, dict):
+                texts.extend([w.get('way', ''), w.get('cost', '')])
+        for inv in t.get('involves') or []:
+            texts.append(str(inv))
+        for text in texts:
+            if not text:
+                continue
+            for m in SECTOR_GROUP_RE.finditer(text):
+                lbl = m.group(0).strip()
+                sectors[norm(lbl)] = lbl
+            for m in FACTION_GROUP_RE.finditer(text):
+                lbl = m.group(0).strip()
+                factions[norm(lbl)] = lbl
+
+    res = {}
+    if len(sectors) >= 2:
+        res.update(sectors)
+    if len(factions) >= 2:
+        res.update(factions)
+    return res
+
+
+def validate_cast(cast_seeds, turns):
+    """Checks that the cast represents all competing groups, sectors, or factions
+    referenced in dramatic turns, avoiding asymmetric dilemmas where one side is
+    personified and the competing side is an unrepresented collective."""
+    groups = competing_groups_in_turns(turns)
+    problems = []
+    if groups:
+        seeds = as_list(cast_seeds)
+        for g_norm, g_label in groups.items():
+            represented = False
+            for s in seeds:
+                if not isinstance(s, dict):
+                    continue
+                role = norm(s.get('role', '')) or norm(s.get('label', ''))
+                speaks = norm(s.get('speaks_for', ''))
+                name = norm(s.get('name', ''))
+                wants = norm(s.get('wants', ''))
+                holds = norm(s.get('holds', ''))
+                tie = norm(s.get('tie', ''))
+                if (g_norm in role or g_norm in speaks or g_norm in name or
+                        g_norm in wants or g_norm in holds or g_norm in tie):
+                    represented = True
+                    break
+            if not represented:
+                problems.append(
+                    f"competing dilemma group/sector {g_label!r} is referenced in turns but has no representative "
+                    f"in the cast (must appear in role or speaks_for of a cast seed)"
+                )
+    return problems
 
 
 def beat_order(story):
@@ -366,6 +446,9 @@ def check_story(story):
             reps = [r for r, o in chars.items() if speaks_for(o, c)]
             if not reps:
                 findings.append(_finding('crowd_without_representative', f"the crowd {c.get('label')} has no individual who speaks for it"))
+    cast_issues = validate_cast(story.get('premise', {}).get('cast_seeds', []) or list(chars.values()), premise_turns(story))
+    for issue in cast_issues:
+        notes.append(_finding('unrepresented_dilemma_pole', issue))
     usage = derive_usage(story)
     unused_c = [chars[c].get('label') for c, used in usage['characters'].items() if not used and c in chars and chars[c].get('kind') != 'crowd']
     unused_l = [locs[l].get('name') for l, used in usage['locations'].items() if not used and l in locs]
