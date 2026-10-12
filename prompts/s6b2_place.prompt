@@ -26,6 +26,7 @@ For each room:
      * When there is a physical threshold, barrier, or distinct portal (a heavy door, a hatch, a ladder, a dark passage, elevation change): exactly ONE concise sentence (10-25 words) describing the physical act or sensation of crossing (the sound of the latch, ducking under pipes, the temperature shift, footing on the rungs).
      * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
      * For a simple open doorway, adjoining alcove, or unobstructed space with no threshold: use null. Never invent filler ("You make your way to...").
+   - one_way: optional boolean (default false). Internal location exits are bidirectional by default; set to true ONLY for physical one-way barriers (a chute, steep drop, or locked one-way gate). Every room in the location must remain reachable from and have a path back to the starting room.
 
 Build only THIS location. other_locations are built separately and
 rooms_already_built exist: never make a room with one of those names. A
@@ -60,7 +61,8 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
                        "prompt_summary": "<dense multimodal prompt>"}}],
   "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>",
              "text": "<one concise sentence for physical threshold transit, or null if open doorway>",
-             "back_text": "<one concise sentence for return transit, or null if open doorway>"}],
+             "back_text": "<one concise sentence for return transit, or null if open doorway>",
+             "one_way": false}],
   "objects": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": false, "story": false}]
 }
 

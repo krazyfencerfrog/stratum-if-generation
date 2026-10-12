@@ -2397,6 +2397,110 @@ def exit_transitions_and_movement_feedback():
         pass
 
 
+@test
+def stage_b_room_topology_reciprocity_and_scc_invariants():
+    import world
+    from errors import SoftReject
+
+    class Gen:
+        kernel = 'A stormy night at sea.'
+        analysis = {}
+
+    # 1. SCC calculation
+    # A single cycle: A -> B -> C -> A
+    cycle_adj = {'A': ['B'], 'B': ['C'], 'C': ['A']}
+    sccs = world.strongly_connected_components(cycle_adj)
+    check(len(sccs) == 1 and sccs[0] == {'A', 'B', 'C'}, f'cycle SCC mismatch: {sccs}')
+
+    # Disjoint clusters: A <-> B and C <-> D
+    disjoint_adj = {'A': ['B'], 'B': ['A'], 'C': ['D'], 'D': ['C']}
+    sccs_disjoint = world.strongly_connected_components(disjoint_adj)
+    check(len(sccs_disjoint) == 2, f'expected 2 SCCs for disjoint graph, got {len(sccs_disjoint)}')
+
+    # Directed non-reciprocal: A <-> B with one-way B -> C (<-> D)
+    dag_adj = {'A': ['B'], 'B': ['A', 'C'], 'C': ['D'], 'D': ['C']}
+    sccs_dag = world.strongly_connected_components(dag_adj)
+    check(len(sccs_dag) == 2 and any(s == {'A', 'B'} for s in sccs_dag) and any(s == {'C', 'D'} for s in sccs_dag),
+          f'expected 2 SCCs for DAG graph: {sccs_dag}')
+
+    # 2. Location topology check: check_location_topology
+    rooms = [{'name': 'the helm'}, {'name': 'the chart room'}, {'name': 'the hold'}]
+    # Reciprocal chain: helm <-> chart room <-> hold
+    exits_reciprocal = [
+        {'from': 'the helm', 'to': 'the chart room'},
+        {'from': 'the chart room', 'to': 'the hold'}
+    ]
+    check(world.check_location_topology(rooms, exits_reciprocal) == [], 'reciprocal layout should have no issues')
+
+    # One-way exit creates a trap room: chart room -> hold (one_way)
+    exits_oneway_trap = [
+        {'from': 'the helm', 'to': 'the chart room'},
+        {'from': 'the chart room', 'to': 'the hold', 'one_way': True}
+    ]
+    trap_issues = world.check_location_topology(rooms, exits_oneway_trap)
+    check(any('no return path to starting hub' in iss and 'the hold' in iss for iss in trap_issues),
+          f'expected hold trap issue: {trap_issues}')
+
+    # Disconnected/unreachable room
+    exits_disconnected = [{'from': 'the helm', 'to': 'the chart room'}]
+    disc_issues = world.check_location_topology(rooms, exits_disconnected)
+    check(any('not reachable from starting hub' in iss and 'the hold' in iss for iss in disc_issues),
+          f'expected unreachable hold issue: {disc_issues}')
+
+    # 3. link() enforces reciprocity by default, respects one_way
+    w = world.WorldBuilder.__new__(world.WorldBuilder)
+    w.world = {
+        'rooms': {
+            'r1': {'name': 'Room 1', 'exits': []},
+            'r2': {'name': 'Room 2', 'exits': []},
+            'r3': {'name': 'Room 3', 'exits': []},
+        },
+        'objects': {},
+    }
+    w.chars = {}
+    w.gen = Gen()
+    w.locations = {'L1': {'name': 'Location 1', 'kind': 'place'}}
+    w.location_rooms = {'L1': ['r1', 'r2', 'r3']}
+    w.plan = {'rooms': {'min': 1, 'max': 10}}
+
+    w.link('r1', 'r2', 'to r2', 'to r1')
+    check(any(x['to'] == 'r2' for x in w.world['rooms']['r1']['exits']), 'r1 -> r2 missing')
+    check(any(x['to'] == 'r1' for x in w.world['rooms']['r2']['exits']), 'r2 -> r1 reciprocal exit missing')
+
+    w.link('r2', 'r3', 'to r3', one_way=True)
+    check(any(x['to'] == 'r3' and x.get('one_way') for x in w.world['rooms']['r2']['exits']), 'r2 -> r3 one-way missing')
+    check(not any(x['to'] == 'r2' for x in w.world['rooms']['r3']['exits']), 'r3 -> r2 should not exist for one-way')
+
+    # 4. checks() flags lack of return path to starting hub
+    checks_findings = w.checks()
+    check(any('no path back to starting hub' in f and 'Room 3' in f for f in checks_findings),
+          f'checks() should flag Room 3 lacking return path to starting hub: {checks_findings}')
+
+    # 5. b2_validator raises SoftReject on non-returnable room layout
+    w.premise = {}
+    validator = w.b2_validator('L1')
+    bad_place = {
+        'notes': 'Two rooms with a trap chute.',
+        'rooms': [
+            {'name': 'the upper deck', 'description': 'The breezy wooden upper deck with brass rails and salt spray foaming white across the companionway.'},
+            {'name': 'the cargo hold', 'description': 'A deep dark hold full of salted cargo casks smelling of brine and hemp in the dark.'},
+        ],
+        'exits': [
+            {'from': 'the upper deck', 'to': 'the cargo hold', 'label': 'down the chute', 'one_way': True}
+        ],
+        'objects': [
+            {'name': f'item upper {i}', 'room': 'the upper deck', 'description': 'desc'} for i in range(4)
+        ] + [
+            {'name': f'item hold {i}', 'room': 'the cargo hold', 'description': 'desc'} for i in range(4)
+        ]
+    }
+    try:
+        validator(bad_place)
+        check(False, 'validator should SoftReject one-way layout without return path')
+    except SoftReject as e:
+        check('no return path to starting hub' in str(e), f'SoftReject missing return path complaint: {e}')
+
+
 # ---------------------------------------------------------------- runner
 
 

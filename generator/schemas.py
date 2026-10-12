@@ -25,6 +25,7 @@ B = {'type': 'boolean'}
 I = {'type': 'integer'}
 INT_OR_NULL = {'type': ['integer', 'null']}
 STR_OR_NULL = {'type': ['string', 'null']}
+BOOL_OR_NULL = {'type': ['boolean', 'null']}
 
 
 def obj(required=None, **props):
@@ -259,14 +260,16 @@ WORLD_CHARACTER = obj(
 WORLD_FUNCTIONAL = obj(note=S, people=arr(obj(who=S, description=S, here=S, topics=arr(obj(label=S, says=S)))))
 WORLD_PLACE = obj(
     notes=S, rooms=arr(obj(required=['name', 'description'], name=S, description=S, frame=FRAME_OR_NULL)),
-    exits=arr(obj(**{'from': S}, to=S, label=S, back_label=S, text=STR_OR_NULL, back_text=STR_OR_NULL)),
+    exits=arr(obj(required=['from', 'to', 'label'], **{'from': S}, to=S, label=S, back_label=STR_OR_NULL,
+                  text=STR_OR_NULL, back_text=STR_OR_NULL, one_way=BOOL_OR_NULL)),
     objects=arr(obj(name=S, room=S, description=S, portable=B, story=B)),
 )
 WORLD_MAP = obj(
     notes=S,
     connective=arr(obj(required=['name', 'description', 'examinable'],
                        name=S, description=S, examinable=arr(obj(name=S, description=S)), frame=FRAME_OR_NULL)),
-    adjacent=arr(obj(from_room=S, to_room=S, label=S, back_label=S, text=STR_OR_NULL, back_text=STR_OR_NULL)),
+    adjacent=arr(obj(required=['from_room', 'to_room', 'label'], from_room=S, to_room=S, label=S,
+                     back_label=STR_OR_NULL, text=STR_OR_NULL, back_text=STR_OR_NULL, one_way=BOOL_OR_NULL)),
 )
 WORLD_CONVERSATION = obj(notes=S, lines=arr(obj(subject=S, says=arr(VARIANT))))
 WORLD_YOU = obj(

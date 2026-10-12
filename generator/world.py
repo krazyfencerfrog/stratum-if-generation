@@ -63,6 +63,97 @@ def slug(text, taken=()):
     return sid
 
 
+def strongly_connected_components(adj):
+    """Tarjan's algorithm to compute strongly connected components of a directed graph.
+    adj: dict mapping node -> iterable of neighbor nodes.
+    Returns: list of sets, where each set contains node IDs in an SCC.
+    """
+    index = 0
+    indices = {}
+    lowlinks = {}
+    on_stack = set()
+    stack = []
+    sccs = []
+
+    def strongconnect(v):
+        nonlocal index
+        indices[v] = index
+        lowlinks[v] = index
+        index += 1
+        stack.append(v)
+        on_stack.add(v)
+
+        for w in adj.get(v, []):
+            if w not in indices:
+                strongconnect(w)
+                lowlinks[v] = min(lowlinks[v], lowlinks[w])
+            elif w in on_stack:
+                lowlinks[v] = min(lowlinks[v], indices[w])
+
+        if lowlinks[v] == indices[v]:
+            scc = set()
+            while True:
+                w = stack.pop()
+                on_stack.remove(w)
+                scc.add(w)
+                if w == v:
+                    break
+            sccs.append(scc)
+
+    for v in adj:
+        if v not in indices:
+            strongconnect(v)
+    return sccs
+
+
+def check_location_topology(rooms, exits):
+    """Verifies internal location room topology.
+    Returns a list of problems (unreachable rooms, or rooms with no return path to hub)."""
+    if len(rooms) <= 1:
+        return []
+    names = [r.get('name') for r in rooms if r.get('name')]
+    norm_names = {norm(n) for n in names}
+    hub = norm(names[0])
+    loc_adj = {n: [] for n in norm_names}
+    for e in exits:
+        u, v = norm(e.get('from')), norm(e.get('to'))
+        if u in loc_adj and v in loc_adj:
+            loc_adj[u].append(v)
+            if not e.get('one_way'):
+                loc_adj[v].append(u)
+
+    # 1. Forward reachability from hub
+    seen_from_hub, todo = set(), [hub]
+    while todo:
+        curr = todo.pop()
+        if curr in seen_from_hub:
+            continue
+        seen_from_hub.add(curr)
+        todo.extend(loc_adj.get(curr, []))
+
+    # 2. Backward reachability to hub (reverse graph)
+    rev_adj = {n: [] for n in norm_names}
+    for u, neighbors in loc_adj.items():
+        for v in neighbors:
+            rev_adj[v].append(u)
+    seen_to_hub, todo = set(), [hub]
+    while todo:
+        curr = todo.pop()
+        if curr in seen_to_hub:
+            continue
+        seen_to_hub.add(curr)
+        todo.extend(rev_adj.get(curr, []))
+
+    issues = []
+    unreachable = [n for n in names if norm(n) not in seen_from_hub]
+    if unreachable:
+        issues.append(f"rooms not reachable from starting hub {names[0]!r}: {unreachable}")
+    no_return = [n for n in names if norm(n) not in seen_to_hub]
+    if no_return:
+        issues.append(f"rooms with no return path to starting hub {names[0]!r}: {no_return}")
+    return issues
+
+
 # ---------------------------------------------------------------- variants
 
 def compile_variants(variants, states, nodes, problems, where):
@@ -403,10 +494,9 @@ class WorldBuilder:
                                 f"{EXAMINABLE_PER_ROOM[1]}, two or three that matter to the story and the rest saying "
                                 f"something about a person or the place's history")
             if len(rooms) > 1:
-                linked = {norm(e.get('from')) for e in as_list(parsed.get('exits'))} | {norm(e.get('to')) for e in as_list(parsed.get('exits'))}
-                lonely = [r['name'] for r in rooms if norm(r['name']) not in linked]
-                if lonely:
-                    soft.append(f'rooms with no exit inside the location: {lonely}')
+                topo_issues = check_location_topology(rooms, as_list(parsed.get('exits')))
+                if topo_issues:
+                    soft.append('; '.join(topo_issues))
             kernel = getattr(self.gen, 'kernel', '')
             items = [(o.get('name'), o.get('name')) for o in things]
             paper_hits = paper.heavy(items, kernel)
@@ -442,7 +532,8 @@ class WorldBuilder:
         for e in as_list(answer.get('exits')):
             a, b = by_name.get(norm(e.get('from'))), by_name.get(norm(e.get('to')))
             if a and b:
-                self.link(a, b, e.get('label'), e.get('back_label'), e.get('text'), e.get('back_text'))
+                self.link(a, b, e.get('label'), e.get('back_label'), e.get('text'), e.get('back_text'),
+                          one_way=bool(e.get('one_way')))
         made = {norm(o['name']) for o in self.world['objects'].values()}
         for o in as_list(answer.get('objects')):
             if not isinstance(o, dict) or not o.get('name'):
@@ -458,18 +549,36 @@ class WorldBuilder:
                 'story': bool(o.get('story'))}
         self.location_rooms[lid] = list(dict.fromkeys(by_name.values()))
 
-    def link(self, a, b, label=None, back=None, text=None, back_text=None):
+    def link(self, a, b, label=None, back=None, text=None, back_text=None, one_way=False):
         rooms = self.world['rooms']
-        if not any(x['to'] == b for x in rooms[a]['exits']):
+        ex_ab = next((x for x in rooms[a]['exits'] if x['to'] == b), None)
+        if not ex_ab:
             ex = {'to': b, 'label': label or f"to {rooms[b]['name']}"}
             if text and str(text).strip():
                 ex['text'] = str(text).strip()
+            if one_way:
+                ex['one_way'] = True
             rooms[a]['exits'].append(ex)
-        if not any(x['to'] == a for x in rooms[b]['exits']):
-            ex = {'to': a, 'label': back or f"to {rooms[a]['name']}"}
-            if back_text and str(back_text).strip():
-                ex['text'] = str(back_text).strip()
-            rooms[b]['exits'].append(ex)
+        else:
+            if label and not ex_ab.get('label'):
+                ex_ab['label'] = label
+            if text and str(text).strip() and not ex_ab.get('text'):
+                ex_ab['text'] = str(text).strip()
+            if one_way:
+                ex_ab['one_way'] = True
+
+        if not one_way:
+            ex_ba = next((x for x in rooms[b]['exits'] if x['to'] == a), None)
+            if not ex_ba:
+                ex = {'to': a, 'label': back or f"to {rooms[a]['name']}"}
+                if back_text and str(back_text).strip():
+                    ex['text'] = str(back_text).strip()
+                rooms[b]['exits'].append(ex)
+            else:
+                if back and not ex_ba.get('label'):
+                    ex_ba['label'] = back
+                if back_text and str(back_text).strip() and not ex_ba.get('text'):
+                    ex_ba['text'] = str(back_text).strip()
 
     def b2_map(self):
         """Which locations adjoin, and the connective places between them."""
@@ -502,6 +611,42 @@ class WorldBuilder:
                                     f"something worth examining that contributes to the story's feel")
             if problems:
                 raise ValueError('; '.join(problems))
+            cand_names = set(room_names) | {norm(c['name']) for c in as_list(parsed.get('connective')) if c.get('name')}
+            cand_adj = {n: [] for n in cand_names}
+            for rid, r in self.world['rooms'].items():
+                u = norm(r['name'])
+                for ex in r.get('exits', []):
+                    dest_r = self.world['rooms'].get(ex['to'])
+                    if dest_r:
+                        cand_adj[u].append(norm(dest_r['name']))
+            for a in as_list(parsed.get('adjacent')):
+                u, v = norm(a.get('from_room')), norm(a.get('to_room'))
+                if u in cand_adj and v in cand_adj:
+                    cand_adj[u].append(v)
+                    if not a.get('one_way'):
+                        cand_adj[v].append(u)
+            undir = {n: set(cand_adj[n]) for n in cand_names}
+            for u in cand_adj:
+                for v in cand_adj[u]:
+                    undir[v].add(u)
+            seen_undir = set()
+            clusters = []
+            for n in cand_names:
+                if n not in seen_undir:
+                    cluster = set()
+                    todo = [n]
+                    while todo:
+                        curr = todo.pop()
+                        if curr in cluster:
+                            continue
+                        cluster.add(curr)
+                        seen_undir.add(curr)
+                        todo.extend(undir.get(curr, set()) - cluster)
+                    clusters.append(cluster)
+            if len(clusters) > 1:
+                problems.append(f"map topology has {len(clusters)} disconnected room clusters; all locations must join")
+            if problems:
+                raise ValueError('; '.join(problems))
         answer = self.gen.run_prompt('s6b2_map', 'map', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
         }, prompt_file='s6b2m_map.prompt', validator=validate, klass='build', schema=schemas.WORLD_MAP)
@@ -514,7 +659,8 @@ class WorldBuilder:
         for a in as_list(answer.get('adjacent')):
             x, y = room_names.get(norm(a.get('from_room'))), room_names.get(norm(a.get('to_room')))
             if x and y and x != y:
-                self.link(x, y, a.get('label'), a.get('back_label'), a.get('text'), a.get('back_text'))
+                self.link(x, y, a.get('label'), a.get('back_label'), a.get('text'), a.get('back_text'),
+                          one_way=bool(a.get('one_way')))
 
     # ------------------------------------------------------------ B1c
 
@@ -682,6 +828,7 @@ class WorldBuilder:
         findings = []
         rooms = self.world['rooms']
         if rooms:
+            adj = {r: [e['to'] for e in rooms[r].get('exits', []) if e['to'] in rooms] for r in rooms}
             start = next(iter(rooms))
             seen, todo = set(), [start]
             while todo:
@@ -689,10 +836,44 @@ class WorldBuilder:
                 if r in seen:
                     continue
                 seen.add(r)
-                todo += [e['to'] for e in rooms[r]['exits']]
+                todo += adj.get(r, [])
             lost = [rooms[r]['name'] for r in rooms if r not in seen]
             if lost:
                 findings.append(f'rooms no exit reaches: {lost}')
+
+            sccs = strongly_connected_components(adj)
+            if len(sccs) > 1:
+                has_one_way = any(e.get('one_way') for r in rooms for e in rooms[r].get('exits', []))
+                scc_names = [[rooms[r]['name'] for r in c] for c in sccs]
+                if not has_one_way:
+                    findings.append(f'room topology has {len(sccs)} disconnected strongly connected components: {scc_names}')
+                else:
+                    sink_sccs = [c for c in sccs if not any(dest not in c for r in c for dest in adj.get(r, []))]
+                    if len(sink_sccs) > 1:
+                        sink_names = [[rooms[r]['name'] for r in c] for c in sink_sccs]
+                        findings.append(f'room topology has {len(sink_sccs)} dead-end sink components: {sink_names}')
+
+            for lid, rids in self.location_rooms.items():
+                valid_rids = [r for r in rids if r in rooms]
+                if len(valid_rids) > 1:
+                    hub = valid_rids[0]
+                    loc_set = set(valid_rids)
+                    loc_rev_adj = {r: [] for r in valid_rids}
+                    for r in valid_rids:
+                        for e in rooms[r].get('exits', []):
+                            if e.get('to') in loc_set:
+                                loc_rev_adj[e['to']].append(r)
+                    can_reach_hub, todo = set(), [hub]
+                    while todo:
+                        curr = todo.pop()
+                        if curr in can_reach_hub:
+                            continue
+                        can_reach_hub.add(curr)
+                        todo.extend(loc_rev_adj.get(curr, []))
+                    no_hub_path = [rooms[r]['name'] for r in valid_rids if r not in can_reach_hub]
+                    if no_hub_path:
+                        loc_title = self.locations[lid]['name'] if isinstance(self.locations.get(lid), dict) and 'name' in self.locations[lid] else str(lid)
+                        findings.append(f"rooms in location {loc_title!r} have no path back to starting hub {rooms[hub]['name']!r}: {no_hub_path}")
         target = self.plan['rooms']
         if not target['min'] <= len(rooms) <= target['max']:
             findings.append(f"{len(rooms)} rooms against a target of {target['min']}-{target['max']}")

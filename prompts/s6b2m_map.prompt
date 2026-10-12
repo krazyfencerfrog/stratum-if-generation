@@ -11,6 +11,7 @@ the landing).
    - text / back_text: transitional prose for moving between the spaces.
      * Connective routes and cross-location boundaries are physical passages (stairs, yards, alleys, fire doors, weather thresholds): provide exactly ONE concise sentence (10-25 words) describing the physical act or sensation of passing through (the draught, the footing, rain, the sound of the gate or door).
      * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
+   - one_way: optional boolean (default false). Set to true only for physical one-way barriers (e.g. a high drop, chute, or one-way security door). All locations must remain reachable from the story's start.
  - connective: places to add between locations where the geography wants
    them. Add them fairly freely, but never as empty skeletons: each needs a
    description of three or four specific sentences that contributes to the
@@ -35,7 +36,8 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "adjacent": [{"from_room": "<room or connective place>", "to_room": "<room or connective place>",
                 "label": "<from -> to>", "back_label": "<to -> from>",
                 "text": "<one concise sentence describing the physical crossing>",
-                "back_text": "<one concise sentence describing the return crossing>"}]
+                "back_text": "<one concise sentence describing the return crossing>",
+                "one_way": false}]
 }
 
 EXAMPLE (a late-night radio phone-in story; for shape only)
