@@ -48,6 +48,7 @@ import schemas           # noqa: E402
 import stats as stats_mod  # noqa: E402
 from llm_client import LlmCallError   # noqa: E402
 from ollama_client import OllamaClient  # noqa: E402
+from agy_client import AgyClient        # noqa: E402
 
 TESTS = []
 used_prompts = set()
@@ -2185,6 +2186,75 @@ def ollama_client_against_fake_server():
         check('server version' in out and 'recommended client settings' in out, f'probe output:\n{out[-2000:]}')
     finally:
         server.shutdown()
+
+
+@test
+def agy_client_unit_test():
+    from unittest.mock import patch, MagicMock
+    import main as main_mod
+
+    # 1. Model and effort resolution logic
+    c_pro = AgyClient(model="gemini-3.1-pro-high", echo=False)
+    m, eff = c_pro._resolve_model_and_effort(think=False)
+    check(m == "gemini-3.1-pro-low" and eff is None, f"think=False mapping: {m}, {eff}")
+    m, eff = c_pro._resolve_model_and_effort(think=True)
+    check(m == "gemini-3.1-pro-high" and eff is None, f"think=True mapping: {m}, {eff}")
+
+    c_default = AgyClient(model="", echo=False)
+    c_default.model = None
+    m, eff = c_default._resolve_model_and_effort(think=False)
+    check(m is None and eff == "low", f"default think=False mapping: {m}, {eff}")
+    m, eff = c_default._resolve_model_and_effort(think=True)
+    check(m is None and eff == "high", f"default think=True mapping: {m}, {eff}")
+
+    # 2. Mocked subprocess execution
+    fake_payload = {
+        "status": "SUCCESS",
+        "response": '{"answer": "ok"}',
+        "duration_seconds": 1.25,
+        "structured_output": {"answer": "ok"},
+        "usage": {
+            "input_tokens": 150,
+            "output_tokens": 25,
+            "thinking_tokens": 20,
+            "total_tokens": 175,
+        }
+    }
+    mock_proc = MagicMock()
+    mock_proc.returncode = 0
+    mock_proc.stdout = json.dumps(fake_payload)
+    mock_proc.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_proc) as mock_run:
+        client = AgyClient(model="gemini-3.1-pro-high", echo=False)
+        schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
+        thinking, response = client.run_prompt("test prompt", format=schema, think=True)
+
+        check(response == '{"answer": "ok"}', f"response mismatch: {response}")
+        check("[Agy thinking tokens: 20]" in thinking, f"thinking mismatch: {thinking}")
+        check(client.last_call['prompt_tokens'] == 150, "prompt_tokens")
+        check(client.last_call['output_tokens'] == 25, "output_tokens")
+        check(client.last_call['thinking_tokens'] == 20, "thinking_tokens")
+        check(client.last_call['format_sent'] is True, "format_sent")
+        check(mock_run.called, "subprocess.run not called")
+
+        args, kwargs = mock_run.call_args
+        cmd = args[0]
+        check("--json-schema" in cmd, "json-schema not in cmd")
+        check("--model" in cmd and "gemini-3.1-pro-high" in cmd, "model not in cmd")
+        check(kwargs['input'] == "test prompt", "input not passed to stdin")
+
+    # 3. get_client() dispatching
+    old_client_env = os.environ.get("STRATUM_CLIENT")
+    try:
+        os.environ["STRATUM_CLIENT"] = "agy"
+        cl = main_mod.get_client()
+        check(isinstance(cl, AgyClient), f"expected AgyClient, got {type(cl)}")
+    finally:
+        if old_client_env is not None:
+            os.environ["STRATUM_CLIENT"] = old_client_env
+        else:
+            os.environ.pop("STRATUM_CLIENT", None)
 
 
 @test
