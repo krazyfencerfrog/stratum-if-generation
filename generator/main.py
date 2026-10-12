@@ -952,6 +952,18 @@ class StoryGenerator:
             bad_forms += [problem for _, problem, _ in repeated_turns(turns)]
         if bad_forms and check_forms:
             raise SoftReject('; '.join(bad_forms))
+        bad_involves = []
+        for i, t in enumerate(turns):
+            for r in t.get('involves') or []:
+                if checks.is_non_agent_role(r):
+                    bad_involves.append(
+                        f"turn {i + 1}: involves contains non-agent tool/object {r!r}. "
+                        f"Only dramatic agents (people, creatures, or beings with interpersonal agency) "
+                        f"may be listed in involves. Tools, vehicles, and consumable props belong in situation "
+                        f"and ways_through, not involves"
+                    )
+        if bad_involves and check_forms:
+            raise SoftReject('; '.join(bad_involves))
         plotty = sorted({r for t in turns for r in t['involves'] if FUNCTION_ROLE.search(r)})
         if plotty and not check_forms:
             plotty = []

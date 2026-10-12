@@ -2510,20 +2510,20 @@ def balanced_dilemma_representation_and_nameless_group_invariants():
     # 1. validate_cast flags unrepresented competing dilemma sectors
     dilemma_turns = [
         {'id': 1, 'situation': 'The drone leaks outside Sector 7.', 'what_you_must_do': 'fix core',
-         'ways_through': [{'way': 'seal it', 'cost': 'time'}], 'involves': ['the drone']},
+         'ways_through': [{'way': 'seal it', 'cost': 'time'}], 'involves': ['the drone technician']},
         {'id': 2, 'situation': 'Stress fracture above Sector 4.', 'what_you_must_do': 'stop fracture',
          'ways_through': [{'way': 'vent Sector 4', 'cost': 'lives'}, {'way': 'hold core', 'cost': 'air'}],
          'involves': ['the sector leader of Sector 4']},
     ]
     asymmetric_seeds = [
-        {'role': 'the drone', 'kind': 'individual'},
+        {'role': 'the drone technician', 'kind': 'individual'},
         {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
     ]
     issues = checks.validate_cast(asymmetric_seeds, dilemma_turns)
     check(len(issues) == 1 and 'Sector 7' in issues[0], f'expected Sector 7 dilemma finding: {issues}')
 
     balanced_seeds = [
-        {'role': 'the drone', 'kind': 'individual'},
+        {'role': 'the drone technician', 'kind': 'individual'},
         {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
         {'role': 'the engineer in Sector 7', 'kind': 'individual'},
     ]
@@ -2583,6 +2583,102 @@ def balanced_dilemma_representation_and_nameless_group_invariants():
     b.gen.soft = None
     b.divergence(2, {'diverges_at': 'N02'})
     check(b.gen.soft is None, f'divergence targeting represented cast member should not SoftReject: {b.gen.soft}')
+
+
+@test
+def non_agent_entity_and_consumable_prop_cast_invariants():
+    import checks
+    import main as gen_main
+    from errors import SoftReject
+
+    # 1. checks.is_non_agent_role classifies roles accurately
+    check(checks.is_non_agent_role('the maintenance drone'), 'maintenance drone should be identified as non-agent role')
+    check(checks.is_non_agent_role('the drone'), 'drone should be identified as non-agent role')
+    check(checks.is_non_agent_role('the battery'), 'battery should be identified as non-agent role')
+    check(checks.is_non_agent_role('the reactor core'), 'reactor core should be identified as non-agent role')
+    check(checks.is_non_agent_role('the backup generator'), 'generator should be identified as non-agent role')
+    check(not checks.is_non_agent_role('the drone technician'), 'drone technician is an agent role')
+    check(not checks.is_non_agent_role('the drone operator'), 'drone operator is an agent role')
+    check(not checks.is_non_agent_role('the core engineer'), 'core engineer is an agent role')
+    check(not checks.is_non_agent_role("the ship's AI"), 'ship AI is not a non-agent tool')
+    check(not checks.is_non_agent_role('the old horse master'), 'horse master is an agent')
+
+    # 2. validate_cast catches non-agent roles and consumable hardware specs
+    drone_seed = {
+        'role': 'the maintenance drone',
+        'kind': 'individual',
+        'being': 'thing',
+        'wants': 'to complete its diagnostic cycle and return to the charging bay',
+        'holds': 'the spare power cells that can stabilize the core',
+        'edge': 'is leaking oil and losing coherence, its logic loops fraying',
+        'tie': "was built to serve the ship's systems",
+        'voice': "emits status beeps and fragmented audio logs: 'Error. Oil pressure critical. Priority: return to charge.'",
+    }
+    turns = [{'id': 1, 'situation': 'Crisis.', 'what_you_must_do': 'fix', 'ways_through': [{'way': 'do', 'cost': 'pay'}], 'involves': []}]
+    issues = checks.validate_cast([drone_seed], turns)
+    check(len(issues) == 1 and 'consumable tool or object' in issues[0], f'expected consumable tool rejection: {issues}')
+
+    # Mock voice on non-drone entity
+    mock_voice_seed = {
+        'role': 'unit 7',
+        'kind': 'individual',
+        'being': 'thing',
+        'wants': 'to obey orders',
+        'voice': "'Error. Status: offline.'",
+    }
+    issues_voice = checks.validate_cast([mock_voice_seed], turns)
+    check(len(issues_voice) == 1 and 'consumable tool or object' in issues_voice[0], f'expected mock voice rejection: {issues_voice}')
+
+    # Genuine agents pass without complaint
+    valid_agents = [
+        {'role': 'the drone technician', 'kind': 'individual', 'being': 'person', 'wants': 'to save the crew', 'voice': "'Keep your hands off the rig.'"},
+        {'role': "the ship's AI", 'kind': 'individual', 'being': 'thing', 'wants': 'to protect the ship', 'voice': "'I cannot allow you to vent that compartment, Captain.'"},
+    ]
+    check(checks.validate_cast(valid_agents, turns) == [], 'valid dramatic agents should pass validation')
+
+    # 3. validate_turns raises SoftReject if a turn's involves names a non-agent tool
+    bad_turn = {
+        'turns': [
+            {'id': 1, 'situation': 'leak', 'what_you_must_do': 'seal', 'ways_through': [{'way': 'seal', 'cost': 'air'}],
+             'involves': ['the maintenance drone'], 'form': 'trade'},
+            {'id': 2, 'situation': 'fire', 'what_you_must_do': 'extinguish', 'ways_through': [{'way': 'extinguish', 'cost': 'water'}],
+             'involves': ['the captain'], 'form': 'persuade'},
+        ],
+        'complications': [],
+    }
+    try:
+        gen_main.StoryGenerator.validate_turns(bad_turn, check_forms=True)
+        check(False, 'validate_turns should have rejected maintenance drone in involves')
+    except SoftReject as e:
+        check('involves contains non-agent tool/object' in str(e), f'expected non-agent involves error: {e}')
+
+    # 4. cast_validator raises SoftReject on consumable tools
+    g = gen_main.StoryGenerator(f'{PREFIX}test_consumable_cast')
+    g.kernel = 'Generational ship'
+    g.analysis = {'s3_brief': {}}
+    c_val = g.cast_validator([{'id': 1, 'situation': 'sit', 'what_you_must_do': 'task', 'ways_through': [], 'involves': ['the technician']}])
+    try:
+        c_val({
+            'notes': 'test',
+            'cast_seeds': [
+                {'role': 'the technician', 'kind': 'individual', 'being': 'person', 'wants': 'survive', 'holds': 'tools', 'edge': 'alone', 'tie': 'crew', 'voice': "'Stay back.'", 'breaking_point': None, 'opposition': False, 'gender': 'f'},
+                drone_seed,
+            ]
+        })
+        check(False, 'cast_validator should have raised SoftReject for drone seed')
+    except SoftReject as e:
+        check('consumable tool or object' in str(e), f'expected consumable tool SoftReject: {e}')
+
+    # 5. check_story tags non_agent_cast_entity
+    fake_story = {
+        'lines': {'T1': {'path': ['N01']}}, 'nodes': {'N01': {'beat': 'opening', 'turn': 1, 'way': 1, 'who': ['C01'], 'where': ['L01']}},
+        'framework': {'beats': [{'id': 'opening', 'required': True}]},
+        'characters': {'C01': {'label': 'the technician', 'kind': 'individual', 'nodes': ['N01']}},
+        'locations': {'L01': {'name': 'the core', 'why': 'reason', 'nodes': ['N01']}},
+        'premise': {'turns': turns, 'cast_seeds': [drone_seed]},
+    }
+    findings = [f['issue'] for f in checks.check_story(fake_story)['notes'] if f.get('kind') == 'non_agent_cast_entity']
+    check(len(findings) == 1 and 'the maintenance drone' in findings[0], f'check_story should tag non_agent_cast_entity: {findings}')
 
 
 # ---------------------------------------------------------------- runner

@@ -95,14 +95,87 @@ def competing_groups_in_turns(turns):
     return res
 
 
+NON_AGENT_ROLE_RE = re.compile(
+    r"\b(maintenance drone|repair drone|surveillance drone|recon drone|drone|autopilot|"
+    r"reactor core|power cells?|battery|generator|compressor|pump|valve|bulkhead|"
+    r"terminal|sensor|recycler|accumulator|engine)\b",
+    re.I
+)
+
+AGENT_TITLE_RE = re.compile(
+    r"\b(pilot|operator|technician|mechanic|engineer|handler|master|chief|specialist|"
+    r"officer|crew|worker|driver|keeper|controller|inspector|guard|clerk|attendant|"
+    r"tender|user|builder|programmer|captain|navigator|steward)\b",
+    re.I
+)
+
+HARDWARE_SPECS_RE = re.compile(
+    r"\b(diagnostic cycle|charging bay|charging dock|oil pressure|logic loops?|firmware|"
+    r"hardware specs?|maintenance loop|system protocol|recharge bay|operating system|"
+    r"factory settings?|power cells? (?:that can|to) stabilize|spare power cells?|"
+    r"built to serve the ship's systems)\b",
+    re.I
+)
+
+MACHINE_VOICE_RE = re.compile(
+    r"\b(status beeps?|error logs?|error codes?|audio logs?|diagnostic logs?|beeps and boops)\b|"
+    r"['\"]?\b(error|alert|warning|priority|offline|standby)[\.:]",
+    re.I
+)
+
+ROUTINE_WANTS_RE = re.compile(
+    r"\b(diagnostic cycle|return to (?:the )?charg|recharge|maintenance loop|await(?:ing)? orders|"
+    r"execute protocol|run routine)\b",
+    re.I
+)
+
+
+def is_non_agent_role(role):
+    """Returns True if the role describes a non-agent tool, hardware device,
+    drone, or consumable prop without an agentic profession/title."""
+    r = str(role or '').strip()
+    return bool(NON_AGENT_ROLE_RE.search(r) and not AGENT_TITLE_RE.search(r))
+
+
+def check_seed_agency(seed):
+    """Verifies that a cast seed represents an agent with dramatic agency,
+    rejecting consumable tools, hardware devices, and non-agent entities."""
+    if not isinstance(seed, dict):
+        return None
+    role = str(seed.get('role', '') or seed.get('label', '')).strip()
+    wants = str(seed.get('wants', '')).strip()
+    holds = str(seed.get('holds', '')).strip()
+    edge = str(seed.get('edge', '')).strip()
+    tie = str(seed.get('tie', '')).strip()
+    voice = str(seed.get('voice', '')).strip()
+    all_text = f"{wants} {holds} {edge} {tie} {voice}"
+
+    # 1. Non-agent role name (e.g., 'the maintenance drone', 'the battery', 'the reactor core')
+    if is_non_agent_role(role):
+        return (f"'{role}' is a consumable tool or object, not a dramatic agent. "
+                f"Model it as an object/fixture in the world and seed a character with interpersonal agency instead.")
+
+    # 2. Hardware specs, routine loops, or machine voice on any seed
+    if (MACHINE_VOICE_RE.search(voice) or
+            HARDWARE_SPECS_RE.search(all_text) or
+            ROUTINE_WANTS_RE.search(wants)):
+        return (f"'{role}' is a consumable tool or object, not a dramatic agent. "
+                f"Model it as an object/fixture in the world and seed a character with interpersonal agency instead.")
+
+    return None
+
+
 def validate_cast(cast_seeds, turns):
-    """Checks that the cast represents all competing groups, sectors, or factions
-    referenced in dramatic turns, avoiding asymmetric dilemmas where one side is
-    personified and the competing side is an unrepresented collective."""
+    """Checks that:
+    1. The cast represents all competing groups, sectors, or factions
+       referenced in dramatic turns, avoiding asymmetric dilemmas where one side is
+       personified and the competing side is an unrepresented collective.
+    2. Cast seeds do not represent non-agent tools, hardware, vehicles, or consumable
+       props lacking interpersonal agency or moral stakes."""
     groups = competing_groups_in_turns(turns)
     problems = []
+    seeds = as_list(cast_seeds)
     if groups:
-        seeds = as_list(cast_seeds)
         for g_norm, g_label in groups.items():
             represented = False
             for s in seeds:
@@ -123,6 +196,12 @@ def validate_cast(cast_seeds, turns):
                     f"competing dilemma group/sector {g_label!r} is referenced in turns but has no representative "
                     f"in the cast (must appear in role or speaks_for of a cast seed)"
                 )
+    for s in seeds:
+        if not isinstance(s, dict):
+            continue
+        prob = check_seed_agency(s)
+        if prob:
+            problems.append(prob)
     return problems
 
 
@@ -448,7 +527,8 @@ def check_story(story):
                 findings.append(_finding('crowd_without_representative', f"the crowd {c.get('label')} has no individual who speaks for it"))
     cast_issues = validate_cast(story.get('premise', {}).get('cast_seeds', []) or list(chars.values()), premise_turns(story))
     for issue in cast_issues:
-        notes.append(_finding('unrepresented_dilemma_pole', issue))
+        kind = 'non_agent_cast_entity' if 'consumable tool or object' in issue else 'unrepresented_dilemma_pole'
+        notes.append(_finding(kind, issue))
     usage = derive_usage(story)
     unused_c = [chars[c].get('label') for c, used in usage['characters'].items() if not used and c in chars and chars[c].get('kind') != 'crowd']
     unused_l = [locs[l].get('name') for l, used in usage['locations'].items() if not used and l in locs]
