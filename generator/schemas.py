@@ -211,7 +211,7 @@ PROSE_EDIT = obj(texts=arr(obj(id=S, text=S)), images_used=arr(S))
 ARC_CAST = obj(cast=arr(obj(who=S, note=S, tier=enum(['supporting', 'functional']))))
 
 UP_DOWN = enum(['up', 'down'])
-UP_DOWN_OR_NULL = {'type': ['string', 'null'], 'enum': ['up', 'down', None]}
+UP_DOWN_OR_NULL = nullable(UP_DOWN)
 MOMENT = obj(node=S, kind=enum(['turn', 'reveal', 'test', 'demonstration']), change=S)
 ARC = obj(
     who=S,
