@@ -980,6 +980,9 @@ def the_prose_pass_revises_text_and_keeps_structure():
     view = eng.start(seed=1)
     shown = ' '.join(view['text']) + (view['room'] or {}).get('text', '')
     check('{' not in shown and 'voiced' in shown, f'the engine did not render the codes: {shown[:300]}')
+    prose_md = load('prose', 'prose.md')
+    check('## Character Dialogue Distinctiveness' in prose_md, 'dialogue distinctiveness section missing in prose.md')
+    check('average pairwise distinctiveness' in prose_md, 'average pairwise distinctiveness missing in prose.md')
 
 
 @test
@@ -1008,6 +1011,82 @@ def prose_names_known_people_and_codes_every_name():
     w.convert_names()
     check(w.pkg['intro'][0]['text'] == 'The cat sleeps by the stove; the cat and {C02} wait.' and
           'unnamed' not in w.pkg['world']['characters']['C01'], f"a role is not a name: {w.pkg['intro'][0]['text']}")
+
+
+@test
+def prose_character_dialogue_distinctiveness_and_validation():
+    import prose
+
+    # 1. Dialogue validation catches dropped quotation marks
+    issues_drop_quotes = prose.validate_dialogue_text('"Stay back," he warned.', 'He tells you to stay back.')
+    check(issues_drop_quotes and 'quotation marks' in issues_drop_quotes[0],
+          f'did not detect dropped quotation marks: {issues_drop_quotes}')
+
+    # 2. Dialogue validation catches player action narration
+    issues_player_action = prose.validate_dialogue_text('"What is this?"', '"You ask him what this is."')
+    check(issues_player_action and 'narrates player action' in issues_player_action[0],
+          f'did not detect player action narration: {issues_player_action}')
+
+    # 3. Valid quoted dialogue passes without issues
+    issues_valid = prose.validate_dialogue_text('"Stay back," he warned.', '"Get back behind the hatch now!"')
+    check(not issues_valid, f'valid dialogue was rejected: {issues_valid}')
+
+    # 4. Distinctiveness metrics
+    pkg = {
+        'world': {
+            'characters': {
+                'C01': {
+                    'name': 'Barnaby Flint',
+                    'topics': {
+                        't1': {'says': [{'text': '"Reefs break on jagged rocks."'}]}
+                    }
+                },
+                'C02': {
+                    'name': 'Dr. Vance',
+                    'topics': {
+                        't1': {'says': [{'text': '"Virulent fever spreads swiftly."'}]}
+                    }
+                }
+            }
+        }
+    }
+    dd = prose.dialogue_distinctiveness(pkg)
+    check(dd['avg_distinctiveness'] == 1.0, f'expected 1.0 distinctiveness, got {dd["avg_distinctiveness"]}')
+    check(len(dd['pairs']) == 1, f'expected 1 pair, got {len(dd["pairs"])}')
+    check(dd['characters']['C01']['words'] > 0 and dd['characters']['C02']['words'] > 0, 'word counts missing')
+
+    # Shared vocabulary drops distinctiveness
+    pkg['world']['characters']['C02']['topics']['t1']['says'] = [{'text': '"Reefs break swiftly."'}]
+    dd_overlap = prose.dialogue_distinctiveness(pkg)
+    check(dd_overlap['avg_distinctiveness'] < 1.0, 'overlapping vocabulary did not reduce distinctiveness')
+    check(dd_overlap['pairs'][0]['overlap'] == 2, f'expected 2 shared words (reefs, break), got {dd_overlap["pairs"][0]["overlap"]}')
+
+    # 5. ProseWriter.people() threads voice, breaking_point, edge from cast_seeds
+    story = {
+        'premise': {
+            'cast_seeds': [
+                {
+                    'role': 'the ghost captain',
+                    'voice': "speaks in nautical commands: 'steady as she goes'",
+                    'breaking_point': 'when the bell tolls midnight',
+                    'edge': 'holds a rusted sextant'
+                }
+            ]
+        }
+    }
+    pkg_cast = {
+        'world': {
+            'characters': {
+                'C02': {'name': 'Hugh Calloway', 'role': 'the ghost captain'}
+            }
+        }
+    }
+    w = prose.ProseWriter(None, pkg_cast, story=story)
+    people = w.people()
+    c02_person = next((p for p in people if p['code'] == 'C02'), None)
+    check(c02_person and 'nautical commands' in c02_person['voice'], 'voice not pulled from cast_seeds')
+    check(c02_person['breaking_point'] == 'when the bell tolls midnight', 'breaking_point not pulled from cast_seeds')
+    check(c02_person['edge'] == 'holds a rusted sextant', 'edge not pulled from cast_seeds')
 
 
 @test

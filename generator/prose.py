@@ -36,7 +36,7 @@ from errors import SoftReject
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 
-TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8, 'recap': 40}
+TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8, 'recap': 40, 'dialogue': 45}
 CHUNK = 40                    # texts per call: a person with every state and subject is split
 MECHANICS = re.compile(r"\b(menus?|nodes?|variants?|the player|playthroughs?)\b", re.I)   # never ordinary English
 ALTERNATIVES = re.compile(r"\bif\b[^.!?]*[;,]\s*(?:and |but |or )?if\b", re.I)
@@ -69,9 +69,12 @@ GUIDANCE = {
     'person': "THIS PART is one person: how they look (by their state), the line the room shows them by ('here': what "
               "they are doing or holding when found, never where they are, since each scene places them and the line "
               "is read in every room they turn up in), "
-              "and what they say on each subject, in their own voice. 'unnamed' is how the player sees them before "
-              "learning their name: a short phrase, three to eight words, starting with 'the' or 'a', what you would "
-              "notice first ('the old man in the captain's coat').",
+              "and what they say on each subject in conversation topics ('topics'). "
+              "CRITICAL FOR DIALOGUE: The lines under 'topics' are spoken directly by this person. Revise their spoken lines strictly in "
+              "this person's own voice, vocabulary, and rhythm (see 'voice' and 'breaking_point' in this part), NOT in the story narrator's voice. "
+              "Preserve their distinctive idioms, sentence length, and attitude. "
+              "'unnamed' is how the player sees them before learning their name: a short phrase, three to eight words, starting with 'the' or 'a', "
+              "what you would notice first ('the old man in the captain's coat').",
     'place': "THIS PART is one location: each room's description (given on the first visit and on Look, so it is "
              "the room itself, not this moment), its state fragments, and the things in it as they read when "
              "examined.",
@@ -118,6 +121,24 @@ def words(text):
     return re.findall(r"[a-z0-9']+", str(text).lower())
 
 
+QUOTES = ("'", '"', '“', '”', '‘', '’')
+
+
+def validate_dialogue_text(original, revised):
+    """Checks character dialogue: returns list of soft issue strings, or empty list."""
+    issues = []
+    orig_stripped = (original or '').strip()
+    rev_stripped = (revised or '').strip()
+    if any(orig_stripped.startswith(q) or orig_stripped.endswith(q) for q in QUOTES) and not any(
+        rev_stripped.startswith(q) or rev_stripped.endswith(q) for q in QUOTES
+    ):
+        issues.append("character dialogue should remain spoken dialogue in quotation marks, not indirect narration")
+    inner = rev_stripped.strip("'\"“”‘’").strip()
+    if re.match(r"^you\s+(ask|tell|look|say|nod|watch|listen|step|walk)\b", inner, re.I):
+        issues.append("narrates player action instead of speaking the character's line; write what the character says aloud")
+    return issues
+
+
 class ProseWriter:
     def __init__(self, gen, package, story=None):
         self.gen = gen
@@ -133,10 +154,14 @@ class ProseWriter:
     def people(self):
         out = []
         cast = {norm_role(c.get('label')): c for c in (self.story.get('characters') or {}).values()}
+        seeds = {norm_role(s.get('role')): s for s in (self.story.get('premise', {}).get('cast_seeds') or []) if isinstance(s, dict)}
         for cid, c in self.chars.items():
-            seed = cast.get(norm_role(c.get('role'))) or {}
+            role_key = norm_role(c.get('role'))
+            seed = cast.get(role_key) or seeds.get(role_key) or {}
             out.append({'code': cid, 'name': c.get('name'), 'role': c.get('role'),
                         'voice': seed.get('voice') or c.get('voice'),
+                        'breaking_point': seed.get('breaking_point') or c.get('breaking_point'),
+                        'edge': seed.get('edge') or c.get('edge'),
                         'known_to_you': bool(c.get('known') or not c.get('unnamed'))})
         return out
 
@@ -284,7 +309,11 @@ class ProseWriter:
             part = path[2]
             return {'opening': 'opening', 'interactions': 'action', 'room_text': 'room'}.get(part, 'other')
         if path[0] == 'world':
-            return 'room' if path[1] == 'rooms' and path[3] == 'description' else 'other'
+            if path[1] == 'rooms' and path[3] == 'description':
+                return 'room'
+            if path[1] == 'characters' and len(path) > 3 and path[3] == 'topics':
+                return 'dialogue'
+            return 'other'
         if path[0] == 'endings':
             return 'ending'
         if path[0] == 'intro':
@@ -317,7 +346,7 @@ class ProseWriter:
             name = '{' + p[2] + '}' if p[1] == 'characters' else (x.get('name') or p[2])
             if p[1] == 'characters':
                 if p[3] == 'topics':
-                    return f"{name}, asked about {x['topics'][p[4]].get('label', p[4])}"
+                    return f"what {name} says aloud when asked about {x['topics'][p[4]].get('label', p[4])}"
                 return {'description': f'{name}, as seen', 'here': f'how the room shows {name}'}.get(p[3], f'{name} ({p[3]})')
             if p[1] == 'rooms':
                 return {'description': f'{name}: the room', 'fragments': f'{name}: a detail by state',
@@ -390,6 +419,9 @@ class ProseWriter:
                 if k == 'recap' and example_guard.player_deed(t):     # the same recap is read whatever they did
                     soft.append(f'recap: says what the player did ("{example_guard.player_deed(t).group(0)}"); say what '
                                 f'the scene put before them, since the journal lists their choices beneath it')
+                if k == 'dialogue':
+                    for issue in validate_dialogue_text(originals[i], t):
+                        soft.append(f'{i}: {issue}')
                 if ALTERNATIVES.search(t):
                     soft.append(f'{i}: narrates alternatives ("{ALTERNATIVES.search(t).group(0)}"); say what happens')
                 if MECHANICS.search(t):
@@ -426,6 +458,15 @@ class ProseWriter:
                 part['room_frames'] = rf
         elif kind == 'person':
             cid = unit['of']
+            ch_info = next((p for p in self.people() if p['code'] == cid), {})
+            part.update(
+                character_code=cid,
+                character_name=ch_info.get('name'),
+                role=ch_info.get('role'),
+                voice=ch_info.get('voice'),
+                breaking_point=ch_info.get('breaking_point'),
+                edge=ch_info.get('edge'),
+            )
             if self.chars.get(cid, {}).get('portrait'):
                 part['portrait'] = self.chars[cid]['portrait']
         answer = self.gen.run_prompt(f's8b_{uid}', 'edit', {
@@ -453,6 +494,7 @@ class ProseWriter:
     # ------------------------------------------------------------ the whole pass
 
     def run(self):
+        dd_before = dialogue_distinctiveness(self.original)
         self.prepare_names()
         self.style()
         codes = set(self.chars)
@@ -464,6 +506,14 @@ class ProseWriter:
             sys.path.insert(0, ENGINE)
         from story import Story, validate
         errors, _ = validate(Story(self.pkg))
+        dd_after = dialogue_distinctiveness(self.pkg)
+        self.dd_before = dd_before
+        self.dd_after = dd_after
+        if dd_before['pairs'] and dd_before['avg_distinctiveness'] > 0:
+            if dd_after['avg_distinctiveness'] < dd_before['avg_distinctiveness'] * 0.8:
+                self.findings.append(
+                    f"character dialogue distinctiveness dropped from {dd_before['avg_distinctiveness']:.2f} to {dd_after['avg_distinctiveness']:.2f}"
+                )
         return self.pkg, errors
 
 
@@ -478,7 +528,7 @@ def check_validator(parsed):
     parsed['problems'] = [str(x) for x in as_list(parsed.get('problems')) if str(x).strip()]
 
 
-def report_markdown(story_id, style, findings, errors, before, after):
+def report_markdown(story_id, style, findings, errors, before, after, dd=None):
     lines = [f'# {story_id}: the prose pass', '', '## Style sheet', '']
     for k in ('tradition', 'person_tense', 'register', 'rhythm', 'length'):
         if style.get(k):
@@ -489,12 +539,73 @@ def report_markdown(story_id, style, findings, errors, before, after):
               f'{before[0]} texts, {before[1]} words before; {after[1]} words after', '', '## Findings', '']
     lines += [f'- {f}' for f in findings] or ['- none']
     lines += ['', '## Engine validator', ''] + ([f'- ERROR {e}' for e in errors] or ['- no errors'])
+    if dd and dd.get('characters'):
+        lines += ['', '## Character Dialogue Distinctiveness', '',
+                  f"- **average pairwise distinctiveness:** {dd.get('avg_distinctiveness', 1.0):.2f}",
+                  '']
+        chars = dd.get('characters', {})
+        if chars:
+            lines += ['### Speakers', '']
+            for cid, info in sorted(chars.items()):
+                lines.append(f"- **{info.get('name', cid)}** ({cid}): {info.get('words', 0)} words, "
+                             f"{info.get('unique', 0)} unique, TTR: {info.get('ttr', 0.0):.2f}")
+            lines.append('')
+        pairs = dd.get('pairs', [])
+        if pairs:
+            lines += ['### Pairwise distinctiveness', '']
+            for p in pairs:
+                p_names = ' vs '.join(p['pair'])
+                lines.append(f"- **{p_names}:** distinctiveness {p['distinctiveness']:.2f} "
+                             f"({p['overlap']} shared words)")
+            lines.append('')
     return '\n'.join(lines) + '\n'
 
 
 def size(pkg):
     texts = [t for _, t in text_paths(pkg)]
     return len(texts), sum(len(words(t)) for t in texts)
+
+
+def dialogue_distinctiveness(pkg):
+    """Calculates character-level word count, unique vocabulary, TTR, and
+    pairwise Jaccard distinctiveness across all characters with dialogue."""
+    chars = (pkg.get('world') or {}).get('characters') or {}
+    profiles = {}
+    for cid, c in chars.items():
+        name = c.get('name') or cid
+        texts = [t for _, t in text_paths(c.get('topics') or {})]
+        word_list = [w for t in texts for w in words(CODE.sub(' ', t))]
+        if not word_list:
+            continue
+        vocab = set(word_list)
+        profiles[cid] = {
+            'name': name,
+            'words': len(word_list),
+            'unique': len(vocab),
+            'ttr': round(len(vocab) / len(word_list), 3) if word_list else 0.0,
+            'vocab': vocab,
+        }
+    pairs = []
+    cids = sorted(profiles.keys())
+    for i in range(len(cids)):
+        for j in range(i + 1, len(cids)):
+            c1, c2 = cids[i], cids[j]
+            v1, v2 = profiles[c1]['vocab'], profiles[c2]['vocab']
+            union = v1 | v2
+            inter = v1 & v2
+            sim = len(inter) / len(union) if union else 0.0
+            dist = round(1.0 - sim, 3)
+            pairs.append({
+                'pair': (profiles[c1]['name'], profiles[c2]['name']),
+                'distinctiveness': dist,
+                'overlap': len(inter),
+            })
+    avg_dist = round(sum(p['distinctiveness'] for p in pairs) / len(pairs), 3) if pairs else 1.0
+    return {
+        'characters': {cid: {k: v for k, v in p.items() if k != 'vocab'} for cid, p in profiles.items()},
+        'pairs': pairs,
+        'avg_distinctiveness': avg_dist,
+    }
 
 
 def write(gen, story=None):
@@ -510,7 +621,7 @@ def write(gen, story=None):
     gen.save_story_json('package_prose.json', pkg)
     gen.save_story_json('prose_style.json', writer.style_sheet)
     gen.save_story_file('prose.md', report_markdown(gen.story_id, writer.style_sheet, writer.findings, errors,
-                                                    size(package), size(pkg)))
+                                                    size(package), size(pkg), getattr(writer, 'dd_after', None)))
     print(f'prose: {size(package)[1]} words -> {size(pkg)[1]}; validator {len(errors)} error(s)')
     for e in errors:
         print(f'  - {e}')
