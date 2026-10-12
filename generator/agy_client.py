@@ -111,7 +111,14 @@ class AgyClient(LlmClient):
                 err_msg = proc.stderr.strip() or proc.stdout.strip()
                 last_error = LlmCallError(f"agy failed with code {proc.returncode}: {err_msg}")
                 if attempt < max_attempts:
-                    time.sleep(2)
+                    if "not recognized as a known model" in err_msg and model_to_use and "pro" in model_to_use:
+                        fallback_model = "gemini-3.8-flash-low" if think is False else "gemini-3.8-flash-high"
+                        if self.echo:
+                            print(f"  [agy] Model {model_to_use} temporarily unavailable, switching to {fallback_model}")
+                        if "--model" in cmd:
+                            idx = cmd.index("--model")
+                            cmd[idx + 1] = fallback_model
+                    time.sleep(attempt * 4)
                     continue
                 self.last_call = {
                     'seconds': round(time.time() - started, 2),
