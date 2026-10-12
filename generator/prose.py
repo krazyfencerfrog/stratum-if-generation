@@ -516,7 +516,7 @@ class ProseWriter:
             '$$ALREADY_READ$$': json.dumps({'openings': self.openings[-8:], 'images_spent': self.spent[-20:]}, ensure_ascii=False),
             '$$UNIT$$': json.dumps(part, ensure_ascii=False),
             '$$TEXTS_JSON$$': json.dumps(items, ensure_ascii=False, indent=1),
-        }, prompt_file='s8b_edit.prompt', validator=validate, klass='build', schema=schemas.PROSE_EDIT)
+        }, prompt_file='s8b_edit.prompt', validator=validate, klass='edit', schema=schemas.PROSE_EDIT)
         texts = answer['texts'] if isinstance(answer['texts'], dict) else {t['id']: t['text'] for t in answer['texts']}
         for i, path in enumerate(paths):
             set_at(self.pkg, path, texts[f't{i + 1}'])

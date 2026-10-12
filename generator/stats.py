@@ -95,6 +95,15 @@ CALL_CLASSES = {
         'limit_thinking_bytes': 25000, 'limit_seconds': 1800, 'limit_response_bytes': 24000,
         'num_predict': 14000, 'fallback': 'no_think', 'force_answer': True,
     },
+    # prose revision and targeted entity rewrites: thinking off,
+    # structured output matching schemas.PROSE_EDIT. Cuts downstream
+    # rewrite latency from ~4-5 minutes per unit to ~15-30 seconds.
+    'edit': {
+        'think': False,
+        'target_thinking_bytes': 0, 'target_seconds': 180,
+        'limit_thinking_bytes': 20000, 'limit_seconds': 600, 'limit_response_bytes': 16000,
+        'num_predict': 14000, 'fallback': None,
+    },
 }
 
 
@@ -134,7 +143,7 @@ def step_of(prefix):
     p = re.sub(r'_(i|r)\d+', '', prefix)
     p = re.sub(r'^(s3_5r)\d+$', r'\1', p)
     if re.match(r'^s[4-9]', p):
-        p = re.sub(r'^(s\d+[a-z]?)_.*$', r'\1', p)
+        p = re.sub(r'^(s\d+[a-z0-9]*)_.*$', r'\1', p)
     return p
 
 

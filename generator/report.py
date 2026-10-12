@@ -48,9 +48,19 @@ STAGES = [
     ('4p branch plan', r'^s4p$'),
     ('4d next-line judge (baseline: review)', r'^s4d$'),
     ('4e outline judge', r'^s4e$'),
+    ('stage A: arcs & minor nodes', r'^s5.*$'),
+    ('stage B: world building', r'^s6.*$'),
+    ('stage C/D: scene compilation', r'^s7.*$'),
+    ('stage 8: prose revision', r'^s8.*$'),
 ]
 
-OLD_CLASS = [(r'^s2$', 'extract'), (r'^s3(_0[abc]|[b-h])$', 'extract'), (r'^s4d$', 'build')]
+OLD_CLASS = [
+    (r'^s2$', 'extract'),
+    (r'^s3(_0[abc]|[b-h])$', 'extract'),
+    (r'^s4d$', 'build'),
+    (r'^s8b', 'edit'),
+    (r'^s6b1_functional', 'classify'),
+]
 
 
 def stage_of(step):
