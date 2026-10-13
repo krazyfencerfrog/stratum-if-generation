@@ -110,6 +110,19 @@ class AgyClient(LlmClient):
             if proc.returncode != 0:
                 err_msg = proc.stderr.strip() or proc.stdout.strip()
                 last_error = LlmCallError(f"agy failed with code {proc.returncode}: {err_msg}")
+                if "RESOURCE_EXHAUSTED" in err_msg or "429" in err_msg or "quota reached" in err_msg:
+                    m = re.search(r'Resets in (?:(\d+)m)?(?:(\d+)s)?', err_msg)
+                    if m:
+                        mins = int(m.group(1)) if m.group(1) else 0
+                        secs = int(m.group(2)) if m.group(2) else 0
+                        wait_s = mins * 60 + secs + 10
+                    else:
+                        wait_s = 60
+                    if self.echo:
+                        print(f"  [agy] Quota limit reached (429). Pausing for {wait_s}s until reset...")
+                    time.sleep(wait_s)
+                    continue
+
                 if attempt < max_attempts:
                     if "not recognized as a known model" in err_msg and model_to_use and "pro" in model_to_use:
                         fallback_model = "gemini-3.8-flash-low" if think is False else "gemini-3.8-flash-high"
