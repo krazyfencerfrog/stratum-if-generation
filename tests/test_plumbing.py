@@ -408,6 +408,29 @@ def world_and_scenes_are_checked_for_how_they_read():
     check(any('menu labels must be concise action phrases under 40 characters' in f for f in found_parsed),
           f'parsed action long label caught: {found_parsed}')
 
+    sc_mock = {'id': 'S1', 'major': 'N01'}
+    c.out_edges = lambda sc: [{'to': 'S_T2N01', 'kind': 'branch', 'trigger': 'name boat', 'instead': 'answer heir'}]
+    branch_talk = {'id': 'br1', 'verb': 'talk', 'object': 'C1', 'effects': [{'set': 'go_S1__S_T2N01'}], 'label': 'talk captain'}
+    p_talk = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [branch_talk], 'opening': []}, {}, {}, sc=sc_mock)
+    check(any("branch departure must be a physical/world action, not conversation ('talk')" in f for f in p_talk),
+          f'talk branch action caught: {p_talk}')
+
+    branch_look = {'id': 'br2', 'verb': 'look', 'object': 'door', 'effects': [{'set': 'go_S1__S_T2N01'}], 'label': 'look at boat'}
+    p_look = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [branch_look], 'opening': []}, {}, {}, sc=sc_mock)
+    check(any("branch departure must be an active commitment, not passive inspection ('look')" in f for f in p_look),
+          f'look branch action caught: {p_look}')
+
+    branch_long = {'id': 'br3', 'verb': 'grip', 'object': 'tiller', 'effects': [{'set': 'go_S1__S_T2N01'}],
+                   'label': 'grip the tiller with both hands to call the dead captain'}
+    p_long = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [branch_long], 'opening': []}, {}, {}, sc=sc_mock)
+    check(any("branch labels must be telegraphed action phrases strictly under 40 characters" in f for f in p_long),
+          f'long branch label caught: {p_long}')
+
+    branch_good = {'id': 'br4', 'verb': 'grip', 'object': 'tiller', 'effects': [{'set': 'go_S1__S_T2N01'}],
+                   'label': 'grip tiller, call captain'}
+    p_good = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [branch_good], 'opening': []}, {}, {}, sc=sc_mock)
+    check(len(p_good) == 0, f'clean branch action accepted: {p_good}')
+
 
 @test
 def cast_copying_its_example_is_rejected():

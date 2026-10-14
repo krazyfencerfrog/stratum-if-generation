@@ -275,12 +275,12 @@ class SceneCompiler:
             built = self.build(sc, parsed, problems)
             if problems:
                 raise ValueError('; '.join(problems[:12]))
-            soft = self.reading_problems(built['scene'], parsed, built['props'])
+            soft = self.reading_problems(built['scene'], parsed, built['props'], sc=sc)
             if soft:
                 raise SoftReject('; '.join(soft[:8]))
         return validate
 
-    def reading_problems(self, scene, parsed, props):
+    def reading_problems(self, scene, parsed, props, sc=None):
         """What reads wrong to a player, found by playing kernel40 and kernel35
         (2026-10-08): one informed retry each, never the run."""
         out = []
@@ -384,6 +384,47 @@ class SceneCompiler:
         copied = example_guard.copied_phrases(parsed, ['s7d_scene.prompt'], context)
         if len(copied) >= 2:
             out.append(f"scene copies the prompt's illustration ({len(copied)} phrases: {'; '.join(copied[:3])}); write this story's own actions")
+        if sc:
+            sid = sc.get('id')
+            branch_edges = {e['to']: e for e in self.out_edges(sc) if e.get('kind') == 'branch'}
+            if branch_edges:
+                for it in scene.get('interactions', []):
+                    effects = it.get('effects') or []
+                    for ef in effects:
+                        set_flag = str(ef.get('set') or '')
+                        if set_flag.startswith(f'go_{sid}__'):
+                            target = set_flag.split('__', 1)[1]
+                            if target in branch_edges:
+                                verb = str(it.get('verb') or '').lower()
+                                if verb in ('talk', 'ask', 'say', 'tell'):
+                                    out.append(f"branch action {it.get('label') or verb!r} leads to {target}: "
+                                               f"branch departure must be a physical/world action, not conversation ('{verb}')")
+                                elif verb in ('examine', 'inspect', 'look', 'watch'):
+                                    out.append(f"branch action {it.get('label') or verb!r} leads to {target}: "
+                                               f"branch departure must be an active commitment, not passive inspection ('{verb}')")
+                                lbl = it.get('label') or it.get('detail_label') or it.get('object_label')
+                                if lbl and len(str(lbl)) > 40:
+                                    out.append(f"branch action label {lbl!r} is {len(str(lbl))} chars: "
+                                               f"branch labels must be telegraphed action phrases strictly under 40 characters")
+                for a in as_list((parsed or {}).get('actions')):
+                    if isinstance(a, dict) and a.get('leads_to') in branch_edges:
+                        verb = str(a.get('verb') or '').strip().lower()
+                        if verb in ('talk', 'ask', 'say', 'tell'):
+                            msg = (f"branch action {a.get('label') or verb!r} leads to {a['leads_to']}: "
+                                   f"branch departure must be a physical/world action, not conversation ('{verb}')")
+                            if msg not in out:
+                                out.append(msg)
+                        elif verb in ('examine', 'inspect', 'look', 'watch'):
+                            msg = (f"branch action {a.get('label') or verb!r} leads to {a['leads_to']}: "
+                                   f"branch departure must be an active commitment, not passive inspection ('{verb}')")
+                            if msg not in out:
+                                out.append(msg)
+                        lbl = str(a.get('label') or '')
+                        if lbl and len(lbl) > 40:
+                            msg = (f"branch action label {lbl!r} is {len(lbl)} chars: "
+                                   f"branch labels must be telegraphed action phrases strictly under 40 characters")
+                            if msg not in out:
+                                out.append(msg)
         return out
 
     def resolve(self, name, names, open_rooms, extra=()):
