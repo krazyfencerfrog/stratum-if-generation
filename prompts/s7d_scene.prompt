@@ -17,6 +17,14 @@ What you write, naming rooms, people and things exactly as the packet does:
    only through the menu. Something big that happened between scenes (a
    death, a fire) is told as what the player finds or hears, not done by
    them, and never left unsaid.
+   ARRIVAL AFTERMATH (when the packet includes "arriving"):
+   The player has just chosen a branch divergence to enter this story line.
+   The packet provides "arriving" with "trigger", "instead_of", "shift",
+   "from_scene", and "line_title". The opening MUST establish the immediate
+   fallout and altered reality of that choice (what consequence landed, who is
+   alienated or emboldened, what new pressure or debt presses now). Never
+   open cold as if nothing happened; ground the room in the aftermath of what
+   was just chosen.
  - start_room, and placement: where each person stands. Where the opening
    puts someone, place them there.
  - room_text: for any room that is different in this scene (water on the
@@ -57,8 +65,11 @@ What you write, naming rooms, people and things exactly as the packet does:
              or approach (e.g. "let Osric pay to cut ropes (scrapper deal)" vs "sound the gong for naval honors"),
              strictly under 40 characters. Never use generic ambiguous verbs that disguise the fork as
              routine exploration (no blind "grip tiller" or "batter pawl").
-          3. PHYSICAL CAUSALITY: A branch departure representing physical transit must be taken by a physical
-             verb (go, cut, untie, heave, cast off), not ambient conversation topics.
+          3. PHYSICAL CAUSALITY & CONTROL FIXTURES: A branch departure representing transit or taking command
+             must be taken by a physical verb (go, cut, untie, heave, cast off), not ambient conversation topics.
+             For vehicle controls or fixed machinery (tillers, handwheels, levers, valves, hawsers), use
+             manipulation verbs (grip, turn, steer, lever, heave, throw), NEVER "take" (in the engine, "take"
+             strictly picks up a portable item into player inventory).
       If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET),
       actions and movement represent telemetry, data bus queries, radio commands, or
       sensor sweeps; never use human bipedal locomotion ("step down", "walk into", "climb")
@@ -85,11 +96,12 @@ What you write, naming rooms, people and things exactly as the packet does:
 Rules:
  - Verbs: prefer the core verbs (talk, use, give, show, take); add a story
    verb where the action deserves its own word, especially one the story
-   repeats (bail, climb, salute). Take is only picking up a thing that can
-   be carried: leaving through a door, signing a paper or acting on two
-   things gets its own verb (leave, sign, wrap). Look, examine, wait and
-   think are the engine's own: never write them. Never two actions with the
-   same verb, object and detail.
+   repeats (bail, climb, salute). Take is ONLY picking up a portable thing that can
+   be carried in inventory: operating vehicle controls, fixed machinery, doors or
+   structural fittings gets a manipulation verb (grip, turn, steer, heave, throw,
+   lever, open). Leaving through a door, signing a paper or acting on two things
+   gets its own verb (leave, sign, wrap). Look, examine, wait and think are the
+   engine's own: never write them. Never two actions with the same verb, object and detail.
  - Every option and action is something done or said, never a moral label
    ("be kind"). A detail that is a line to say goes in quotation marks.
  - Menu labels must be concise action phrases or short spoken lines, strictly

@@ -431,6 +431,31 @@ def world_and_scenes_are_checked_for_how_they_read():
     p_good = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [branch_good], 'opening': []}, {}, {}, sc=sc_mock)
     check(len(p_good) == 0, f'clean branch action accepted: {p_good}')
 
+    # Test in_divergence and arriving packet metadata on branch arrival scenes
+    c.story = {
+        'edges': [{'from': 'N01', 'to': 'T2N01', 'kind': 'branch', 'lines': ['T2'],
+                   'trigger': {'text': 'take tiller and name boat'}}],
+        'lines': {'T2': {'title': 'The Captain Line', 'motivation': 'Move the boat',
+                         'divergence': {'trigger': 'take tiller', 'instead_of': 'leave boat', 'shift': 'ghost commands chain'}}}
+    }
+    c.scene_of = {'N01': 'S_N01', 'T2N01': 'S_T2N01'}
+    c.arcs = {'plan': {}}
+    c.states = set()
+    c.minors = {}
+    c.open_rooms = lambda sc: ['deck']
+    c.nodes = {'T2N01': {'id': 'T2N01', 'kind': 'major', 'summary': 'Arrival', 'image': 'boat'}}
+
+    inv = c.in_divergence({'id': 'S_T2N01', 'major': 'T2N01', 'nodes': ['T2N01']})
+    check(inv is not None and inv['from_scene'] == 'S_N01', f'in_divergence returned {inv}')
+    check(inv['shift'] == 'ghost commands chain', f'unexpected shift: {inv}')
+    check(inv['line_title'] == 'The Captain Line', f'unexpected line_title: {inv}')
+
+    pkt = c.packet({'id': 'S_T2N01', 'major': 'T2N01', 'title': 'Arrival', 'beat': 'second_crisis',
+                    'lines': ['T2'], 'nodes': ['T2N01'], 'who': [], 'ending': None})
+    check('arriving' in pkt, f'missing arriving block in packet: {pkt.keys()}')
+    check(pkt['arriving']['from_scene'] == 'S_N01', f'unexpected arriving from_scene: {pkt.get("arriving")}')
+    check(pkt['arriving']['trigger'] == 'take tiller and name boat', f'unexpected arriving trigger: {pkt.get("arriving")}')
+
 
 @test
 def cast_copying_its_example_is_rejected():

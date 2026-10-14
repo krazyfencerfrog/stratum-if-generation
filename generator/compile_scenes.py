@@ -178,6 +178,30 @@ class SceneCompiler:
         out.sort(key=lambda x: {'branch': 0, 'ending': 1, 'default': 2}[x['kind']])
         return out
 
+    def in_divergence(self, sc):
+        """If this scene is reached via a branch departure edge, returns the divergence
+        context that triggered the move into this story line."""
+        major = sc['major']
+        for e in self.story.get('edges') or []:
+            if e.get('to') == major and e.get('kind') == 'branch':
+                from_scene = self.scene_of.get(e.get('from'))
+                lines = e.get('lines') or []
+                line_id = lines[0] if lines else None
+                line_info = (self.story.get('lines') or {}).get(line_id) or {} if line_id else {}
+                dv = line_info.get('divergence') or {}
+                trig = e.get('trigger') or {}
+                trigger_text = trig.get('text') if isinstance(trig, dict) else (trig or dv.get('trigger'))
+                return {
+                    'from_scene': from_scene,
+                    'line_id': line_id,
+                    'line_title': line_info.get('title'),
+                    'line_motivation': line_info.get('motivation'),
+                    'trigger': trigger_text,
+                    'instead_of': dv.get('instead_of'),
+                    'shift': dv.get('shift'),
+                }
+        return None
+
     def shifts_from(self, sc):
         return [sh for sh in self.arcs.get('pattern_shifts') or []
                 if sh.get('does') == 'line' and sh.get('condition') and self.scene_of.get(sh.get('at')) == sc['id']]
@@ -253,14 +277,18 @@ class SceneCompiler:
             if 0 < sc['event'] <= len(ev):
                 e = ev[sc['event'] - 1]
                 events.append(e.get('what') if isinstance(e, dict) else e)
-        return {'scene': {'id': sc['id'], 'title': sc['title'], 'beat': sc['beat'], 'lines': sc['lines']},
-                'nodes': nodes, 'event_here': events, 'tells_due_here': self.tells_due(sc),
-                'rooms': rooms,
-                'people': [{'name': self.world['characters'][c]['name'], 'role': self.world['characters'][c].get('role'),
-                            'topics': [t['label'] for t in self.world['characters'][c]['topics'].values()][:6]} for c in cast],
-                'states': sorted(self.states), 'visibility': (self.arcs.get('plan') or {}).get('state_visibility'),
-                'leaving': [{k: v for k, v in dict(otherwise=e.get('instead'), **e).items() if v is not None}
-                            for e in self.out_edges(sc)]}
+        pkg = {'scene': {'id': sc['id'], 'title': sc['title'], 'beat': sc['beat'], 'lines': sc['lines']},
+               'nodes': nodes, 'event_here': events, 'tells_due_here': self.tells_due(sc),
+               'rooms': rooms,
+               'people': [{'name': self.world['characters'][c]['name'], 'role': self.world['characters'][c].get('role'),
+                           'topics': [t['label'] for t in self.world['characters'][c]['topics'].values()][:6]} for c in cast],
+               'states': sorted(self.states), 'visibility': (self.arcs.get('plan') or {}).get('state_visibility'),
+               'leaving': [{k: v for k, v in dict(otherwise=e.get('instead'), **e).items() if v is not None}
+                           for e in self.out_edges(sc)]}
+        arriving = self.in_divergence(sc)
+        if arriving:
+            pkg['arriving'] = {k: v for k, v in arriving.items() if v is not None}
+        return pkg
 
     def compile_scene(self, sc):
         packet = self.packet(sc)
