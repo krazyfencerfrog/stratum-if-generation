@@ -149,9 +149,30 @@ class SceneCompiler:
                 continue
             to = self.scene_of.get(e['to'])
             trig = e.get('trigger') or {}
-            out.append({'to': to, 'kind': 'branch' if e.get('kind') == 'branch' else 'default',
-                        'trigger': trig.get('text') if isinstance(trig, dict) else None,
-                        'instead': '; '.join(e.get('otherwise') or []) or None})
+            edge_kind = 'branch' if e.get('kind') == 'branch' else 'default'
+            entry = {'to': to, 'kind': edge_kind,
+                     'trigger': trig.get('text') if isinstance(trig, dict) else None,
+                     'instead': '; '.join(e.get('otherwise') or []) or None}
+            if edge_kind == 'branch':
+                lines = e.get('lines') or []
+                if lines:
+                    line_id = lines[0]
+                    line_info = (self.story.get('lines') or {}).get(line_id) or {}
+                    dv = line_info.get('divergence') or {}
+                    if not entry.get('trigger') and dv.get('trigger'):
+                        entry['trigger'] = dv['trigger']
+                    if not entry.get('instead') and dv.get('instead_of'):
+                        entry['instead'] = dv['instead_of']
+                    if dv.get('shift'):
+                        entry['shift'] = dv['shift']
+                    if line_info.get('title'):
+                        entry['branch_title'] = line_info['title']
+                    if line_info.get('motivation'):
+                        entry['branch_motivation'] = line_info['motivation']
+                    ending_obj = line_info.get('ending') or {}
+                    if ending_obj.get('summary'):
+                        entry['branch_ending'] = ending_obj['summary']
+            out.append(entry)
         if sc['ending']:
             out.append({'to': self.ending_id(sc), 'kind': 'ending', 'trigger': None, 'instead': None})
         out.sort(key=lambda x: {'branch': 0, 'ending': 1, 'default': 2}[x['kind']])
@@ -238,7 +259,7 @@ class SceneCompiler:
                 'people': [{'name': self.world['characters'][c]['name'], 'role': self.world['characters'][c].get('role'),
                             'topics': [t['label'] for t in self.world['characters'][c]['topics'].values()][:6]} for c in cast],
                 'states': sorted(self.states), 'visibility': (self.arcs.get('plan') or {}).get('state_visibility'),
-                'leaving': [{'to': e['to'], 'kind': e['kind'], 'trigger': e['trigger'], 'otherwise': e['instead']}
+                'leaving': [{k: v for k, v in dict(otherwise=e.get('instead'), **e).items() if v is not None}
                             for e in self.out_edges(sc)]}
 
     def compile_scene(self, sc):

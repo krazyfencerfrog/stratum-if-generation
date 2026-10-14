@@ -63,6 +63,12 @@ divergence:
    lists the ways no line has taken yet, by node.)
  - instead_of: what "you" do at that point on the existing line, in the
    same plain past tense, so both sides of the fork are stated.
+   ORTHOGONAL MODALITY RULE: The "trigger" and its "instead_of" must represent
+   fundamentally distinct, opposing approaches (e.g. supernatural submission vs
+   commercial liquidation vs shared physical struggle). NEVER generate subtle semantic
+   synonyms or mere rephrasings of the same deed (no "name the boat" vs "claim the boat as heir",
+   no "sign with right hand" vs "sign with left hand"). The player must be able to recognize
+   what each choice stands for at a glance.
  - opportunity: if the trigger needs something the existing node does
    not yet contain (an offer, a discovery, an arrival), say what must be
    added to that node; otherwise null.

@@ -38,13 +38,24 @@ What you write, naming rooms, people and things exactly as the packet does:
       moment;
     - two to four incidental activities: help with a chore, share a drink,
       play with the dog. They make the place lived in;
-    - for EVERY entry in "leaving", the action that takes it ("leads_to":
-      its target). The default way on must be findable from every state of
-      the scene, never hidden; one that moves the player somewhere (out a
-      door, down a lane) is a go, where a player looks to leave, labelled
-      with how ("out the front door"); a branch is the outline's trigger, done in
-      the world, and people around it say what is at stake before it is
-      taken. If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET),
+    - for EVERY entry in "leaving", the action that takes it ("leads_to": its target):
+        * Default / linear progression: findable from every state of the scene, never hidden;
+          one that moves the player somewhere (out a door, down a lane) is a go, where a player
+          looks to leave, labelled with how ("out the front door").
+        * BRANCH DIVERGENCE (when "kind" is "branch"):
+          A branch is NEVER an unannounced booby trap or an ambiguous prop poke. The packet provides
+          the branch's full divergence context ("trigger", "instead", "shift", "branch_title", "branch_motivation").
+          1. DRAMATIC STANDOFF: Staged as an active impasse. The characters advocating each path
+             must visibly clash, plead, or state their demands/warnings in the opening and dialogues.
+             If taking a path risks or destroys a character's prop, money, or trust, that vulnerability
+             must be established in the room or dialogue BEFORE the action is chosen.
+          2. TELEGRAPHED LABELS: The menu label and detail phrase must telegraph the strategic commitment
+             or approach (e.g. "let Osric pay to cut ropes (scrapper deal)" vs "sound the gong for naval honors"),
+             strictly under 40 characters. Never use generic ambiguous verbs that disguise the fork as
+             routine exploration (no blind "grip tiller" or "batter pawl").
+          3. PHYSICAL CAUSALITY: A branch departure representing physical transit must be taken by a physical
+             verb (go, cut, untie, heave, cast off), not ambient conversation topics.
+      If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET),
       actions and movement represent telemetry, data bus queries, radio commands, or
       sensor sweeps; never use human bipedal locomotion ("step down", "walk into", "climb")
       or physical anatomy ("your hands", "in your pocket", "catch your breath").

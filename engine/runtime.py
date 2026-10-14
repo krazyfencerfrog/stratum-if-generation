@@ -623,11 +623,12 @@ class Engine:
 
     def _exit_due(self):
         st = self.state
-        if any(m.get('required') and m['id'] not in st.used for m in self.moments()):
-            return None          # a required moment holds the scene until it is answered
         for ex in self.scene().get('exits') or []:
             if evaluate(ex.get('when', 'true'), self.state):
-                return ex['to']
+                # A branch exit represents an intentional departure from this story line;
+                # it takes precedence over lingering unresolved local scene moments.
+                if ex.get('kind') == 'branch' or not any(m.get('required') and m['id'] not in st.used for m in self.moments()):
+                    return ex['to']
         return None
 
     def _enter_scene(self, sid, room=None):
