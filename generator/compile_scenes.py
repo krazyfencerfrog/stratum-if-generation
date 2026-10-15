@@ -22,7 +22,7 @@ events and nudges, and any small props. Python owns everything mechanical:
     (every scene's rooms joined among themselves), every name resolving
     while compiling (a hard retry), and after assembly the engine's
     validator and the playtest simulator.
-Output: <id>_package.json (stratum-story/1, playable with engine/cli.py) and
+Output: <id>_package_draft.json (stratum-story/1 draft, before prose revision) and
 <id>_package.md (the report: findings and walkthroughs).
 """
 
@@ -812,8 +812,8 @@ class SceneCompiler:
     def compile_and_verify(self, runs=None, max_states=None):
         """Compiles the package, runs the engine validator and playtest.
         Records reachability metrics in run_stats.json and writes package.md.
-        If validation or playtest finds errors, removes any existing package.json
-        and raises PipelineHalt. Only emits package.json on clean verification."""
+        If validation or playtest finds errors, removes any existing package_draft.json
+        and raises PipelineHalt. Only emits package_draft.json on clean verification."""
         package = self.run()
         report = self.check(package, runs=runs, max_states=max_states)
 
@@ -830,7 +830,7 @@ class SceneCompiler:
         fatal_errors = validator_errors + play_errors
 
         if fatal_errors:
-            pkg_path = self.gen.story_file_path('package.json')
+            pkg_path = self.gen.story_file_path('package_draft.json')
             if os.path.exists(pkg_path):
                 os.remove(pkg_path)
             for e in self.findings + fatal_errors:
@@ -841,8 +841,8 @@ class SceneCompiler:
                 + "; ".join(fatal_errors[:3])
             )
 
-        # Clean verification: emit package.json
-        self.gen.save_story_json('package.json', package)
+        # Clean verification: emit package_draft.json
+        self.gen.save_story_json('package_draft.json', package)
         return package, report
 
     def run(self):
@@ -921,8 +921,8 @@ def report_markdown(story_id, findings, report):
 
 def main(argv=None):
     """python compile_scenes.py <story_id>: stages C and D on a directory with
-    the outline, stage A and stage B. Writes <id>_package.json and .md; play
-    it with python ../engine/cli.py ../stories/<id>/<id>_package.json"""
+    the outline, stage A and stage B. Writes <id>_package_draft.json and .md; play
+    it with python ../engine/cli.py ../stories/<id>/<id>_package_draft.json"""
     from main import StoryGenerator, PipelineHalt
     import scenes
     ap = argparse.ArgumentParser(description=main.__doc__)

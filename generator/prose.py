@@ -2,7 +2,7 @@
 """The prose stage (docs/later_stages.md §6): an editing pass over the text
 stages B and D already wrote, in one voice per story.
 
-    python prose.py <story_id>     # on a directory with <id>_package.json; writes <id>_package_prose.json
+    python prose.py <story_id>     # on a directory with <id>_package_draft.json; writes <id>_package.json
 
 1. 8a, the style sheet: the voice for THIS story (tradition, person and
    tense, register, rhythm, how each person speaks, recurring images, what
@@ -649,16 +649,16 @@ def dialogue_distinctiveness(pkg):
 
 
 def write(gen, story=None):
-    """Runs the pass for gen's story: needs <id>_package.json."""
+    """Runs the pass for gen's story: needs <id>_package_draft.json."""
     base = gen.story_file_path('')
-    with open(base + 'package.json', encoding='utf-8') as f:
+    with open(base + 'package_draft.json', encoding='utf-8') as f:
         package = json.load(f)
     if story is None and os.path.isfile(base + 'story.json'):
         with open(base + 'story.json', encoding='utf-8') as f:
             story = json.load(f)
     writer = ProseWriter(gen, package, story)
     pkg, errors = writer.run()
-    gen.save_story_json('package_prose.json', pkg)
+    gen.save_story_json('package.json', pkg)
     gen.save_story_json('prose_style.json', writer.style_sheet)
     gen.save_story_file('prose.md', report_markdown(gen.story_id, writer.style_sheet, writer.findings, errors,
                                                     size(package), size(pkg), getattr(writer, 'dd_after', None)))
@@ -675,8 +675,8 @@ def main(argv=None):
     args = ap.parse_args(argv)
     gen = StoryGenerator(story_id=args.story_id)
     base = gen.story_file_path('')
-    if not os.path.isfile(base + 'package.json'):
-        print('the prose pass needs <id>_package.json (run --stage-d first)', file=sys.stderr)
+    if not os.path.isfile(base + 'package_draft.json'):
+        print('the prose pass needs <id>_package_draft.json (run --stage-d first)', file=sys.stderr)
         return 1
     for key, suffix in (('s3_brief', 's3_brief.json'), ('s3_4_promises', 's3_4_promises.json')):
         if os.path.isfile(base + suffix):

@@ -20,11 +20,11 @@ python -m venv .env
 source .env/bin/activate
 pip install -e .
 
-# Play via the plain terminal player:
-python engine/cli.py engine/examples/kernel35_demo.json
+# Play via the paned curses TUI (default, requires 80x24 terminal):
+python -m engine examples/kernel35_the_mooring_line.json
 
-# Or play via the paned curses TUI (requires 80x24 terminal):
-python engine/tui.py engine/examples/kernel35_demo.json
+# Or play via the plain terminal player:
+python -m engine --cli examples/kernel35_the_mooring_line.json
 ```
 
 ### Controls & Navigation
@@ -93,12 +93,12 @@ Story Kernel (2-3 sentences)
    │
    ▼
 [ Stages C & D ] Scene Compilation, Engine Package Assembly & Playtesting
-   │
+   │        ↳ Emits <id>_package_draft.json (resume checkpoint)
    ▼
 [ Stage 8 ] Prose Revision: Voice Harmonization & Engine Tokenization (generator/prose.py)
    │
    ▼
-Playable Story Package (<id>_package_prose.json)
+Playable Story Package (<id>_package.json)
 ```
 
 ### Key Stages
@@ -164,7 +164,26 @@ python tests/test_plumbing.py
 ```
 
 ### Running the Pipeline
-Run scripts from inside the `generator/` directory:
+Run the pipeline directly from the repository root:
+
+```bash
+# Run a full story generation run from a kernel (front-to-back through prose)
+python -m generator --story-id=my_story tests/kernels/kernel1.txt
+
+# Run through Stage D compilation without prose revision (emits <id>_package_draft.json)
+python -m generator --story-id=my_story --no-prose tests/kernels/kernel1.txt
+
+# Run through Stage A (Arc synthesis)
+python -m generator --story-id=my_story --stage-a tests/kernels/kernel1.txt
+
+# Stop after the outline loop (Step 3.8 / 4)
+python -m generator --story-id=my_story --stop-after 3.8 tests/kernels/kernel1.txt
+
+# Run against a model-free stub client for rapid pipeline testing
+STRATUM_CLIENT=stub python -m generator --story-id=stubtest tests/kernels/kernel1.txt
+```
+
+You can also run internal developer tools from `generator/`:
 
 ```bash
 cd generator
@@ -172,17 +191,8 @@ cd generator
 # Probe local Ollama server capabilities (context speed, structured output, breakers)
 python probe_ollama.py
 
-# Run a full story generation run from a kernel
-python main.py --story-id=my_story < ../tests/kernels/kernel1.txt
-
-# Run through Stage A (Arc synthesis)
-python main.py --story-id=my_story --stage-a < ../tests/kernels/kernel1.txt
-
 # Inspect call timings, token counts, and circuit breaker interventions
 python report.py my_story --baseline ../docs/baseline_kernel1_run_stats.json
-
-# Run against a model-free stub client for rapid pipeline testing
-STRATUM_CLIENT=stub python main.py --story-id=stubtest < ../tests/kernels/kernel1.txt
 ```
 
 ### Batch Runs & GPU Safety
@@ -199,10 +209,10 @@ python batch.py status
 
 ## 6. Repository Layout & Further Reading
 
+- [`examples/`](examples/): Curated, standalone playable story packages ready to run in the engine.
 - [`engine/`](engine/): The interactive fiction runtime, CLI player, curses TUI, and automated playtest verifier.
 - [`generator/`](generator/): The multi-stage narrative generation pipeline, Ollama client, and validators.
 - [`prompts/`](prompts/): System prompts and few-shot calibration fixtures for all generation stages.
 - [`tests/kernels/`](tests/kernels/): Curated test kernels across multiple genres and structural challenges.
-- [`CLAUDE.md`](CLAUDE.md): Detailed architectural and operational manual for code development.
 - [`docs/engine_design.md`](docs/engine_design.md): Deep-dive into engine mechanics, disclosure design, and UI layout.
 - [`docs/outline_design.md`](docs/outline_design.md): Design document for the outline generation loop and story graph invariants.

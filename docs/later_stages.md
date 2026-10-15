@@ -483,7 +483,7 @@ state moves onto the options by position, decides required moments (a state
 some ending variant or pattern shift reads) and demands their neutral
 option, sets the done flags, builds exits as flags the leading actions set
 (pattern shifts first, then branches, then the default), assembles
-`<id>_package.json` and checks it with the engine's validator and playtest
+`<id>_package_draft.json` and checks it with the engine's validator and playtest
 (`<id>_package.md`). On the stub, kernel to playable package end to end. Not
 yet built: the repair call fed by the playtest's findings; exploring a whole
 story exhaustively does not scale (the stub stops at the state limit in its
@@ -735,8 +735,9 @@ Built as designed, with these settled while building:
   soft length, and across scenes a five-word run already read that the
   revision brought (a fact the text already had may recur). A missing text
   or a code that names nobody is a hard retry.
-- Output: `<id>_package_prose.json` beside the package (the package is
-  kept), `<id>_prose_style.json`, `<id>_prose.md` (the sheet, its sample,
+- Output: `<id>_package.json` (the final revised package; the draft
+  `<id>_package_draft.json` is preserved as a resume checkpoint),
+  `<id>_prose_style.json`, `<id>_prose.md` (the sheet, its sample,
   the size before and after, findings, the engine validator).
 - Not yet run on the live model: the first run is kernel35's package
   (about 25 calls, 2-2.5 hours).

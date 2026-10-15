@@ -1879,7 +1879,7 @@ class StoryGenerator:
     def run_package(self, story=None, arcs_result=None, world_result=None):
         """Stages C and D (generator/compile_scenes.py): reconcile, compile
         every scene, assemble the engine package, and check it with the
-        engine's validator and playtest. Writes <id>_package.json and .md."""
+        engine's validator and playtest. Writes <id>_package_draft.json and .md."""
         load = lambda suffix: json.loads(Path(self.story_file_path(suffix)).read_text(encoding='utf-8'))
         story = story or self.analysis.get('story') or load('story.json')
         arcs_result = arcs_result or load('arcs.json')
@@ -1897,8 +1897,8 @@ class StoryGenerator:
 
 
     def run_prose(self):
-        """The prose pass (generator/prose.py) over <id>_package.json: writes
-        <id>_package_prose.json, <id>_prose_style.json and <id>_prose.md."""
+        """The prose pass (generator/prose.py) over <id>_package_draft.json: writes
+        <id>_package.json, <id>_prose_style.json and <id>_prose.md."""
         import prose
         return prose.write(self, self.analysis.get('story'))
 
@@ -1945,11 +1945,12 @@ def csv(value):
     return [s.strip() for s in (value or '').split(',') if s.strip()]
 
 
-if __name__ == "__main__":
-
+def main(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("kernel_file", nargs="?", default=None,
+                        help="optional path to story premise kernel text file (reads from stdin if omitted)")
     parser.add_argument("--story-id", default='', help="identifier for the story, used for directory and file naming (note will be slugified)")
     parser.add_argument("--author", default="Anonymous", help="author name or credit for story package metadata")
     parser.add_argument("--rating", default=DEFAULT_RATING, help="(step2 input) US Film Rating to respect for generated story")
@@ -1990,14 +1991,14 @@ if __name__ == "__main__":
                              "<id>_world.json, <id>_world.md); implies --stage-a")
     parser.add_argument("--stage-d", action="store_true",
                         help="after stage B, run stages C and D (compile the scenes into an engine package: "
-                             "<id>_package.json, playable with engine/cli.py); implies --stage-a and --stage-b")
+                             "<id>_package_draft.json, playable with engine/cli.py); implies --stage-a and --stage-b")
     parser.add_argument("--prose", action="store_true",
                         help="after stage D, the prose pass (a style sheet, then the text revised part by part in "
-                             "that voice: <id>_package_prose.json); implies --stage-d")
+                             "that voice: <id>_package.json); implies --stage-d")
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     story_id = slugify(args.story_id)
     if not story_id:
@@ -2014,15 +2015,19 @@ if __name__ == "__main__":
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
 
-    print('enter kernel and close stdin:')
-
     def finish(code=0):
         for line in gen.stats.summary_lines():
             print(line)
         sys.exit(code)
 
     try:
-        gen.s1_take_kernel(sys.stdin.read())
+        if args.kernel_file:
+            with open(args.kernel_file, encoding='utf-8') as f:
+                kernel_text = f.read()
+        else:
+            print('enter kernel and close stdin:')
+            kernel_text = sys.stdin.read()
+        gen.s1_take_kernel(kernel_text)
         gen.s2_apply_rating(rating=args.rating)
 
         gen.s2_split_shape()
@@ -2076,3 +2081,7 @@ if __name__ == "__main__":
             print(line)
         raise
     finish()
+
+
+if __name__ == "__main__":
+    main()

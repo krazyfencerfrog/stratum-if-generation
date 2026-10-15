@@ -981,7 +981,7 @@ def the_prose_pass_revises_text_and_keeps_structure():
     from runtime import Engine
     run('prose', args=['--prose'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
                                         'STUB_STYLE_FAILS': '1', 'STUB_PROSE_DROP': '1', 'STUB_PROSE_IF': '1'})
-    before, after = load('prose', 'package.json'), load('prose', 'package_prose.json')
+    before, after = load('prose', 'package_draft.json'), load('prose', 'package.json')
 
     def skeleton(node):
         if isinstance(node, dict):
@@ -992,10 +992,10 @@ def the_prose_pass_revises_text_and_keeps_structure():
         return node
     check(skeleton(before) == skeleton(after), 'the prose pass changed something other than text')
     # a resumed run replays every saved edit (the validator reads back the form it saved)
-    os.remove(os.path.join(story_dir('prose'), f'{PREFIX}prose_package_prose.json'))
+    os.remove(os.path.join(story_dir('prose'), f'{PREFIX}prose_package.json'))
     n_calls = len(calls('prose'))
     run('prose', args=['--prose'], fresh=False, env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
-    check(load('prose', 'package_prose.json') == after and len(calls('prose')) == n_calls,
+    check(load('prose', 'package.json') == after and len(calls('prose')) == n_calls,
           'a resumed prose pass did not replay its saved edits')
     texts = []
 
@@ -1144,7 +1144,7 @@ def stages_c_and_d_compile_a_playable_package():
     from story import Story as EngineStory, validate as engine_validate
     from runtime import Engine
     run('staged', args=['--stage-d'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'})
-    package = load('staged', 'package.json')
+    package = load('staged', 'package_draft.json')
     story = EngineStory(package)
     errors, _ = engine_validate(story)
     check(not errors, f'the compiled package does not validate: {errors[:5]}')
@@ -1213,7 +1213,7 @@ def stage_d_blocks_and_halts_on_unreachable_scenes_or_stuck_states():
                       os.path.join(story_dir(halt_name), f.replace(f'{PREFIX}staged_', f'{PREFIX}{halt_name}_')))
 
     gen = StoryGenerator(story_id=f'{PREFIX}{halt_name}')
-    pkg_path = gen.story_file_path('package.json')
+    pkg_path = gen.story_file_path('package_draft.json')
     with open(pkg_path, 'w', encoding='utf-8') as f:
         f.write('{"stale": true}')
 
@@ -1246,7 +1246,7 @@ def stage_d_blocks_and_halts_on_unreachable_scenes_or_stuck_states():
         check('Stage D package verification failed' in str(e), f'unexpected halt message: {e}')
 
     check(halted, 'compile_and_verify did not raise PipelineHalt on broken graph')
-    check(not os.path.exists(pkg_path), 'package.json was not removed upon verification failure')
+    check(not os.path.exists(pkg_path), 'package_draft.json was not removed upon verification failure')
     md_path = gen.story_file_path('package.md')
     check(os.path.exists(md_path) and '# ' in Path(md_path).read_text(encoding='utf-8'),
           'package.md was not written on verification failure')

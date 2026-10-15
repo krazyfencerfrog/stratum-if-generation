@@ -18,19 +18,25 @@ Each package is a standalone JSON file compliant with the Stratum engine specifi
 You can play any of these stories using the built-in terminal interfaces from the root of the repository:
 
 ### 1. Terminal User Interface (TUI)
-Recommended for standard play:
+Recommended for standard play (defaults to TUI):
 ```bash
-python engine/tui.py examples/kernel2_the_chain_that_names_the_dead.json
+python -m engine examples/kernel2_the_chain_that_names_the_dead.json
 ```
 
 ### 2. Line-Oriented Command Line Interface (CLI)
 Suitable for scripting, piping, or minimal terminals:
 ```bash
-python engine/cli.py examples/kernel35_the_mooring_line.json
+python -m engine --cli examples/kernel35_the_mooring_line.json
 ```
 
 ### 3. Validating Packages
 To verify the structural integrity, reachability, and grammar checks without playing:
 ```bash
-python engine/cli.py examples/kernel37_the_wire_and_the_gun.json --check
+python -m engine --check examples/kernel37_the_wire_and_the_gun.json
+```
+
+### 4. Automated Playtesting
+To run the automated reachability solver and walkthrough finder:
+```bash
+python -m engine --playtest examples/kernel35_the_mooring_line.json
 ```
