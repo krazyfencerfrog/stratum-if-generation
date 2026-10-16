@@ -93,8 +93,11 @@ class ClaudeClient(LlmClient):
             attempt += 1
             started = time.time()
             try:
+                # its own session: claude never sees the terminal, so ctrl-c
+                # interrupts this process (and subprocess.run kills claude)
+                # instead of killing claude and leaving the retry loop to go on
                 proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
-                                      timeout=timeout, cwd=self.workdir)
+                                      timeout=timeout, cwd=self.workdir, start_new_session=True)
             except subprocess.TimeoutExpired:
                 elapsed = round(time.time() - started, 2)
                 self.last_call = {

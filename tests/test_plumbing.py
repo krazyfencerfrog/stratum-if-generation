@@ -2350,6 +2350,7 @@ def claude_client_unit_test():
         check("--no-session-persistence" in cmd and "--strict-mcp-config" in cmd, "isolation flags missing")
         check(kwargs['input'] == "test prompt", "input not passed to stdin")
         check(kwargs['cwd'] == client.workdir and not os.listdir(client.workdir), "not run in an empty workdir")
+        check(kwargs.get('start_new_session') is True, "claude must not share the terminal's session")
 
     # 2. Plain-text result, thinking effort, no model given
     text_payload = dict(ok_payload, result="```json\n{\"a\": 1}\n```", structured_output=None,
