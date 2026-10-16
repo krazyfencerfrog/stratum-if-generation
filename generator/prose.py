@@ -66,7 +66,7 @@ GUIDANCE = {
     'scene': "THIS PART is one scene: its opening (the first thing read on arrival: put the player in the room and "
              "the moment, with who is here; it tells the world, never a deed the player did not choose), what each of its actions does (the response to choosing it), how its "
              "rooms read during it, the events that happen on their own, the nudges if the player idles, and its "
-             "journal entry ('recap': what the scene put before the player, for the story-so-far page).",
+             "journal entry ('recap': what the scene put before the player, for the story-so-far page; describe the circumstance, dilemma, or situation found here—NEVER describe what the player chose or did (no 'You took...', 'You let...', 'You signed...'), because the journal records player choices separately beneath it).",
     'person': "THIS PART is one person: how they look (by their state), the line the room shows them by ('here': what "
               "they are doing or holding when found, never where they are, since each scene places them and the line "
               "is read in every room they turn up in), "
@@ -384,9 +384,10 @@ class ProseWriter:
         if kind == 'scene' and unit['first']:
             sid = unit['of']
             node = (self.story.get('nodes') or {}).get(sid[2:] if sid.startswith('S_') else sid) or {}
-            items.append({'id': 'recap', 'what': "the journal entry for this scene: what it put before the player, as "
-                          "they will remember it afterwards (who was there, what pressed), one or two sentences, past "
-                          "tense, second person; never what they chose, which the journal lists on its own",
+            items.append({'id': 'recap', 'what': "the journal entry for this scene: the situation, dilemma, or "
+                          "circumstance confronting the protagonist on arrival (who was there, what pressed), one or two "
+                          "sentences; describe what was before you or found in the world, NEVER a player deed or choice (do NOT "
+                          "write 'You took...', 'You let...', 'You signed...', 'You decided...'), which the journal lists separately beneath it",
                           'text': node.get('summary') or self.pkg['scenes'][sid].get('title') or ''})
             kinds['recap'], originals['recap'] = 'recap', items[-1]['text']
         ids = [x['id'] for x in items]
@@ -419,8 +420,9 @@ class ProseWriter:
                 if k == 'recap' and not 8 <= len(words(t)) <= 70:
                     soft.append(f'recap: {len(words(t))} words; one or two sentences')
                 if k == 'recap' and example_guard.player_deed(t):     # the same recap is read whatever they did
-                    soft.append(f'recap: says what the player did ("{example_guard.player_deed(t).group(0)}"); say what '
-                                f'the scene put before them, since the journal lists their choices beneath it')
+                    soft.append(f'recap: says what the player did ("{example_guard.player_deed(t).group(0)}"); describe '
+                                f'the situation or dilemma confronting the protagonist, not player deeds (no "You take...", '
+                                f'"You let...", "You signed..."), since the journal lists their choices beneath it')
                 if k == 'dialogue':
                     for issue in validate_dialogue_text(originals[i], t):
                         soft.append(f'{i}: {issue}')

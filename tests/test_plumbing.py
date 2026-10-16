@@ -3275,6 +3275,46 @@ def stage_d_moment_option_count_and_neutral_discipline():
     check(any('needs a neutral option marked "neutral": true' in p for p in problems), f'missing neutral option should be rejected: {problems}')
 
 
+@test
+def prose_recap_guidance_and_player_deed_validation():
+    import prose, example_guard
+
+    # 1. Verify player deed detection in recap
+    deed_texts = [
+        "You take the cold tiller with both hands and call the boat by its name.",
+        "You let him inspect while Laurent stands in the doorway.",
+        "You signed the breaker's ledger before the fog set in.",
+        "You keep the engine running while Osric coughs in the soot.",
+        "You decide to hold the price firm at five pounds.",
+        "You agreed to cut the lines with a billhook.",
+    ]
+    for dt in deed_texts:
+        m = example_guard.player_deed(dt)
+        check(m is not None, f"expected player deed detection in '{dt}'")
+
+    # 2. Verify non-deed situational/dilemma recaps pass cleanly
+    valid_recaps = [
+        "The canal basin lay frozen beneath the weir while {C01} demanded forty pounds.",
+        "Soots billowed from the open stove, and {C02} stood shivering in the doorway with his wrench.",
+        "A low paper price was on the table, unaware that the mooring chain was still held from inside.",
+        "You were trapped beside the weir as night came on and the water turned to slush."
+    ]
+    for vr in valid_recaps:
+        m = example_guard.player_deed(vr)
+        check(m is None, f"unexpected player deed detection in valid recap '{vr}': {m}")
+
+    # 3. Check GUIDANCE['scene'] includes the negative constraint
+    scene_guidance = prose.GUIDANCE.get('scene', '')
+    check('recap' in scene_guidance, "recap not mentioned in GUIDANCE['scene']")
+    check('NEVER describe what the player chose or did' in scene_guidance,
+          "GUIDANCE['scene'] missing negative constraint on recap player deeds")
+
+    # 4. Check s8b_edit.prompt includes Rule 11
+    prompt_text = open(os.path.join(ROOT, 'prompts', 's8b_edit.prompt'), encoding='utf-8').read()
+    check('11. Scene Recaps' in prompt_text, "Rule 11 missing from s8b_edit.prompt")
+    check('NEVER narrate the player\'s choices' in prompt_text, "Rule 11 missing negative constraint in s8b_edit.prompt")
+
+
 # ---------------------------------------------------------------- runner
 
 
