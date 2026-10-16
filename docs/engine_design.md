@@ -557,4 +557,4 @@ here-lines naming places, sentence-case event topics; stage D's take on
 fixed things, the engine's own verbs, ways on written as use, openings that
 narrate a deed of the player's, placements that contradict the opening,
 events retelling it; prose recaps that narrate the player's choices): see
-CLAUDE.md.
+docs/later_stages.md.

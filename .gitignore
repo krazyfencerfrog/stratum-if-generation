@@ -217,16 +217,16 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# local LLM backend selection (see README) and plumbing-test story directories
+# local LLM backend selection (see README)
 generator/dynamic_config.py
-stories/zzt_*/
 
-# batch runner state
-stories/batch_queue.json*
-stories/batch_report.md
-stories/*/*_batch.log
-*.lock
-
-# Stratum run scratch, traces, and telemetry
+# Stratum run scratch, traces, telemetry, and GPU locks
 stories/
 *.lock
+
+# Stratum engine game saves
+*.save
+
+# AI agent local settings and write scratch
+.claude/
+**/.claude/

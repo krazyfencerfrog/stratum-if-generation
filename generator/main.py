@@ -24,8 +24,8 @@ The product is a story graph: <id>_story.json and <id>_story.md.
 
 Every model call is resumable: its output is saved under stories/<id>/ and
 skipped on the next run if the file exists. Every attempt is recorded in
-<id>_run_stats.json (see report.py). docs/outline_design.md describes the
-pipeline; CLAUDE.md the file naming and how to re-run a step.
+<id>_run_stats.json (see report.py). docs/outline_design.md and
+docs/later_stages.md describe the pipeline stages and artifacts.
 """
 
 import os
