@@ -545,6 +545,8 @@ class StoryGenerator:
         loop_seed = None        # set after a loop: the retry samples from a new seed
         attempts_left = retries + 1
         attempt = 0
+        syntax_retries_left = 1
+        soft_candidate = None
         while attempts_left > 0:
             attempts_left -= 1
             attempt += 1
@@ -660,17 +662,38 @@ class StoryGenerator:
                     self.stats.record(**rec)
                     print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
                     feedback = self.retry_feedback(e, response)
+                    soft_candidate = (parsed, str(e))
                     continue
                 rec['soft_problems'] = str(e)
                 print(f'  attempt {attempt} for {output_member_name} accepted with problems left to the next check: {e}')
-            except (json.JSONDecodeError, ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
+            except json.JSONDecodeError as e:
                 last_error = e
                 rec['error'] = str(e)
                 self.keep_rejected(prefix, attempt, thinking, response)
                 self.stats.record(**rec)
-                print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
-                feedback = self.retry_feedback(e, response)
-                continue
+                if attempts_left > 0 or syntax_retries_left > 0:
+                    if attempts_left == 0:
+                        syntax_retries_left -= 1
+                        attempts_left += 1
+                    print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
+                    feedback = self.retry_feedback(e, response)
+                    continue
+                if soft_candidate is not None:
+                    parsed, soft_err = soft_candidate
+                    rec['soft_problems'] = f'recovered from syntax error ({e}) by using valid earlier output with soft problems: {soft_err}'
+                    print(f'  falling back to earlier valid output for {output_member_name} (soft problems: {soft_err})')
+                else:
+                    break
+            except (ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
+                last_error = e
+                rec['error'] = str(e)
+                self.keep_rejected(prefix, attempt, thinking, response)
+                self.stats.record(**rec)
+                if attempts_left > 0:
+                    print(f'  attempt {attempt} for {output_member_name} rejected: {e}')
+                    feedback = self.retry_feedback(e, response)
+                    continue
+                break
             rec['ok'] = True
             self.stats.record(**rec)
             self.analysis[output_member_name] = parsed
@@ -764,8 +787,8 @@ class StoryGenerator:
         Repair receives the violation list; it is never a blind re-roll."""
         problem = ('it was not valid JSON (' + str(error) + ')') if isinstance(error, json.JSONDecodeError) else str(error)
         previous = (response or '').strip()
-        if len(previous) > 12000:
-            previous = previous[:12000] + '\n... (truncated)'
+        if len(previous) > 24000:
+            previous = previous[:24000] + '\n... (truncated)'
         return (f"\n\n{RETRY_MARKER}\nA computed check found this wrong with it:\n - {problem}\n"
                 f"Return the whole JSON again with only that fixed. Keep everything else exactly as it was.\n"
                 f"Your previous answer:\n{previous}\n")

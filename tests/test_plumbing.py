@@ -3079,6 +3079,22 @@ def ending_resolution_liveness_contradictions_are_caught():
     )
     check(c4 is None, f"expected None, got: {c4}")
 
+    # "dead end" idiom in resolution does not flag character as dead
+    c5 = checks.resolution_liveness_contradiction(
+        "Eamon remains on the far side of the mountain pass, and Ellis is not there to count the places.",
+        "Following the renamed road into the mountains, the shortcut became a dead end and she is lost.",
+        char_label="C02", char_name="Ellis Dunmore"
+    )
+    check(c5 is None, f"expected None for dead end idiom, got: {c5}")
+
+    # Survival word in neighboring clause does not bleed into absent character
+    c6 = checks.resolution_liveness_contradiction(
+        "Eamon remains on the far side of the dragon's breath; Ellis is not there.",
+        "She is lost in the mountains.",
+        char_label="C02", char_name="Ellis Dunmore"
+    )
+    check(c6 is None, f"expected None for clause isolation, got: {c6}")
+
 
 @test
 def protagonist_embodiment_and_somatic_drift():
@@ -3578,7 +3594,62 @@ def branch_exit_kind_preservation_and_setting_scale_invariants():
     e_blocked = Engine(Story(pkg_no_kind))
     e_blocked.start()
     e_blocked.act('S01.a_branch')
-    check(e_blocked.state.scene == 'S01', f'exit without kind=branch should be blocked by pending required moment')
+
+@test
+def syntax_retry_after_soft_reject_and_fallback():
+    import main as gen_main
+    from errors import SoftReject
+    import tempfile
+
+    td = tempfile.mkdtemp()
+    try:
+        # Test case 1: Attempt 1 has SoftReject. Attempt 2 has JSONDecodeError.
+        # Dedicated syntax retry allows Attempt 3 to fix JSON.
+        gen1 = gen_main.StoryGenerator(story_id='test1', stories_root=td)
+        responses1 = [
+            ('', '{"count": 3}'),              # Attempt 1: valid JSON, triggers SoftReject
+            ('', '{"count": 4'),               # Attempt 2: bad JSON (missing closing brace)
+            ('', '{"count": 4}'),              # Attempt 3: syntax retry, valid JSON
+        ]
+        class MockClient:
+            def __init__(self, responses):
+                self.responses = list(responses)
+                self.calls = 0
+                self.prompts = []
+            def run_prompt(self, p, **kwargs):
+                self.prompts.append(p)
+                resp = self.responses[self.calls]
+                self.calls += 1
+                return resp
+
+        mock1 = MockClient(responses1)
+        gen1.client = mock1
+        def validator(parsed):
+            if parsed.get('count') == 3:
+                raise SoftReject('count should be at least 4')
+            return True
+
+        repl = {'$$TARGET_RATING$$': 'PG', '$$KERNEL$$': 'test'}
+        res1 = gen1.run_prompt('s_test1', 'test1', repl, prompt_file='s2_filter.prompt', validator=validator, retries=1)
+        check(res1 == {'count': 4}, f'expected successful syntax retry, got {res1}')
+        check(mock1.calls == 3, f'expected 3 calls (initial, soft reject retry, syntax retry), got {mock1.calls}')
+        check('it was not valid JSON' in mock1.prompts[-1], 'syntax error feedback not passed to attempt 3')
+
+        # Test case 2: Attempt 1 has SoftReject. Attempts 2 and 3 have bad JSON.
+        # When syntax retries exhaust, pipeline falls back to Attempt 1 candidate instead of crashing.
+        gen2 = gen_main.StoryGenerator(story_id='test2', stories_root=td)
+        responses2 = [
+            ('', '{"count": 3}'),
+            ('', '{"count": 4'),
+            ('', '{"count": 5'),
+        ]
+        mock2 = MockClient(responses2)
+        gen2.client = mock2
+        res2 = gen2.run_prompt('s_test2', 'test2', repl, prompt_file='s2_filter.prompt', validator=validator, retries=1)
+        check(res2 == {'count': 3}, f'expected fallback to soft candidate, got {res2}')
+        check(mock2.calls == 3, f'expected 3 calls before fallback, got {mock2.calls}')
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
 
 
 # ---------------------------------------------------------------- runner

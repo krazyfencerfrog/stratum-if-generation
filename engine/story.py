@@ -680,7 +680,7 @@ def ending_groups(end):
     return groups
 
 
-DEATH_WORDS = re.compile(r'\b(dies|died|killed|perished|succumbed|dead|death)\b', re.I)
+DEATH_WORDS = re.compile(r'\b(dies|died|killed|perished|succumbed|death|dead(?!\s+(?:end|drop|weight|of\s+(?:night|winter)|quiet|silent|reckoning)))\b', re.I)
 SURVIVAL_WORDS = re.compile(r'\b(survives|survived|alive|steps back|remains|still standing|keeps breathing|watches|stands|flees|leaves|steps away)\b', re.I)
 
 
@@ -704,9 +704,16 @@ def resolution_liveness_contradiction(summary_text, resolution_text, char_label=
 
     char_re = re.compile(r'\b(' + '|'.join(name_patterns) + r')\b', re.I) if name_patterns else None
 
-    sentences = [s.strip() for s in re.split(r'[.!?]+', summary_text) if s.strip()]
+    sentences = [s.strip() for s in re.split(r'[.!?;]|\n+', summary_text) if s.strip()]
     if char_re:
-        relevant = [s for s in sentences if char_re.search(s)]
+        clauses = []
+        for s in sentences:
+            parts = re.split(r'[,;]|\b(?:and|but|while)\b', s)
+            for p in parts:
+                p_clean = p.strip()
+                if p_clean and char_re.search(p_clean):
+                    clauses.append(p_clean)
+        relevant = clauses if clauses else [s for s in sentences if char_re.search(s)]
     else:
         relevant = sentences
 
