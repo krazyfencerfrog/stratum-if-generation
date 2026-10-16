@@ -569,17 +569,27 @@ class SceneCompiler:
                 problems.append(f'opportunity {nid} has no moment')
                 continue
             a2 = n.get('options') or []
-            opts = [o for o in as_list(m.get('options')) if isinstance(o, dict) and not o.get('neutral')]
-            neutral = [o for o in as_list(m.get('options')) if isinstance(o, dict) and o.get('neutral')]
-            if len(opts) != len(a2):
-                problems.append(f'moment {nid}: {len(opts)} options for stage A\'s {len(a2)}; one engine action per '
-                                f'option, in the same order (plus a neutral one if it is required)')
-                continue
+            all_opts = [o for o in as_list(m.get('options')) if isinstance(o, dict)]
+            opts = [o for o in all_opts if not o.get('neutral')]
+            neutral = [o for o in all_opts if o.get('neutral')]
             moved = {mv['state'] for o in a2 for mv in o.get('moves') or []}
             is_required = bool(moved & required)
+            if is_required and not neutral and len(all_opts) == len(a2) + 1:
+                all_opts[-1]['neutral'] = True
+                opts = all_opts[:-1]
+                neutral = [all_opts[-1]]
+            if len(opts) != len(a2):
+                if is_required:
+                    problems.append(f'moment {nid}: expected {len(a2)} active options plus 1 neutral option '
+                                    f'("neutral": true) for stage A\'s {len(a2)} options; found {len(opts)} active '
+                                    f'and {len(neutral)} neutral options (one engine action per option, in the same order)')
+                else:
+                    problems.append(f'moment {nid}: expected {len(a2)} active options for stage A\'s {len(a2)}; '
+                                    f'found {len(opts)} options (one engine action per option, in the same order)')
+                continue
             if is_required and not neutral:
                 problems.append(f'moment {nid} is required (its state decides how the story ends), so it needs a '
-                                f'neutral option: something to do that takes no side')
+                                f'neutral option marked "neutral": true: something to do that takes no side')
             ids = []
             for i, (o, src) in enumerate(zip(opts, a2), 1):
                 effects = [{'move': mv['state'], 'dir': mv['direction']} for mv in src.get('moves') or []]

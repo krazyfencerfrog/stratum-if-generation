@@ -32,14 +32,23 @@ What you write, naming rooms, people and things exactly as the packet does:
    (the tells due here: show the effect of the player's earlier choice in
    what a person does or where they stand; give the direction, up or down,
    since the two read differently), or after a node, with a default.
- - moments: one per OPPORTUNITY node. For each of its options, in the
-   SAME ORDER, one engine action: a verb, an object, a detail, a menu
-   label, the room (or null), and the text of what happens (two to four
-   sentences). An active option is a physical try: write what happens when
-   it succeeds or fails, in one text. A REQUIRED opportunity also gets one
-   more option marked "neutral": true, something to do that takes no side
-   ("'Later. Let's get her moving first.'"). An optional one gets a lapse:
-   after how many actions it passes and what that looks like.
+ - moments: one per OPPORTUNITY node.
+   CRITICAL OPTION COUNT AND CORRESPONDENCE:
+   * Active option count must match Stage A EXACTLY: For an opportunity with N
+     options in Stage A (the packet's node["options"]), you MUST write EXACTLY N
+     active engine actions in the SAME ORDER, each with "neutral": false. Never
+     add extraneous choices for narrative richness (e.g. do NOT invent 3 actions
+     when Stage A specifies 2), and never omit an option.
+   * REQUIRED opportunities ("required": true in the packet): You MUST append
+     EXACTLY ONE extra option at the end of the "options" list with "neutral": true,
+     giving something to do that takes no side ("'Later. Let's get her moving first.'").
+     DO NOT leave "neutral": false on this neutral option! It must be explicitly
+     "neutral": true.
+   * OPTIONAL opportunities ("required": false or omitted): Do NOT add a neutral
+     option! Write only the N active options (all "neutral": false) and provide a
+     "lapse" object (after how many actions it passes and what that looks like).
+   An active option is a physical try: write what happens when it succeeds or fails,
+   in one text.
  - actions: everything else the player can do here:
     - each REVELATION node becomes an action that finds it out ("reveals":
       [the node id]): read the letter, open the drawer, ask at the right
@@ -107,6 +116,12 @@ Rules:
  - Menu labels must be concise action phrases or short spoken lines, strictly
    under 40 characters (e.g. "put the letter on the table", "make two teas").
    Never write full narrative sentences or compound descriptions as labels.
+ - Option count matching for moments: For each opportunity node, generate an
+   exact 1:1 match to Stage A's options list in the same order, with each active
+   option marked "neutral": false. If and only if the opportunity is marked
+   "required": true in the packet, append exactly one final neutral option marked
+   "neutral": true (something taking no side). Never add extraneous options and
+   never omit an option.
  - Stakes live in bodies, places and things; paper only where the story is
    about it.
  - Keep each text short: this is a placeholder a later prose pass rewrites,
@@ -123,7 +138,10 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
   "placement": [{"who": "<name>", "room": "<room>"}],
   "room_text": [{"room": "<room>", "variants": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node or null>", "text": "<text>"}]}],
   "moments": [{"node": "<opportunity node id>",
-               "options": [{"verb": "<verb>", "object": "<name>", "detail": "<name, or a line in quotes, or null>", "label": "<concise menu label for the detail, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "neutral": false}],
+               "options": [
+                 {"verb": "<verb>", "object": "<name>", "detail": "<name, or a line in quotes, or null>", "label": "<concise menu label for the detail, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "neutral": false},
+                 {"verb": "<verb>", "object": "<name>", "detail": "<line in quotes or null, taking no side>", "label": "<label under 40 chars>", "room": "<room or null>", "text": "<takes no side>", "neutral": true}
+               ],
                "lapse": {"after": 4, "text": "<what passing it looks like>"}}],
   "actions": [{"verb": "<verb>", "object": "<name or null>", "detail": "<or null>", "label": "<concise menu label, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "reveals": ["<revelation node id>"], "leads_to": "<target from leaving, or null>", "once": false}],
   "events": [{"text": "<what happens>", "after_turns": 2, "after": null}],

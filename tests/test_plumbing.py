@@ -3144,6 +3144,137 @@ def content_rating_derivation_and_package_metadata():
     check(bool(meta['rating_advisory']), 'advisory empty')
 
 
+@test
+def stage_d_moment_option_count_and_neutral_discipline():
+    import compile_scenes
+    compiler = compile_scenes.SceneCompiler.__new__(compile_scenes.SceneCompiler)
+    compiler.world = {
+        'rooms': {'r1': {'name': 'the room', 'location': 'L01', 'exits': []}},
+        'objects': {},
+        'characters': {}
+    }
+    compiler.nodes = {
+        'N01': {'kind': 'major'},
+        'N01a': {
+            'kind': 'opportunity',
+            'options': [
+                {'do': 'First choice', 'moves': [{'state': 'st_a', 'direction': 'up'}]},
+                {'do': 'Second choice', 'moves': [{'state': 'st_a', 'direction': 'down'}]}
+            ]
+        }
+    }
+    compiler.states = {'st_a'}
+    compiler.story = {'lines': {'T1': {'path': ['N01', 'N01a']}}, 'line_order': ['T1']}
+    compiler.scene_of = {'N01': 'S01', 'N01a': 'S01'}
+    compiler.plan = {'scenes': [{'id': 'S01', 'nodes': ['N01', 'N01a']}]}
+    compiler.verbs = set()
+    compiler.arcs = {'pattern_shifts': []}
+
+    # Mock required_states: st_a is required
+    compiler.required_states = lambda: {'st_a'}
+
+    sc = {'id': 'S01', 'major': 'N01', 'nodes': ['N01', 'N01a'], 'who': [], 'title': 'S01', 'lines': ['T1']}
+
+    # 1. Exact match with Stage A + explicit neutral: true -> compiles cleanly
+    answer_valid = {
+        'opening': 'Opening text.',
+        'start_room': 'the room',
+        'placement': [],
+        'room_text': [],
+        'moments': [{
+            'node': 'N01a',
+            'options': [
+                {'verb': 'talk', 'object': 'the room', 'detail': None, 'label': 'talk choice 1', 'room': 'the room', 'text': 'Done 1', 'neutral': False},
+                {'verb': 'use', 'object': 'the room', 'detail': None, 'label': 'use choice 2', 'room': 'the room', 'text': 'Done 2', 'neutral': False},
+                {'verb': 'wait', 'object': None, 'detail': None, 'label': 'wait choice n', 'room': None, 'text': 'Done n', 'neutral': True}
+            ]
+        }],
+        'actions': [{'verb': 'leave', 'object': 'the room', 'detail': None, 'label': 'out', 'room': 'the room', 'text': 'Leave', 'reveals': [], 'leads_to': 'S02', 'once': False}],
+        'events': [],
+        'nudges': [{'after': 4, 'text': 'Nudge.'}],
+        'props': []
+    }
+    compiler.out_edges = lambda s: [{'to': 'S02', 'kind': 'default'}]
+    problems = []
+    compiler.build(sc, answer_valid, problems)
+    check(not any('moment N01a' in p for p in problems), f'valid moments should have no moment errors: {problems}')
+
+    # 2. Required moment where model provided 2 active + 1 neutral choice but marked all neutral: false (Issue #37 Gemini failure pattern)
+    # Auto-heal should coerce the 3rd option to neutral: True and succeed without soft-rejecting
+    answer_gemini_drift = {
+        'opening': 'Opening text.',
+        'start_room': 'the room',
+        'placement': [],
+        'room_text': [],
+        'moments': [{
+            'node': 'N01a',
+            'options': [
+                {'verb': 'talk', 'object': 'the room', 'detail': None, 'label': 'talk choice 1', 'room': 'the room', 'text': 'Done 1', 'neutral': False},
+                {'verb': 'use', 'object': 'the room', 'detail': None, 'label': 'use choice 2', 'room': 'the room', 'text': 'Done 2', 'neutral': False},
+                {'verb': 'wait', 'object': None, 'detail': None, 'label': 'wait choice n', 'room': None, 'text': 'Done n', 'neutral': False}
+            ]
+        }],
+        'actions': [{'verb': 'leave', 'object': 'the room', 'detail': None, 'label': 'out', 'room': 'the room', 'text': 'Leave', 'reveals': [], 'leads_to': 'S02', 'once': False}],
+        'events': [],
+        'nudges': [{'after': 4, 'text': 'Nudge.'}],
+        'props': []
+    }
+    problems = []
+    built = compiler.build(sc, answer_gemini_drift, problems)
+    check(not any('moment N01a' in p for p in problems), f'auto-healed moment should have no moment errors: {problems}')
+    mom = built['scene']['moments'][0]
+    check(mom.get('required') is True, 'moment should be required')
+    check(bool(mom.get('neutral')), 'moment should have neutral id')
+
+    # 3. Optional moment (not required): extra 3rd option should be rejected
+    compiler.required_states = lambda: set()  # not required
+    answer_extra_on_optional = {
+        'opening': 'Opening text.',
+        'start_room': 'the room',
+        'placement': [],
+        'room_text': [],
+        'moments': [{
+            'node': 'N01a',
+            'options': [
+                {'verb': 'talk', 'object': 'the room', 'detail': None, 'label': 'talk choice 1', 'room': 'the room', 'text': 'Done 1', 'neutral': False},
+                {'verb': 'use', 'object': 'the room', 'detail': None, 'label': 'use choice 2', 'room': 'the room', 'text': 'Done 2', 'neutral': False},
+                {'verb': 'wait', 'object': None, 'detail': None, 'label': 'extra choice 3', 'room': None, 'text': 'Done 3', 'neutral': False}
+            ],
+            'lapse': {'after': 4, 'text': 'Passing.'}
+        }],
+        'actions': [{'verb': 'leave', 'object': 'the room', 'detail': None, 'label': 'out', 'room': 'the room', 'text': 'Leave', 'reveals': [], 'leads_to': 'S02', 'once': False}],
+        'events': [],
+        'nudges': [{'after': 4, 'text': 'Nudge.'}],
+        'props': []
+    }
+    problems = []
+    compiler.build(sc, answer_extra_on_optional, problems)
+    check(any('expected 2 active options' in p for p in problems), f'optional moment with 3 options should be rejected: {problems}')
+
+    # 4. Required moment missing neutral option (only 2 active options provided): should be rejected
+    compiler.required_states = lambda: {'st_a'}
+    answer_missing_neutral = {
+        'opening': 'Opening text.',
+        'start_room': 'the room',
+        'placement': [],
+        'room_text': [],
+        'moments': [{
+            'node': 'N01a',
+            'options': [
+                {'verb': 'talk', 'object': 'the room', 'detail': None, 'label': 'talk choice 1', 'room': 'the room', 'text': 'Done 1', 'neutral': False},
+                {'verb': 'use', 'object': 'the room', 'detail': None, 'label': 'use choice 2', 'room': 'the room', 'text': 'Done 2', 'neutral': False}
+            ]
+        }],
+        'actions': [{'verb': 'leave', 'object': 'the room', 'detail': None, 'label': 'out', 'room': 'the room', 'text': 'Leave', 'reveals': [], 'leads_to': 'S02', 'once': False}],
+        'events': [],
+        'nudges': [{'after': 4, 'text': 'Nudge.'}],
+        'props': []
+    }
+    problems = []
+    compiler.build(sc, answer_missing_neutral, problems)
+    check(any('needs a neutral option marked "neutral": true' in p for p in problems), f'missing neutral option should be rejected: {problems}')
+
+
 # ---------------------------------------------------------------- runner
 
 
