@@ -2306,6 +2306,26 @@ def agy_client_unit_test():
 
 
 @test
+def ctrl_c_stops_a_run_started_with_sigint_ignored():
+    import signal
+    # how a shell without job control starts a background job
+    proc = subprocess.Popen([sys.executable, 'main.py', f'--story-id={PREFIX}sigint'], cwd=GEN,
+                            env=dict(os.environ, STRATUM_CLIENT='stub', PYTHONUNBUFFERED='1'),
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            preexec_fn=lambda: signal.signal(signal.SIGINT, signal.SIG_IGN))
+    try:
+        line = proc.stdout.readline().decode()
+        check('enter kernel' in line, f'expected the kernel prompt, got {line!r}')
+        proc.send_signal(signal.SIGINT)
+        out = line + proc.communicate(timeout=10)[0].decode()
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait()
+    check(proc.returncode != 0 and 'KeyboardInterrupt' in out, f'ctrl-c did not stop the run:\n{out[-1000:]}')
+
+
+@test
 def ab_harness_replays_from_phase3():
     e = dict(os.environ, STRATUM_CLIENT='stub')
     for k in list(e):
