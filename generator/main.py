@@ -29,6 +29,7 @@ docs/later_stages.md describe the pipeline stages and artifacts.
 """
 
 import os
+import signal
 import sys
 import time
 import random
@@ -2059,6 +2060,9 @@ def csv(value):
 
 
 def main(argv=None):
+    # an inherited ignore (background job without job control) would make ctrl-c a no-op
+    if signal.getsignal(signal.SIGINT) is signal.SIG_IGN:
+        signal.signal(signal.SIGINT, signal.default_int_handler)
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
