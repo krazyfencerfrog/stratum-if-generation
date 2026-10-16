@@ -12,6 +12,7 @@ Each package is a standalone JSON file compliant with the Stratum engine specifi
 | `kernel2_the_chain_that_names_the_dead.json` | *The Chain That Names the Dead* | Memorial forge / Moral accounting | 9 | 3 |
 | `kernel33_the_seaside_hotel.json` | *The Seaside Hotel* | Coastal hotel / Inheritance pressure | 11 | 3 |
 | `kernel37_the_wire_and_the_gun.json` | *The Wire and the Gun* | Frontier / Mechanical tension | 12 | 3 |
+| `kernel40_the_saddle_in_the_square.json` | *The Saddle in the Square* | Frontier town / Cattle baron water rights | 15 | 3 |
 
 ## How to Play
 
