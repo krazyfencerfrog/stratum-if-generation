@@ -38,6 +38,7 @@ Two methods, both driving the real engine (runtime.Engine.perform):
 import argparse
 import ast
 import json
+import os
 import random
 import sys
 from collections import Counter, deque
@@ -560,33 +561,106 @@ def scene_path(result, i):
         labels.append(label)
 
 
-def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE):
+def scene_feeds(story, order):
+    """sid -> the scenes before it in `order` that can lead to it, through an
+    exit or a chain of exits taken in one turn. Only these add to its entry
+    states, so it can be explored as soon as they have been."""
+    nxt = {sid: {ex['to'] for ex in sc.get('exits') or [] if ex['to'] in story.scenes}
+           for sid, sc in story.scenes.items()}
+    feeds = {sid: set() for sid in order}
+    for i, s in enumerate(order):
+        reach, todo = set(), list(nxt[s])
+        while todo:
+            t = todo.pop()
+            if t not in reach:
+                reach.add(t)
+                todo += nxt[t]
+        for t in order[i + 1:]:
+            if t in reach:
+                feeds[t].add(s)
+    return feeds
+
+
+def default_jobs():
+    """Worker processes for a full playtest: one per two CPUs."""
+    return max(1, (os.cpu_count() or 1) // 2)
+
+
+def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, jobs=1):
     """Every scene explored on its own, from entry states the scenes before it
     leave in (the start state for the first). Scales with the size of a
     scene, not of the story; the price is sampling: a scene reached in more
-    distinct states than `per_scene` is explored from a spread of them."""
+    distinct states than `per_scene` is explored from a spread of them.
+
+    With jobs > 1, the scenes whose feeding scenes are done are explored at
+    once, in worker processes. Entry states and endings are merged in scene
+    order either way, so the result is the same as one at a time."""
     norm = Normalizer(story)
     eng = Engine(story)
     eng.start(seed=SEED)
-    arriving = {eng.state.scene: {entry_bucket(norm(eng.state.clone())): (eng.state.clone(), [])}}
-    scenes, endings, sampled = {}, {}, set()
-    for sid in scene_order(story):
-        buckets = arriving.get(sid)
+    start = {eng.state.scene: {entry_bucket(norm(eng.state.clone())): (eng.state.clone(), [])}}
+    order = scene_order(story)
+    scenes, sampled = {}, set()
+
+    def arriving(upto=None):
+        """Entry states by scene as the explored scenes before `upto` (all, if
+        None) leave them, in scene order: the first to leave in a bucket wins."""
+        out = {s: dict(bs) for s, bs in start.items()}
+        for s in order[:order.index(upto)] if upto else order:
+            for target, bs in (scenes[s]['leaving'] if s in scenes else {}).items():
+                for b, v in bs.items():
+                    out.setdefault(target, {}).setdefault(b, v)
+        return out
+
+    def entries(sid):
+        """The entry states sid is explored from, or None when nothing reaches it."""
+        buckets = arriving(sid).get(sid)
         if not buckets:
-            continue
+            return None
         keys = sorted(buckets)
         if len(keys) > per_scene:
             sampled.add(sid)
-        res = explore_scene(story, sid, [buckets[k] for k in spread(keys, per_scene)], norm, max_states)
-        scenes[sid] = res
-        for target, bs in res['leaving'].items():
-            arriving.setdefault(target, {}).update({b: v for b, v in bs.items() if b not in arriving.get(target, {})})
+        return [buckets[k] for k in spread(keys, per_scene)]
+
+    if jobs <= 1 or len(order) <= 1:
+        for sid in order:
+            todo = entries(sid)
+            if todo:
+                scenes[sid] = explore_scene(story, sid, todo, norm, max_states)
+    else:
+        import concurrent.futures
+        import multiprocessing
+        import explore_worker
+        feeds = scene_feeds(story, order)
+        done, running = set(), {}
+        with concurrent.futures.ProcessPoolExecutor(
+                max_workers=min(jobs, len(order)), mp_context=multiprocessing.get_context('spawn'),
+                initializer=explore_worker.init, initargs=(story.data, max_states)) as pool:
+            while len(done) < len(order):
+                for sid in order:
+                    if sid in done or sid in running.values() or not feeds[sid] <= done:
+                        continue
+                    todo = entries(sid)
+                    if todo:
+                        running[pool.submit(explore_worker.explore, sid, todo)] = sid
+                    else:
+                        done.add(sid)               # nothing leads here: never reached
+                if running:
+                    finished, _ = concurrent.futures.wait(running, return_when=concurrent.futures.FIRST_COMPLETED)
+                    for f in finished:
+                        sid = running.pop(f)
+                        scenes[sid] = f.result()
+                        done.add(sid)
+        scenes = {sid: scenes[sid] for sid in order if sid in scenes}
+
+    endings = {}
+    for res in scenes.values():
         for e, combos in res['endings'].items():
             for c, path in combos.items():
                 if c not in endings.setdefault(e, {}) or len(path) < len(endings[e][c]):
                     endings[e][c] = path
     return {'scenes': scenes, 'endings': endings, 'sampled': sampled,
-            'arrived': {s: len(b) for s, b in arriving.items()}}
+            'arrived': {s: len(bs) for s, bs in arriving().items()}}
 
 
 def scene_findings(story, result):
@@ -864,14 +938,14 @@ WHOLE_STORY_SCENES = 3    # stories with more scenes are explored one scene at a
 
 
 def run(story, runs=500, max_states=50000, walkthroughs=False, out=sys.stdout, styled_runs=None, scene_states=None,
-        by_scene=None):
+        by_scene=None, jobs=1):
     """Explore (the whole story when it is small, else scene by scene), play
     every style, report. `by_scene` forces the method; `scene_states` caps
-    each scene's exploration."""
+    each scene's exploration; `jobs` explores that many scenes at once."""
     if by_scene is None:
         by_scene = len(story.scenes) > WHOLE_STORY_SCENES
     if by_scene:
-        return run_by_scene(story, runs, scene_states or SCENE_STATES, walkthroughs, out, styled_runs)
+        return run_by_scene(story, runs, scene_states or SCENE_STATES, walkthroughs, out, styled_runs, jobs)
     result = explore(story, max_states=max_states)
     errors, notes = explore_findings(story, result)
     styled_runs = styled_runs or max(50, runs // 5)
@@ -928,8 +1002,8 @@ def print_plays(plays, story, out):
                 print(f'      shift {sid} -> {to}: {rate:.0%}', file=out)
 
 
-def run_by_scene(story, runs, scene_states, walkthroughs, out, styled_runs):
-    result = explore_scenes(story, max_states=scene_states)
+def run_by_scene(story, runs, scene_states, walkthroughs, out, styled_runs, jobs=1):
+    result = explore_scenes(story, max_states=scene_states, jobs=jobs)
     errors, notes = scene_findings(story, result)
     styled_runs = styled_runs or max(50, runs // 5)
     plays = [play(story, style, runs=runs if style == 'random' else styled_runs) for style in styles_for(story)]
@@ -969,6 +1043,8 @@ def main(argv=None):
     ap.add_argument('--runs', type=int, default=500, help='random plays (styled plays get a fifth, at least 50)')
     ap.add_argument('--max-states', type=int, default=50000)
     ap.add_argument('--by-scene', action='store_true', help='explore scene by scene even for a small story')
+    ap.add_argument('--jobs', type=int, default=default_jobs(),
+                    help='scenes explored at once, in worker processes (default: one per two CPUs)')
     args = ap.parse_args(argv)
     story = Story.load(args.package)
     errors, _ = validate(story)
@@ -976,7 +1052,7 @@ def main(argv=None):
         print('the package does not validate; run cli.py --check')
         return 1
     report = run(story, runs=args.runs, max_states=args.max_states, walkthroughs=args.walkthroughs,
-                 by_scene=True if args.by_scene else None)
+                 by_scene=True if args.by_scene else None, jobs=args.jobs)
     return 1 if report['errors'] else 0
 
 

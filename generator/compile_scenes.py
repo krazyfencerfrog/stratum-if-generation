@@ -776,7 +776,8 @@ class SceneCompiler:
 
     def check(self, package, runs=None, max_states=None):
         """The engine's validator, then the playtest. STRATUM_PLAYTEST=quick
-        (the plumbing tests) explores less and plays fewer runs."""
+        (the plumbing tests) explores less and plays fewer runs;
+        STRATUM_PLAYTEST_JOBS sets how many scenes are explored at once."""
         quick = os.environ.get('STRATUM_PLAYTEST') == 'quick'
         runs = runs or (20 if quick else 200)
         max_states = max_states or (3000 if quick else 60000)
@@ -814,8 +815,11 @@ class SceneCompiler:
             }
             return report
         out = io.StringIO()
+        # scenes explored at once in worker processes; a quick playtest is over before they would start
+        jobs = int(os.environ.get('STRATUM_PLAYTEST_JOBS') or (1 if quick else engine_playtest.default_jobs()))
         result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
-                                     styled_runs=10 if quick else None, scene_states=1500 if quick else None)
+                                     styled_runs=10 if quick else None, scene_states=1500 if quick else None,
+                                     jobs=jobs)
         metrics = extract_playtest_metrics(story, result)
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report
