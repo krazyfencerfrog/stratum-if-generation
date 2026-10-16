@@ -979,8 +979,9 @@ def the_prose_pass_revises_text_and_keeps_structure():
     sys.path.insert(0, os.path.join(ROOT, 'engine'))
     from story import Story as EngineStory, validate as engine_validate
     from runtime import Engine
-    run('prose', args=['--prose'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
-                                        'STUB_STYLE_FAILS': '1', 'STUB_PROSE_DROP': '1', 'STUB_PROSE_IF': '1'})
+    _, out = run('prose', args=['--prose'], env={'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
+                                                 'STUB_STYLE_FAILS': '1', 'STUB_PROSE_DROP': '1', 'STUB_PROSE_IF': '1',
+                                                 'STUB_PROSE_RETRY_DROP': 'S_N01'})
     before, after = load('prose', 'package_draft.json'), load('prose', 'package.json')
 
     def skeleton(node):
@@ -1017,6 +1018,7 @@ def the_prose_pass_revises_text_and_keeps_structure():
     strangers = [c for c in after['world']['characters'].values() if c.get('name') and not c.get('known')]
     check(strangers and all(c['unnamed'] == 'the stub figure in a coat' for c in strangers), 'unnamed labels')
     check(not any('If it slips' in t for t in texts), 'narrated alternatives survived the retry')
+    check('kept [\'t2\'] from the previous attempt' in out, 'a text the retry dropped was not kept from attempt 1')
     check(load('prose', 'prose_style.json')['tradition'] == 'a stub tradition, revised', 'the faulted style sheet was not rewritten')
     check(all(sc.get('recap') and '(voiced)' in sc['recap'][0]['text'] for sc in after['scenes'].values()),
           'every scene should have a journal entry')
@@ -1032,6 +1034,18 @@ def the_prose_pass_revises_text_and_keeps_structure():
     prose_md = load('prose', 'prose.md')
     check('## Character Dialogue Distinctiveness' in prose_md, 'dialogue distinctiveness section missing in prose.md')
     check('average pairwise distinctiveness' in prose_md, 'average pairwise distinctiveness missing in prose.md')
+
+
+@test
+def a_prose_retry_keeps_only_texts_nobody_complained_about():
+    # S_N01's first attempt is faulted in t1 only, so the t2 its retry drops comes back
+    # from attempt 1 (the_prose_pass_revises_text_and_keeps_structure); in S_N02 attempt 1
+    # was also told t2 repeats an earlier part, so a retry that drops t2 must still fail
+    env = {'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick',
+           'STUB_PROSE_IF': '1', 'STUB_PROSE_RETRY_DROP': 'S_N02'}
+    _, out = run('prose_drop', args=['--prose'], env=env, expect=1)
+    check("s8b_S_N02_edit: model output failed validation" in out and "texts missing or empty: ['t2']" in out,
+          f'expected S_N02 to fail on t2:\n{out[-1500:]}')
 
 
 @test
