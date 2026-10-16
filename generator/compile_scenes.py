@@ -291,11 +291,12 @@ class SceneCompiler:
         return pkg
 
     def compile_scene(self, sc):
+        """The model call alone: a scene's packet reads only the plan and the
+        finished world, so scenes can be written in parallel."""
         packet = self.packet(sc)
-        answer = self.gen.run_prompt(f's7d_{sc["id"]}', 'scene', {
+        return self.gen.run_prompt(f's7d_{sc["id"]}', 'scene', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
         }, prompt_file='s7d_scene.prompt', validator=self.validator(sc, packet), klass='build', schema=schemas.SCENE)
-        self.compiled[sc['id']] = self.build(sc, answer)
 
     def validator(self, sc, packet):
         def validate(parsed):
@@ -858,8 +859,8 @@ class SceneCompiler:
     def run(self):
         """Reconcile and compile; returns the package (check it with check())."""
         self.reconcile()
-        for sc in self.plan['scenes']:
-            self.compile_scene(sc)
+        for sc, answer in zip(self.plan['scenes'], self.gen.map_calls(self.compile_scene, self.plan['scenes'])):
+            self.compiled[sc['id']] = self.build(sc, answer)
         return self.package()
 
 

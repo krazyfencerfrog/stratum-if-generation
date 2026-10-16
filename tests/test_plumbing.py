@@ -1139,6 +1139,68 @@ def prose_character_dialogue_distinctiveness_and_validation():
 
 
 @test
+def parallel_calls_match_a_serial_run():
+    # the same story id both times: names are seeded from it
+    env = {'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'}
+    outputs = ('world.json', 'package_draft.json')
+    run('par', args=['--stage-d'], env=env)
+    serial = {suffix: load('par', suffix) for suffix in outputs}
+    n_serial = len(calls('par'))
+    run('par', args=['--stage-d', '--parallel', '4'], env=env)
+    for suffix in outputs:
+        check(load('par', suffix) == serial[suffix], f'{suffix} differs between the serial and the parallel run')
+    check(len(calls('par')) == n_serial, f'{len(calls("par"))} calls recorded in parallel, {n_serial} serially')
+    for c in calls('par'):
+        logs = glob.glob(os.path.join(story_dir('par'), f"{PREFIX}par_{c['prefix']}_*.log"))
+        check(logs, f"no log for {c['prefix']}")
+
+
+@test
+def map_calls_keeps_order_and_isolates_clients():
+    import main as main_mod
+
+    class Echo:
+        def __init__(self):
+            self.last_call = {}
+
+        def run_prompt(self, prompt, **kwargs):
+            print(f'log of {prompt}')
+            time.sleep(0.01 * (5 - int(prompt[-1])))       # later items finish first
+            self.last_call = {'prompt_tokens': int(prompt[-1])}
+            return '', prompt
+
+    gen = main_mod.StoryGenerator.__new__(main_mod.StoryGenerator)
+    gen.parallel, gen._local, gen.client = 4, threading.local(), Echo()
+    seen = {}
+
+    def call(i):
+        client = gen.thread_client()
+        buf = io.StringIO()
+        with gen.log_to(buf):
+            _, out = client.run_prompt(f'p{i}')
+        seen[i] = (client, client.last_call['prompt_tokens'], buf.getvalue())
+        return out
+    check(gen.map_calls(call, range(5)) == [f'p{i}' for i in range(5)], 'results out of item order')
+    check(all(tokens == i for i, (_, tokens, _) in seen.items()), "a call read another call's last_call")
+    check(all(log == f'log of p{i}\n' for i, (_, _, log) in seen.items()), 'a log caught another thread\'s output')
+    check(len({id(c) for c, _, _ in seen.values()}) > 1 and gen.client not in [c for c, _, _ in seen.values()],
+          'worker threads shared a client')
+
+    def fail(i):
+        if i in (1, 3):
+            raise ValueError(f'item {i}')
+        return i
+    try:
+        gen.map_calls(fail, range(5))
+        check(False, 'expected the failure to be raised')
+    except ValueError as e:
+        check(str(e) == 'item 1', f'the first failing item should be raised, got {e}')
+
+    gen.parallel = 1
+    check(gen.map_calls(lambda i: i * 2, range(3)) == [0, 2, 4], 'serial path')
+
+
+@test
 def stages_c_and_d_compile_a_playable_package():
     sys.path.insert(0, os.path.join(ROOT, 'engine'))
     from story import Story as EngineStory, validate as engine_validate

@@ -271,12 +271,13 @@ class WorldBuilder:
     # ------------------------------------------------------------ B1
 
     def b1_character(self, cid):
+        """The model call alone: it reads only the plan, so characters can
+        be written in parallel and added afterwards in cast order."""
         packet = self.character_packet(cid)
-        answer = self.gen.run_prompt(f's6b1_{cid}', 'character', {
+        return self.gen.run_prompt(f's6b1_{cid}', 'character', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
         }, prompt_file='s6b1_character.prompt', validator=self.b1_validator(cid), klass='build',
             schema=schemas.WORLD_CHARACTER)
-        self.add_character(cid, answer)
 
     def b1_validator(self, cid):
         def validate(parsed):
@@ -915,14 +916,15 @@ class WorldBuilder:
     def run(self):
         people = [c for c, ch in self.chars.items() if ch.get('kind') != 'crowd']
         major = [c for c in people if self.tiers.get(c) in ('arc', 'supporting')]
-        for cid in major:
-            self.b1_character(cid)
+        for cid, answer in zip(major, self.gen.map_calls(self.b1_character, major)):
+            self.add_character(cid, answer)
         self.b1_functional([c for c in people if c not in major])
+        # each place is told the rooms and things already built, so these stay one at a time
         for lid in self.locations:
             self.b2_place(lid)
         self.b2_map()
-        for cid in self.world['characters']:
-            self.b1c_conversation(cid)
+        # a conversation reads the world's subjects and changes only its own person's topics
+        self.gen.map_calls(self.b1c_conversation, list(self.world['characters']))
         self.b3_you()
         return {'story_id': self.story.get('story_id'), 'stage': 'world', 'world': self.world,
                 'protagonist': self.protagonist, 'done_flags': done_flags({'w': self.world, 'p': self.protagonist}),

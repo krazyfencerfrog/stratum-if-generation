@@ -183,6 +183,11 @@ python -m generator --story-id=my_story --stop-after 3.8 tests/kernels/kernel1.t
 STRATUM_CLIENT=stub python -m generator --story-id=stubtest tests/kernels/kernel1.txt
 ```
 
+With a remote client (such as `STRATUM_CLIENT=agy`), `--parallel N` runs the independent per-item calls N
+at a time: stage B's characters and conversations, and stage D's scenes. Places and the prose pass stay
+sequential, because each of those calls is shown what the earlier ones already wrote. The output is the same
+as a serial run. The default is 1; leave it there on a local Ollama GPU.
+
 You can also run internal developer tools from `generator/`:
 
 ```bash
