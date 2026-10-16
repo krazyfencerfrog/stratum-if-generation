@@ -2709,6 +2709,57 @@ def balanced_dilemma_representation_and_nameless_group_invariants():
 
 
 @test
+def anti_mirroring_and_conflict_modality_validation():
+    # Setup builder with a detailed main line node
+    b = builder({'s4a_i1': plan(MAIN)})
+    # Give N04 a detailed adapted scene
+    b.nodes['N04']['adapted'] = (
+        'By an abandoned wharf Osric yanks the fuel line to stall the engine so he can sell the deck fittings, '
+        'while Teodor Dunmore circles on his bicycle with ready cash. You patch the severed fuel pipe with Osric '
+        'sticky liquorice roll while the engine restarts in a cloud of burnt sugar smoke.'
+    )
+
+    # 1. Mirrored divergence beat that clones N04's mechanical stall device and phrases
+    div_mirror = branch('N03', [entry('commitment')], rejoin='N05')
+    div_mirror['beats'][0]['adapted'] = (
+        'By the abandoned wharf Osric yanks the fuel line to stall the engine so he can conclude business with '
+        'Teodor Dunmore on his bicycle. You patch the severed fuel pipe with sticky liquorice while the engine restarts '
+        'in a cloud of smoke.'
+    )
+    b.gen.answers['s4c_i2'] = div_mirror
+    b.gen.soft = None
+    b.divergence(2, {'diverges_at': 'N03'})
+    check(b.gen.soft and 'mirrors existing N04' in b.gen.soft,
+          f'Anti-mirroring should SoftReject cloned adapted beat: {b.gen.soft}')
+
+    # 2. Distinct conflict modality (social/environmental) passes cleanly
+    div_fresh = branch('N03', [entry('commitment')], rejoin='N05')
+    div_fresh['beats'][0]['adapted'] = (
+        'At the tidal narrows lock-keeper Hollis shuts the sluice gate in defiance, demanding cash upfront for basin tolls. '
+        'You confront the town bailiff over his expired warrant while the rising tide rocks the hull against stone piers.'
+    )
+    b.gen.answers['s4c_i2'] = div_fresh
+    b.gen.soft = None
+    b.divergence(2, {'diverges_at': 'N03'})
+    check(b.gen.soft is None, f'Fresh conflict modality should pass without SoftReject: {b.gen.soft}')
+
+    # 3. Verify prompts contain anti-mirroring and conflict diversification guidance
+    with open('prompts/s4c_divergence.prompt') as f:
+        s4c_txt = f.read()
+    check('ANTI-MIRRORING & CONFLICT MODALITY DIVERSIFICATION' in s4c_txt,
+          's4c prompt missing anti-mirroring section')
+    check('ANTI-MIRRORING & DIVERSIFIED CONFLICT MODALITIES' in s4c_txt,
+          's4c prompt missing Rule 8a')
+
+    with open('prompts/s4b_line_nodes.prompt') as f:
+        s4b_txt = f.read()
+    check('NO VERBAL TICS OR REPEATED ANCHOR PHRASES' in s4b_txt,
+          's4b prompt missing Rule 15 update')
+    check('DIVERSIFY CONFLICT MODALITIES & CRISIS DEVICES' in s4b_txt,
+          's4b prompt missing Rule 16')
+
+
+@test
 def non_agent_entity_and_consumable_prop_cast_invariants():
     import checks
     import main as gen_main

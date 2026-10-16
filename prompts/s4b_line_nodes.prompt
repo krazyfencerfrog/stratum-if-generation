@@ -34,8 +34,11 @@ WHAT YOU WRITE FOR EACH NODE
    person's manner show, reported, not quoted at length.
    Vary your imagery: do not repeat identical figurative phrases, metaphors
    or verbal formulas across nodes (e.g. "the chain around your neck", "a
-   wound in the earth"). If a motif recurs across beats, show it through
-   different concrete actions, sights, or changes rather than repeating
+   wound in the earth"). Never repeat literal anchor phrases, action formulas,
+   or physical gestures across nodes or lines (e.g. "coins onto the cabin",
+   "the boat clears the", "checks the hull for damage", "you keep your hand
+   on the tiller"). If an action or motif recurs across beats, show it through
+   different concrete actions, verbs, sights, or changes rather than repeating
    the same wording.
  - where: one to three places, by name. (For the opening node N01, limit
    to one or two places to prevent initial player overload).
@@ -94,9 +97,18 @@ OTHER RULES
      pay_off_here makes the planted thing decide or change what happens.
  14. THE QUESTION IS NOT THE VERB: say what you bring about and what it
      costs; never "you choose" or "you decide between".
- 15. NO VERBAL TICS: Vary imagery across nodes. Do not reuse identical
-     poetic phrases, figurative formulas, or stock metaphors across
-     multiple summaries (e.g. "chain around your neck", "wound in the earth").
+ 15. NO VERBAL TICS OR REPEATED ANCHOR PHRASES: Vary imagery and action verbs
+     across nodes. Do not reuse identical poetic phrases, figurative formulas,
+     or literal physical action descriptions across multiple summaries (e.g.
+     "chain around your neck", "the boat clears the...", "coins onto the cabin...",
+     "checks the hull for damage..."). Each node must describe movement,
+     inspection, and interaction in its own words.
+ 16. DIVERSIFY CONFLICT MODALITIES & CRISIS DEVICES: When detailing how an
+     obstacle or crisis is met, do not repeat the same complication archetype
+     or mechanical stall device across nodes or branches (e.g. repeated fuel-line
+     sabotage, repeated ledger haggling, repeated unbolting of hardware). Ground
+     each node in a distinct form of friction—environmental, mechanical,
+     interpersonal, or logistical.
 
 OUTPUT FORMAT (JSON)
 

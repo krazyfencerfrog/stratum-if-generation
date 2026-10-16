@@ -36,6 +36,26 @@ existing line plays at the same beat, by the same way, retells a node the
 story already has; take a different way, or resolve the turn in a way of
 this line's own, and change what the situation is made of.
 
+ANTI-MIRRORING & CONFLICT MODALITY DIVERSIFICATION:
+When diverging, never mirror or clone the complication archetypes,
+mechanical stall devices, physical crisis devices, or obstacle tropes used
+on the main line or prior lines. If the main line stalled progress through
+mechanical failure or sabotage (e.g. cut fuel line, broken valve, unbolting
+machinery), or through a specific bureaucratic hurdle (e.g. arguing over a
+ledger, demanding signatures, haggling with a passing dealer), this branch
+MUST pivot to an entirely different conflict modality:
+ - Social / Interpersonal: mutiny, extortion, moral betrayal, competing
+   demands between allies, public exposure, or authority intervention.
+ - Environmental / Spatial: structural collapse, flash flooding, navigating
+   dangerous currents, sudden weather/visibility shifts, physical entrapment.
+ - Logistical / Material: scarcity of supplies/coal/tools, competing
+   custody of physical assets, emergency salvage, physical exhaustion or injury.
+Do not recycle the opposition's micro-actions or pursuit antics across
+branches (e.g. if a pursuer threw coins from a bicycle on the main line,
+do not repeat bicycle pursuit or coin tossing here). Each line's middle must
+feel made of fresh physical and dramatic circumstances, not the main line
+with nouns swapped or minor cosmetic edits.
+
 WHAT YOU PRODUCE
 
 through_line: title, motivation (what "you" come to want, and what it
@@ -98,8 +118,11 @@ entry has the same shape as on the main line:
    main line planted, and pay it differently.
  - adapted: one or two sentences: what happens here on THIS line, who
    does what to whom, and what is different afterwards. Specific to this
-   premise; a sentence that could be pasted into another story is not
-   adapted.
+   line: do not copy-paste or lightly paraphrase existing line beats. If an
+   existing line used a specific obstacle, pursuer action, or complication
+   at this beat, this line MUST use a different modality of conflict, fresh
+   action verbs, and distinct physical friction. A sentence that could be
+   pasted into another story or borrowed from the main line is not adapted.
 
 ending and rejoins_at: the line ENDS. Normally its last new entry is its
 own ending (rejoins_at null; "ending" gives its title, summary, and its
@@ -146,6 +169,15 @@ $$TERM_ENGINE$$
  8. The promises are the audience's: a set piece the main line played
     may go the other way here; one it did not play is this line's to
     play. Under a comic tone, say what is funny in at least one entry.
+ 8a. ANTI-MIRRORING & DIVERSIFIED CONFLICT MODALITIES: Never mirror the main
+     line's crisis devices, complication archetypes, or obstacle tropes. If an
+     existing line used a mechanical stall device (e.g. severed pipe, engine
+     sabotage, jammed machinery) or a specific bureaucratic obstacle (e.g.
+     ledger disputes, logbook signatures), new lines MUST NOT reuse that
+     device at parallel beats. Divergent lines must introduce fresh obstacles
+     drawn from different conflict modalities (social friction,
+     environmental/spatial peril, logistical shortages). Do not recycle
+     opposition micro-actions or pursuit antics across branches.
 
 $$SHAPE_NOTE$$
 

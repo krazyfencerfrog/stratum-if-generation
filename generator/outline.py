@@ -1076,7 +1076,29 @@ class OutlineBuilder:
                                 f"the divergence shifts sacrifice or cost to {group_str!r}, but no character in the cast "
                                 f"represents this group; every competing group or sector at stake must be represented by a member of the cast"
                             )
-                            break
+            # Anti-mirroring check: divergent line beats must not clone scene text/devices from existing lines
+            mirrored = []
+            for e in entries:
+                e_text = str(e.get('adapted') or '')
+                e_grams = example_guard.ngrams(e_text)
+                if not e_grams:
+                    continue
+                for nid, node in self.nodes.items():
+                    if nid in prefix:
+                        continue
+                    n_text = str(node.get('adapted') or '')
+                    n_grams = example_guard.ngrams(n_text)
+                    if not n_grams:
+                        continue
+                    shared = e_grams & n_grams
+                    jaccard = len(shared) / len(e_grams | n_grams)
+                    if len(shared) >= 8 or jaccard >= 0.22:
+                        sample = '; '.join([' '.join(x) for x in sorted(shared)[:3]])
+                        mirrored.append(f"beat '{e.get('beat')}' mirrors existing {nid} ({len(shared)} shared phrases, e.g. '{sample}')")
+            if mirrored:
+                soft.append('these new entries mirror existing line beats, cloning obstacle devices and scene text: '
+                            + '; '.join(mirrored)
+                            + '. Divergent branches must confront different types of obstacles (social, environmental, logistical) with fresh phrasing rather than repeating parallel line scenes')
 
             if soft:
                 raise SoftReject('; '.join(soft))
