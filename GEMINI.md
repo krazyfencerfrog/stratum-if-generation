@@ -46,7 +46,6 @@ STRATUM_CLIENT=stub python -m generator --story-id=stubtest tests/kernels/kernel
 
 ### Git & Sandbox Protocols
 * **Explicit Commits**: Use explicit `git add <file>`; never stage blanket sweeps.
-* **Author Identity**: Commit as Krazy via environment variables (`GIT_AUTHOR_NAME="Krazy"`, `GIT_AUTHOR_EMAIL="krazyfencerfrog@gmail.com"`).
 * **Forbidden Commits**: Never commit `dynamic_config.py`, `.claude/` files, or local credential artifacts.
 * **No Automatic Remote Push**: Do not run `git push` to origin automatically. Remote pushes are explicitly executed or instructed by the user.
 * **Sandbox Network Constraints**: In sandboxed agent environments, network access is blocked by default. Commands requiring external network access (`git push`, `gh issue ...`) require approval to run unsandboxed.

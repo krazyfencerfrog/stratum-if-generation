@@ -21,7 +21,7 @@ class AgyClient(LlmClient):
         super().__init__()
         self.model = model or os.environ.get("AGY_MODEL", os.environ.get("STRATUM_MODEL", "gemini-3.8-flash-high"))
         self.effort = effort or os.environ.get("AGY_EFFORT")
-        self.agy_path = agy_path or os.environ.get("AGY_PATH") or shutil.which("agy") or "/home/krazy/.local/bin/agy"
+        self.agy_path = agy_path or os.environ.get("AGY_PATH") or shutil.which("agy") or os.path.expanduser("~/.local/bin/agy")
         self.echo = echo
         self.last_call = {}
 
