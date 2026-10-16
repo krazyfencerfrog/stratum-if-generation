@@ -1089,6 +1089,8 @@ class StubClient(LlmClient):
             out = out[1:]
         if not retry and env_int('STUB_PROSE_IF', 0) and part.get('kind') == 'scene' and out:
             out[0]['text'] = 'If it slips, you fall; if it holds, you climb.'
+        if retry and part.get('id') == os.environ.get('STUB_PROSE_RETRY_DROP') and len(out) > 2:
+            del out[1]              # the retry fixes what it was told and loses t2 along the way
         return {"texts": out, "images_used": [f"stub image {part.get('id')}"]}
 
     def p_s7d(self, p):

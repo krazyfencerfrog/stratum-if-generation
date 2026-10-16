@@ -392,6 +392,9 @@ class ProseWriter:
             kinds['recap'], originals['recap'] = 'recap', items[-1]['text']
         ids = [x['id'] for x in items]
         earlier = ' ' + ' '.join(self.read_so_far) + ' ' if kind == 'scene' else ''
+        # the last attempt that got as far as the soft checks, and the ids its
+        # complaints named: a retry is told to change only those
+        previous, flagged = {}, set()
 
         def validate(parsed):
             if not isinstance(parsed, dict):
@@ -401,6 +404,13 @@ class ProseWriter:
                 got = {str(k): str(v or '').strip() for k, v in texts.items()}
             else:
                 got = {str(t.get('id')): str(t.get('text') or '').strip() for t in as_list(texts) if isinstance(t, dict)}
+            # a retry that drops a text nobody complained about keeps the
+            # previous attempt's (s8b_S_N08 lost t26 fixing the recap, 2026-10-16)
+            kept = [i for i in ids if not got.get(i) and previous.get(i) and i not in flagged]
+            for i in kept:
+                got[i] = previous[i]
+            if kept:
+                print(f'  kept {kept} from the previous attempt: the retry left them out')
             missing = [i for i in ids if not got.get(i)]
             if missing:
                 raise ValueError(f'texts missing or empty: {missing[:12]}; return every id you were given, revised')
@@ -461,7 +471,7 @@ class ProseWriter:
                                     base_text, t, char_label=cid, char_name=char_info.get('name'))
                                 if contr:
                                     soft.append(f'{i}: resolution text contradicts ending summary: {contr}')
-            ending_res_texts = []
+            ending_res_texts, ending_res_ids = [], []
             for i in ids:
                 if i.startswith('t') and i[1:].isdigit():
                     idx = int(i[1:]) - 1
@@ -469,6 +479,7 @@ class ProseWriter:
                         p = paths[idx]
                         if p[0] == 'endings' and len(p) >= 6 and p[2] == 'resolutions':
                             ending_res_texts.append(got[i])
+                            ending_res_ids.append(i)
             if ending_res_texts:
                 rep = checks.check_epilogue_syntactic_repetition(ending_res_texts)
                 if rep:
@@ -483,6 +494,12 @@ class ProseWriter:
                         if f' {run} ' in earlier and f' {run} ' not in given and sum(len(x) > 3 for x in w[j:j + REPEAT_N]) >= 3:
                             soft.append(f'{i}: "{run}" was already read in an earlier part; find new words')
                             break
+            previous.clear()
+            previous.update(got)
+            flagged.clear()
+            flagged.update(s.split(':', 1)[0] for s in soft)
+            if 'endings' in flagged:
+                flagged.update(ending_res_ids)
             if soft:
                 raise SoftReject('; '.join(soft[:12]))
         part = {'id': uid, 'kind': kind, 'title': title}
