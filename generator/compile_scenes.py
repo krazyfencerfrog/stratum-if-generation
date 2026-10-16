@@ -684,7 +684,7 @@ class SceneCompiler:
                    'opening': [{'text': str(answer.get('opening') or '').strip()}] if answer.get('opening') else [],
                    'rooms': open_, 'start_room': start, 'cast': cast, 'room_text': room_text,
                    'interactions': interactions, 'moments': moments, 'events': events, 'nudges': nudges,
-                   'exits': [{k: v for k, v in x.items() if k != 'kind'} for x in exits]}
+                   'exits': exits}
         if answer.get('frame'):
             sc_data['frame'] = answer['frame']
         return {'scene': sc_data, 'props': new_objects}

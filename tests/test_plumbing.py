@@ -3315,6 +3315,83 @@ def prose_recap_guidance_and_player_deed_validation():
     check('NEVER narrate the player\'s choices' in prompt_text, "Rule 11 missing negative constraint in s8b_edit.prompt")
 
 
+@test
+def branch_exit_kind_preservation_and_setting_scale_invariants():
+    import sys, copy
+    sys.path.insert(0, os.path.join(ROOT, 'engine'))
+    from runtime import Engine
+    from story import Story
+
+    # 1. Check s3f_setting.prompt contains moving vehicle guidance
+    setting_prompt = open(os.path.join(ROOT, 'prompts', 's3f_setting.prompt'), encoding='utf-8').read()
+    check('MOVING VEHICLES AND VOYAGES' in setting_prompt, 'MOVING VEHICLES AND VOYAGES missing from s3f_setting.prompt')
+
+    # 2. Test engine branch exit precedence with kind='branch' vs blocked without kind
+    pkg = {
+        'format': 'stratum-story/1',
+        'start': {'scene': 'S01', 'room': 'r1'},
+        'intro': [{'text': 'Intro text'}],
+        'scenes': {
+            'S01': {
+                'title': 'Start Scene',
+                'start_room': 'r1',
+                'rooms': ['r1'],
+                'interactions': [
+                    {'id': 'S01.a_branch', 'verb': 'grip', 'object': 'tiller', 'detail': 'name_her',
+                     'effects': [{'set': 'go_S01__S_BRANCH'}]},
+                    {'id': 'S01.m1.1', 'verb': 'sign', 'object': 'log', 'effects': [{'set': 'done_m1'}]},
+                    {'id': 'S01.m1.n', 'verb': 'talk', 'object': 'C01', 'effects': [{'set': 'done_m1'}]}
+                ],
+                'moments': [
+                    {'id': 'S01.m1', 'options': ['S01.m1.1', 'S01.m1.n'], 'required': True, 'neutral': 'S01.m1.n'}
+                ],
+                'exits': [
+                    {'to': 'S_BRANCH', 'when': 'flags.go_S01__S_BRANCH', 'kind': 'branch'},
+                    {'to': 'S02', 'when': 'flags.go_S01__S02', 'kind': 'continue'}
+                ]
+            },
+            'S_BRANCH': {
+                'title': 'Branch Scene',
+                'start_room': 'r1',
+                'rooms': ['r1'],
+                'interactions': [{'id': 'S_BRANCH.a1', 'verb': 'look', 'text': 'branch look'}],
+                'exits': [{'to': 'E1', 'when': 'true'}]
+            },
+            'S02': {
+                'title': 'Main Scene 2',
+                'start_room': 'r1',
+                'rooms': ['r1'],
+                'interactions': [{'id': 'S02.a1', 'verb': 'look', 'text': 's02 look'}],
+                'exits': [{'to': 'E1', 'when': 'true'}]
+            }
+        },
+        'endings': {
+            'E1': {'title': 'The End', 'text': [{'text': 'End text'}]}
+        },
+        'world': {
+            'rooms': {'r1': {'name': 'Room 1', 'description': [{'text': 'A room'}]}},
+            'objects': {'tiller': {'name': 'the tiller', 'location': 'r1'},
+                        'log': {'name': 'the log', 'location': 'r1'}},
+            'characters': {'C01': {'name': 'Laurent', 'location': 'r1'}}
+        }
+    }
+
+    # With kind='branch': engine immediately transitions to S_BRANCH despite required moment m1 being incomplete
+    e = Engine(Story(copy.deepcopy(pkg)))
+    e.start()
+    check(e.state.scene == 'S01', 'expected start at S01')
+    e.act('S01.a_branch')
+    check(e.state.scene == 'S_BRANCH', f'branch exit with kind=branch should transition immediately, got {e.state.scene}')
+
+    # Without kind='branch': engine blocks departure because required moment is unresolved
+    pkg_no_kind = copy.deepcopy(pkg)
+    del pkg_no_kind['scenes']['S01']['exits'][0]['kind']
+    e_blocked = Engine(Story(pkg_no_kind))
+    e_blocked.start()
+    e_blocked.act('S01.a_branch')
+    check(e_blocked.state.scene == 'S01', f'exit without kind=branch should be blocked by pending required moment')
+
+
 # ---------------------------------------------------------------- runner
 
 

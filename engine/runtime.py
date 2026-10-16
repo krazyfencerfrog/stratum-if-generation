@@ -616,7 +616,7 @@ class Engine:
         req = [m for m in self.moments() if m.get('required') and m['id'] not in st.used]
         if not req:
             return None
-        ready_exits = [ex for ex in self.scene().get('exits') or [] if evaluate(ex.get('when', 'true'), st)]
+        ready_exits = [ex for ex in self.scene().get('exits') or [] if evaluate(ex.get('when', 'true'), st) and ex.get('kind') != 'branch']
         if ready_exits:
             return req
         return None

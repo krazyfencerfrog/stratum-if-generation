@@ -13,12 +13,19 @@ SETTING STRUCTURE describes how the story's required locations relate to one ano
 
 SETTING SCALE describes the size of the single largest physical/geographic unit the story's footprint reaches. Judge it by what the narrative actually needs to render as navigable, depicted space — not by the geographic scope of backdrop context the Kernel mentions in passing.
 
- - room_or_building: the story's total footprint is a single modest structure or a small handful of rooms — a house, an apartment, a shop, a classroom, a campsite, a single modest vehicle or small boat.
- - city_or_region: the footprint spans a town, city, or a bounded geographic region — multiple neighborhoods, a county, an island, a metro area. Also use this tier for a single large multi-sector structure that functions like a small city even though it is nominally "one" building or vessel — a generation ship, a space station, a sprawling institutional campus, an arcology. Size the tier by functional complexity, not by whether the story's lawyers would call it one building.
+ - room_or_building: the story's total footprint is a single modest structure or a small handful of rooms — a house, an apartment, a shop, a classroom, a campsite, or a single stationary/contained vehicle or boat whose journey does not reach outside places (see MOVING VEHICLES AND VOYAGES below).
+ - city_or_region: the footprint spans a town, city, or a bounded geographic region — multiple neighborhoods, a county, an island, a metro area, or a transit/waterway corridor along which a traveling vehicle journeys between stops. Also use this tier for a single large multi-sector structure that functions like a small city even though it is nominally "one" building or vessel — a generation ship, a space station, a sprawling institutional campus, an arcology. Size the tier by functional complexity, not by whether the story's lawyers would call it one building.
  - world: the footprint spans a full country, continent, planet, or comparably large single world — multiple regions or cities within one world.
  - multi_world: the footprint spans more than one distinct world, planet, plane, dimension, or otherwise ontologically separate reality.
 
 STRUCTURE AND SCALE ARE INDEPENDENT AXES. A story can be small-scale but dispersed (a handful of rooms, each in a different, hard-to-reach location) or large-scale but clustered (an entire generation ship treated as one navigable complex; a dozen parallel worlds reached by an unmarked doorway-step). Judge each axis on its own terms. Do not let a high reading on one pull the other along by assumption — this is exactly the failure Calibration Example B is built to stress-test.
+
+MOVING VEHICLES AND VOYAGES:
+When a story takes place aboard a small vehicle or vessel that stays moored, parked, or confined to a single immediate dock, yard, or room-cluster, its footprint is room_or_building.
+HOWEVER, when the Kernel explicitly calls for a journey, voyage, road trip, courier run, or transit where the vessel or vehicle travels between distinct waypoints, stops, locks, wharves, or settlements (e.g. "the boat actually goes somewhere", a train journey through a valley, a delivery run across town):
+ - The depicted footprint is NOT the vehicle's interior alone; it is the transit corridor, waterway, or route traversed (city_or_region, or world if spanning countries/continents).
+ - Structure is judged by whether the narrative marks the travel between waypoints as events (dispersed) or treats them as seamless local hops (clustered).
+Never confine an explicitly traveling vehicle or voyage story to room_or_building scale.
 
 THINGS THAT DO NOT AUTOMATICALLY RAISE STRUCTURE OR SCALE:
  - Backdrop context with large geographic scope that the story doesn't actually require the player to visit or the narrative to render as space (a "citywide blackout," "news of a distant war," "she's famous across three continents"). This is color, not footprint — score the footprint the story actually depicts.
