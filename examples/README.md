@@ -13,6 +13,7 @@ Each package is a standalone JSON file compliant with the Stratum engine specifi
 | `kernel33_the_seaside_hotel.json` | *The Seaside Hotel* | Coastal hotel / Inheritance pressure | 11 | 3 |
 | `kernel37_the_wire_and_the_gun.json` | *The Wire and the Gun* | Frontier / Mechanical tension | 12 | 3 |
 | `kernel40_the_saddle_in_the_square.json` | *The Saddle in the Square* | Frontier town / Cattle baron water rights | 15 | 3 |
+| `kernel31_the_loose_knot.json` | *The Loose Knot* | Epic fantasy / Dragon awakening & companion loyalties | 19 | 4 |
 
 ## How to Play
 
