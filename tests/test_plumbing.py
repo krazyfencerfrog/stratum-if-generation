@@ -49,6 +49,7 @@ import stats as stats_mod  # noqa: E402
 from llm_client import LlmCallError   # noqa: E402
 from ollama_client import OllamaClient  # noqa: E402
 from agy_client import AgyClient        # noqa: E402
+from claude_client import ClaudeClient  # noqa: E402
 
 TESTS = []
 used_prompts = set()
@@ -2374,6 +2375,98 @@ def agy_client_unit_test():
         os.environ["STRATUM_CLIENT"] = "agy"
         cl = main_mod.get_client()
         check(isinstance(cl, AgyClient), f"expected AgyClient, got {type(cl)}")
+    finally:
+        if old_client_env is not None:
+            os.environ["STRATUM_CLIENT"] = old_client_env
+        else:
+            os.environ.pop("STRATUM_CLIENT", None)
+
+
+@test
+def claude_client_unit_test():
+    from unittest.mock import patch, MagicMock
+    import main as main_mod
+
+    def proc_for(payload, returncode=0):
+        p = MagicMock()
+        p.returncode = returncode
+        p.stdout = json.dumps(payload)
+        p.stderr = ""
+        return p
+
+    ok_payload = {
+        "type": "result", "subtype": "success", "is_error": False,
+        "result": '{"answer": "ok"}', "structured_output": {"answer": "ok"},
+        "duration_ms": 1250, "stop_reason": "tool_use",
+        "usage": {"input_tokens": 10, "cache_creation_input_tokens": 100, "cache_read_input_tokens": 40,
+                  "output_tokens": 25, "output_tokens_details": {"thinking_tokens": 20}},
+        "modelUsage": {"claude-test": {}},
+    }
+
+    # 1. Mocked call: schema, effort, isolation flags, token accounting
+    with patch("subprocess.run", return_value=proc_for(ok_payload)) as mock_run:
+        client = ClaudeClient(model="opus", claude_path="claude", echo=False)
+        schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
+        thinking, response = client.run_prompt("test prompt", format=schema, think=False)
+
+        check(response == '{"answer": "ok"}', f"response mismatch: {response}")
+        check("[Claude thinking tokens: 20]" in thinking, f"thinking mismatch: {thinking}")
+        check(client.last_call['prompt_tokens'] == 150, f"prompt_tokens {client.last_call['prompt_tokens']}")
+        check(client.last_call['output_tokens'] == 25, "output_tokens")
+        check(client.last_call['seconds'] == 1.25, "seconds")
+        check(client.last_call['done_reason'] == 'stop', "done_reason")
+        check(client.last_call['format_sent'] is True, "format_sent")
+
+        args, kwargs = mock_run.call_args
+        cmd = args[0]
+        check(cmd[cmd.index("--json-schema") + 1] == json.dumps(schema), "json-schema not in cmd")
+        check(cmd[cmd.index("--model") + 1] == "opus", "model not in cmd")
+        check(cmd[cmd.index("--effort") + 1] == "low", "think=False should run at low effort")
+        check(cmd[cmd.index("--tools") + 1] == "", "tools not disabled")
+        check("--no-session-persistence" in cmd and "--strict-mcp-config" in cmd, "isolation flags missing")
+        check(kwargs['input'] == "test prompt", "input not passed to stdin")
+        check(kwargs['cwd'] == client.workdir and not os.listdir(client.workdir), "not run in an empty workdir")
+        check(kwargs.get('start_new_session') is True, "claude must not share the terminal's session")
+
+    # 2. Plain-text result, thinking effort, no model given
+    text_payload = dict(ok_payload, result="```json\n{\"a\": 1}\n```", structured_output=None,
+                        stop_reason="max_tokens")
+    with patch("subprocess.run", return_value=proc_for(text_payload)) as mock_run:
+        client = ClaudeClient(claude_path="claude", echo=False)
+        client.model = None
+        _, response = client.run_prompt("p", think=True)
+        cmd = mock_run.call_args[0][0]
+        check(response == '{"a": 1}', f"code fence not stripped: {response!r}")
+        check("--model" not in cmd and "--json-schema" not in cmd, "unexpected flags")
+        check(cmd[cmd.index("--effort") + 1] == "high", "think=True should run at high effort")
+        check(client.last_call['done_reason'] == 'length', "max_tokens should map to length")
+
+    # 3. Usage limit waits without spending an attempt; other errors retry then raise
+    limit = proc_for({"type": "result", "is_error": True, "result": "You've hit your limit · resets 3pm"}, 1)
+    with patch("subprocess.run", side_effect=[limit, limit, proc_for(ok_payload)]), \
+            patch("time.sleep") as mock_sleep:
+        client = ClaudeClient(claude_path="claude", echo=False)
+        _, response = client.run_prompt("p")
+        check(response == '{"answer": "ok"}', "did not recover after usage limit")
+        check(client.last_call['crash_retries'] == 0, "limit waits counted as retries")
+        check(mock_sleep.call_count == 2, f"expected 2 limit sleeps, got {mock_sleep.call_count}")
+
+    broken = proc_for({"type": "result", "is_error": True, "subtype": "error_during_execution", "result": "boom"}, 1)
+    with patch("subprocess.run", return_value=broken) as mock_run, patch("time.sleep"):
+        client = ClaudeClient(claude_path="claude", echo=False)
+        try:
+            client.run_prompt("p")
+            check(False, "expected LlmCallError")
+        except LlmCallError as e:
+            check("boom" in str(e), f"error text: {e}")
+        check(mock_run.call_count == 3, f"expected 3 attempts, got {mock_run.call_count}")
+
+    # 4. get_client() dispatching
+    old_client_env = os.environ.get("STRATUM_CLIENT")
+    try:
+        os.environ["STRATUM_CLIENT"] = "claude"
+        cl = main_mod.get_client()
+        check(isinstance(cl, ClaudeClient), f"expected ClaudeClient, got {type(cl)}")
     finally:
         if old_client_env is not None:
             os.environ["STRATUM_CLIENT"] = old_client_env

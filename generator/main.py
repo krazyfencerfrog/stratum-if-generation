@@ -257,8 +257,8 @@ MENU_VERB = re.compile(
 def get_client():
     """STRATUM_CLIENT=stub selects the model-free stub without needing a
     dynamic_config.py at all; STRATUM_CLIENT=agy (or gemini/antigravity) selects
-    the Antigravity/Gemini frontier CLI client; otherwise the local
-    dynamic_config decides."""
+    the Antigravity/Gemini frontier CLI client; STRATUM_CLIENT=claude selects
+    the Claude Code CLI client; otherwise the local dynamic_config decides."""
     client_name = os.environ.get('STRATUM_CLIENT', '').lower()
     if client_name == 'stub':
         from stub_client import StubClient
@@ -266,6 +266,9 @@ def get_client():
     if client_name in ('agy', 'antigravity', 'gemini'):
         from agy_client import AgyClient
         return AgyClient()
+    if client_name == 'claude':
+        from claude_client import ClaudeClient
+        return ClaudeClient()
     import dynamic_config
     return dynamic_config.get_client()
 
