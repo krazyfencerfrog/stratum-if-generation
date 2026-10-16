@@ -552,6 +552,29 @@ def playtest_explores_scene_by_scene():
 
 
 @test
+def playtest_explores_scenes_in_parallel_as_it_does_serially():
+    # 15 scenes over three lines, all reached even at a small cap
+    story = Story.load(os.path.join(ROOT, 'examples', 'kernel40_the_saddle_in_the_square.json'))
+
+    def plain(result):
+        """The exploration with its states as dicts, so two runs compare."""
+        scenes = {}
+        for sid, r in result['scenes'].items():
+            r = dict(r, states=[st.to_dict() for st in r['states']])
+            r['leaving'] = {t: {b: (st.to_dict(), path) for b, (st, path) in bs.items()} for t, bs in r['leaving'].items()}
+            scenes[sid] = r
+        return dict(result, scenes=scenes)
+    serial = playtest.explore_scenes(story, max_states=50)
+    parallel = playtest.explore_scenes(story, max_states=50, jobs=4)
+    check(len(serial['scenes']) == len(story.scenes), f"only {len(serial['scenes'])} scenes explored")
+    check(list(parallel['scenes']) == list(serial['scenes']), 'scenes explored in another order')
+    check(plain(parallel) == plain(serial), 'the parallel exploration differs from the serial one')
+    order = playtest.scene_order(story)
+    feeds = playtest.scene_feeds(story, order)
+    check(all(order.index(s) < order.index(t) for t, fs in feeds.items() for s in fs), 'a scene fed by a later one')
+
+
+@test
 def seekers_play_the_story_not_the_menu():
     story = Story(demo_data())
     for style in ('seek', 'seek:branch'):
