@@ -181,7 +181,15 @@ python -m generator --story-id=my_story --stop-after 3.8 tests/kernels/kernel1.t
 
 # Run against a model-free stub client for rapid pipeline testing
 STRATUM_CLIENT=stub python -m generator --story-id=stubtest tests/kernels/kernel1.txt
+
+# Run on a Claude subscription via the Claude Code CLI (`claude -p`, logged in)
+STRATUM_CLIENT=claude STRATUM_CLAUDE_MODEL=opus python -m generator --story-id=my_story tests/kernels/kernel1.txt
 ```
+
+The Claude backend (`generator/claude_client.py`) runs each call as a stateless, tool-less `claude -p`
+completion with schema-constrained output. Non-thinking steps run at `--effort low`, thinking steps at
+`STRATUM_CLAUDE_EFFORT` (default `high`). When the subscription usage limit is hit it sleeps and retries
+(`STRATUM_CLAUDE_LIMIT_WAIT`, default 900s, up to `STRATUM_CLAUDE_LIMIT_MAX`, default 6h).
 
 You can also run internal developer tools from `generator/`:
 
