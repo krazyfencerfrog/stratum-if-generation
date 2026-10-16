@@ -36,6 +36,10 @@ import re
 import json
 import argparse
 import contextlib
+import copy
+import queue
+import subprocess
+import threading
 from pathlib import Path
 
 from llm_client import LlmCallError
@@ -265,10 +269,54 @@ def get_client():
     return dynamic_config.get_client()
 
 
+class ThreadStdout:
+    """sys.stdout for parallel calls: each thread's writes go to the file it
+    named with to(), or to the real stdout when it named none."""
+
+    def __init__(self, base):
+        self.base = base
+        self.local = threading.local()
+
+    def target(self):
+        return getattr(self.local, 'target', None) or self.base
+
+    def write(self, text):
+        return self.target().write(text)
+
+    def flush(self):
+        return self.target().flush()
+
+    def __getattr__(self, name):
+        return getattr(self.base, name)
+
+    @contextlib.contextmanager
+    def to(self, f):
+        before = getattr(self.local, 'target', None)
+        self.local.target = f
+        try:
+            yield f
+        finally:
+            self.local.target = before
+
+
+def kill_children():
+    """SIGTERM this process's child processes (CLI model clients started by
+    worker threads, which run in their own sessions and so never see ctrl-c)."""
+    try:
+        out = subprocess.run(['pgrep', '-P', str(os.getpid())], capture_output=True, text=True).stdout
+    except OSError:
+        return
+    for pid in out.split():
+        try:
+            os.kill(int(pid), signal.SIGTERM)
+        except (ValueError, OSError):
+            pass
+
+
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
-                 branching='plan', outline_judge=True, stories_root=None, author='Anonymous'):
+                 branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1):
         self.story_id = story_id
         self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
@@ -280,6 +328,8 @@ class StoryGenerator:
         self.promises_on = promises          # --no-promises skips 3.4; the prompts get "none"
         self.branching = branching           # 'plan' (4p designs every divergence) or 'judge' (4d, one seed per iteration)
         self.outline_judge = outline_judge   # --no-outline-judge skips 4e
+        self.parallel = max(1, int(parallel or 1))  # --parallel: independent per-item calls run this many at once
+        self._local = threading.local()      # a worker thread's own client and log target
 
         self.story_path_str = os.path.join(stories_root or os.path.join(THIS_DIR, "..", "stories"), self.story_id)
         self.story_path = Path(self.story_path_str)
@@ -481,8 +531,7 @@ class StoryGenerator:
         if leftover:
             raise ValueError(f"{prompt_file_name}: unfilled placeholders {leftover} for {output_member_name}")
 
-        if self.client is None:
-            self.client = get_client()
+        client = self.thread_client()
         profile = call_profile(klass)
         think = self.think_for(prefix, name, klass)
 
@@ -515,15 +564,15 @@ class StoryGenerator:
             started = time.time()
             stamp = int(started * 1000)     # names this attempt's partial trace if it is cut
             thinking, response, call_error = '', '', None
-            if hasattr(self.client, 'last_call'):
-                self.client.last_call = {}
+            if hasattr(client, 'last_call'):
+                client.last_call = {}
             with open(log_path, "w", encoding="utf-8") as f:
-                with contextlib.redirect_stdout(f):
+                with self.log_to(f):
                     try:
-                        (thinking, response) = self.client.run_prompt(full_prompt, **kwargs)
+                        (thinking, response) = client.run_prompt(full_prompt, **kwargs)
                     except LlmCallError as e:
                         thinking, response, call_error = e.thinking, e.response, e
-            info = getattr(self.client, 'last_call', None) or {}
+            info = getattr(client, 'last_call', None) or {}
             thinking, response = thinking or '', response or ''
             rec.update({
                 'seconds': round(time.time() - started, 2),
@@ -632,6 +681,70 @@ class StoryGenerator:
             f"{attempt} attempts (last error: {last_error}); see "
             f"{self.story_file_path(prefix + '_raw_output_response.txt')}"
         )
+
+    # ------------------------------------------------------------------ parallel calls
+
+    def thread_client(self):
+        """The client for this thread. Worker threads get their own shallow
+        copy, so one call's last_call is never read as another's."""
+        if self.client is None:
+            self.client = get_client()
+        return getattr(self._local, 'client', None) or self.client
+
+    def log_to(self, f):
+        """stdout to the call's log file. Serially that is redirect_stdout;
+        with worker threads sys.stdout is shared, so it is routed per thread."""
+        if self.parallel <= 1:
+            return contextlib.redirect_stdout(f)
+        if not isinstance(sys.stdout, ThreadStdout):
+            sys.stdout = ThreadStdout(sys.stdout)
+        return sys.stdout.to(f)
+
+    def map_calls(self, fn, items):
+        """[fn(item) for item in items], up to self.parallel at a time.
+
+        For loops whose calls are independent of each other: fn makes the
+        model call and returns its answer, and the caller folds the answers
+        into shared state afterwards, in item order, so the result does not
+        depend on which call finished first. On a failure no new items are
+        started, the ones in flight finish (their outputs are saved, so a
+        re-run resumes past them), and the first failing item's error is
+        raised. Workers are daemon threads: ctrl-c stops the model processes
+        they started and exits without waiting for them."""
+        items = list(items)
+        if self.parallel <= 1 or len(items) <= 1:
+            return [fn(x) for x in items]
+        base = self.thread_client()
+        results, errors = [None] * len(items), {}
+        todo = queue.Queue()
+        for i, x in enumerate(items):
+            todo.put((i, x))
+
+        def work():
+            self._local.client = copy.copy(base)
+            while not errors:
+                try:
+                    i, x = todo.get_nowait()
+                except queue.Empty:
+                    return
+                try:
+                    results[i] = fn(x)
+                except BaseException as e:      # noqa: B036 (re-raised by the main thread)
+                    errors[i] = e
+
+        threads = [threading.Thread(target=work, daemon=True) for _ in range(min(self.parallel, len(items)))]
+        for t in threads:
+            t.start()
+        try:
+            for t in threads:
+                while t.is_alive():
+                    t.join(0.5)
+        except KeyboardInterrupt:
+            kill_children()
+            raise
+        if errors:
+            raise errors[min(errors)]
+        return results
 
     def keep_rejected(self, prefix, attempt, thinking, response):
         """A rejected attempt's output is kept beside the accepted one (the
@@ -1998,6 +2111,9 @@ def main(argv=None):
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
+    parser.add_argument("--parallel", type=int, default=1,
+                        help="run independent per-item calls (stage B characters and conversations, stage D "
+                             "scenes) this many at once; for remote clients (agy). Default 1: one at a time")
     args = parser.parse_args(argv)
 
     story_id = slugify(args.story_id)
@@ -2010,7 +2126,7 @@ def main(argv=None):
                              breakers=not args.no_breakers, framework_override=args.framework.strip() or None,
                              force_answer=not args.no_force_answer, promises=not args.no_promises,
                              branching=args.branching, outline_judge=not args.no_outline_judge,
-                             author=args.author)
+                             author=args.author, parallel=args.parallel)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)

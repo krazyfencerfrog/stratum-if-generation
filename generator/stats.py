@@ -20,6 +20,7 @@ output bytes per second end to end): 25 KB of thinking is about 25 minutes.
 import json
 import os
 import re
+import threading
 import time
 
 SCHEMA_VERSION = 5
@@ -165,10 +166,12 @@ class RunStats:
                 self.calls = []
                 self.extra = {}
         self.session_start = len(self.calls)
+        self.lock = threading.RLock()       # parallel calls record from worker threads
 
     def record_extra(self, key, value):
-        self.extra[key] = value
-        self.save()
+        with self.lock:
+            self.extra[key] = value
+            self.save()
 
     def record(self, **rec):
         profile = call_profile(rec.get('klass'))
@@ -181,8 +184,9 @@ class RunStats:
         if rec.get('seconds', 0) > profile['target_seconds']:
             over.append('seconds')
         rec['over_target'] = over
-        self.calls.append(rec)
-        self.save()
+        with self.lock:
+            self.calls.append(rec)
+            self.save()
         return rec
 
     def save(self):
