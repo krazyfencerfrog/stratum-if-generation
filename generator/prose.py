@@ -438,17 +438,14 @@ class ProseWriter:
                         soft.append(f'{i}: {issue}')
                 if ALTERNATIVES.search(t):
                     soft.append(f'{i}: narrates alternatives ("{ALTERNATIVES.search(t).group(0)}"); say what happens')
-                if MECHANICS.search(t):
-                    soft.append(f'{i}: a game word ("{MECHANICS.search(t).group(0)}")')
-                if ANNOUNCED.search(t) and not ANNOUNCED.search(originals[i] or '') or (k == 'ending' and ANNOUNCED.search(t)):
-                    soft.append(f'{i}: names the craft ("{ANNOUNCED.search(t).group(0)}"); show what is lost instead')
                 for cid, c in self.chars.items():
                     unnamed = c.get('unnamed')
                     if unnamed and re.search(r'\b' + re.escape(unnamed) + r"['’]s\b", t, re.I):
                         soft.append(f"{i}: ungrammatical possessive on unintroduced handle ({unnamed!r}); use head noun or person code")
-                # Semantic invariants (somatic embodiment discipline and resolution liveness
-                # consistency) are evaluated across complete context by semantic LLM judges
-                # (s8j_somatic and s8j_fate) during the post-edit pass (#49), retiring fragile regexes.
+                # Semantic invariants (somatic embodiment discipline, resolution liveness
+                # consistency, and fourth-wall/craft mechanics leakage) are evaluated across
+                # complete context by semantic LLM judges (s8j_somatic, s8j_fate, s8j_craft)
+                # during the post-edit pass (#49), retiring fragile regexes.
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
@@ -628,6 +625,38 @@ class ProseWriter:
                 self.findings.append(msg)
         return res
 
+    def judge_craft(self):
+        """Step 8j3: Evaluates rewritten narrative texts for fourth-wall breaks,
+        game engine mechanics leakage, and meta-craft announcements (#49 Phase 3)."""
+        if not self.gen or not hasattr(self.gen, 'run_prompt'):
+            return None
+        texts = {}
+        if self.pkg.get('opening'):
+            texts['opening'] = self.pkg['opening']
+        for sid, scene in (self.pkg.get('scenes') or {}).items():
+            if scene.get('opening'):
+                texts[f'{sid}_opening'] = scene['opening']
+            for r_idx, r in enumerate(scene.get('recap') or []):
+                if isinstance(r, dict) and r.get('text'):
+                    texts[f'{sid}_recap_{r_idx+1}'] = r['text']
+            for a_idx, a in enumerate(scene.get('actions') or []):
+                if isinstance(a, dict) and a.get('text'):
+                    texts[f'{sid}_act_{a_idx+1}'] = a['text']
+        for eid, end in (self.pkg.get('endings') or {}).items():
+            for t_idx, t in enumerate(end.get('text') or []):
+                if isinstance(t, dict) and t.get('text'):
+                    texts[f'{eid}_text_{t_idx+1}'] = t['text']
+        if not texts:
+            return None
+        res = self.gen.run_prompt('s8j', 'craft', {
+            '$$TEXTS_JSON$$': json.dumps(texts, ensure_ascii=False, indent=1),
+        }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+        if res and res.get('verdict') == 'issues_found':
+            for v in res.get('violations') or []:
+                msg = f"craft leakage ({v.get('issue_type')}) in {v.get('text_id')}: {v.get('quote')} ({v.get('reason')})"
+                self.findings.append(msg)
+        return res
+
     # ------------------------------------------------------------ the whole pass
 
     def run(self):
@@ -641,6 +670,7 @@ class ProseWriter:
         self.convert_names()            # any name a revision wrote anyway
         self.judge_somatic()
         self.judge_fates()
+        self.judge_craft()
         if ENGINE not in sys.path:
             sys.path.insert(0, ENGINE)
         from story import Story, validate

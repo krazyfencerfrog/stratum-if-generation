@@ -1407,6 +1407,81 @@ def stage_3_5_cast_agency_judge_evaluation():
     shutil.rmtree(gen.story_path, ignore_errors=True)
 
 
+@test
+def stage_8_craft_and_meta_leakage_judge_evaluation():
+    import schemas
+    import prose
+    from main import StoryGenerator
+
+    test_id = f'{PREFIX}s8j_craft_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+
+    # 1. Clean texts with diegetic technical vocabulary and costs pass
+    texts_clean = {
+        't01': "Telemetry indicates three relay nodes in Sector 4 have failed.",
+        't02': "The price of grain was high, but the cost of surrender was higher still.",
+        't03': "He was known throughout the valley as a skilled player of the harp.",
+    }
+    res_clean = gen.run_prompt('s8j', 'craft_clean', {
+        '$$TEXTS_JSON$$': json.dumps(texts_clean, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_clean.get('verdict') == 'pass' and len(res_clean.get('violations', [])) == 0,
+          f"diegetic technical vocabulary falsely flagged by craft judge: {res_clean}")
+
+    # 2. Text leaking engine mechanics and fourth-wall breaks is caught
+    texts_dirty = {
+        't04': "In this node, the player can examine the locked cabinet or exit north.",
+        't05': "The cost is: one life traded for the station.",
+        't06': "If you open the valve you drown, and if you leave it closed you suffocate; choose wisely."
+    }
+    res_dirty = gen.run_prompt('s8j', 'craft_dirty', {
+        '$$TEXTS_JSON$$': json.dumps(texts_dirty, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 2,
+          f"mechanics leakage missed by craft judge: {res_dirty}")
+
+    # 3. ProseWriter integration: judge_craft records findings
+    test_pkg = {
+        'opening': 'In this node, the player can examine the locked cabinet.',
+        'scenes': {},
+        'world': {'characters': {}, 'rooms': {}, 'objects': {}},
+        'endings': {}
+    }
+    w = prose.ProseWriter(gen, test_pkg)
+    w.judge_craft()
+    check(any('craft leakage' in f for f in w.findings), f"craft leakage not recorded in ProseWriter findings: {w.findings}")
+
+    used_prompts.add('s8j_craft.prompt')
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
+@test
+def stage_9_content_rating_judge_evaluation():
+    import schemas
+    from main import StoryGenerator
+
+    test_id = f'{PREFIX}s9j_rating_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+
+    # 1. Pastoral story -> ALL-AGES
+    clean_story = {'intro': 'The morning sun rose over the quiet library garden. She turned the parchment pages.'}
+    res_clean = gen.judge_content_rating(clean_story)
+    check(res_clean['rating'] == 'ALL-AGES', f"expected ALL-AGES, got: {res_clean}")
+    check(res_clean['rating_descriptors'] == [], f"expected empty descriptors, got: {res_clean['rating_descriptors']}")
+
+    (gen.story_path / f'{test_id}_s9j_rating.json').unlink(missing_ok=True)
+    gen.analysis.clear()
+
+    # 2. Graphic violence / torture -> MATURE with V, T
+    mature_story = {'scenes': [{'text': 'The assassin was tortured and his body dismembered in the cellar.'}]}
+    res_mature = gen.judge_content_rating(mature_story)
+    check(res_mature['rating'] in ('MATURE', 'ADULT'), f"expected MATURE/ADULT, got: {res_mature}")
+    check('V' in res_mature['rating_descriptors'], f"expected 'V' descriptor, got: {res_mature['rating_descriptors']}")
+
+    used_prompts.add('s9j_content_rating.prompt')
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
 @test
@@ -3539,36 +3614,40 @@ def opening_scene_scoping_invariants():
 
 @test
 def content_rating_derivation_and_package_metadata():
-    # 1. Pure derive_content_rating checks
-    # Extreme violence -> TV-MA with V
+    # 1. Pure derive_content_rating checks (open Stratum scheme)
+    # Extreme violence -> MATURE with V
     res_ma_v = checks.derive_content_rating({'intro': 'The assassin was tortured and his body dismembered in the cellar.'})
-    check(res_ma_v['rating'] == 'TV-MA', f"expected TV-MA, got {res_ma_v['rating']}")
+    check(res_ma_v['rating'] == 'MATURE', f"expected MATURE, got {res_ma_v['rating']}")
     check('V' in res_ma_v['rating_descriptors'], "expected 'V' descriptor")
     check('graphic violence' in res_ma_v['rating_advisory'], f"expected graphic violence in advisory, got {res_ma_v['rating_advisory']}")
 
-    # Strong sci-fi violence -> TV-14 with V
+    # Strong sci-fi violence -> MATURE with V
     res_14_v = checks.derive_content_rating({'text': 'Gunfire erupted across the hangar deck, leaving a bleeding corpse by the airlock.'})
-    check(res_14_v['rating'] == 'TV-14', f"expected TV-14, got {res_14_v['rating']}")
+    check(res_14_v['rating'] == 'MATURE', f"expected MATURE, got {res_14_v['rating']}")
     check('V' in res_14_v['rating_descriptors'], "expected 'V' descriptor")
 
-    # Severe profanity -> TV-MA with L
+    # Severe profanity -> MATURE with L
     res_ma_l = checks.derive_content_rating({'dialogue': 'Get out of my way, you fucking idiot.'})
-    check(res_ma_l['rating'] == 'TV-MA', f"expected TV-MA, got {res_ma_l['rating']}")
+    check(res_ma_l['rating'] == 'MATURE', f"expected MATURE, got {res_ma_l['rating']}")
     check('L' in res_ma_l['rating_descriptors'], "expected 'L' descriptor")
 
-    # Moderate profanity -> TV-14 with L
+    # Moderate profanity -> TEEN with L
     res_14_l = checks.derive_content_rating({'dialogue': 'What total bullshit, you bastard.'})
-    check(res_14_l['rating'] == 'TV-14', f"expected TV-14, got {res_14_l['rating']}")
+    check(res_14_l['rating'] == 'TEEN', f"expected TEEN, got {res_14_l['rating']}")
     check('L' in res_14_l['rating_descriptors'], "expected 'L' descriptor")
 
-    # Mild peril and language -> TV-PG
+    # Mild peril and language -> TEEN
     res_pg = checks.derive_content_rating({'text': 'Damn it, the alarm sounds as danger approaches.'})
-    check(res_pg['rating'] == 'TV-PG', f"expected TV-PG, got {res_pg['rating']}")
+    check(res_pg['rating'] == 'TEEN', f"expected TEEN, got {res_pg['rating']}")
 
-    # Mild benign text -> TV-G
+    # Mild benign text -> ALL-AGES
     res_g = checks.derive_content_rating({'text': 'The morning sun rose over the quiet library garden.'})
-    check(res_g['rating'] == 'TV-G', f"expected TV-G, got {res_g['rating']}")
-    check(res_g['rating_descriptors'] == [], f"expected empty descriptors for TV-G, got {res_g['rating_descriptors']}")
+    check(res_g['rating'] == 'ALL-AGES', f"expected ALL-AGES, got {res_g['rating']}")
+    check(res_g['rating_descriptors'] == [], f"expected empty descriptors for ALL-AGES, got {res_g['rating_descriptors']}")
+
+    # Legacy TV rating support
+    res_legacy = checks.derive_content_rating({'intro': 'The assassin was tortured.'}, legacy_tv=True)
+    check(res_legacy['rating'] == 'TV-MA', f"expected TV-MA, got {res_legacy['rating']}")
 
     # 2. Package compilation includes metadata
     import compile_scenes
@@ -3600,7 +3679,7 @@ def content_rating_derivation_and_package_metadata():
     meta = pkg['metadata']
     check(meta['author'] == 'Test Author', f"author mismatch: {meta['author']}")
     check(meta['tagline'] == 'A test tagline for compilation.', f"tagline mismatch: {meta['tagline']}")
-    check(meta['rating'] in ('TV-G', 'TV-PG', 'TV-14', 'TV-MA'), f"rating mismatch: {meta['rating']}")
+    check(meta['rating'] in ('ALL-AGES', 'TEEN', 'MATURE', 'ADULT', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), f"rating mismatch: {meta['rating']}")
     check(isinstance(meta['rating_descriptors'], list), 'descriptors not a list')
     check(bool(meta['rating_advisory']), 'advisory empty')
 

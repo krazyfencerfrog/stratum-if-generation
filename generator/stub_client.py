@@ -204,6 +204,8 @@ class StubClient(LlmClient):
             ('You are step 8b of', 's8b'),
             ('You are step 8j1 of', 's8j_fate'),
             ('You are step 8j2 of', 's8j_somatic'),
+            ('You are step 8j-craft of', 's8j_craft'),
+            ('You are step 9j of', 's9j_rating'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -1237,6 +1239,92 @@ class StubClient(LlmClient):
             "verdict": "pass",
             "violations": [],
         }
+
+    def p_s8j_craft(self, p):
+        texts = self.section(p, '- Second-Person Narrative Texts') or {}
+        violations = []
+        for tid, txt in texts.items():
+            t_str = str(txt)
+            t_lower = t_str.lower()
+            if 'the player' in t_lower or 'this node' in t_lower or ('variant' in t_lower and 'virus' not in t_lower and 'pathogen' not in t_lower):
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'meta_leakage',
+                    'reason': "Text refers directly to game engine mechanics or 'the player' rather than maintaining second-person immersion."
+                })
+            elif 'the cost is:' in t_lower or 'the dramatic cost' in t_lower:
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'craft_announcement',
+                    'reason': "Text explicitly announces premise craft mechanics instead of dramatizing narrative consequences."
+                })
+            elif 'if you open the valve you drown, and if you leave it closed' in t_lower:
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'unresolved_alternatives',
+                    'reason': "Text narrating contradictory alternative branches in a single passage."
+                })
+        if violations:
+            return {
+                "reading": f"Found {len(violations)} prose craft violation(s).",
+                "verdict": "issues_found",
+                "violations": violations,
+            }
+        return {
+            "reading": "All prose texts maintain second-person immersion with no engine mechanics leakage or craft announcements.",
+            "verdict": "pass",
+            "violations": [],
+        }
+
+    def p_s9j_rating(self, p):
+        idx = p.rfind('- Story Narrative Texts')
+        body = p[idx:] if idx != -1 else p
+        body_lower = body.lower()
+        if 'tortured' in body_lower or 'dismembered' in body_lower:
+            return {
+                "reading": "The story contains explicit torture and graphic violence.",
+                "rating": "MATURE",
+                "rating_descriptors": ["V", "T"],
+                "rating_advisory": "Recommended for mature readers (17+). Contains graphic violence, torture, and dark themes.",
+            }
+        elif 'fucking' in body_lower or 'shit' in body_lower:
+            return {
+                "reading": "The story contains coarse profanity.",
+                "rating": "MATURE",
+                "rating_descriptors": ["L"],
+                "rating_advisory": "Recommended for mature readers (17+). Contains coarse language.",
+            }
+        elif 'gunfire' in body_lower or 'corpse' in body_lower or 'bleeding' in body_lower:
+            return {
+                "reading": "The story contains sci-fi combat and violence.",
+                "rating": "TEEN",
+                "rating_descriptors": ["V"],
+                "rating_advisory": "Recommended for teen readers (13+). Contains sci-fi combat and violence.",
+            }
+        elif 'bastard' in body_lower or 'bullshit' in body_lower:
+            return {
+                "reading": "The story contains moderate profanity.",
+                "rating": "TEEN",
+                "rating_descriptors": ["L"],
+                "rating_advisory": "Recommended for teen readers (13+). Contains moderate language.",
+            }
+        elif 'damn' in body_lower or 'alarm' in body_lower or 'peril' in body_lower:
+            return {
+                "reading": "The story contains mild peril and infrequent mild language.",
+                "rating": "TEEN",
+                "rating_descriptors": ["L"],
+                "rating_advisory": "Recommended for teen readers (13+). Contains mild peril and language.",
+            }
+        else:
+            return {
+                "reading": "The story depicts peaceful pastoral or exploratory themes with no coarse content.",
+                "rating": "ALL-AGES",
+                "rating_descriptors": [],
+                "rating_advisory": "Suitable for all audiences.",
+            }
 
     def p_s7d(self, p):
         pk = self.section(p, 'THIS SCENE (') or {}

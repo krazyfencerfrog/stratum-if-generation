@@ -851,9 +851,10 @@ MATURE_THEMES_RE = re.compile(
 )
 
 
-def derive_content_rating(package_or_story_data):
-    """Derives a TV Parental Guidelines content rating (TV-G, TV-PG, TV-14, TV-MA),
-    descriptor tags (V, L, S, D), and advisory text by scanning text in a story document or package."""
+def derive_content_rating(package_or_story_data, legacy_tv=False):
+    """Derives a content rating, descriptor tags (V, L, S, T/D), and advisory text by scanning text in a story.
+    By default outputs the open Stratum Content Advisory scheme (ALL-AGES, TEEN, MATURE, ADULT).
+    When legacy_tv=True, outputs legacy TV Parental Guidelines (TV-G, TV-PG, TV-14, TV-MA)."""
     def collect_strings(node):
         if isinstance(node, str):
             yield node
@@ -881,19 +882,25 @@ def derive_content_rating(package_or_story_data):
     has_ma_theme = bool(MA_THEMES_RE.search(full_text))
     has_mature_theme = bool(MATURE_THEMES_RE.search(full_text))
 
-    if has_ma_v or has_ma_l or has_ma_s or has_ma_theme:
-        rating = 'TV-MA'
-    elif has_strong_v or has_strong_l or has_sugg_d or has_mature_theme:
-        rating = 'TV-14'
-    elif has_mild_v or has_mild_l:
-        rating = 'TV-PG'
+    if legacy_tv:
+        if has_ma_v or has_ma_l or has_ma_s or has_ma_theme:
+            rating = 'TV-MA'
+        elif has_strong_v or has_strong_l or has_sugg_d or has_mature_theme:
+            rating = 'TV-14'
+        elif has_mild_v or has_mild_l:
+            rating = 'TV-PG'
+        else:
+            rating = 'TV-G'
     else:
-        rating = 'TV-G'
+        if has_ma_v or has_ma_l or has_ma_s or has_ma_theme or has_strong_v:
+            rating = 'MATURE'
+        elif has_strong_l or has_mild_v or has_mild_l or has_sugg_d or has_mature_theme:
+            rating = 'TEEN'
+        else:
+            rating = 'ALL-AGES'
 
     descriptors = []
-    if has_ma_v or has_strong_v:
-        descriptors.append('V')
-    elif has_mild_v and rating in ('TV-PG', 'TV-14'):
+    if has_ma_v or has_strong_v or has_mild_v:
         descriptors.append('V')
 
     if has_ma_l or has_strong_l or has_mild_l:
@@ -902,58 +909,50 @@ def derive_content_rating(package_or_story_data):
     if has_ma_s:
         descriptors.append('S')
     elif has_sugg_d:
-        descriptors.append('D')
+        descriptors.append('D' if legacy_tv else 'S')
 
-    if rating == 'TV-G':
+    if has_ma_theme or has_mature_theme:
+        if not legacy_tv and 'T' not in descriptors:
+            descriptors.append('T')
+
+    if rating in ('TV-G', 'ALL-AGES'):
         descriptors = []
 
-    if rating == 'TV-MA':
-        causes = []
-        if has_ma_v:
-            causes.append('graphic violence')
-        elif has_strong_v:
-            causes.append('violence')
-        if has_ma_l:
-            causes.append('explicit language')
-        elif has_strong_l:
-            causes.append('coarse language')
-        if has_ma_s:
-            causes.append('explicit sexual situations')
-        if has_ma_theme:
-            causes.append('disturbing themes')
-        if not causes:
-            causes.append('mature content')
-    elif rating == 'TV-14':
-        causes = []
-        if has_strong_v:
-            causes.append('intense sci-fi violence and peril')
-        elif has_mild_v:
-            causes.append('thematic peril')
-        if has_strong_l:
-            causes.append('coarse language')
-        elif has_mild_l:
-            causes.append('mild language')
-        if has_sugg_d:
-            causes.append('suggestive dialogue')
-        if has_mature_theme:
-            causes.append('dark thematic elements')
-        if not causes:
-            causes.append('thematic material')
-    elif rating == 'TV-PG':
-        causes = []
-        if has_mild_v:
-            causes.append('mild peril and fantasy violence')
-        if has_mild_l:
-            causes.append('mild language')
-        if not causes:
-            causes.append('thematic elements')
-    else:
-        causes = []
+    causes = []
+    if has_ma_v:
+        causes.append('graphic violence')
+    elif has_strong_v:
+        causes.append('violence')
+    elif has_mild_v:
+        causes.append('mild peril')
 
-    if causes:
-        advisory = f"Rated {rating} for {', '.join(causes[:-1]) + (' and ' if len(causes) > 1 else '') + causes[-1]}."
+    if has_ma_l:
+        causes.append('explicit language')
+    elif has_strong_l:
+        causes.append('coarse language')
+    elif has_mild_l:
+        causes.append('mild language')
+
+    if has_ma_s:
+        causes.append('explicit sexual situations')
+    elif has_sugg_d:
+        causes.append('suggestive dialogue')
+
+    if has_ma_theme or has_mature_theme:
+        causes.append('dark thematic elements')
+
+    if legacy_tv:
+        if causes:
+            advisory = f"Rated {rating} for {', '.join(causes[:-1]) + (' and ' if len(causes) > 1 else '') + causes[-1]}."
+        else:
+            advisory = f"Rated {rating} suitable for general audiences."
     else:
-        advisory = f"Rated {rating} suitable for general audiences."
+        if rating == 'ALL-AGES':
+            advisory = "Suitable for all audiences."
+        else:
+            cause_text = (', '.join(causes[:-1]) + (' and ' if len(causes) > 1 else '') + causes[-1]) if causes else 'thematic elements'
+            target = 'mature readers (17+)' if rating in ('MATURE', 'ADULT') else 'teen readers (13+)'
+            advisory = f"Recommended for {target}. Contains {cause_text}."
 
     return {
         'rating': rating,

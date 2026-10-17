@@ -2127,6 +2127,37 @@ class StoryGenerator:
             print(f'  - {e}')
         return package, report
 
+    def judge_content_rating(self, story_data):
+        """Runs the semantic content rating judge (s9j_content_rating.prompt)
+        over the story package text to derive an unencumbered maturity rating (#49 Phase 3)."""
+        def collect_strings(node):
+            if isinstance(node, str):
+                yield node
+            elif isinstance(node, dict):
+                for k, v in node.items():
+                    if k not in ('id', 'format', 'story_id', 'when', 'known_when', 'after'):
+                        yield from collect_strings(v)
+            elif isinstance(node, list):
+                for v in node:
+                    yield from collect_strings(v)
+
+        texts = list(collect_strings(story_data))
+        sample_blob = '\n\n'.join(t.strip() for t in texts if t.strip() and len(t.strip()) > 15)[:12000]
+        try:
+            res = self.run_prompt('s9j', 'rating', {
+                '$$STORY_TEXTS$$': sample_blob or 'The quiet library.',
+            }, prompt_file='s9j_content_rating.prompt', klass='classify', schema=schemas.CONTENT_RATING_JUDGE)
+            if res:
+                return {
+                    'rating': res.get('rating') or 'ALL-AGES',
+                    'rating_descriptors': res.get('rating_descriptors') or [],
+                    'rating_advisory': res.get('rating_advisory') or '',
+                }
+        except Exception as e:
+            print(f'  [content_rating_judge] fallback: {e}')
+        return checks.derive_content_rating(story_data)
+
+
 
     def run_prose(self):
         """The prose pass (generator/prose.py) over <id>_package_draft.json: writes

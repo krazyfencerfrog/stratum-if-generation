@@ -744,9 +744,11 @@ class SceneCompiler:
             tagline = f"A story of wanting {prot['wants'].strip().rstrip('.')}."
 
         endings = self.endings()
-        rating_info = checks.derive_content_rating({
-            'world': self.world, 'protagonist': self.protagonist, 'scenes': scenes, 'endings': endings
-        })
+        pkg_payload = {'world': self.world, 'protagonist': self.protagonist, 'scenes': scenes, 'endings': endings}
+        if hasattr(self.gen, 'judge_content_rating'):
+            rating_info = self.gen.judge_content_rating(pkg_payload)
+        else:
+            rating_info = checks.derive_content_rating(pkg_payload)
 
         metadata = {
             'author': author,

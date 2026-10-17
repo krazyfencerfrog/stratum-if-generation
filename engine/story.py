@@ -78,7 +78,7 @@ class Story:
         self.author = (self.metadata.get('author') or 'Anonymous').strip()
         self.tagline = (self.metadata.get('tagline') or '').strip()
         self.model = (self.metadata.get('model') or '').strip()
-        self.rating = (self.metadata.get('rating') or 'TV-PG').strip()
+        self.rating = (self.metadata.get('rating') or 'ALL-AGES').strip()
         self.rating_descriptors = list(self.metadata.get('rating_descriptors') or [])
         self.rating_advisory = (self.metadata.get('rating_advisory') or '').strip()
         self.verbs = dict(CORE_VERBS)
@@ -329,8 +329,9 @@ def validate(story):
         if not isinstance(meta, dict):
             errors.append('metadata must be an object')
         else:
-            if 'rating' in meta and meta['rating'] not in ('TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'):
-                errors.append(f"metadata: rating {meta['rating']!r} must be one of TV-Y, TV-Y7, TV-G, TV-PG, TV-14, TV-MA")
+            valid_ratings = ('ALL-AGES', 'TEEN', 'MATURE', 'ADULT', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA')
+            if 'rating' in meta and meta['rating'] not in valid_ratings:
+                errors.append(f"metadata: rating {meta['rating']!r} must be one of {', '.join(valid_ratings)}")
             if 'rating_descriptors' in meta:
                 if not isinstance(meta['rating_descriptors'], list):
                     errors.append('metadata: rating_descriptors must be a list of strings')

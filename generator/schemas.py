@@ -358,6 +358,29 @@ CAST_JUDGE = obj(
     unrepresented_groups=arr(UNREPRESENTED_GROUP),
 )
 
+# ---------------------------------------------------------------- stage 8 prose craft judge (#49 Phase 3)
+
+CRAFT_VIOLATION = obj(
+    text_id=S,
+    quote=S,
+    issue_type=enum(['meta_leakage', 'craft_announcement', 'unresolved_alternatives']),
+    reason=S,
+)
+CRAFT_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'issues_found']),
+    violations=arr(CRAFT_VIOLATION),
+)
+
+# ---------------------------------------------------------------- stage 9 content rating judge (#49 Phase 3)
+
+CONTENT_RATING_JUDGE = obj(
+    reading=S,
+    rating=enum(['ALL-AGES', 'TEEN', 'MATURE', 'ADULT', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA']),
+    rating_descriptors=arr(S),
+    rating_advisory=S,
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -367,6 +390,8 @@ ALL = {
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
     'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE, 'CAST_JUDGE': CAST_JUDGE,
+    'CRAFT_JUDGE': CRAFT_JUDGE, 'CONTENT_RATING_JUDGE': CONTENT_RATING_JUDGE,
 }
+
 
 
