@@ -287,8 +287,8 @@ def dynamic_lexicon_generates_and_samples_names():
         "landmarks": ["Riverbend", "Shadowfen", "the Drowned Willows", "the Lock Gate"],
         "materials_and_props": {
             "containers": ["leather-bound journal", "dusty ledger", "tarred kit bag", "wicker creel"],
-            "fixtures": ["flickering candle", "carbide lamp", "iron brazier"],
-            "tools_and_wear": ["ornate brass key", "marlinspike", "wool smock"]
+            "fixtures": ["cracked mirror", "brass candle", "carbide lamp", "iron brazier"],
+            "tools_and_wear": ["dusty ledger", "skeleton key", "marlinspike", "wool smock"]
         }
     }
     test_seeds = [
@@ -320,6 +320,8 @@ def dynamic_lexicon_generates_and_samples_names():
     check(not any(p in palette['tools_and_wear'] for p in names.AVOID_PROPS), f"cliché prop in tools: {palette}")
     check("tarred kit bag" in palette['containers'] and "carbide lamp" in palette['fixtures'] and "marlinspike" in palette['tools_and_wear'],
           f"valid material props lost: {palette}")
+    check("brass candle" in palette['fixtures'] and "skeleton key" in palette['tools_and_wear'],
+          f"legitimate scene affordances (candle/key) should not be blocked: {palette}")
 
     # 3. Determinism check: Identical story_id + lexicon reproduces the exact same names and toponyms
     repeat_seeds = [

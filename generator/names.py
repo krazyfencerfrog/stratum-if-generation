@@ -47,10 +47,9 @@ AVOID_TOPONYMS = {
     'new eden', 'valoria', 'aethelgard', 'sunspire', 'blackwood', 'raven rock', 'starfall'
 }
 
-# cliché IF staging props kept out of examinable object pools
+# gratuitous purple-prose compound filler kept out of object pools (narrowly scoped to prevent blocking legitimate scene affordances like keys or candles)
 AVOID_PROPS = {
-    'leather-bound journal', 'dusty ledger', 'ornate brass key', 'rusted iron key',
-    'cracked mirror', 'half-empty bottle of whiskey', 'flickering candle', 'faded map'
+    'leather-bound journal', 'dusty ledger', 'cracked mirror'
 }
 
 
