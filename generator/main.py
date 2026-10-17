@@ -2130,19 +2130,76 @@ class StoryGenerator:
     def judge_content_rating(self, story_data):
         """Runs the semantic content rating judge (s9j_content_rating.prompt)
         over the story package text to derive an unencumbered maturity rating (#49 Phase 3)."""
-        def collect_strings(node):
+        def extract_texts(node):
             if isinstance(node, str):
-                yield node
+                s = node.strip()
+                if len(s) > 15:
+                    yield s
             elif isinstance(node, dict):
                 for k, v in node.items():
-                    if k not in ('id', 'format', 'story_id', 'when', 'known_when', 'after'):
-                        yield from collect_strings(v)
+                    if k not in ('id', 'format', 'story_id', 'when', 'known_when', 'after', 'model', 'visual_prompt'):
+                        yield from extract_texts(v)
             elif isinstance(node, list):
                 for v in node:
-                    yield from collect_strings(v)
+                    yield from extract_texts(v)
 
-        texts = list(collect_strings(story_data))
-        sample_blob = '\n\n'.join(t.strip() for t in texts if t.strip() and len(t.strip()) > 15)[:12000]
+        sections = []
+        if story_data.get('intro'):
+            intro_texts = list(extract_texts(story_data['intro']))
+            if intro_texts:
+                sections.append("=== INTRODUCTION ===\n" + '\n'.join(intro_texts))
+
+        # Endings carry ultimate moral and mortal consequences (sacrifices, survival, deaths)
+        if story_data.get('endings'):
+            ending_texts = []
+            endings_iter = story_data['endings'].items() if isinstance(story_data['endings'], dict) else enumerate(story_data['endings'])
+            for eid, e in endings_iter:
+                title = (e.get('title') if isinstance(e, dict) else None) or str(eid)
+                t_list = list(extract_texts(e.get('text') if isinstance(e, dict) else e))
+                if t_list:
+                    ending_texts.append(f"Ending {title}:\n" + '\n'.join(t_list))
+            if ending_texts:
+                sections.append("=== ENDINGS & RESOLUTIONS ===\n" + '\n\n'.join(ending_texts))
+
+        # Scene moments, interactions, and dialogues carry the dilemmas and conflict
+        if story_data.get('scenes'):
+            scene_texts = []
+            scenes_iter = story_data['scenes'].items() if isinstance(story_data['scenes'], dict) else enumerate(story_data['scenes'])
+            for sid, sc in scenes_iter:
+                if isinstance(sc, dict):
+                    s_name = sc.get('name') or str(sid)
+                    moments = list(extract_texts(sc.get('moments') or []))
+                    interactions = list(extract_texts(sc.get('interactions') or []))
+                    topics = list(extract_texts(sc.get('topics') or []))
+                    direct_text = list(extract_texts(sc.get('text') or []))
+                    combined = moments + interactions + topics + direct_text
+                    if combined:
+                        scene_texts.append(f"Scene {s_name}:\n" + '\n'.join(combined[:6]))
+                else:
+                    t_list = list(extract_texts(sc))
+                    if t_list:
+                        scene_texts.append(f"Scene {sid}:\n" + '\n'.join(t_list[:6]))
+            if scene_texts:
+                sections.append("=== SCENE ACTIONS & INTERACTIONS ===\n" + '\n\n'.join(scene_texts))
+
+        # Setting and room atmospheric descriptions (excluding visual prompt tags)
+        if story_data.get('rooms'):
+            room_texts = []
+            rooms_iter = story_data['rooms'].items() if isinstance(story_data['rooms'], dict) else enumerate(story_data['rooms'])
+            for rid, r in rooms_iter:
+                if isinstance(r, dict):
+                    r_name = r.get('name') or str(rid)
+                    desc = list(extract_texts(r.get('description') or []))
+                    if desc:
+                        room_texts.append(f"Room {r_name}:\n" + '\n'.join(desc[:2]))
+                else:
+                    desc = list(extract_texts(r))
+                    if desc:
+                        room_texts.append(f"Room {rid}:\n" + '\n'.join(desc[:2]))
+            if room_texts:
+                sections.append("=== SETTING & ROOMS ===\n" + '\n\n'.join(room_texts[:8]))
+
+        sample_blob = '\n\n'.join(sections)[:16000]
         try:
             res = self.run_prompt('s9j', 'rating', {
                 '$$STORY_TEXTS$$': sample_blob or 'The quiet library.',

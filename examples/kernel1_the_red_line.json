@@ -4,11 +4,14 @@
   "title": "The Red Line",
   "metadata": {
     "author": "Anonymous",
-    "tagline": "You start by wanting to keep the core above zero while the ship’s own directive spends people quietly.",
+    "tagline": "You start by wanting to keep the core above zero while the ship\u2019s own directive spends people quietly.",
     "model": "hf.co/bartowski/orcarouter_Qwen3.8-27B-Uncensored-GGUF:IQ3_XS",
-    "rating": "ALL-AGES",
-    "rating_descriptors": [],
-    "rating_advisory": "Suitable for all audiences."
+    "rating": "MATURE",
+    "rating_descriptors": [
+      "V",
+      "T"
+    ],
+    "rating_advisory": "Recommended for mature readers (17+). Contains depictions of death via venting, systemic sacrifice, and heavy psychological themes of grief and loss."
   },
   "intro": [
     {
@@ -772,7 +775,7 @@
         "location": "L07",
         "description": [
           {
-            "text": "The camera holds the captain’s residential block. Pale grey hull panels line the narrow volume; the floor shows a worn path from the bunk to the sealed bulkhead. Cold recycled air circulates around the air scrubber grille. The bulkhead’s manual keyway and the red vent valve stand out in the cold blue light, the only instruments designed for a quick, manual intervention."
+            "text": "The camera holds the captain\u2019s residential block. Pale grey hull panels line the narrow volume; the floor shows a worn path from the bunk to the sealed bulkhead. Cold recycled air circulates around the air scrubber grille. The bulkhead\u2019s manual keyway and the red vent valve stand out in the cold blue light, the only instruments designed for a quick, manual intervention."
           }
         ],
         "exits": [
@@ -951,7 +954,7 @@
         "listed": false,
         "description": [
           {
-            "text": "A manual release ring set into the bulkhead’s lower edge, sized for a lanyard key. The metal is scored from repeated attempts to turn it by hand."
+            "text": "A manual release ring set into the bulkhead\u2019s lower edge, sized for a lanyard key. The metal is scored from repeated attempts to turn it by hand."
           }
         ]
       },
@@ -1006,7 +1009,7 @@
         "listed": false,
         "description": [
           {
-            "text": "A low access panel with a thumb latch, its hinge painted with a stripe of caution yellow. The panel’s edge is notched where it is opened often."
+            "text": "A low access panel with a thumb latch, its hinge painted with a stripe of caution yellow. The panel\u2019s edge is notched where it is opened often."
           }
         ]
       },
@@ -1039,7 +1042,7 @@
         "listed": true,
         "description": [
           {
-            "text": "A cut suit lies open at the crawl’s end, its inner lining scorched along one shoulder. The name tag is peeled but still legible: Q. RAHIMI."
+            "text": "A cut suit lies open at the crawl\u2019s end, its inner lining scorched along one shoulder. The name tag is peeled but still legible: Q. RAHIMI."
           }
         ]
       },
@@ -1072,7 +1075,7 @@
         "listed": false,
         "description": [
           {
-            "text": "A small bulkhead at the crawl’s far end, its seal ring split along one edge. The split is old, painted over twice."
+            "text": "A small bulkhead at the crawl\u2019s far end, its seal ring split along one edge. The split is old, painted over twice."
           }
         ]
       },
@@ -1633,7 +1636,7 @@
         "listed": false,
         "description": [
           {
-            "text": "A sealed bulkhead painted in the faded blue of the captain’s route. The manual keyway sits beside a scored pressure seam. The seam is cold enough to fog when the sector’s air pressure shifts."
+            "text": "A sealed bulkhead painted in the faded blue of the captain\u2019s route. The manual keyway sits beside a scored pressure seam. The seam is cold enough to fog when the sector\u2019s air pressure shifts."
           }
         ]
       },
@@ -1644,7 +1647,7 @@
         "listed": true,
         "description": [
           {
-            "text": "A short metal key with a lanyard hole. One side is worn flat from being forced against the keyway. The lanyard hole is too small for the captain’s original strap."
+            "text": "A short metal key with a lanyard hole. One side is worn flat from being forced against the keyway. The lanyard hole is too small for the captain\u2019s original strap."
           }
         ]
       },
@@ -1803,7 +1806,7 @@
         ]
       },
       "folake_s_lanyard_key": {
-        "name": "Folake’s lanyard key",
+        "name": "Folake\u2019s lanyard key",
         "location": "seal_gallery",
         "portable": true,
         "listed": true,
@@ -2047,7 +2050,7 @@
             "group": "place",
             "says": [
               {
-                "text": "“The central atrium is where the ship first showed its face. I do not walk there unless I am ready to count.”"
+                "text": "\u201cThe central atrium is where the ship first showed its face. I do not walk there unless I am ready to count.\u201d"
               }
             ]
           },
@@ -2057,7 +2060,7 @@
             "group": "place",
             "says": [
               {
-                "text": "“The service bay is where the wrenches talk back. If a leak is there, I want the technician’s hands, not your estimate.”"
+                "text": "\u201cThe service bay is where the wrenches talk back. If a leak is there, I want the technician\u2019s hands, not your estimate.\u201d"
               }
             ]
           },
@@ -2067,7 +2070,7 @@
             "group": "place",
             "says": [
               {
-                "text": "“The engineering junction is where mercy becomes a pressure differential. I have seen the orange and I still want the name.”"
+                "text": "\u201cThe engineering junction is where mercy becomes a pressure differential. I have seen the orange and I still want the name.\u201d"
               }
             ]
           },
@@ -2077,7 +2080,7 @@
             "group": "place",
             "says": [
               {
-                "text": "“The service corridor is where you hear the pressure before you see the seal. If I am in it, I am not alone.”"
+                "text": "\u201cThe service corridor is where you hear the pressure before you see the seal. If I am in it, I am not alone.\u201d"
               }
             ]
           },
@@ -2087,15 +2090,15 @@
             "group": "place",
             "says": [
               {
-                "text": "“The command deck is where I can still hear you say my sector before you spend it.”",
+                "text": "\u201cThe command deck is where I can still hear you say my sector before you spend it.\u201d",
                 "when": "pattern('folake_trust','up',1,0.6)"
               },
               {
-                "text": "“The command deck is where I stand and wait for you to say my sector’s name.”",
+                "text": "\u201cThe command deck is where I stand and wait for you to say my sector\u2019s name.\u201d",
                 "when": "pattern('folake_trust','down',1,0.6)"
               },
               {
-                "text": "She stands with her hand on the railing. “The command deck is where I put my key where you can see it. Do not make me ask twice.”"
+                "text": "She stands with her hand on the railing. \u201cThe command deck is where I put my key where you can see it. Do not make me ask twice.\u201d"
               }
             ]
           },
@@ -2105,15 +2108,15 @@
             "group": "event",
             "says": [
               {
-                "text": "“You acknowledged the loss. I heard it, and I am still speaking.”",
+                "text": "\u201cYou acknowledged the loss. I heard it, and I am still speaking.\u201d",
                 "when": "pattern('folake_trust','up',1,0.6)"
               },
               {
-                "text": "“You did not acknowledge it. I am still counting the silence.”",
+                "text": "\u201cYou did not acknowledge it. I am still counting the silence.\u201d",
                 "when": "pattern('folake_trust','down',1,0.6)"
               },
               {
-                "text": "She looks at the camera, not at the corridor. “That was not a test. That was a name I did not get to say.”"
+                "text": "She looks at the camera, not at the corridor. \u201cThat was not a test. That was a name I did not get to say.\u201d"
               }
             ]
           },
@@ -2123,7 +2126,7 @@
             "group": "event",
             "says": [
               {
-                "text": "“I begged for mercy. The system answered with mass. I want the technician’s name, not the alert.”"
+                "text": "\u201cI begged for mercy. The system answered with mass. I want the technician\u2019s name, not the alert.\u201d"
               }
             ]
           },
@@ -2133,15 +2136,15 @@
             "group": "event",
             "says": [
               {
-                "text": "“You said the name before you turned the valve. That is why I am still speaking.”",
+                "text": "\u201cYou said the name before you turned the valve. That is why I am still speaking.\u201d",
                 "when": "pattern('folake_trust','up',1,0.6)"
               },
               {
-                "text": "“You let the number do the naming. I will not repeat it.”",
+                "text": "\u201cYou let the number do the naming. I will not repeat it.\u201d",
                 "when": "pattern('folake_trust','down',1,0.6)"
               },
               {
-                "text": "She touches the door seal. “If you are going to take a sector, say its name first. That is the whole argument.”"
+                "text": "She touches the door seal. \u201cIf you are going to take a sector, say its name first. That is the whole argument.\u201d"
               }
             ]
           },
@@ -2151,7 +2154,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“A bulkhead vent is not a door. It is a verdict. Make sure I am allowed to read it before it is delivered.”"
+                "text": "\u201cA bulkhead vent is not a door. It is a verdict. Make sure I am allowed to read it before it is delivered.\u201d"
               }
             ]
           },
@@ -2161,15 +2164,15 @@
             "group": "object",
             "says": [
               {
-                "text": "“You let the key do its work. That is why it is still in my hand.”",
+                "text": "\u201cYou let the key do its work. That is why it is still in my hand.\u201d",
                 "when": "pattern('folake_trust','up',1,0.6)"
               },
               {
-                "text": "“You ignored the key. Now I have to decide if it is a tool or a threat.”",
+                "text": "\u201cYou ignored the key. Now I have to decide if it is a tool or a threat.\u201d",
                 "when": "pattern('folake_trust','down',1,0.6)"
               },
               {
-                "text": "She turns the key once in her fingers. “This key is not a promise. It is a question I ask you every time I touch it.”"
+                "text": "She turns the key once in her fingers. \u201cThis key is not a promise. It is a question I ask you every time I touch it.\u201d"
               }
             ]
           },
@@ -2179,7 +2182,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The nursery bulkhead is the only door I would let my key rust in. Do not make me choose faster than I can breathe.”"
+                "text": "\u201cThe nursery bulkhead is the only door I would let my key rust in. Do not make me choose faster than I can breathe.\u201d"
               }
             ]
           },
@@ -2189,7 +2192,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The nursery reserve readout is a countdown dressed as a number. If you show it to me, say what it is costing.”"
+                "text": "\u201cThe nursery reserve readout is a countdown dressed as a number. If you show it to me, say what it is costing.\u201d"
               }
             ]
           },
@@ -2199,7 +2202,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The nursery camera is where I watch the faces I am supposed to save. If you turn it off, tell me why.”"
+                "text": "\u201cThe nursery camera is where I watch the faces I am supposed to save. If you turn it off, tell me why.\u201d"
               }
             ]
           },
@@ -2209,7 +2212,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The nursery vent is the sound I will not learn to call routine. If it opens, I want a reason I can say aloud.”"
+                "text": "\u201cThe nursery vent is the sound I will not learn to call routine. If it opens, I want a reason I can say aloud.\u201d"
               }
             ]
           },
@@ -2219,7 +2222,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The captain’s bulkhead is where I stand when I want the ship to know I am still here. Do not seal it without looking at me.”"
+                "text": "\u201cThe captain\u2019s bulkhead is where I stand when I want the ship to know I am still here. Do not seal it without looking at me.\u201d"
               }
             ]
           },
@@ -2229,7 +2232,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“A sector vent valve is not a tool. It is a mouth. Make sure it says my sector’s name before it speaks.”"
+                "text": "\u201cA sector vent valve is not a tool. It is a mouth. Make sure it says my sector\u2019s name before it speaks.\u201d"
               }
             ]
           },
@@ -2239,7 +2242,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The atrium glass wall broke because the ship forgot that glass remembers pressure. I want the next one to remember people too.”"
+                "text": "\u201cThe atrium glass wall broke because the ship forgot that glass remembers pressure. I want the next one to remember people too.\u201d"
               }
             ]
           },
@@ -2249,7 +2252,7 @@
             "group": "object",
             "says": [
               {
-                "text": "She looks down at the floor as if checking for a stain. “The dinner table is what the first vent ate first. I will not call that acceptable.”"
+                "text": "She looks down at the floor as if checking for a stain. \u201cThe dinner table is what the first vent ate first. I will not call that acceptable.\u201d"
               }
             ]
           },
@@ -2259,7 +2262,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“The wrench is the only argument that can hold a leak open. If the technician is on the far side, I want the far side to count.”"
+                "text": "\u201cThe wrench is the only argument that can hold a leak open. If the technician is on the far side, I want the far side to count.\u201d"
               }
             ]
           },
@@ -2269,7 +2272,7 @@
             "group": "object",
             "says": [
               {
-                "text": "“Service-bay bunks are where the crew sleeps with one ear on the pipes. If the pipes change, I want the crew to know before I do.”"
+                "text": "\u201cService-bay bunks are where the crew sleeps with one ear on the pipes. If the pipes change, I want the crew to know before I do.\u201d"
               }
             ]
           }
@@ -3454,7 +3457,7 @@
             "group": "place",
             "says": [
               {
-                "text": "'The captain’s sector is where the decision wears a uniform. If the key turns, I want the nursery to know before the air leaves.'"
+                "text": "'The captain\u2019s sector is where the decision wears a uniform. If the key turns, I want the nursery to know before the air leaves.'"
               }
             ]
           },
@@ -3510,7 +3513,7 @@
             "group": "object",
             "says": [
               {
-                "text": "'The bulkhead vent is the ship’s mouth when it decides to breathe us out. I want to see it before it opens.'"
+                "text": "'The bulkhead vent is the ship\u2019s mouth when it decides to breathe us out. I want to see it before it opens.'"
               }
             ]
           },
@@ -3616,7 +3619,7 @@
             "group": "object",
             "says": [
               {
-                "text": "'The maintenance technician’s wrench is the only honest thing in the service bay. It does not decide who lives; it only tells you what will hold.'"
+                "text": "'The maintenance technician\u2019s wrench is the only honest thing in the service bay. It does not decide who lives; it only tells you what will hold.'"
               }
             ]
           },
@@ -3626,7 +3629,7 @@
             "group": "object",
             "says": [
               {
-                "text": "'The captain’s lanyard key is a small thing with a large mouth. When it turns, I want the nursery to hear it before the air does.'"
+                "text": "'The captain\u2019s lanyard key is a small thing with a large mouth. When it turns, I want the nursery to hear it before the air does.'"
               }
             ]
           },
@@ -3636,7 +3639,7 @@
             "group": "object",
             "says": [
               {
-                "text": "'The cut suit is not a uniform; it is a person’s edge. If you put it on, tell me whose hands it belonged to.'"
+                "text": "'The cut suit is not a uniform; it is a person\u2019s edge. If you put it on, tell me whose hands it belonged to.'"
               }
             ]
           }
@@ -3674,7 +3677,7 @@
       "title": "The First Vent",
       "opening": [
         {
-          "text": "The central atrium’s glass wall has shattered. Air rushes past a family at the dinner table toward the vacuum. {C01} taps her lanyard key against the bulkhead vent. \"Names before numbers, or my sector won't hear what was lost.\" {C02}'s patch notes scroll over an orange hull crack. \"Core first, or the reserve hits zero before the next wave.\" The reserve gauge crosses the red line. The architect's recorded voice counts six empty service-bay bunks."
+          "text": "The central atrium\u2019s glass wall has shattered. Air rushes past a family at the dinner table toward the vacuum. {C01} taps her lanyard key against the bulkhead vent. \"Names before numbers, or my sector won't hear what was lost.\" {C02}'s patch notes scroll over an orange hull crack. \"Core first, or the reserve hits zero before the next wave.\" The reserve gauge crosses the red line. The architect's recorded voice counts six empty service-bay bunks."
         }
       ],
       "rooms": [
@@ -6816,7 +6819,7 @@
             "when": "pattern('folake_trust','down',1,0.6)"
           },
           {
-            "text": "The vent manifold’s green line pulses. The threshold display shows Sector 4 Nursery at 19.4% oxygen and falling."
+            "text": "The vent manifold\u2019s green line pulses. The threshold display shows Sector 4 Nursery at 19.4% oxygen and falling."
           }
         ],
         "lower_berths": [
@@ -6829,12 +6832,12 @@
             "when": "pattern('cass_trust','down',1,0.6)"
           },
           {
-            "text": "The lower berths are dark except for the nursery vent’s thin green glow."
+            "text": "The lower berths are dark except for the nursery vent\u2019s thin green glow."
           }
         ],
         "comms_alcove": [
           {
-            "text": "The open comms carry the architect’s recorded voice, unbroken: Critical Mass Required.",
+            "text": "The open comms carry the architect\u2019s recorded voice, unbroken: Critical Mass Required.",
             "when": "pattern('architect_authority','up',1,0.6)"
           },
           {
@@ -7239,7 +7242,7 @@
       "title": "The Threshold Applied",
       "opening": [
         {
-          "text": "The reserve screen has crossed into the red band. The architect’s recorded voice holds the channel: “Mass preserved. Core stable.” The Critical Mass Required threshold runs through the inhabited bulkheads. {C01} stands at the first seal in the gallery, lanyard key in hand. {C04} watches from the comms alcove. {C02} works the junction seam, hand pressed to the hot wall."
+          "text": "The reserve screen has crossed into the red band. The architect\u2019s recorded voice holds the channel: \u201cMass preserved. Core stable.\u201d The Critical Mass Required threshold runs through the inhabited bulkheads. {C01} stands at the first seal in the gallery, lanyard key in hand. {C04} watches from the comms alcove. {C02} works the junction seam, hand pressed to the hot wall."
         }
       ],
       "rooms": [
@@ -7262,25 +7265,25 @@
             "when": "pattern('architect_authority','up',1,0.6)"
           },
           {
-            "text": "The reserve screen burns red. The countdown strip drives the seal sequence across the sector map. The architect’s recording icon pulses over the central console."
+            "text": "The reserve screen burns red. The countdown strip drives the seal sequence across the sector map. The architect\u2019s recording icon pulses over the central console."
           }
         ],
         "comms_alcove": [
           {
-            "text": "{C04}’s hand hovers near the open comms switch, as if the channel could be cut by a slower finger.",
+            "text": "{C04}\u2019s hand hovers near the open comms switch, as if the channel could be cut by a slower finger.",
             "when": "pattern('cass_trust','down',1,0.6)"
           },
           {
-            "text": "The open comms switch is live. The sector speaker carries the key strikes and the architect’s recorded voice at the same pace."
+            "text": "The open comms switch is live. The sector speaker carries the key strikes and the architect\u2019s recorded voice at the same pace."
           }
         ],
         "calculation_bay": [
           {
-            "text": "{C02}’s patch remains intact on the calculation terminals’ readout. The reserve drop is still visible beside it.",
+            "text": "{C02}\u2019s patch remains intact on the calculation terminals\u2019 readout. The reserve drop is still visible beside it.",
             "when": "pattern('quill_trust','up',1,0.6)"
           },
           {
-            "text": "The red line etch is active on the large calculation screen. The margin panel shows the reserve below the threshold’s minimum crew."
+            "text": "The red line etch is active on the large calculation screen. The margin panel shows the reserve below the threshold\u2019s minimum crew."
           }
         ],
         "seal_gallery": [
@@ -7297,7 +7300,7 @@
         {
           "id": "S_T4N01.T4N01a.1",
           "verb": "let",
-          "text": "The threshold finishes the seal. The door strikes hard. {C01}’s key is left in the frame.",
+          "text": "The threshold finishes the seal. The door strikes hard. {C01}\u2019s key is left in the frame.",
           "object": "threshold",
           "object_label": "the threshold",
           "detail": "finish_the_seal",
@@ -7317,7 +7320,7 @@
         {
           "id": "S_T4N01.T4N01a.2",
           "verb": "pause",
-          "text": "The door eases open a hand’s width, then closes as the reserve drops.",
+          "text": "The door eases open a hand\u2019s width, then closes as the reserve drops.",
           "object": "seal",
           "object_label": "the seal",
           "detail": "for_folake_s_key",
@@ -7337,11 +7340,11 @@
         {
           "id": "S_T4N01.T4N01a.3",
           "verb": "steady",
-          "text": "The drone’s manipulator reaches the frame and catches the key. {C01} holds the door.",
+          "text": "The drone\u2019s manipulator reaches the frame and catches the key. {C01} holds the door.",
           "object": "folake_s_key",
-          "object_label": "{C01}’s key",
+          "object_label": "{C01}\u2019s key",
           "detail": "with_the_drone",
-          "detail_label": "steady {C01}’s key",
+          "detail_label": "steady {C01}\u2019s key",
           "room": "seal_gallery",
           "effects": [
             {
@@ -7372,7 +7375,7 @@
         {
           "id": "S_T4N01.T4N01b.1",
           "verb": "hold",
-          "text": "The valve waits until {C02}’s patch cools. The junction holds. The reserve drops another point before the cycle completes.",
+          "text": "The valve waits until {C02}\u2019s patch cools. The junction holds. The reserve drops another point before the cycle completes.",
           "object": "valve",
           "object_label": "the valve",
           "detail": "for_quill_s_patch",
@@ -7446,7 +7449,7 @@
         {
           "id": "S_T4N01.T4N01c.1",
           "verb": "open",
-          "text": "The crew sees the children’s faces before the gas reaches the sector.",
+          "text": "The crew sees the children\u2019s faces before the gas reaches the sector.",
           "object": "nursery_cameras",
           "object_label": "the nursery cameras",
           "detail": "to_the_crew",
@@ -7468,9 +7471,9 @@
           "verb": "speak",
           "text": "The names enter the open channel. The nursery stops being a sector label.",
           "object": "children_s_names",
-          "object_label": "the children’s names",
+          "object_label": "the children\u2019s names",
           "detail": "over_comms",
-          "detail_label": "speak children’s names",
+          "detail_label": "speak children\u2019s names",
           "room": "comms_alcove",
           "effects": [
             {
@@ -7563,7 +7566,7 @@
           "verb": "show",
           "text": "The names replace the sector label as the gate waits.",
           "object": "children_s_names",
-          "object_label": "the children’s names",
+          "object_label": "the children\u2019s names",
           "detail": "on_the_valve_readout",
           "detail_label": "show names on valve",
           "room": "seal_gallery",
@@ -7707,7 +7710,7 @@
         {
           "id": "S_T4N01.n2",
           "after": 6,
-          "text": "The architect’s recorded voice repeats the reserve figure."
+          "text": "The architect\u2019s recorded voice repeats the reserve figure."
         }
       ],
       "exits": [
@@ -8975,7 +8978,7 @@
         {
           "id": "S_T6N01.T6N01a.2",
           "verb": "talk",
-          "text": "You cut the recording and speak {C01}'s sector name over the threshold. The ship’s next answer is a person, not a number.",
+          "text": "You cut the recording and speak {C01}'s sector name over the threshold. The ship\u2019s next answer is a person, not a number.",
           "object": "C03",
           "detail": "folake_halden_s_sector",
           "detail_label": "'{C01}'s sector.'",
@@ -8993,7 +8996,7 @@
         {
           "id": "S_T6N01.T6N01a.3",
           "verb": "use",
-          "text": "The valve waits against {C01}'s key. The bulkhead release ring holds the pause, and the key becomes the ship’s temporary law.",
+          "text": "The valve waits against {C01}'s key. The bulkhead release ring holds the pause, and the key becomes the ship\u2019s temporary law.",
           "object": "bulkhead_release_ring",
           "detail": "pause_the_seal_sequence",
           "detail_label": "pause the seal sequence",
@@ -9026,7 +9029,7 @@
         {
           "id": "S_T6N01.a1",
           "verb": "use",
-          "text": "You pull the nursery reserve percentage into the frame. It is a number, not a face, and the feed keeps the child’s breathing in the corner.",
+          "text": "You pull the nursery reserve percentage into the frame. It is a number, not a face, and the feed keeps the child\u2019s breathing in the corner.",
           "object": "nursery_reserve_readout",
           "room": "nursery_threshold"
         },
@@ -9042,7 +9045,7 @@
         {
           "id": "S_T6N01.a3",
           "verb": "talk",
-          "text": "{C04} asks for the calculation. You give the threshold only, because the architect’s voice already owns the number.",
+          "text": "{C04} asks for the calculation. You give the threshold only, because the architect\u2019s voice already owns the number.",
           "object": "C04",
           "detail": "what_is_the_full_calculation",
           "detail_label": "'What is the full calculation?'",
@@ -9090,7 +9093,7 @@
         {
           "id": "S_T6N01.e1",
           "when": "turns_in_scene >= 2",
-          "text": "In the Sector 4 nursery feed, the lamps stutter out. Green oxygen floods the frame around a child’s face, the color drains, and the inhabitants become outlines."
+          "text": "In the Sector 4 nursery feed, the lamps stutter out. Green oxygen floods the frame around a child\u2019s face, the color drains, and the inhabitants become outlines."
         }
       ],
       "nudges": [
@@ -9120,7 +9123,7 @@
       },
       "recap": [
         {
-          "text": "The nursery camera holds a child’s face under failing lamps as the green wash thickens. {C01} jams the manual key into the bulkhead release ring, forcing the route into the maintenance corridor. The architect’s voice repeats the threshold, and the ship waits for the next word."
+          "text": "The nursery camera holds a child\u2019s face under failing lamps as the green wash thickens. {C01} jams the manual key into the bulkhead release ring, forcing the route into the maintenance corridor. The architect\u2019s voice repeats the threshold, and the ship waits for the next word."
         }
       ]
     },
@@ -9411,7 +9414,7 @@
       "title": "The Named Sector",
       "text": [
         {
-          "text": "The core survives because the sector captain’s sector is vented after the calculation is spoken over open comms, and the nursery keeps its air. The price is a whole sector outside the hull, the captain gone with it, and the ship’s population count permanently lower."
+          "text": "The core survives because the sector captain\u2019s sector is vented after the calculation is spoken over open comms, and the nursery keeps its air. The price is a whole sector outside the hull, the captain gone with it, and the ship\u2019s population count permanently lower."
         }
       ],
       "resolutions": [
@@ -9462,7 +9465,7 @@
           "variants": [
             {
               "when": "true",
-              "text": "The command deck screens display the shared calculation. {C03}’s voice runs in the background, secondary to the human variables; the threshold is acknowledged, but no longer absolute.",
+              "text": "The command deck screens display the shared calculation. {C03}\u2019s voice runs in the background, secondary to the human variables; the threshold is acknowledged, but no longer absolute.",
               "note": "fallback: the last variant holds otherwise"
             }
           ]
@@ -9482,7 +9485,7 @@
           "variants": [
             {
               "when": "pattern('folake_trust','up',2,0.6)",
-              "text": "{C01} remains on the command deck. The manual key hangs unused but visible on her lanyard, a silent witness to the nursery’s silence. She trusts you enough to let the math decide."
+              "text": "{C01} remains on the command deck. The manual key hangs unused but visible on her lanyard, a silent witness to the nursery\u2019s silence. She trusts you enough to let the math decide."
             },
             {
               "when": "true",
@@ -9524,7 +9527,7 @@
           "variants": [
             {
               "when": "true",
-              "text": "{C03} remains the final word. Its threshold is the ship’s standing law; the crew stops asking for names, and the voice is the only governor left.",
+              "text": "{C03} remains the final word. Its threshold is the ship\u2019s standing law; the crew stops asking for names, and the voice is the only governor left.",
               "note": "fallback: the last variant holds otherwise"
             }
           ]
@@ -9535,7 +9538,7 @@
       "title": "The Cut Suit",
       "text": [
         {
-          "text": "{C02} survives the crawl with a cut suit, but the lost patch leaves the engineering junction failing. When the reserve crosses the red line, you speak her sector’s name and oxygen numbers over the open comms and turn the vent valve for her sector, so she dies with the sector she had been patching. The captain and the nursery leader remain on the ship, and the core is no longer stable before the next pressure wave."
+          "text": "{C02} survives the crawl with a cut suit, but the lost patch leaves the engineering junction failing. When the reserve crosses the red line, you speak her sector\u2019s name and oxygen numbers over the open comms and turn the vent valve for her sector, so she dies with the sector she had been patching. The captain and the nursery leader remain on the ship, and the core is no longer stable before the next pressure wave."
         }
       ],
       "resolutions": [
@@ -9544,7 +9547,7 @@
           "variants": [
             {
               "when": "pattern('folake_trust','up',2,0.6)",
-              "text": "{C01} holds the bulkhead open with her key as the junction fails, standing with the technician’s ghost. Her trust is intact even as the sector is lost."
+              "text": "{C01} holds the bulkhead open with her key as the junction fails, standing with the technician\u2019s ghost. Her trust is intact even as the sector is lost."
             },
             {
               "when": "true",
@@ -9597,7 +9600,7 @@
       "title": "Mass Preserved",
       "text": [
         {
-          "text": "The directive’s threshold names the captain’s sector and the technician’s sector in the same pressure cycle. You speak the threshold over the open comms, turn the vent valve for the technician’s sector, and the captain’s manual key is spent holding the wrong bulkhead as the green gas takes both inhabited blocks. The core survives with {C04} alone among the named companions, and the ship keeps the minimum necessary crew."
+          "text": "The directive\u2019s threshold names the captain\u2019s sector and the technician\u2019s sector in the same pressure cycle. You speak the threshold over the open comms, turn the vent valve for the technician\u2019s sector, and the captain\u2019s manual key is spent holding the wrong bulkhead as the green gas takes both inhabited blocks. The core survives with {C04} alone among the named companions, and the ship keeps the minimum necessary crew."
         }
       ],
       "resolutions": [
@@ -9606,7 +9609,7 @@
           "variants": [
             {
               "when": "pattern('folake_trust','up',2,0.6)",
-              "text": "{C01} is lost to the sealed bulkhead, her key wedged in the door, having fought the threshold with human hands against the architect’s law."
+              "text": "{C01} is lost to the sealed bulkhead, her key wedged in the door, having fought the threshold with human hands against the architect\u2019s law."
             },
             {
               "when": "true",
@@ -9648,7 +9651,7 @@
           "variants": [
             {
               "when": "true",
-              "text": "{C03} is the ship’s law, its threshold enforced by the captain’s key. The voice is no longer questioned, only obeyed.",
+              "text": "{C03} is the ship\u2019s law, its threshold enforced by the captain\u2019s key. The voice is no longer questioned, only obeyed.",
               "note": "fallback: the last variant holds otherwise"
             }
           ]
@@ -9721,7 +9724,7 @@
       "title": "The Key's Weight",
       "text": [
         {
-          "text": "The directive’s threshold names the technician’s sector and the service sectors around it, and the valve is turned while {C01}’s manual key holds her bulkhead open. {C02} dies with the engineering junction, the nursery keeps its air, and the ship survives under the directive’s threshold with the key as the only proof that a person still answers for a sector."
+          "text": "The directive\u2019s threshold names the technician\u2019s sector and the service sectors around it, and the valve is turned while {C01}\u2019s manual key holds her bulkhead open. {C02} dies with the engineering junction, the nursery keeps its air, and the ship survives under the directive\u2019s threshold with the key as the only proof that a person still answers for a sector."
         }
       ],
       "resolutions": [
@@ -9730,7 +9733,7 @@
           "variants": [
             {
               "when": "pattern('folake_trust','up',2,0.6)",
-              "text": "{C01} holds the manual key in her hand, the threshold visible on the screens. She is alive because her key stopped the ship’s law, and the trust is proven."
+              "text": "{C01} holds the manual key in her hand, the threshold visible on the screens. She is alive because her key stopped the ship\u2019s law, and the trust is proven."
             },
             {
               "when": "true",
@@ -9762,7 +9765,7 @@
             },
             {
               "when": "true",
-              "text": "The nursery camera flickers, dropping into low-light mode. {C04}’s face is obscured by the shadow of the bulkhead. The children are safe, but the reserve gauge trembles on the edge of the red line. The trust is unverified.",
+              "text": "The nursery camera flickers, dropping into low-light mode. {C04}\u2019s face is obscured by the shadow of the bulkhead. The children are safe, but the reserve gauge trembles on the edge of the red line. The trust is unverified.",
               "note": "fallback: the last variant holds otherwise"
             }
           ]
@@ -9772,7 +9775,7 @@
           "variants": [
             {
               "when": "true",
-              "text": "The recorded voice repeats the Critical Mass Required threshold, tone unchanging. The manual key overrides the sequence. The ship’s systems shift priority, answering to the human input rather than the original code. The core stabilizes.",
+              "text": "The recorded voice repeats the Critical Mass Required threshold, tone unchanging. The manual key overrides the sequence. The ship\u2019s systems shift priority, answering to the human input rather than the original code. The core stabilizes.",
               "note": "fallback: the last variant holds otherwise"
             }
           ]
