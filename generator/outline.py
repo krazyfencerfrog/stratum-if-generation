@@ -893,7 +893,7 @@ class OutlineBuilder:
                 'valid_divergence_nodes': valid,
             }),
             '$$SHAPE_NOTE$$': self.shape_note(),
-        }, prompt_file='s4p_branch_plan.prompt', validator=validate, klass='judge', schema=schemas.BRANCH_PLAN)
+        }, prompt_file='s4p_branch_plan.prompt', validator=validate, klass='build', schema=schemas.BRANCH_PLAN)
 
     def question_block(self):
         med = self.premise.get('mediation') or {}

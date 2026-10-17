@@ -81,7 +81,7 @@ CALL_CLASSES = {
     'judge': {
         'think': None,
         'target_thinking_bytes': 12000, 'target_seconds': 720,
-        'limit_thinking_bytes': 24000, 'limit_seconds': 1500, 'limit_response_bytes': 8000,
+        'limit_thinking_bytes': 24000, 'limit_seconds': 1500, 'limit_response_bytes': 16000,
         'num_predict': 8192, 'fallback': 'no_think', 'force_answer': True,
     },
     # construction: the premise pieces, the line plans, the node fill.
