@@ -173,6 +173,7 @@ class StubClient(LlmClient):
             ('You are a premise builder', 's3_5a'),
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
+            ('You are the setting-lexicon generator', 's3_5d'),
             ('You are a fidelity auditor', 's3_5v'),
             ('You are a Kernel fidelity checker', 's3_5k'),
             ('You are the repair step for the premise', 's3_5r'),
@@ -501,6 +502,23 @@ class StubClient(LlmClient):
                           "voice": None if kind == "crowd" else f"stub voice of {r}: 'stub line'",
                           "breaking_point": bp, "opposition": opp, "gender": "n" if kind == "crowd" else ("f" if "warden" in r else "m")})
         return {"notes": "stub", "cast_seeds": seeds}
+
+    def p_s3_5d(self, p):
+        return {
+            "setting_culture": "stub northern frontier",
+            "naming_style": "given_surname",
+            "m": ["Garreth", "Halvard", "Osric", "Branok", "Torvald", "Eamon", "Corwen", "Bram", "Rurik", "Anselm",
+                  "Kendrick", "Willem", "Frey", "Magnus", "Beren", "Daven", "Lukas", "Tobias", "Giles", "Godric",
+                  "Alden", "Bertram", "Conrad", "Derrick", "Edmund", "Geoffrey", "Harlan", "Jocelyn", "Lambert", "Milo"],
+            "f": ["Maren", "Sybilla", "Astrid", "Ilsa", "Kirsten", "Tora", "Gretel", "Vera", "Brina", "Morwenna",
+                  "Linnea", "Signe", "Brenna", "Rowena", "Dagny", "Ingrid", "Helena", "Alethea", "Petra", "Beatrix",
+                  "Constance", "Dorothea", "Eulalia", "Felicity", "Gisela", "Honora", "Isolde", "Klara", "Lucia", "Millicent"],
+            "n": ["Rowan", "Ash", "Peregrine", "Robin", "Jules", "Perry", "Kit", "Dale", "Morgan", "Blythe"],
+            "surnames": ["Whitlock", "Blackwood", "Stone", "Fenner", "Oakhaven", "Moor", "Ironwood", "Calloway",
+                         "Winter", "Ashford", "Barrow", "Clay", "Dunmore", "Fletcher", "Greene", "Hargrave",
+                         "Kenward", "Lockwood", "Mallow", "Pendleton", "Rotherham", "Scriven", "Thorpe", "Underhill", "Weaver"],
+            "epithets": ["the Bold", "the Quiet", "of the Ridge", "the Younger", "the Far-Strider"],
+        }
 
     def p_s3_5k(self, p):
         clauses = self.listed(p, '--- KERNEL CLAUSES ---')

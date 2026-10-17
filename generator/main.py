@@ -320,8 +320,10 @@ def kill_children():
 class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
-                 branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1):
+                 branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1,
+                 dynamic_names=False):
         self.story_id = story_id
+        self.dynamic_names = bool(dynamic_names or os.environ.get('STRATUM_DYNAMIC_NAMES') == '1')
         self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
@@ -1367,19 +1369,59 @@ class StoryGenerator:
             '$$ROLES$$': '\n'.join(f' - {r}' for r in roles) or ' (the turns name nobody)',
             '$$KERNEL$$': self.kernel,
         }, validator=self.cast_validator(turns['turns']), klass='classify', schema=schemas.CAST)
-        return self.name_cast(self.assemble_premise(budget, engine, turns, cast))
+        lexicon = self.generate_lexicon(engine, cast.get('cast_seeds') or []) if self.dynamic_names else None
+        return self.name_cast(self.assemble_premise(budget, engine, turns, cast), lexicon=lexicon)
 
-    def name_cast(self, premise):
+    def generate_lexicon(self, engine, cast_seeds):
+        """Generates a setting-specific lexicon of names (Stage 3.5d) matching the story's
+        culture, geography, and language, dispersing LLM mode collapse (the Kael problem)."""
+        roles_text = '\n'.join(f" - {s.get('role')} ({s.get('being', 'person')}, {s.get('gender', 'n')})"
+                               for s in cast_seeds if isinstance(s, dict))
+        setting_text = str((engine.get('arena') or {}).get('description') or '')
+        try:
+            return self.run_prompt('s3_5d', 'lexicon', {
+                '$$KERNEL$$': self.kernel,
+                '$$TONE$$': self.tone_line(),
+                '$$SETTING$$': setting_text or self.kernel,
+                '$$CAST_ROLES$$': roles_text or ' (none)',
+            }, validator=self.validate_lexicon, klass='classify', schema=schemas.LEXICON)
+        except Exception as e:
+            print(f'  [lexicon] falling back to static pools: {e}')
+            return None
+
+    @staticmethod
+    def validate_lexicon(parsed):
+        if not isinstance(parsed, dict):
+            raise ValueError('lexicon must be an object')
+        m = [x for x in (parsed.get('m') or []) if str(x).strip()]
+        f = [x for x in (parsed.get('f') or []) if str(x).strip()]
+        surnames = [x for x in (parsed.get('surnames') or []) if str(x).strip()]
+        if len(m) < 8 or len(f) < 8:
+            raise ValueError(f'lexicon must provide at least 8 masculine and 8 feminine names (got {len(m)} m, {len(f)} f)')
+        if len(surnames) < 8 and parsed.get('naming_style') not in ('single',):
+            raise ValueError(f'lexicon must provide at least 8 surnames (got {len(surnames)})')
+        return True
+
+    def name_cast(self, premise, lexicon=None):
         """Names for the cast come from Python (generator/names.py), not the
         model: the role stays the key, the name rides along. Keeps any name a
-        seed already has, so a repair that adds a seed names only that one."""
+        seed already has, so a repair that adds a seed names only that one.
+        When a setting lexicon is provided, names are drawn from that setting's
+        candidate pool rather than the static pools."""
+        lexicon = lexicon or premise.get('lexicon')
+        if lexicon:
+            premise['lexicon'] = lexicon
+            names.register_lexicon(self.story_id, lexicon)
         texts = [self.kernel or ''] + names.premise_texts(premise)
-        pool = premise.get('name_pool') or names.with_culture(names.pool_for(*texts), self.story_id, texts)
+        pool = premise.get('name_pool') or (
+            f"dynamic:{lexicon.get('setting_culture', 'custom')}" if lexicon else
+            names.with_culture(names.pool_for(*texts), self.story_id, texts)
+        )
         identity = ((self.analysis.get('s3_brief') or {}).get('fields') or {}).get('3-0b.protagonist_identity') or {}
         human = str(identity.get('type') or 'human').lower() == 'human'
-        you = names.name_protagonist(premise.get('protagonist'), self.story_id, pool, human)
+        you = names.name_protagonist(premise.get('protagonist'), self.story_id, pool, human, lexicon=lexicon)
         premise['name_pool'] = names.assign_names(premise.get('cast_seeds') or [], self.story_id, texts, pool,
-                                                  reserved=[you] if you else [])
+                                                  reserved=[you] if you else [], lexicon=lexicon)
         return premise
 
     def tone_line(self):
@@ -2141,6 +2183,8 @@ def main(argv=None):
     parser.add_argument("--craft-spine", action="store_true",
                         help="run the craft spine (3.75: want against need, irony, escalation, setup/payoff) after "
                              "the premise and give its want/need to the line calls (default: off)")
+    parser.add_argument("--dynamic-names", action="store_true",
+                        help="generate a story-specific naming lexicon in Stage 3.5d to prevent cliché name mode collapse (the Kael problem)")
     parser.add_argument("--parallel", type=int, default=1,
                         help="run independent per-item calls (stage B characters and conversations, stage D "
                              "scenes) this many at once; for remote clients (agy). Default 1: one at a time")
@@ -2156,7 +2200,8 @@ def main(argv=None):
                              breakers=not args.no_breakers, framework_override=args.framework.strip() or None,
                              force_answer=not args.no_force_answer, promises=not args.no_promises,
                              branching=args.branching, outline_judge=not args.no_outline_judge,
-                             author=args.author, parallel=args.parallel)
+                             author=args.author, parallel=args.parallel,
+                             dynamic_names=args.dynamic_names)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)

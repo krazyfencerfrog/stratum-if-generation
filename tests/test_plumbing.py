@@ -246,6 +246,65 @@ def hidden_truth_and_cast_edges():
 
 
 @test
+def dynamic_lexicon_generates_and_samples_names():
+    import names
+    import main as gen_main
+
+    # 1. Full run with --dynamic-names
+    run('dyn_names', args=['--dynamic-names', '--stop-after=3.5'])
+    premise = load('dyn_names', 's3_5_premise_accepted.json')
+    check('lexicon' in premise and isinstance(premise['lexicon'], dict), 'lexicon missing from premise')
+    lex = premise['lexicon']
+    check(len(lex.get('m', [])) >= 8 and len(lex.get('f', [])) >= 8 and len(lex.get('surnames', [])) >= 8,
+          f'lexicon lists too small: {lex}')
+    check(premise.get('name_pool', '').startswith('dynamic:'), f"name_pool should be dynamic, got {premise.get('name_pool')}")
+    seeds = premise['cast_seeds']
+    named = [s for s in seeds if s.get('name')]
+    check(named, 'no cast members were named')
+    for s in named:
+        parts = [p.lower() for p in s['name'].split()]
+        check(not any(p in names.AVOID for p in parts), f"cliché name found in cast: {s['name']}")
+    # Protagonist is also named
+    you = premise.get('protagonist')
+    if you and you.get('name'):
+        parts = [p.lower() for p in you['name'].split()]
+        check(not any(p in names.AVOID for p in parts), f"cliché name found in protagonist: {you['name']}")
+
+    # 2. Cliché anti-collapse test: Even if the model outputs cliché names in its pool,
+    # Python strips them and samples clean names
+    contaminated_lexicon = {
+        "setting_culture": "tainted frontier",
+        "naming_style": "given_surname",
+        "m": ["Kael", "Thorne", "Cassian", "Voss", "Osric", "Garreth", "Halvard", "Branok", "Torvald"],
+        "f": ["Elara", "Lyra", "Seraphina", "Aria", "Maren", "Sybilla", "Astrid", "Ilsa", "Kirsten"],
+        "n": ["Rowan", "Nova", "Ash", "Peregrine", "Robin"],
+        "surnames": ["Kael", "Thorne", "Whitlock", "Blackwood", "Stone", "Fenner", "Oakhaven"],
+        "epithets": ["the Bold", "the Quiet"],
+    }
+    test_seeds = [
+        {"role": "the hedge witch", "kind": "individual", "being": "person", "gender": "f"},
+        {"role": "the disgraced knight", "kind": "individual", "being": "person", "gender": "m"},
+        {"role": "the wanderer", "kind": "individual", "being": "person", "gender": "n"},
+    ]
+    names.assign_names(test_seeds, 'anti_kael_story', ['fantasy frontier'], lexicon=contaminated_lexicon)
+    for s in test_seeds:
+        assigned = s.get('name')
+        check(assigned, f"seed not named: {s}")
+        parts = [p.lower() for p in assigned.split()]
+        check(not any(p in names.AVOID for p in parts),
+              f"Kael-problem name survived Python filtering: {assigned}")
+    # 3. Determinism check: Identical story_id + lexicon reproduces the exact same names
+    repeat_seeds = [
+        {"role": "the hedge witch", "kind": "individual", "being": "person", "gender": "f"},
+        {"role": "the disgraced knight", "kind": "individual", "being": "person", "gender": "m"},
+        {"role": "the wanderer", "kind": "individual", "being": "person", "gender": "n"},
+    ]
+    names.assign_names(repeat_seeds, 'anti_kael_story', ['fantasy frontier'], lexicon=contaminated_lexicon)
+    check([s['name'] for s in repeat_seeds] == [s['name'] for s in test_seeds],
+          'dynamic lexicon name assignment is not deterministic')
+
+
+@test
 def premise_halt():
     # a Kernel clause contradicted, with a quote that is really in the premise, stops the run
     _, out = run('halt', env={'STUB_PREMISE_ALWAYS_HARD': '3'}, expect=2)
@@ -3650,7 +3709,6 @@ def syntax_retry_after_soft_reject_and_fallback():
         check(mock2.calls == 3, f'expected 3 calls before fallback, got {mock2.calls}')
     finally:
         shutil.rmtree(td, ignore_errors=True)
-
 
 # ---------------------------------------------------------------- runner
 

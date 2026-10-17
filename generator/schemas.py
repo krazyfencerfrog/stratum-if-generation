@@ -109,6 +109,18 @@ CAST = obj(
                        breaking_point=STR_OR_NULL, opposition=B)),
 )
 
+LEXICON_STYLES = ['given_surname', 'family_first', 'patronymic', 'patronymic_of', 'origin', 'single']
+
+LEXICON = obj(
+    setting_culture=S,
+    naming_style=enum(LEXICON_STYLES),
+    m=arr(S),
+    f=arr(S),
+    n=arr(S),
+    surnames=arr(S),
+    epithets=arr(S),
+)
+
 KERNEL_CHECK = obj(clauses=arr(obj(n=I, requires=S, premise_says=S, note=S, contradiction=B, quote=S)))
 
 PREMISE_CHECK = obj(

@@ -1341,7 +1341,8 @@ class OutlineBuilder:
                     self.characters[cid]['name'] = names.pick(
                         self.gen.story_id, c['label'], names.seed_pool(seed, self.premise.get('name_pool') or 'modern'),
                         names.seed_gender(c) or names.gender_hint(c['label'], [str(c.get('wants') or ''), str(c.get('why') or '')]),
-                        [x['name'] for x in self.characters.values() if x.get('name')])
+                        [x['name'] for x in self.characters.values() if x.get('name')],
+                        lexicon=self.premise.get('lexicon'))
         for x in fill['nodes']:
             node = self.nodes[x['id']]
             node['title'] = str(x.get('title')).strip()
