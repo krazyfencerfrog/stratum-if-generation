@@ -314,6 +314,32 @@ SCENE = obj(
     frame=FRAME_OR_NULL,
 )
 
+# ---------------------------------------------------------------- stage 8 semantic judges (#49)
+
+FATE_CONTRADICTION = obj(
+    ending_id=S,
+    character=S,
+    quote_ending=S,
+    quote_resolution=S,
+    reason=S,
+)
+FATE_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'contradictions_found']),
+    contradictions=arr(FATE_CONTRADICTION),
+)
+
+SOMATIC_VIOLATION = obj(
+    text_id=S,
+    quote=S,
+    reason=S,
+)
+SOMATIC_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'drift_found']),
+    violations=arr(SOMATIC_VIOLATION),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -322,5 +348,6 @@ ALL = {
     'PROSE_EDIT': PROSE_EDIT, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
-    'FRAME': FRAME,
+    'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE,
 }
+

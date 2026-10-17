@@ -446,31 +446,12 @@ class ProseWriter:
                     unnamed = c.get('unnamed')
                     if unnamed and re.search(r'\b' + re.escape(unnamed) + r"['’]s\b", t, re.I):
                         soft.append(f"{i}: ungrammatical possessive on unintroduced handle ({unnamed!r}); use head noun or person code")
-                drift = checks.check_somatic_drift(t, embodiment)
-                if drift:
-                    soft.append(f'{i}: {drift}')
+                # Semantic invariants (somatic embodiment discipline and resolution liveness
+                # consistency) are evaluated across complete context by semantic LLM judges
+                # (s8j_somatic and s8j_fate) during the post-edit pass (#49), retiring fragile regexes.
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
-                if i.startswith('t') and i[1:].isdigit():
-                    idx = int(i[1:]) - 1
-                    if 0 <= idx < len(paths):
-                        p = paths[idx]
-                        if p[0] == 'endings' and len(p) >= 6 and p[2] == 'resolutions':
-                            eid, gi, vi = p[1], p[3], p[5]
-                            end_obj = self.pkg['endings'].get(eid) or {}
-                            base_text = ' '.join(x.get('text', '') for x in (end_obj.get('text') or []) if isinstance(x, dict))
-                            base_id = next((f't{b_idx + 1}' for b_idx, path in enumerate(paths) if path[:3] == ('endings', eid, 'text')), None)
-                            if base_id and base_id in got:
-                                base_text = got[base_id]
-                            resolutions = end_obj.get('resolutions') or []
-                            if gi < len(resolutions):
-                                cid = resolutions[gi].get('about')
-                                char_info = self.pkg['world']['characters'].get(cid) or {}
-                                contr = checks.resolution_liveness_contradiction(
-                                    base_text, t, char_label=cid, char_name=char_info.get('name'))
-                                if contr:
-                                    soft.append(f'{i}: resolution text contradicts ending summary: {contr}')
             ending_res_texts, ending_res_ids = [], []
             for i in ids:
                 if i.startswith('t') and i[1:].isdigit():
@@ -550,6 +531,103 @@ class ProseWriter:
             if opening:
                 self.openings.append(' '.join(opening[0].split()[:30]))
 
+    def judge_somatic(self):
+        """Step 8j2: Evaluates second-person texts for protagonist embodiment discipline."""
+        if not self.gen or not hasattr(self.gen, 'run_prompt'):
+            return None
+        embodiment = (self.pkg.get('protagonist') or {}).get('embodiment') or \
+                     (self.pkg.get('premise', {}).get('protagonist') or {}).get('embodiment')
+        if not embodiment or embodiment not in checks.DISENBODIED_EMBODIMENTS:
+            return None
+
+        texts = {}
+        if self.pkg.get('opening'):
+            texts['opening'] = self.pkg['opening']
+        you = self.pkg.get('you') or {}
+        for idx, d in enumerate(you.get('description') or []):
+            if isinstance(d, dict) and d.get('text'):
+                texts[f'you_desc_{idx+1}'] = d['text']
+        for idx, th in enumerate(you.get('think') or []):
+            if isinstance(th, dict) and th.get('says'):
+                for s_idx, s in enumerate(th['says']):
+                    if isinstance(s, dict) and s.get('text'):
+                        texts[f'you_think_{idx+1}_{s_idx+1}'] = s['text']
+        for sid, scene in (self.pkg.get('scenes') or {}).items():
+            if scene.get('opening'):
+                texts[f'{sid}_opening'] = scene['opening']
+            for r_idx, r in enumerate(scene.get('recap') or []):
+                if isinstance(r, dict) and r.get('text'):
+                    texts[f'{sid}_recap_{r_idx+1}'] = r['text']
+        for eid, end in (self.pkg.get('endings') or {}).items():
+            for t_idx, t in enumerate(end.get('text') or []):
+                if isinstance(t, dict) and t.get('text'):
+                    texts[f'{eid}_text_{t_idx+1}'] = t['text']
+
+        if not texts:
+            return None
+
+        role = (self.pkg.get('protagonist') or {}).get('role') or 'the protagonist'
+        emb_payload = {
+            'embodiment': embodiment,
+            'role': role,
+            'guidance': 'Non-human or disembodied intelligence; must operate via telemetry, sensors, network buses, or mechanical effectors, never biological human anatomy.'
+        }
+        res = self.gen.run_prompt('s8j', 'somatic', {
+            '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_payload, ensure_ascii=False, indent=1),
+            '$$TEXTS_JSON$$': json.dumps(texts, ensure_ascii=False, indent=1),
+        }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+
+        if res and res.get('verdict') == 'drift_found':
+            for v in res.get('violations') or []:
+                msg = f"somatic drift in {v.get('text_id')}: {v.get('quote')} ({v.get('reason')})"
+                self.findings.append(msg)
+        return res
+
+    def judge_fates(self):
+        """Step 8j1: Evaluates character resolutions against ending narratives for contradictions."""
+        if not self.gen or not hasattr(self.gen, 'run_prompt'):
+            return None
+        endings = self.pkg.get('endings') or {}
+        if not endings:
+            return None
+
+        payload = []
+        for eid, end in sorted(endings.items()):
+            base_text = ' '.join(x.get('text', '') for x in (end.get('text') or []) if isinstance(x, dict) and x.get('text'))
+            resolutions_payload = []
+            for group in end.get('resolutions') or []:
+                cid = group.get('about')
+                char_info = (self.pkg.get('world') or {}).get('characters', {}).get(cid) or {}
+                char_name = char_info.get('name') or cid
+                for vi, v in enumerate(group.get('variants') or []):
+                    vt = v.get('text', '')
+                    if vt:
+                        resolutions_payload.append({
+                            'character_code': cid,
+                            'character_name': char_name,
+                            'variant_index': vi,
+                            'resolution_text': vt
+                        })
+            if base_text and resolutions_payload:
+                payload.append({
+                    'ending_id': eid,
+                    'ending_narrative': base_text,
+                    'character_resolutions': resolutions_payload
+                })
+
+        if not payload:
+            return None
+
+        res = self.gen.run_prompt('s8j', 'fate', {
+            '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(payload, ensure_ascii=False, indent=1),
+        }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+
+        if res and res.get('verdict') == 'contradictions_found':
+            for c in res.get('contradictions') or []:
+                msg = f"fate contradiction in {c.get('ending_id')}: {c.get('character')} - {c.get('reason')}"
+                self.findings.append(msg)
+        return res
+
     # ------------------------------------------------------------ the whole pass
 
     def run(self):
@@ -561,6 +639,8 @@ class ProseWriter:
         for unit in self.units():
             self.edit(unit, codes)
         self.convert_names()            # any name a revision wrote anyway
+        self.judge_somatic()
+        self.judge_fates()
         if ENGINE not in sys.path:
             sys.path.insert(0, ENGINE)
         from story import Story, validate

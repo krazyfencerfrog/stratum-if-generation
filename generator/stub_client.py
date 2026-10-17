@@ -201,6 +201,8 @@ class StubClient(LlmClient):
             ('You are step 8a of', 's8a'),
             ('You are step 8v of', 's8v'),
             ('You are step 8b of', 's8b'),
+            ('You are step 8j1 of', 's8j_fate'),
+            ('You are step 8j2 of', 's8j_somatic'),
         ]
         for phrase, kind in checks:
             if phrase in head or phrase in flat:
@@ -1125,6 +1127,70 @@ class StubClient(LlmClient):
         if retry and part.get('id') == os.environ.get('STUB_PROSE_RETRY_DROP') and len(out) > 2:
             del out[1]              # the retry fixes what it was told and loses t2 along the way
         return {"texts": out, "images_used": [f"stub image {part.get('id')}"]}
+
+    def p_s8j_fate(self, p):
+        data = self.section(p, '- the Endings and Character Resolutions') or []
+        contradictions = []
+        for item in data:
+            ending_id = item.get('ending_id')
+            end_narrative = str(item.get('ending_narrative', ''))
+            for res in item.get('character_resolutions', []):
+                char = res.get('character_code') or res.get('character_name') or 'character'
+                res_text = str(res.get('resolution_text', ''))
+                # Real contradiction check: one says survived, one says died
+                res_low = res_text.lower()
+                end_low = end_narrative.lower()
+                is_contradiction = False
+                if 'dies before the' in res_low and ('still standing' in end_low or 'watches from' in end_low):
+                    is_contradiction = True
+                elif ('is killed' in end_low or 'dies in the' in end_low) and ('steps back alive' in res_low or 'survives' in res_low):
+                    is_contradiction = True
+
+                if is_contradiction:
+                    contradictions.append({
+                        'ending_id': ending_id or 'END',
+                        'character': char,
+                        'quote_ending': end_narrative[:80],
+                        'quote_resolution': res_text[:80],
+                        'reason': 'Resolution contradicts ending liveness outcome.'
+                    })
+        if contradictions:
+            return {
+                "reading": f"Found {len(contradictions)} contradiction(s) in ending resolutions.",
+                "verdict": "contradictions_found",
+                "contradictions": contradictions,
+            }
+        return {
+            "reading": "All character resolutions align with ending narratives.",
+            "verdict": "pass",
+            "contradictions": [],
+        }
+
+    def p_s8j_somatic(self, p):
+        emb_data = self.section(p, '- Protagonist Embodiment and Description') or {}
+        embodiment = str(emb_data.get('embodiment', '')).lower()
+        texts = self.section(p, '- Second-Person Narrative Texts') or {}
+        violations = []
+        if embodiment in ('distributed_network', 'ship_ai', 'sessile_entity', 'swarm', 'systemic_entity'):
+            for tid, txt in texts.items():
+                t_lower = str(txt).lower()
+                if ('you step' in t_lower or 'over your hands' in t_lower or 'your breath' in t_lower or 'you sign' in t_lower) and 'castell' not in t_lower:
+                    violations.append({
+                        'text_id': tid,
+                        'quote': txt[:80],
+                        'reason': f"Protagonist embodiment is {embodiment}; text describes biological human action."
+                    })
+        if violations:
+            return {
+                "reading": f"Found {len(violations)} somatic drift violation(s).",
+                "verdict": "drift_found",
+                "violations": violations,
+            }
+        return {
+            "reading": f"All second-person texts conform to {embodiment or 'human'} embodiment discipline.",
+            "verdict": "pass",
+            "violations": [],
+        }
 
     def p_s7d(self, p):
         pk = self.section(p, 'THIS SCENE (') or {}

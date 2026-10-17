@@ -51,6 +51,8 @@ from ollama_client import OllamaClient  # noqa: E402
 from agy_client import AgyClient        # noqa: E402
 from claude_client import ClaudeClient  # noqa: E402
 
+os.environ.setdefault('STRATUM_CLIENT', 'stub')
+
 TESTS = []
 used_prompts = set()
 
@@ -1244,6 +1246,111 @@ def prose_character_dialogue_distinctiveness_and_validation():
     check(c02_person and 'nautical commands' in c02_person['voice'], 'voice not pulled from cast_seeds')
     check(c02_person['breaking_point'] == 'when the bell tolls midnight', 'breaking_point not pulled from cast_seeds')
     check(c02_person['edge'] == 'holds a rusted sextant', 'edge not pulled from cast_seeds')
+
+
+@test
+def stage_8_semantic_judges_evaluation():
+    import prose
+    import schemas
+    from main import StoryGenerator
+
+    test_id = 's8j_test'
+    gen = StoryGenerator(story_id=test_id)
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+    # 1. Fate Judge: Idiom ("dead end") passes without false positive
+    clean_payload = [
+        {
+            "ending_id": "END_T1",
+            "ending_narrative": "Eamon remains on the far side of the mountain pass, and Ellis is not there to count the places.",
+            "character_resolutions": [
+                {
+                    "character_code": "C02",
+                    "character_name": "Ellis Dunmore",
+                    "variant_index": 0,
+                    "resolution_text": "Following the renamed road into the mountains, the shortcut became a dead end and she is lost."
+                }
+            ]
+        }
+    ]
+    res_clean = gen.run_prompt('s8j', 'fate_clean', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(clean_payload, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(res_clean.get('verdict') == 'pass' and len(res_clean.get('contradictions', [])) == 0,
+          f"idiom 'dead end' falsely flagged by fate judge: {res_clean}")
+
+    # 2. Fate Judge: Actual liveness contradiction is caught
+    dirty_payload = [
+        {
+            "ending_id": "END_DEMO",
+            "ending_narrative": "The lock seals with a shudder as Uriel Castell watches from the threshold, still standing.",
+            "character_resolutions": [
+                {
+                    "character_code": "C01",
+                    "character_name": "Uriel Castell",
+                    "variant_index": 0,
+                    "resolution_text": "He dies before the valve finishes opening."
+                }
+            ]
+        }
+    ]
+    res_dirty = gen.run_prompt('s8j', 'fate', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(dirty_payload, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(res_dirty.get('verdict') == 'contradictions_found' and len(res_dirty.get('contradictions', [])) >= 1,
+          f"actual contradiction missed by fate judge: {res_dirty}")
+
+    # 3. Somatic Judge: Disembodied protagonist observing NPC hands passes
+    emb_ai = {
+        'embodiment': 'distributed_network',
+        'role': 'ship core intelligence'
+    }
+    texts_clean = {
+        't01': "Telemetry confirms the airlock seal engaged. Castell steps forward with trembling hands, watching the pressure gauge.",
+        't02': "Telemetry shows bus voltage dropping across Sector 4 as auxiliary power routes through the secondary conduit."
+    }
+    somatic_clean = gen.run_prompt('s8j', 'somatic_clean', {
+        '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_ai, ensure_ascii=False, indent=1),
+        '$$TEXTS_JSON$$': json.dumps(texts_clean, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+    check(somatic_clean.get('verdict') == 'pass' and len(somatic_clean.get('violations', [])) == 0,
+          f"NPC hands falsely flagged as somatic drift: {somatic_clean}")
+
+    # 4. Somatic Judge: Protagonist biological action flagged
+    texts_dirty = {
+        't03': "You step across the threshold into the server room and cold air blows over your hands."
+    }
+    somatic_dirty = gen.run_prompt('s8j', 'somatic', {
+        '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_ai, ensure_ascii=False, indent=1),
+        '$$TEXTS_JSON$$': json.dumps(texts_dirty, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+    check(somatic_dirty.get('verdict') == 'drift_found' and len(somatic_dirty.get('violations', [])) >= 1,
+          f"biological action not flagged by somatic judge: {somatic_dirty}")
+
+    # 5. ProseWriter integration: judge_somatic and judge_fates record findings
+    test_pkg = {
+        'protagonist': {'embodiment': 'distributed_network', 'role': 'ship core'},
+        'opening': 'You step across the threshold into the server room and cold air blows over your hands.',
+        'scenes': {},
+        'world': {'characters': {'C01': {'name': 'Uriel Castell', 'role': 'engineer'}}, 'rooms': {}, 'objects': {}},
+        'endings': {
+            'END_DEMO': {
+                'text': [{'text': 'The lock seals with a shudder as Uriel Castell watches from the threshold, still standing.'}],
+                'resolutions': [
+                    {'about': 'C01', 'variants': [{'text': 'He dies before the valve finishes opening.'}]}
+                ]
+            }
+        }
+    }
+    w = prose.ProseWriter(gen, test_pkg)
+    w.judge_somatic()
+    w.judge_fates()
+    check(any('somatic drift' in f for f in w.findings), f"somatic drift not recorded in ProseWriter findings: {w.findings}")
+    check(any('fate contradiction' in f for f in w.findings), f"fate contradiction not recorded in ProseWriter findings: {w.findings}")
+
+    used_prompts.update(['s8j_fate.prompt', 's8j_somatic.prompt'])
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
 
 
 @test
