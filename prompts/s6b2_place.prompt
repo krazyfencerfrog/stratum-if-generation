@@ -49,6 +49,10 @@ Objects: four to eight examinable things per room.
    or two sentences, with one detail that rewards looking.
  - Stakes live in things that can break, burn, be carried off or fought
    over. Paper (a ledger, a form) only where the story is about it.
+ - Material culture: when material_culture is provided in the packet (containers,
+   fixtures, tools), draw from that specific palette. Avoid cliché IF staging props
+   (leather-bound journal, dusty ledger, ornate brass key, rusted iron key,
+   cracked mirror, flickering candle, half-empty bottle of whiskey).
 
 OUTPUT FORMAT (JSON)
 

@@ -39,6 +39,51 @@ def get_lexicon(story_id):
     """Retrieves any registered dynamic lexicon for a story."""
     return LEXICONS.get(story_id)
 
+
+# cliché toponym tropes kept out of setting generation
+AVOID_TOPONYMS = {
+    'oakhaven', 'ravenspire', 'riverbend', 'shadowfen', 'eldergrove', 'silverwood',
+    'mistveil', 'ironhold', 'whispering pines', 'aegis', 'arcadia', 'horizon', 'nexus',
+    'new eden', 'valoria', 'aethelgard', 'sunspire', 'blackwood', 'raven rock', 'starfall'
+}
+
+# cliché IF staging props kept out of examinable object pools
+AVOID_PROPS = {
+    'leather-bound journal', 'dusty ledger', 'ornate brass key', 'rusted iron key',
+    'cracked mirror', 'half-empty bottle of whiskey', 'flickering candle', 'faded map'
+}
+
+
+def pick_settlement(story_id, role_or_context='', lexicon=None):
+    """Picks an authentic toponym from the setting lexicon, avoiding generic fantasy tropes."""
+    lexicon = lexicon or LEXICONS.get(story_id) or {}
+    candidates = [str(x).strip() for x in lexicon.get('settlements', []) if str(x).strip().lower() not in AVOID_TOPONYMS]
+    if not candidates:
+        return None
+    rng = random.Random(f'{story_id}|settlement|{str(role_or_context).lower()}')
+    return rng.choice(candidates)
+
+
+def pick_landmark(story_id, role_or_context='', lexicon=None):
+    """Picks an authentic geographical or local landmark from the setting lexicon."""
+    lexicon = lexicon or LEXICONS.get(story_id) or {}
+    candidates = [str(x).strip() for x in lexicon.get('landmarks', []) if str(x).strip().lower() not in AVOID_TOPONYMS]
+    if not candidates:
+        return None
+    rng = random.Random(f'{story_id}|landmark|{str(role_or_context).lower()}')
+    return rng.choice(candidates)
+
+
+def material_palette(story_id, lexicon=None):
+    """Returns the setting's authentic material culture palette (containers, fixtures, tools)."""
+    lexicon = lexicon or LEXICONS.get(story_id) or {}
+    mat = lexicon.get('materials_and_props') or {}
+    return {
+        'containers': [str(x).strip() for x in mat.get('containers', []) if str(x).strip().lower() not in AVOID_PROPS],
+        'fixtures': [str(x).strip() for x in mat.get('fixtures', []) if str(x).strip().lower() not in AVOID_PROPS],
+        'tools_and_wear': [str(x).strip() for x in mat.get('tools_and_wear', []) if str(x).strip().lower() not in AVOID_PROPS],
+    }
+
 # keyword -> pool; whole words only. The kernel's own words count three
 # times; the premise's once. Era and culture pools score in full; the two
 # tone pools (romance, adventure) at half, so "a romance in Regency London"

@@ -39,6 +39,7 @@ import sys
 import checks
 from checks import as_list
 import example_guard
+import names as names_mod
 import paper
 import schemas
 from errors import SoftReject
@@ -446,6 +447,9 @@ class WorldBuilder:
                   'scenes': self.scenes_with(location=lid),
                   'people_here': sorted({self.who(c) for sc in self.plan['scenes'] if lid in sc['where']
                                          for c in sc['who'] if c in self.chars})}
+        mat = names_mod.material_palette(self.gen.story_id, self.premise.get('lexicon'))
+        if any(mat.values()):
+            packet['material_culture'] = mat
         answer = self.gen.run_prompt(f's6b2_{lid}', 'place', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PACKET_JSON$$': compact(packet),
         }, prompt_file='s6b2_place.prompt', validator=self.b2_validator(others + built), klass='build', schema=schemas.WORLD_PLACE)
@@ -513,6 +517,9 @@ class WorldBuilder:
             if paper_hits:
                 soft.append(paper.complaint(paper_hits, len(things), 'objects in this location'))
             brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {}
+            cliches = [o.get('name') for o in things if any(p in str(o.get('name', '')).lower() for p in names_mod.AVOID_PROPS)]
+            if cliches:
+                soft.append(f"location uses cliché staging props ({'; '.join(cliches)}); ground objects in the setting's authentic material culture")
             context = [kernel, json.dumps(brief), json.dumps(self.premise)]
             copied = example_guard.copied_phrases(parsed, ['s6b2_place.prompt', 's6b2m_map.prompt'], context)
             if len(copied) >= 2:

@@ -119,6 +119,13 @@ LEXICON = obj(
     n=arr(S),
     surnames=arr(S),
     epithets=arr(S),
+    settlements=arr(S),
+    landmarks=arr(S),
+    materials_and_props=obj(
+        containers=arr(S),
+        fixtures=arr(S),
+        tools_and_wear=arr(S),
+    ),
 )
 
 KERNEL_CHECK = obj(clauses=arr(obj(n=I, requires=S, premise_says=S, note=S, contradiction=B, quote=S)))

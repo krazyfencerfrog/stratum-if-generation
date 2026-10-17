@@ -1400,6 +1400,15 @@ class StoryGenerator:
             raise ValueError(f'lexicon must provide at least 8 masculine and 8 feminine names (got {len(m)} m, {len(f)} f)')
         if len(surnames) < 8 and parsed.get('naming_style') not in ('single',):
             raise ValueError(f'lexicon must provide at least 8 surnames (got {len(surnames)})')
+        parsed.setdefault('settlements', [])
+        parsed.setdefault('landmarks', [])
+        mat = parsed.get('materials_and_props')
+        if not isinstance(mat, dict):
+            parsed['materials_and_props'] = {'containers': [], 'fixtures': [], 'tools_and_wear': []}
+        else:
+            mat.setdefault('containers', [])
+            mat.setdefault('fixtures', [])
+            mat.setdefault('tools_and_wear', [])
         return True
 
     def name_cast(self, premise, lexicon=None):

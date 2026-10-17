@@ -257,6 +257,9 @@ def dynamic_lexicon_generates_and_samples_names():
     lex = premise['lexicon']
     check(len(lex.get('m', [])) >= 8 and len(lex.get('f', [])) >= 8 and len(lex.get('surnames', [])) >= 8,
           f'lexicon lists too small: {lex}')
+    check('settlements' in lex and len(lex['settlements']) >= 5, f'settlements missing or small: {lex}')
+    check('landmarks' in lex and len(lex['landmarks']) >= 5, f'landmarks missing or small: {lex}')
+    check('materials_and_props' in lex and isinstance(lex['materials_and_props'], dict), f'materials missing: {lex}')
     check(premise.get('name_pool', '').startswith('dynamic:'), f"name_pool should be dynamic, got {premise.get('name_pool')}")
     seeds = premise['cast_seeds']
     named = [s for s in seeds if s.get('name')]
@@ -270,8 +273,8 @@ def dynamic_lexicon_generates_and_samples_names():
         parts = [p.lower() for p in you['name'].split()]
         check(not any(p in names.AVOID for p in parts), f"cliché name found in protagonist: {you['name']}")
 
-    # 2. Cliché anti-collapse test: Even if the model outputs cliché names in its pool,
-    # Python strips them and samples clean names
+    # 2. Cliché anti-collapse test: Even if the model outputs cliché names, toponyms, or props in its pool,
+    # Python strips them and samples clean entities
     contaminated_lexicon = {
         "setting_culture": "tainted frontier",
         "naming_style": "given_surname",
@@ -280,6 +283,13 @@ def dynamic_lexicon_generates_and_samples_names():
         "n": ["Rowan", "Nova", "Ash", "Peregrine", "Robin"],
         "surnames": ["Kael", "Thorne", "Whitlock", "Blackwood", "Stone", "Fenner", "Oakhaven"],
         "epithets": ["the Bold", "the Quiet"],
+        "settlements": ["Oakhaven", "Ravenspire", "Aegis", "Coldwater Gap", "Starkie's Wharf", "High Skerry"],
+        "landmarks": ["Riverbend", "Shadowfen", "the Drowned Willows", "the Lock Gate"],
+        "materials_and_props": {
+            "containers": ["leather-bound journal", "dusty ledger", "tarred kit bag", "wicker creel"],
+            "fixtures": ["flickering candle", "carbide lamp", "iron brazier"],
+            "tools_and_wear": ["ornate brass key", "marlinspike", "wool smock"]
+        }
     }
     test_seeds = [
         {"role": "the hedge witch", "kind": "individual", "being": "person", "gender": "f"},
@@ -293,7 +303,25 @@ def dynamic_lexicon_generates_and_samples_names():
         parts = [p.lower() for p in assigned.split()]
         check(not any(p in names.AVOID for p in parts),
               f"Kael-problem name survived Python filtering: {assigned}")
-    # 3. Determinism check: Identical story_id + lexicon reproduces the exact same names
+
+    # Toponym sampling & cliché purge
+    settlement = names.pick_settlement('anti_kael_story', 'capital', lexicon=contaminated_lexicon)
+    check(settlement and settlement.lower() not in names.AVOID_TOPONYMS, f"cliché toponym picked: {settlement}")
+    check(settlement in ["Coldwater Gap", "Starkie's Wharf", "High Skerry"], f"unexpected settlement: {settlement}")
+
+    landmark = names.pick_landmark('anti_kael_story', 'river', lexicon=contaminated_lexicon)
+    check(landmark and landmark.lower() not in names.AVOID_TOPONYMS, f"cliché landmark picked: {landmark}")
+    check(landmark in ["the Drowned Willows", "the Lock Gate"], f"unexpected landmark: {landmark}")
+
+    # Material culture cliché purge
+    palette = names.material_palette('anti_kael_story', lexicon=contaminated_lexicon)
+    check(not any(p in palette['containers'] for p in names.AVOID_PROPS), f"cliché prop in containers: {palette}")
+    check(not any(p in palette['fixtures'] for p in names.AVOID_PROPS), f"cliché prop in fixtures: {palette}")
+    check(not any(p in palette['tools_and_wear'] for p in names.AVOID_PROPS), f"cliché prop in tools: {palette}")
+    check("tarred kit bag" in palette['containers'] and "carbide lamp" in palette['fixtures'] and "marlinspike" in palette['tools_and_wear'],
+          f"valid material props lost: {palette}")
+
+    # 3. Determinism check: Identical story_id + lexicon reproduces the exact same names and toponyms
     repeat_seeds = [
         {"role": "the hedge witch", "kind": "individual", "being": "person", "gender": "f"},
         {"role": "the disgraced knight", "kind": "individual", "being": "person", "gender": "m"},
@@ -302,6 +330,10 @@ def dynamic_lexicon_generates_and_samples_names():
     names.assign_names(repeat_seeds, 'anti_kael_story', ['fantasy frontier'], lexicon=contaminated_lexicon)
     check([s['name'] for s in repeat_seeds] == [s['name'] for s in test_seeds],
           'dynamic lexicon name assignment is not deterministic')
+    check(names.pick_settlement('anti_kael_story', 'capital', lexicon=contaminated_lexicon) == settlement,
+          'settlement selection is not deterministic')
+    check(names.pick_landmark('anti_kael_story', 'river', lexicon=contaminated_lexicon) == landmark,
+          'landmark selection is not deterministic')
 
 
 @test

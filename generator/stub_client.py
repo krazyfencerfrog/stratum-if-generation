@@ -518,6 +518,21 @@ class StubClient(LlmClient):
                          "Winter", "Ashford", "Barrow", "Clay", "Dunmore", "Fletcher", "Greene", "Hargrave",
                          "Kenward", "Lockwood", "Mallow", "Pendleton", "Rotherham", "Scriven", "Thorpe", "Underhill", "Weaver"],
             "epithets": ["the Bold", "the Quiet", "of the Ridge", "the Younger", "the Far-Strider"],
+            "settlements": [
+                "Kallvik", "Fjellgard", "Nordhavn", "Steinsund", "Varanger",
+                "Osterdal", "Sorstrand", "Almdal", "Vikingsund", "Hellefjord",
+                "Torven", "Eidsvoll"
+            ],
+            "landmarks": [
+                "the High Skerry", "the Iron Seam", "the Gull Roost", "the Cold Spit",
+                "the Low Mire", "the Timber Reach", "the Grey Shelf", "the Sound Narrows",
+                "the Bell Rock", "the Winter Cairn"
+            ],
+            "materials_and_props": {
+                "containers": ["tarred wooden kit", "tin tea cannister", "sealskin pouch", "wicker creel", "iron-hooped firkin"],
+                "fixtures": ["grease lamp", "cast-iron stove", "brass ship lantern", "driftwood bench", "slate hearth"],
+                "tools_and_wear": ["bone sail-needle", "marlinspike", "wool watch-cap", "horn tallow-box", "tarred linen apron"],
+            },
         }
 
     def p_s3_5k(self, p):
