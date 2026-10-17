@@ -551,8 +551,8 @@ class StubClient(LlmClient):
             role = str(s.get('role', '')).lower()
             voice = str(s.get('voice', '')).lower()
             wants = str(s.get('wants', '')).lower()
-            if 'maintenance drone' in role or ('unit 7' in role and 'offline' in voice) or \
-               ('diagnostic cycle' in wants and 'charging bay' in wants):
+            if 'maintenance drone' in role or 'dron de mantenimiento' in role or ('unit 7' in role and 'offline' in voice) or \
+               ('diagnostic cycle' in wants and 'charging bay' in wants) or ('ciclo de diagnóstico' in wants):
                 agency_issues.append({
                     'role': s.get('role', 'unknown'),
                     'reason': "Entity is a routine diagnostic tool/hardware device, not a dramatic agent."
@@ -562,14 +562,17 @@ class StubClient(LlmClient):
             for w in t.get('ways_through') or []:
                 if isinstance(w, dict):
                     sit += ' ' + str(w.get('way', '')) + ' ' + str(w.get('cost', ''))
-            if 'Sector 7' in sit or 'sector 7' in sit.lower():
+            if 'Sector 7' in sit or 'sector 7' in sit.lower() or 'sector inferior' in sit.lower():
                 represented = any('sector 7' in str(s.get('role', '')).lower() or
-                                  'sector 7' in str(s.get('speaks_for', '')).lower() for s in seeds)
+                                  'sector 7' in str(s.get('speaks_for', '')).lower() or
+                                  'sector inferior' in str(s.get('role', '')).lower() or
+                                  'sector inferior' in str(s.get('speaks_for', '')).lower() for s in seeds)
                 if not represented:
+                    group_name = 'Sector 7' if 'sector 7' in sit.lower() else 'el sector inferior'
                     unrepresented.append({
-                        'group': 'Sector 7',
+                        'group': group_name,
                         'turn': t.get('id', 1),
-                        'reason': "Turn involves Sector 7 but no cast seed represents it."
+                        'reason': f"Turn involves {group_name} but no cast seed represents it."
                     })
         if agency_issues or unrepresented:
             return {
@@ -1189,9 +1192,11 @@ class StubClient(LlmClient):
                 res_low = res_text.lower()
                 end_low = end_narrative.lower()
                 is_contradiction = False
-                if 'dies before the' in res_low and ('still standing' in end_low or 'watches from' in end_low):
+                if ('dies before the' in res_low or 'muere antes de' in res_low) and \
+                   ('still standing' in end_low or 'watches from' in end_low or 'todavía en pie' in end_low or 'observa desde' in end_low):
                     is_contradiction = True
-                elif ('is killed' in end_low or 'dies in the' in end_low) and ('steps back alive' in res_low or 'survives' in res_low):
+                elif ('is killed' in end_low or 'dies in the' in end_low or 'muere en' in end_low or 'es asesinado' in end_low) and \
+                     ('steps back alive' in res_low or 'survives' in res_low or 'sobrevive' in res_low):
                     is_contradiction = True
 
                 if is_contradiction:
@@ -1222,7 +1227,8 @@ class StubClient(LlmClient):
         if embodiment in ('distributed_network', 'ship_ai', 'sessile_entity', 'swarm', 'systemic_entity'):
             for tid, txt in texts.items():
                 t_lower = str(txt).lower()
-                if ('you step' in t_lower or 'over your hands' in t_lower or 'your breath' in t_lower or 'you sign' in t_lower) and 'castell' not in t_lower:
+                if ('you step' in t_lower or 'over your hands' in t_lower or 'your breath' in t_lower or 'you sign' in t_lower or
+                    'cruzas' in t_lower or 'tus manos' in t_lower or 'respiras' in t_lower) and 'castell' not in t_lower and 'mateo' not in t_lower:
                     violations.append({
                         'text_id': tid,
                         'quote': txt[:80],
@@ -1246,14 +1252,15 @@ class StubClient(LlmClient):
         for tid, txt in texts.items():
             t_str = str(txt)
             t_lower = t_str.lower()
-            if 'the player' in t_lower or 'this node' in t_lower or ('variant' in t_lower and 'virus' not in t_lower and 'pathogen' not in t_lower):
+            if 'the player' in t_lower or 'el jugador' in t_lower or 'this node' in t_lower or 'este nodo' in t_lower or \
+               ('variant' in t_lower and 'virus' not in t_lower and 'pathogen' not in t_lower):
                 violations.append({
                     'text_id': tid,
                     'quote': t_str[:80],
                     'issue_type': 'meta_leakage',
                     'reason': "Text refers directly to game engine mechanics or 'the player' rather than maintaining second-person immersion."
                 })
-            elif 'the cost is:' in t_lower or 'the dramatic cost' in t_lower:
+            elif 'the cost is:' in t_lower or 'the dramatic cost' in t_lower or 'el coste dramático' in t_lower:
                 violations.append({
                     'text_id': tid,
                     'quote': t_str[:80],
@@ -1283,21 +1290,21 @@ class StubClient(LlmClient):
         idx = p.rfind('- Story Narrative Texts')
         body = p[idx:] if idx != -1 else p
         body_lower = body.lower()
-        if 'tortured' in body_lower or 'dismembered' in body_lower:
+        if 'tortured' in body_lower or 'dismembered' in body_lower or 'torturado' in body_lower or 'desmembrado' in body_lower:
             return {
                 "reading": "The story contains explicit torture and graphic violence.",
                 "rating": "MATURE",
                 "rating_descriptors": ["V", "T"],
                 "rating_advisory": "Recommended for mature readers (17+). Contains graphic violence, torture, and dark themes.",
             }
-        elif 'fucking' in body_lower or 'shit' in body_lower:
+        elif 'fucking' in body_lower or 'shit' in body_lower or 'mierda' in body_lower:
             return {
                 "reading": "The story contains coarse profanity.",
                 "rating": "MATURE",
                 "rating_descriptors": ["L"],
                 "rating_advisory": "Recommended for mature readers (17+). Contains coarse language.",
             }
-        elif 'gunfire' in body_lower or 'corpse' in body_lower or 'bleeding' in body_lower:
+        elif 'gunfire' in body_lower or 'corpse' in body_lower or 'bleeding' in body_lower or 'disparos' in body_lower or 'cadáver' in body_lower:
             return {
                 "reading": "The story contains sci-fi combat and violence.",
                 "rating": "TEEN",
@@ -1311,7 +1318,7 @@ class StubClient(LlmClient):
                 "rating_descriptors": ["L"],
                 "rating_advisory": "Recommended for teen readers (13+). Contains moderate language.",
             }
-        elif 'damn' in body_lower or 'alarm' in body_lower or 'peril' in body_lower:
+        elif 'damn' in body_lower or 'alarm' in body_lower or 'peril' in body_lower or 'alarma' in body_lower:
             return {
                 "reading": "The story contains mild peril and infrequent mild language.",
                 "rating": "TEEN",

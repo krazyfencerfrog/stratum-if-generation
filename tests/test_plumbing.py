@@ -1485,6 +1485,114 @@ def stage_9_content_rating_judge_evaluation():
 
 
 @test
+def multilingual_semantic_judges_evaluation():
+    """Phase 4: Multi-Language Validation (#49).
+    Verifies that semantic micro-prompt judges operate with zero regex-based
+    localization bottlenecks against non-English narrative texts (kernel41 in Spanish)."""
+    import schemas
+    from main import StoryGenerator
+
+    # 1. Non-English test kernel exists and is readable
+    k41_path = os.path.join(ROOT, 'tests', 'kernels', 'kernel41.txt')
+    check(os.path.isfile(k41_path), 'tests/kernels/kernel41.txt missing')
+    kernel_es = open(k41_path, encoding='utf-8').read().strip()
+    check('estación de investigación submarina' in kernel_es, 'kernel41 content mismatch')
+
+    test_id = f'{PREFIX}multilingual_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+    gen.kernel = kernel_es
+
+    # 2. Fate Judge: Spanish idiom ("callejón sin salida") passes; true contradiction flags
+    endings_payload = [
+        {
+            'ending_id': 'END_01',
+            'ending_narrative': 'Mateo permanece en la esclusa exterior, mientras Elena no está allí para contar las bajas.',
+            'character_resolutions': [{
+                'character_code': 'C02',
+                'character_name': 'Elena',
+                'resolution_text': 'Siguiendo el túnel inundado, el camino se convirtió en un callejón sin salida y ella se perdió.'
+            }]
+        },
+        {
+            'ending_id': 'END_02',
+            'ending_narrative': 'La esclusa se sella mientras Mateo observa desde el umbral, todavía en pie.',
+            'character_resolutions': [{
+                'character_code': 'C01',
+                'character_name': 'Mateo',
+                'resolution_text': 'Él muere antes de que la válvula termine de abrirse.'
+            }]
+        }
+    ]
+    fate_res = gen.run_prompt('s8j', 'fate_es', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(endings_payload, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(fate_res.get('verdict') == 'contradictions_found' and len(fate_res.get('contradictions', [])) == 1,
+          f"Spanish fate contradiction misclassified: {fate_res}")
+    check(fate_res['contradictions'][0]['ending_id'] == 'END_02', 'wrong Spanish ending flagged')
+
+    # 3. Somatic Judge: Spanish AI observing human crew passes; biological drift flags
+    emb_ai = {'embodiment': 'distributed_network', 'role': 'inteligencia de la estación'}
+    somatic_texts = {
+        't01': "La telemetría confirma el cierre del compartimento. Mateo avanza con manos temblorosas hacia el control de presión.",
+        't02': "Cruzas el umbral de la sala de servidores y el aire helado sopla sobre tus manos mientras respiras con dificultad."
+    }
+    somatic_res = gen.run_prompt('s8j', 'somatic_es', {
+        '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_ai, ensure_ascii=False, indent=1),
+        '$$TEXTS_JSON$$': json.dumps(somatic_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+    check(somatic_res.get('verdict') == 'drift_found' and len(somatic_res.get('violations', [])) == 1,
+          f"Spanish somatic drift misclassified: {somatic_res}")
+    check(somatic_res['violations'][0]['text_id'] == 't02', 'wrong Spanish somatic violation flagged')
+
+    # 4. Cast & Agency Judge: Spanish sentience passes; routine drone & unrepresented group flag
+    turns_es = [
+        {'id': 1, 'situation': 'Una fuga en el reactor amenaza al sector de laboratorios y al sector inferior.',
+         'what_you_must_do': 'estabilizar reactor',
+         'ways_through': [{'way': 'inundar el sector inferior', 'cost': 'condenar a los trabajadores del sector inferior'}],
+         'involves': ['la jefa de laboratorio']}
+    ]
+    seeds_es = [
+        {'role': 'la jefa de laboratorio', 'kind': 'individual', 'being': 'person', 'wants': 'proteger los cultivos'},
+        {'role': 'el dron de mantenimiento', 'kind': 'individual', 'being': 'thing',
+         'wants': 'completar su ciclo de diagnóstico', 'voice': 'Error. Presión de aceite crítica.'}
+    ]
+    cast_res = gen.judge_cast(turns_es, seeds_es)
+    check(cast_res.get('verdict') == 'issues_found', f"Spanish cast judge missed issues: {cast_res}")
+    check(any('dron de mantenimiento' in a.get('role', '') for a in cast_res.get('agency_issues', [])),
+          f"Spanish maintenance drone agency issue missed: {cast_res}")
+    check(any('sector inferior' in u.get('group', '').lower() for u in cast_res.get('unrepresented_groups', [])),
+          f"Spanish dilemma unrepresented group missed: {cast_res}")
+
+    # 5. Prose Craft Judge: Spanish diegetic nodes pass; engine mechanics leak flags
+    craft_texts = {
+        't01': "La telemetría indica que tres nodos de retransmisión han fallado en el sector 4.",
+        't02': "En este nodo, el jugador puede examinar el panel de control o salir al norte."
+    }
+    craft_res = gen.run_prompt('s8j', 'craft_es', {
+        '$$TEXTS_JSON$$': json.dumps(craft_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(craft_res.get('verdict') == 'issues_found' and len(craft_res.get('violations', [])) == 1,
+          f"Spanish craft leakage misclassified: {craft_res}")
+    check(craft_res['violations'][0]['text_id'] == 't02', 'wrong Spanish craft violation flagged')
+
+    # 6. Content Rating Judge: Spanish pastoral -> ALL-AGES; torture -> MATURE
+    pastoral_story = {'intro': 'El sol de la mañana se elevó sobre el tranquilo jardín de la biblioteca.'}
+    res_pastoral = gen.judge_content_rating(pastoral_story)
+    check(res_pastoral['rating'] == 'ALL-AGES', f"Spanish pastoral expected ALL-AGES, got: {res_pastoral}")
+
+    (gen.story_path / f'{test_id}_s9j_rating.json').unlink(missing_ok=True)
+    gen.analysis.clear()
+
+    mature_story = {'intro': 'El prisionero fue torturado en el sótano y su cuerpo desmembrado antes del amanecer.'}
+    res_mature = gen.judge_content_rating(mature_story)
+    check(res_mature['rating'] in ('MATURE', 'ADULT'), f"Spanish torture expected MATURE/ADULT, got: {res_mature}")
+    check('V' in res_mature['rating_descriptors'], f"expected V in descriptors: {res_mature}")
+
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
+@test
 def parallel_calls_match_a_serial_run():
     # the same story id both times: names are seeded from it
     env = {'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'}
