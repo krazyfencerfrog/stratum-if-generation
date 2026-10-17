@@ -1352,6 +1352,62 @@ def stage_8_semantic_judges_evaluation():
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
+@test
+def stage_3_5_cast_agency_judge_evaluation():
+    import schemas
+    from main import StoryGenerator
+
+    test_id = f'{PREFIX}s3_5j_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+
+    # 1. Valid dramatic agents & balanced dilemma pass cleanly
+    balanced_turns = [
+        {'id': 1, 'situation': 'Stress fracture threatens Sector 4 and Sector 7.',
+         'what_you_must_do': 'stabilize fracture',
+         'ways_through': [{'way': 'route power to Sector 4', 'cost': 'Sector 7 loses auxiliary air'}],
+         'involves': ['the sector leader of Sector 4', 'the engineer in Sector 7']}
+    ]
+    balanced_seeds = [
+        {'role': 'the sector leader of Sector 4', 'kind': 'individual', 'being': 'person', 'wants': 'protect residents'},
+        {'role': 'the engineer in Sector 7', 'kind': 'individual', 'being': 'person', 'wants': 'maintain pressure'},
+        {'role': "the ship's AI", 'kind': 'individual', 'being': 'thing', 'wants': 'preserve hull integrity',
+         'voice': "'I cannot allow you to vent Sector 7, Captain.'"}
+    ]
+    res_clean = gen.judge_cast(balanced_turns, balanced_seeds)
+    check(res_clean.get('verdict') == 'pass' and len(res_clean.get('agency_issues', [])) == 0 and
+          len(res_clean.get('unrepresented_groups', [])) == 0, f"balanced cast falsely faulted: {res_clean}")
+
+    (gen.story_path / f'{test_id}_s3_5j_cast.json').unlink(missing_ok=True)
+    gen.analysis.clear()
+
+    # 2. Inanimate routine drone and unrepresented dilemma group are caught
+    asymmetric_turns = [
+        {'id': 1, 'situation': 'Stress fracture threatens Sector 4 and Sector 7.',
+         'what_you_must_do': 'stabilize fracture',
+         'ways_through': [{'way': 'vent Sector 7 to save Sector 4', 'cost': 'Sector 7 margin'}],
+         'involves': ['the sector leader of Sector 4']}
+    ]
+    faulted_seeds = [
+        {'role': 'the sector leader of Sector 4', 'kind': 'individual', 'being': 'person', 'wants': 'protect residents'},
+        {'role': 'the maintenance drone', 'kind': 'individual', 'being': 'thing',
+         'wants': 'to complete its diagnostic cycle and return to the charging bay',
+         'voice': "Error. Oil pressure critical. Status: standby."}
+    ]
+    res_faulted = gen.judge_cast(asymmetric_turns, faulted_seeds)
+    check(res_faulted.get('verdict') == 'issues_found', f"expected issues_found, got: {res_faulted}")
+    check(any('maintenance drone' in a.get('role', '') for a in res_faulted.get('agency_issues', [])),
+          f"maintenance drone agency issue missed: {res_faulted}")
+    check(any('Sector 7' in u.get('group', '') for u in res_faulted.get('unrepresented_groups', [])),
+          f"Sector 7 representation issue missed: {res_faulted}")
+    check(any('agency: the maintenance drone' in f for f in gen.analysis.get('s3_5j_findings', [])),
+          f"agency finding not recorded in gen.analysis: {gen.analysis.get('s3_5j_findings')}")
+
+    used_prompts.add('s3_5j_cast_judge.prompt')
+    shutil.rmtree(gen.story_path, ignore_errors=True)
+
+
+
 
 @test
 def parallel_calls_match_a_serial_run():
@@ -2708,7 +2764,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5v', 's3_5k', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5j', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)

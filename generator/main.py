@@ -1369,8 +1369,49 @@ class StoryGenerator:
             '$$ROLES$$': '\n'.join(f' - {r}' for r in roles) or ' (the turns name nobody)',
             '$$KERNEL$$': self.kernel,
         }, validator=self.cast_validator(turns['turns']), klass='classify', schema=schemas.CAST)
+        self.judge_cast(turns['turns'], cast.get('cast_seeds') or [])
         lexicon = self.generate_lexicon(engine, cast.get('cast_seeds') or []) if self.dynamic_names else None
         return self.name_cast(self.assemble_premise(budget, engine, turns, cast), lexicon=lexicon)
+
+    def judge_cast(self, turns, seeds):
+        """Runs the semantic cast & agency judge (s3_5j_cast.prompt) over cast seeds
+        and turns to verify dramatic agency and dilemma representation (#49 Phase 2)."""
+        turns_summary = [{
+            'id': t.get('id'),
+            'situation': t.get('situation'),
+            'what_you_must_do': t.get('what_you_must_do'),
+            'ways_through': t.get('ways_through'),
+            'involves': t.get('involves')
+        } for t in turns]
+        seeds_summary = [{
+            'role': s.get('role'),
+            'kind': s.get('kind'),
+            'being': s.get('being'),
+            'speaks_for': s.get('speaks_for'),
+            'wants': s.get('wants'),
+            'voice': s.get('voice'),
+            'holds': s.get('holds'),
+            'edge': s.get('edge'),
+            'tie': s.get('tie')
+        } for s in seeds]
+        try:
+            res = self.run_prompt('s3_5j', 'cast', {
+                '$$TURNS$$': compact_json({'turns': turns_summary}),
+                '$$CAST_SEEDS$$': compact_json({'cast_seeds': seeds_summary}),
+            }, prompt_file='s3_5j_cast_judge.prompt', klass='classify', schema=schemas.CAST_JUDGE)
+            if res and res.get('verdict') == 'issues_found':
+                issues = []
+                for a in res.get('agency_issues') or []:
+                    issues.append(f"agency: {a.get('role')} - {a.get('reason')}")
+                for u in res.get('unrepresented_groups') or []:
+                    issues.append(f"dilemma: {u.get('group')} in turn {u.get('turn')} - {u.get('reason')}")
+                if issues:
+                    self.analysis['s3_5j_findings'] = issues
+                    print(f"  [cast_judge] findings: {'; '.join(issues)}")
+            return res
+        except Exception as e:
+            print(f'  [cast_judge] fallback: {e}')
+            return None
 
     def generate_lexicon(self, engine, cast_seeds):
         """Generates a setting-specific lexicon of names (Stage 3.5d) matching the story's

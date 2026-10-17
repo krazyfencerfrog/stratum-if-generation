@@ -174,6 +174,7 @@ class StubClient(LlmClient):
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
             ('You are the setting-lexicon generator', 's3_5d'),
+            ('You are step 3.5j of', 's3_5j_cast'),
             ('You are a fidelity auditor', 's3_5v'),
             ('You are a Kernel fidelity checker', 's3_5k'),
             ('You are the repair step for the premise', 's3_5r'),
@@ -535,6 +536,51 @@ class StubClient(LlmClient):
                 "fixtures": ["grease lamp", "cast-iron stove", "brass ship lantern", "driftwood bench", "slate hearth"],
                 "tools_and_wear": ["bone sail-needle", "marlinspike", "wool watch-cap", "horn tallow-box", "tarred linen apron"],
             },
+        }
+
+    def p_s3_5j_cast(self, p):
+        turns_data = self.section(p, '- the Dramatic Turns') or []
+        seeds_data = self.section(p, '- the Cast Seeds') or []
+        turns = turns_data.get('turns', []) if isinstance(turns_data, dict) else (turns_data or [])
+        seeds = seeds_data.get('cast_seeds', []) if isinstance(seeds_data, dict) else (seeds_data or [])
+        agency_issues = []
+        unrepresented = []
+        for s in seeds:
+            role = str(s.get('role', '')).lower()
+            voice = str(s.get('voice', '')).lower()
+            wants = str(s.get('wants', '')).lower()
+            if 'maintenance drone' in role or ('unit 7' in role and 'offline' in voice) or \
+               ('diagnostic cycle' in wants and 'charging bay' in wants):
+                agency_issues.append({
+                    'role': s.get('role', 'unknown'),
+                    'reason': "Entity is a routine diagnostic tool/hardware device, not a dramatic agent."
+                })
+        for t in turns:
+            sit = str(t.get('situation', '')) + ' ' + str(t.get('what_you_must_do', ''))
+            for w in t.get('ways_through') or []:
+                if isinstance(w, dict):
+                    sit += ' ' + str(w.get('way', '')) + ' ' + str(w.get('cost', ''))
+            if 'Sector 7' in sit or 'sector 7' in sit.lower():
+                represented = any('sector 7' in str(s.get('role', '')).lower() or
+                                  'sector 7' in str(s.get('speaks_for', '')).lower() for s in seeds)
+                if not represented:
+                    unrepresented.append({
+                        'group': 'Sector 7',
+                        'turn': t.get('id', 1),
+                        'reason': "Turn involves Sector 7 but no cast seed represents it."
+                    })
+        if agency_issues or unrepresented:
+            return {
+                "reading": f"Found {len(agency_issues)} agency issue(s) and {len(unrepresented)} unrepresented group(s).",
+                "verdict": "issues_found",
+                "agency_issues": agency_issues,
+                "unrepresented_groups": unrepresented,
+            }
+        return {
+            "reading": "All cast seeds possess interpersonal agency and dilemma factions are balanced.",
+            "verdict": "pass",
+            "agency_issues": [],
+            "unrepresented_groups": [],
         }
 
     def p_s3_5k(self, p):

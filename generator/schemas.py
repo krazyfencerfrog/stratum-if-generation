@@ -340,6 +340,24 @@ SOMATIC_JUDGE = obj(
     violations=arr(SOMATIC_VIOLATION),
 )
 
+# ---------------------------------------------------------------- stage 3.5 cast & agency judge (#49 Phase 2)
+
+CAST_AGENCY_ISSUE = obj(
+    role=S,
+    reason=S,
+)
+UNREPRESENTED_GROUP = obj(
+    group=S,
+    turn=I,
+    reason=S,
+)
+CAST_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'issues_found']),
+    agency_issues=arr(CAST_AGENCY_ISSUE),
+    unrepresented_groups=arr(UNREPRESENTED_GROUP),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -348,6 +366,7 @@ ALL = {
     'PROSE_EDIT': PROSE_EDIT, 'ARC_CAST': ARC_CAST, 'ARC_PLAN': ARC_PLAN, 'LINE_EXPANSION': LINE_EXPANSION,
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
-    'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE,
+    'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE, 'CAST_JUDGE': CAST_JUDGE,
 }
+
 
