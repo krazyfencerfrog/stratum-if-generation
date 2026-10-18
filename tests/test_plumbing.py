@@ -1564,12 +1564,13 @@ def engine_non_circular_and_active_opposition_checks():
     check(engine_good.get('E13', {}).get('holds') is True, f"E13 falsely flagged valid premise: {engine_good.get('E13')}")
     check(engine_good.get('E14', {}).get('holds') is True, f"E14 falsely flagged valid premise: {engine_good.get('E14')}")
 
-    # CJK clause splitting verification
-    from brief import kernel_clauses
-    ja_clauses = kernel_clauses(open('tests/kernels/kernel33_ja.txt').read())
+    # Prompt-based kernel clause extraction verification
+    gen.kernel = open('tests/kernels/kernel33_ja.txt').read()
+    ja_clauses = gen.get_kernel_clauses()
     check(len(ja_clauses) == 7, f"Expected 7 clauses for kernel33_ja, got {len(ja_clauses)}: {ja_clauses}")
 
     used_prompts.add('s3_5v_premise_check.prompt')
+    used_prompts.add('s2_clauses.prompt')
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 

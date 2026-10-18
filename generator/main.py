@@ -1667,13 +1667,33 @@ class StoryGenerator:
                  'verified': quote_in(e.get('quote'), premise_text)}
                 for e in answer.get('clauses') or [] if isinstance(e, dict) and as_bool(e.get('contradiction'))]
 
+    def get_kernel_clauses(self):
+        """Extract atomic kernel clauses via s2_clauses prompt across any
+        language, falling back to kernel_clauses."""
+        if 's2_clauses' in self.analysis:
+            saved = self.analysis['s2_clauses']
+            if isinstance(saved, dict) and isinstance(saved.get('clauses'), list):
+                return [(int(c['n']), str(c['clause'])) for c in saved['clauses'] if isinstance(c, dict) and 'n' in c and 'clause' in c]
+        try:
+            parsed = self.run_prompt('s2k', 'kernel_clauses', {
+                '$$KERNEL$$': self.kernel,
+            }, prompt_file='s2_clauses.prompt', schema=schemas.KERNEL_CLAUSES, klass='classify')
+            if isinstance(parsed, dict) and isinstance(parsed.get('clauses'), list):
+                clauses = [(int(c['n']), str(c['clause'])) for c in parsed['clauses'] if isinstance(c, dict) and 'n' in c and 'clause' in c]
+                if clauses:
+                    self.analysis['s2_clauses'] = parsed
+                    return clauses
+        except Exception:
+            pass
+        return kernel_clauses(self.kernel)
+
     def verify_premise(self, premise, round_no):
         """Computed checks, the 3.5k Kernel check and the 3.5v audit.
         Returns the normalized finding list; an empty list is a clean
         verdict. The verdict is computed from the model's per-item answers,
         not asked for."""
         brief = self.analysis.get('s3_brief')
-        clauses = kernel_clauses(self.kernel)
+        clauses = self.get_kernel_clauses()
         constraints = constraint_fields(brief)
         checklist = self.engine_checklist(premise)
 

@@ -61,6 +61,10 @@ SHAPE = obj(
     ),
 )
 
+KERNEL_CLAUSES = obj(
+    clauses=arr(obj(n=I, clause=S))
+)
+
 # ---------------------------------------------------------------- 3.4
 
 PROMISES = obj(

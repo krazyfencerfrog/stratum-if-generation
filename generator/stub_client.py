@@ -159,6 +159,7 @@ class StubClient(LlmClient):
         flat = head.replace('\n', ' ')
         checks = [
             ('You are a narrative classification and adaptation engine', 'filter'),
+            ('You are the kernel clause extractor', 'kernel_clauses'),
             ('You are the shape-split step', 'shape'),
             ('You are an interactive-contract analyst', 's3_0a'),
             ('identity and epistemic-state analyst', 's3_0b'),
@@ -287,6 +288,21 @@ class StubClient(LlmClient):
 
     def p_filter(self, p):
         return p.split('USER KERNEL:')[-1].strip()
+
+    def p_kernel_clauses(self, p):
+        from brief import kernel_clauses
+        if '海辺のホテル' in p:
+            return {"clauses": [
+                {"n": 1, "clause": "経営の傾いた海辺のホテルを舞台に、ひと夏をかけてじっくりと描かれるロマンス。"},
+                {"n": 2, "clause": "あなたは新任の夜間支配人。"},
+                {"n": 3, "clause": "相手は料理長で、都会のより格式ある厨房へと移籍しようとしている。"},
+                {"n": 4, "clause": "あなたの気を引こうとするライバルの存在がある。"},
+                {"n": 5, "clause": "料理長がまだこの場を去ろうとしないのには誰も声に出して言えない理由がある。"},
+                {"n": 6, "clause": "すれ違い、すべてが動き出しそうになる一夜、そしてどちらかが先に言葉にしなければならない瞬間を描く。"},
+                {"n": 7, "clause": "複数の結末があり、そのうち少なくとも一つは二人の関係が実を結ぶものにする。"}
+            ]}
+        kernel = p.split('--- USER KERNEL ---')[-1].strip() if '--- USER KERNEL ---' in p else p.split('USER KERNEL')[-1].strip()
+        return {"clauses": [{"n": i, "clause": c} for i, c in kernel_clauses(kernel)]}
 
     def p_shape(self, p):
         kernel = self.text_after(p, '- the Kernel\n')

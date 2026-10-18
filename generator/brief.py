@@ -342,7 +342,7 @@ def valid_serves(tag, brief):
     return False
 
 
-_CLAUSE_SPLIT = re.compile(r'(?<=[.!?;。！？；])\s*|\s*[—–——]\s*|\s+-\s+')
+_CLAUSE_SPLIT = re.compile(r'(?<=[.!?;])\s+|\s+[—–]\s+|\s+-\s+')
 
 
 def kernel_clauses(kernel):
@@ -353,8 +353,8 @@ def kernel_clauses(kernel):
     parts = [p.strip() for p in _CLAUSE_SPLIT.split(text) if p and p.strip()]
     merged = []
     for p in parts:
-        # a fragment of one or two words belongs to its neighbour (unless character length indicates a full clause)
-        if merged and len(p.split()) < 3 and len(p) < 10:
+        # a fragment of one or two words belongs to its neighbour
+        if merged and len(p.split()) < 3:
             merged[-1] = merged[-1] + ' ' + p
         else:
             merged.append(p)
