@@ -1618,6 +1618,10 @@ class StoryGenerator:
             ('E13', 'neither mediation.levers nor turns.ways_through rely on paper messages, folded notes, '
                     'diaries, recipe cards, or ledgers as the primary driver of drama; confrontations and '
                     'interactions are carried out directly face-to-face in the room.'),
+            ('E14', 'if the Kernel or Brief mandates a specific ending outcome or fruition (such as a relationship '
+                    'bearing fruit or an alliance formed), the final turn provides at least one way_through that '
+                    'cleanly delivers that outcome without nullifying costs or forced separation, and companions\' '
+                    'breaking_points do not trigger on that resolution.'),
         ]
         if premise.get('hidden_truth'):
             items.append(('E11', 'hidden_truth is an external, non-circular, human or relational complication (a concrete debt, past event, '

@@ -763,6 +763,12 @@ class StubClient(LlmClient):
                 matched = [p for p in paper_words if p in levers_text or p in ways_text]
                 if matched:
                     return {"id": e, "note": "material relies on paper messages or notes rather than direct interaction", "holds": False, "quote": matched[0]}
+            if e == 'E14':
+                seeds = material.get('cast_seeds') or []
+                for s in seeds:
+                    bp = str(s.get('breaking_point') or '').lower()
+                    if any(x in bp for x in ('unspoken truth', 'confess', 'reveal the truth', 'reveals the truth')):
+                        return {"id": e, "note": f"companion breaking_point triggers on positive resolution ({bp})", "holds": False, "quote": bp}
             return {"id": e, "note": "stub", "holds": True, "quote": ""}
 
         engine_results = [engine_entry(e) for e in engine if not (retold and e == 'E6')]

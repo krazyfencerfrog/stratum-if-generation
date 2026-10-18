@@ -7,6 +7,7 @@
 LOSING AND THE PRICE are different things.
  - A way to lose is the game ending in the PLAYER's defeat. Only the failure model's triggers may cause one, and a failure presence of "none" means the player cannot lose.
  - The price is what the story costs its people on a way it can go, and it is never a way to lose: a death, a body hurt, a bond broken past mending, a home or a way of life ended, a crown or a fortune given up, what befalls whoever breaks an oath, a bargain or a contract. A story the player cannot lose still pays a price.
+ - In non-tragedy, restorative, or romantic stories, the price of a positive outcome or mutual fruition is emotional risk, personal pride, the comfort of safe detachment, or turning down outside ambition—NEVER an arbitrary punitive loss that negates the positive resolution, ruins the protagonist's livelihood, or separates the lovers.
  - The world can hurt. The opposition and the pressure can wreck, injure, take and kill, inside the transgression ceiling, whatever the failure model says: that is pressure and price the story carries forward, not a way to lose.
 
 === ENGINE ===
@@ -25,6 +26,7 @@ NO PAPER DRIVERS: A document, a note, a letter, a ledger, a fee or a signature i
 A HIDDEN TRUTH (an epistemic gap) is a central truth about who "you" are or what is really happening, which the whole story is built to keep from you and which changes what everything before meant when it comes out. Two things are NOT hidden truths, and a brief with no epistemic gap allows both: a secret one person keeps that drives one turn or one reversal (a betrayal planned, a key hidden, a bargain made behind your back), which is a complication; and a fact found out to get through one turn.
 EXTERNAL COMPLICATION REQUIRED: The hidden truth must be an external, tangible, or historical complication—a concrete debt, a past event, a binding obligation to a third party, a health/legal reality, a concealed conflict of interest, or a secret failure.
 HUMAN STAKES, NOT PUZZLE FETCH-QUESTS: The complication must be human, relational, moral, or historical (a binding debt to a patron, a past scandal, a family obligation, a broken oath, an unlogged failure). NEVER make the hidden truth a puzzle side-quest, a missing recipe card, a lost key, an archival hunt, or an exam condition.
+LOGICAL COHERENCE REQUIRED: The causal logic of the hidden truth must make sense: fulfilling a vow must not be described as breaking it; staying out of loyalty or love must not be inverted into a betrayal. If the truth is an obligation to a third party, resolving it must follow logical cause and effect.
 NEVER make the hidden truth circular or tautological:
 - In a romance or relationship story, the secret reason cannot merely be "they secretly have feelings for you."
 - In an alliance or loyalty story, the secret cannot merely be "they want to be your friend."

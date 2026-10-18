@@ -1488,37 +1488,42 @@ def engine_non_circular_and_active_opposition_checks():
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
     gen = StoryGenerator(story_id=test_id)
 
-    # 1. Checklist includes E11 when hidden_truth is present, and E12/E13 always present
+    # 1. Checklist includes E11 when hidden_truth is present, and E12/E13/E14 always present
     p_with_ht = {
         'opposition': {'who_or_what': 'the inspector', 'means': 'shuts down kitchen', 'shown_by': 'demands bribe on the line'},
         'hidden_truth': {'truth': 'the chef owes 50k to the loan shark', 'who_knows': 'the chef', 'what_it_changes': 'explains the urgency'},
         'mediation': {'levers': ['the loan shark in the dining room', 'the kitchen staff loyalty']},
         'turns': [{'id': 1, 'ways_through': [{'way': 'confront the loan shark directly', 'cost': 'reputation'}]}],
+        'cast_seeds': [{'role': 'the chef', 'breaking_point': 'leaves if the kitchen takes the loan shark cash'}],
     }
     checklist = gen.engine_checklist(p_with_ht)
     ids = [i for i, _ in checklist]
     check('E11' in ids, f"E11 not in checklist: {ids}")
     check('E12' in ids, f"E12 not in checklist: {ids}")
     check('E13' in ids, f"E13 not in checklist: {ids}")
+    check('E14' in ids, f"E14 not in checklist: {ids}")
 
     p_without_ht = {
         'opposition': {'who_or_what': 'the inspector', 'means': 'shuts down kitchen', 'shown_by': 'demands bribe on the line'},
         'hidden_truth': None,
         'mediation': {'levers': ['the inspector']},
         'turns': [],
+        'cast_seeds': [],
     }
     checklist_no_ht = gen.engine_checklist(p_without_ht)
     ids_no_ht = [i for i, _ in checklist_no_ht]
     check('E11' not in ids_no_ht, f"E11 unexpectedly in checklist: {ids_no_ht}")
     check('E12' in ids_no_ht, f"E12 not in checklist: {ids_no_ht}")
     check('E13' in ids_no_ht, f"E13 not in checklist: {ids_no_ht}")
+    check('E14' in ids_no_ht, f"E14 not in checklist: {ids_no_ht}")
 
-    # 2. Stub audit catches circular hidden truth, puzzle fetch-quests, toothless opposition, and paper courier levers
+    # 2. Stub audit catches circular hidden truth, puzzle fetch-quests, toothless opposition, paper courier levers, and self-defeating breaking point
     p_bad = {
         'opposition': {'who_or_what': 'the competitor', 'means': 'gives polite tour', 'shown_by': 'leaves a business card'},
         'hidden_truth': {'truth': 'he secretly has feelings for you', 'who_knows': 'him', 'what_it_changes': 'nothing'},
         'mediation': {'levers': ['a folded note on the table']},
         'turns': [{'id': 1, 'ways_through': [{'way': 'find the secret diary', 'cost': 'time'}]}],
+        'cast_seeds': [{'role': 'the partner', 'breaking_point': 'leaves the moment you confess feelings'}],
     }
     res = gen.run_prompt('s3_5v', 'premise_check_bad', {
         '$$CONSTRAINTS$$': ' 1. 3-0b.protagonist_identity [constraint]: human',
@@ -1531,6 +1536,7 @@ def engine_non_circular_and_active_opposition_checks():
     check(engine_results.get('E11', {}).get('holds') is False, f"E11 did not flag circular secret: {engine_results.get('E11')}")
     check(engine_results.get('E12', {}).get('holds') is False, f"E12 did not flag polite opposition: {engine_results.get('E12')}")
     check(engine_results.get('E13', {}).get('holds') is False, f"E13 did not flag paper courier: {engine_results.get('E13')}")
+    check(engine_results.get('E14', {}).get('holds') is False, f"E14 did not flag self-defeating breaking point: {engine_results.get('E14')}")
 
     # Test E11 on puzzle fetch-quest
     p_fetch = dict(p_bad, hidden_truth={'truth': 'the lost recipe card from the grandfather', 'who_knows': 'no one', 'what_it_changes': 'allows cooking'})
@@ -1544,7 +1550,7 @@ def engine_non_circular_and_active_opposition_checks():
     res_fetch_dict = {e['id']: e for e in res_fetch.get('engine', [])}
     check(res_fetch_dict.get('E11', {}).get('holds') is False, f"E11 did not flag fetch quest: {res_fetch_dict.get('E11')}")
 
-    # Clean premise passes E11, E12, and E13
+    # Clean premise passes E11, E12, E13, and E14
     res_good = gen.run_prompt('s3_5v', 'premise_check_good', {
         '$$CONSTRAINTS$$': ' 1. 3-0b.protagonist_identity [constraint]: human',
         '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {t}' for i, t in gen.engine_checklist(p_with_ht)),
@@ -1556,6 +1562,12 @@ def engine_non_circular_and_active_opposition_checks():
     check(engine_good.get('E11', {}).get('holds') is True, f"E11 falsely flagged valid secret: {engine_good.get('E11')}")
     check(engine_good.get('E12', {}).get('holds') is True, f"E12 falsely flagged valid opposition: {engine_good.get('E12')}")
     check(engine_good.get('E13', {}).get('holds') is True, f"E13 falsely flagged valid premise: {engine_good.get('E13')}")
+    check(engine_good.get('E14', {}).get('holds') is True, f"E14 falsely flagged valid premise: {engine_good.get('E14')}")
+
+    # CJK clause splitting verification
+    from brief import kernel_clauses
+    ja_clauses = kernel_clauses(open('tests/kernels/kernel33_ja.txt').read())
+    check(len(ja_clauses) == 7, f"Expected 7 clauses for kernel33_ja, got {len(ja_clauses)}: {ja_clauses}")
 
     used_prompts.add('s3_5v_premise_check.prompt')
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
