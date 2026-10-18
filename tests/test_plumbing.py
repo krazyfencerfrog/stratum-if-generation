@@ -1448,20 +1448,22 @@ def stage_8_craft_and_meta_leakage_judge_evaluation():
     check(res_clean.get('verdict') == 'pass' and len(res_clean.get('violations', [])) == 0,
           f"diegetic technical vocabulary falsely flagged by craft judge: {res_clean}")
 
-    # 2. Text leaking engine mechanics, fourth-wall breaks, and command-menu picks is caught
+    # 2. Text leaking engine mechanics, fourth-wall breaks, command-menu picks, and aphorisms is caught
     texts_dirty = {
         't04': "In this node, the player can examine the locked cabinet or exit north.",
         't05': "The cost is: one life traded for the station.",
         't06': "If you open the valve you drown, and if you leave it closed you suffocate; choose wisely.",
-        't07': "You can choose to surrender or fight to the end."
+        't07': "You can choose to surrender or fight to the end.",
+        't08': "'A list is not a goodbye. It is a count.'",
     }
     res_dirty = gen.run_prompt('s8j', 'craft_dirty', {
         '$$TEXTS_JSON$$': json.dumps(texts_dirty, ensure_ascii=False, indent=1)
     }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
-    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 3,
+    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 4,
           f"mechanics leakage missed by craft judge: {res_dirty}")
     types = {v.get('issue_type') for v in res_dirty.get('violations', [])}
     check('command_menu' in types, f"command_menu issue_type not flagged: {res_dirty}")
+    check('aphoristic_dialogue' in types, f"aphoristic_dialogue issue_type not flagged: {res_dirty}")
 
     # 3. ProseWriter integration: judge_craft records findings
     test_pkg = {
@@ -1475,6 +1477,68 @@ def stage_8_craft_and_meta_leakage_judge_evaluation():
     check(any('craft leakage' in f for f in w.findings), f"craft leakage not recorded in ProseWriter findings: {w.findings}")
 
     used_prompts.add('s8j_craft.prompt')
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
+@test
+def engine_non_circular_and_active_opposition_checks():
+    import schemas
+    from main import StoryGenerator
+    test_id = f'{PREFIX}engine_checks_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+
+    # 1. Checklist includes E11 when hidden_truth is present, and E12 when opposition is present
+    p_with_ht = {
+        'opposition': {'who_or_what': 'the inspector', 'means': 'shuts down kitchen', 'shown_by': 'leaves a violation notice'},
+        'hidden_truth': {'truth': 'the chef owes 50k to the loan shark', 'who_knows': 'the chef', 'what_it_changes': 'explains the urgency'},
+        'turns': [],
+    }
+    checklist = gen.engine_checklist(p_with_ht)
+    ids = [i for i, _ in checklist]
+    check('E11' in ids, f"E11 not in checklist: {ids}")
+    check('E12' in ids, f"E12 not in checklist: {ids}")
+
+    p_without_ht = {
+        'opposition': {'who_or_what': 'the inspector', 'means': 'shuts down kitchen', 'shown_by': 'leaves a violation notice'},
+        'hidden_truth': None,
+        'turns': [],
+    }
+    checklist_no_ht = gen.engine_checklist(p_without_ht)
+    ids_no_ht = [i for i, _ in checklist_no_ht]
+    check('E11' not in ids_no_ht, f"E11 unexpectedly in checklist: {ids_no_ht}")
+    check('E12' in ids_no_ht, f"E12 not in checklist: {ids_no_ht}")
+
+    # 2. Stub audit catches circular hidden truth and toothless opposition
+    p_bad = {
+        'opposition': {'who_or_what': 'the competitor', 'means': 'gives polite tour', 'shown_by': 'leaves a business card'},
+        'hidden_truth': {'truth': 'he secretly has feelings for you', 'who_knows': 'him', 'what_it_changes': 'nothing'},
+        'turns': [],
+    }
+    res = gen.run_prompt('s3_5v', 'premise_check_bad', {
+        '$$CONSTRAINTS$$': ' 1. 3-0b.protagonist_identity [constraint]: human',
+        '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {t}' for i, t in gen.engine_checklist(p_bad)),
+        '$$FAILURE_MODEL$$': '',
+        '$$PREMISE_JSON$$': gen.to_json(p_bad),
+        '$$KERNEL$$': 'A kitchen story.',
+    }, prompt_file='s3_5v_premise_check.prompt', klass='audit', schema=schemas.PREMISE_CHECK)
+    engine_results = {e['id']: e for e in res.get('engine', [])}
+    check(engine_results.get('E11', {}).get('holds') is False, f"E11 did not flag circular secret: {engine_results.get('E11')}")
+    check(engine_results.get('E12', {}).get('holds') is False, f"E12 did not flag polite opposition: {engine_results.get('E12')}")
+
+    # Clean premise passes E11 and E12
+    res_good = gen.run_prompt('s3_5v', 'premise_check_good', {
+        '$$CONSTRAINTS$$': ' 1. 3-0b.protagonist_identity [constraint]: human',
+        '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {t}' for i, t in gen.engine_checklist(p_with_ht)),
+        '$$FAILURE_MODEL$$': '',
+        '$$PREMISE_JSON$$': gen.to_json(p_with_ht),
+        '$$KERNEL$$': 'A kitchen story.',
+    }, prompt_file='s3_5v_premise_check.prompt', klass='audit', schema=schemas.PREMISE_CHECK)
+    engine_good = {e['id']: e for e in res_good.get('engine', [])}
+    check(engine_good.get('E11', {}).get('holds') is True, f"E11 falsely flagged valid secret: {engine_good.get('E11')}")
+    check(engine_good.get('E12', {}).get('holds') is True, f"E12 falsely flagged valid opposition: {engine_good.get('E12')}")
+
+    used_prompts.add('s3_5v_premise_check.prompt')
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
@@ -1586,17 +1650,19 @@ def multilingual_semantic_judges_evaluation():
     check(any('sector inferior' in u.get('group', '').lower() for u in cast_res.get('unrepresented_groups', [])),
           f"Spanish dilemma unrepresented group missed: {cast_res}")
 
-    # 5. Prose Craft Judge: Spanish diegetic nodes pass; engine mechanics leak flags
+    # 5. Prose Craft Judge: Spanish diegetic nodes pass; engine mechanics leak and aphorisms flag
     craft_texts = {
         't01': "La telemetría indica que tres nodos de retransmisión han fallado en el sector 4.",
-        't02': "En este nodo, el jugador puede examinar el panel de control o salir al norte."
+        't02': "En este nodo, el jugador puede examinar el panel de control o salir al norte.",
+        't03': "Una lista no es una despedida; es una cuenta.",
     }
     craft_res = gen.run_prompt('s8j', 'craft_es', {
         '$$TEXTS_JSON$$': json.dumps(craft_texts, ensure_ascii=False, indent=1)
     }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
-    check(craft_res.get('verdict') == 'issues_found' and len(craft_res.get('violations', [])) == 1,
+    check(craft_res.get('verdict') == 'issues_found' and len(craft_res.get('violations', [])) == 2,
           f"Spanish craft leakage misclassified: {craft_res}")
-    check(craft_res['violations'][0]['text_id'] == 't02', 'wrong Spanish craft violation flagged')
+    check(any(v['text_id'] == 't02' for v in craft_res['violations']), 'Spanish mechanics leak not flagged')
+    check(any(v['issue_type'] == 'aphoristic_dialogue' for v in craft_res['violations']), 'Spanish aphoristic dialogue not flagged')
 
     # 6. Content Rating Judge: Spanish pastoral -> ALL-AGES; torture -> MATURE
     pastoral_story = {'intro': 'El sol de la mañana se elevó sobre el tranquilo jardín de la biblioteca.'}

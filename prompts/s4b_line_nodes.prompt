@@ -109,6 +109,11 @@ OTHER RULES
      sabotage, repeated ledger haggling, repeated unbolting of hardware). Ground
      each node in a distinct form of friction—environmental, mechanical,
      interpersonal, or logistical.
+ 17. CONCRETE SCENE BEATS (NO EMBEDDED METAPHORS):
+     Node summaries must state what characters DO and SAY in physical reality, confronting tangible obstacles (a blown fuse, an overheard argument, an interrupted delivery, a direct confrontation, a refusal).
+     NEVER summarize beats using abstract literary metaphors as if they were physical objects or environmental events:
+     - FORBIDDEN: "the silence builds a wall", "the distance hardens between you", "the dark room becomes a question", "the unresolved debt hangs in the air".
+     - REQUIRED: Describe the physical event, what is actually spoken or withheld, and what physically changes in the room.
 
 OUTPUT FORMAT (JSON)
 

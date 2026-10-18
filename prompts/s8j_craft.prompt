@@ -40,6 +40,13 @@ EVALUATION CRITERIA
      - "The canal basin lay frozen while the master demanded forty pounds" -> PASS (diegetic state).
      - "You smell burning timber in the cold air" -> PASS (sensory perception).
 
+6. CRYPTIC APHORISMS / PSEUDO-PROFOUND EPIGRAMS:
+   - VIOLATION (Flag): Spoken dialogue where characters speak in theatrical, symmetrical fortune-cookie aphorisms or pseudo-profound definitions rather than natural speech (e.g. "A reactor is not an engine, it is a heart", "A list is not a goodbye, it is a count", "A crown is not iron, it is a leash"). Spoken lines must sound like a real person in the scene's situation.
+   - NATURAL / OCCUPATIONAL SPEECH (Pass): Grounded occupational dialogue, practical complaints, dry humor, direct statements, or natural idioms must NOT be flagged:
+     - "Bleed the secondary manifold before pressure exceeds two hundred" -> PASS (technical instruction).
+     - "If you're late tomorrow, don't bother coming in" -> PASS (workplace warning).
+     - "I've been on my feet fourteen hours; don't start with me" -> PASS (natural dialogue).
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or after.
@@ -100,6 +107,13 @@ Text t07: "You take the cold tiller with both hands and call the boat by its nam
 
 Text t08: "You were trapped beside the weir as night came on and the water turned to slush."
 -> PASS: Describes the physical predicament and arrival state without unchosen actions.
+
+Example 5 (Aphoristic dialogue vs Natural speech):
+Text t09: "'A list is not a goodbye. It is a count.'"
+-> FLAG aphoristic_dialogue: Spoken dialogue speaks in symmetrical, fortune-cookie definitions rather than natural speech.
+
+Text t10: "'Check the fuel line before you cycle the starter. We only have two gallons left.'"
+-> PASS: Concrete, natural occupational speech with practical intent.
 
 USER INPUT FOLLOWS BELOW
 

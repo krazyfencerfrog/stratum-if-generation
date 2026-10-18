@@ -22,6 +22,12 @@ SOMETHING A READER CAN PICTURE is a person, a place, a physical thing (one that 
 
 === HIDDEN ===
 A HIDDEN TRUTH (an epistemic gap) is a central truth about who "you" are or what is really happening, which the whole story is built to keep from you and which changes what everything before meant when it comes out. Two things are NOT hidden truths, and a brief with no epistemic gap allows both: a secret one person keeps that drives one turn or one reversal (a betrayal planned, a key hidden, a bargain made behind your back), which is a complication; and a fact found out to get through one turn.
+EXTERNAL COMPLICATION REQUIRED: The hidden truth must be an external, tangible, or historical complication—a concrete debt, a past event, a binding obligation to a third party, a health/legal reality, a concealed conflict of interest, or a secret failure.
+NEVER make the hidden truth circular or tautological:
+- In a romance or relationship story, the secret reason cannot merely be "they secretly have feelings for you."
+- In an alliance or loyalty story, the secret cannot merely be "they want to be your friend."
+- In a mystery or detective story, the secret cannot merely be "they are guilty."
+The hidden truth must introduce fresh friction, irreversible stakes, or external pressure when revealed.
 
 === RULES ===
 THE TERMS of a magic, a curse, a bargain, an oath or a contract are what the people bound by it must and must not do, and on what condition, stated so they can be obeyed to the letter ("neither of us touches drink until we are crowned"; "the river carries one crossing for each coin dropped at the ford"), never a mood ("the river is jealous") and never what happens to the paper it is written on (signed, sealed, cut, filed). What befalls whoever breaks the terms is said apart from them (if_broken), and it is the story's price, never a way for the player to lose.

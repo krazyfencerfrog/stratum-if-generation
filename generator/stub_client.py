@@ -739,6 +739,16 @@ class StubClient(LlmClient):
                 return {"id": e, "note": f"turn {e} is written as a pick ({turn_picks[e]})", "holds": False, "quote": turn_picks[e]}
             if always and e == 'E1':
                 return {"id": e, "note": "stub", "holds": False, "quote": "stub quote"}
+            if e == 'E11':
+                ht = str(((material.get('hidden_truth') or {}).get('truth')) or '')
+                if any(x in ht.lower() for x in ('secretly has feelings', 'secretly loves', 'likes you', 'wants to be your friend')):
+                    return {"id": e, "note": "hidden truth is a tautological restatement of the relationship", "holds": False, "quote": ht}
+            if e == 'E12':
+                opp = material.get('opposition') or {}
+                shown = str(opp.get('shown_by') or '')
+                means = str(opp.get('means') or '')
+                if any(x in (shown + ' ' + means).lower() for x in ('business card', 'polite tour', 'courteous', 'routine inspection')):
+                    return {"id": e, "note": "opposition demonstrates polite workplace routine rather than active friction", "holds": False, "quote": shown or means}
             return {"id": e, "note": "stub", "holds": True, "quote": ""}
 
         engine_results = [engine_entry(e) for e in engine if not (retold and e == 'E6')]
@@ -1421,6 +1431,13 @@ class StubClient(LlmClient):
                     'quote': t_str[:80],
                     'issue_type': 'unchosen_player_deed',
                     'reason': "Recap or opening narrates unchosen past deeds rather than the situation arrived in."
+                })
+            elif any(aphorism in t_lower for aphorism in ('a list is not a goodbye', 'a kitchen at 3 am is just a room', 'a chair is not a life', 'una lista no es una despedida', 'a reactor is not an engine', 'a crown is not iron')):
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'aphoristic_dialogue',
+                    'reason': "Spoken dialogue speaks in symmetrical, fortune-cookie definitions rather than natural speech."
                 })
         if violations:
             return {

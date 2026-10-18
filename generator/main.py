@@ -1613,7 +1613,13 @@ class StoryGenerator:
                    'payoff decides or changes the crisis; no setup is used in the scene it appears in.'),
             ('E10', 'opposition.shown_by is something the opposition DOES early that shows what it is capable of, '
                     'not a description of it.'),
+            ('E12', 'opposition.shown_by and means demonstrate active interpersonal friction, leverage, or '
+                    'disruption, not courteous professional routine or polite workplace cooperation.'),
         ]
+        if premise.get('hidden_truth'):
+            items.append(('E11', 'hidden_truth is an external, non-circular complication (a concrete debt, past event, '
+                                 'third-party obligation, health or legal constraint, or concealed conflict), not a '
+                                 'tautological restatement of the relationship or the story\'s core premise.'))
         if premise.get('rules'):
             items.append(('E9', 'each rule\'s terms can be obeyed to the letter (what, how many, on what condition, '
                                 'with what exception), not a mood.'))
