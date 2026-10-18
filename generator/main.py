@@ -1266,7 +1266,7 @@ class StoryGenerator:
     def run_phase3(self):
         replace_kernel_only = {'$$KERNEL$$': self.kernel}
         self.run_prompt('s3_0a', 'interactive_question', replace_kernel_only)
-        self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only)
+        self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only, schema=schemas.IDENTITY_EPISTEMIC)
         self.run_prompt('s3_0c', 'consequence_failure_model', replace_kernel_only)
         self.run_prompt('s3b', 'affect', replace_kernel_only)
         self.run_prompt('s3c', 'theme', replace_kernel_only)

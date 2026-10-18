@@ -323,8 +323,23 @@ class StubClient(LlmClient):
         }
 
     def p_s3_0b(self, p):
+        is_es = 'estación de investigación' in p or 'Fosa de las Marianas' in p or 'oficial científica' in p
+        if is_es:
+            prot = {
+                "type": "human",
+                "role_descriptor": "oficial científica",
+                "embodiment": "embodied_human",
+                "evidence_basis": "explicit"
+            }
+        else:
+            prot = {
+                "type": "systemic_entity",
+                "role_descriptor": "generational-ship AI",
+                "embodiment": "distributed_network",
+                "evidence_basis": "explicit"
+            }
         return {
-            "protagonist_identity": {"type": "systemic_entity", "role_descriptor": "generational-ship AI", "evidence_basis": "explicit"},
+            "protagonist_identity": prot,
             "epistemic_gap": ({"present": True, "gap_description": "what the council is hiding about the air", "design_status": "incidental", "evidence_basis": "explicit"}
                               if env_int('STUB_GAP', 0) else
                               {"present": False, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "strong_inference"}),

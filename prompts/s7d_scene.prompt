@@ -57,8 +57,10 @@ What you write, naming rooms, people and things exactly as the packet does:
       play with the dog. They make the place lived in;
     - for EVERY entry in "leaving", the action that takes it ("leads_to": its target):
         * Default / linear progression: findable from every state of the scene, never hidden;
-          one that moves the player somewhere (out a door, down a lane) is a go, where a player
-          looks to leave, labelled with how ("out the front door").
+          one that moves the player somewhere (out a door, down a lane, through an exit) is a go,
+          where a player looks to leave, labelled with how ("out the front door"). Leaving the scene
+          through an exit must always use verb "go" (or "talk" for departures with a character),
+          never "take" or "use".
         * BRANCH DIVERGENCE (when "kind" is "branch"):
           A branch is NEVER an unannounced booby trap or an ambiguous prop poke. The packet provides
           the branch's full divergence context ("trigger", "instead", "shift", "branch_title", "branch_motivation").

@@ -3542,9 +3542,13 @@ def protagonist_embodiment_and_somatic_drift():
     check(brief.derive_embodiment('systemic_entity', 'station orbital hospital') == 'sessile_entity', 'systemic station should be sessile_entity')
     check(brief.derive_embodiment('systemic_entity', 'nanite swarm') == 'swarm', 'systemic swarm should be swarm')
     check(brief.derive_embodiment('human', 'detective') == 'embodied_human', 'human should be embodied_human')
+    check(brief.derive_embodiment('human', 'new night manager at a failing seaside hotel') == 'embodied_human', 'failing seaside hotel manager should be embodied_human')
     check(brief.derive_embodiment('non_human', 'alien pack') == 'swarm', 'non_human pack should be swarm')
     check(brief.derive_embodiment('non_human', 'sessile fungus') == 'sessile_entity', 'sessile non_human should be sessile_entity')
     check(brief.derive_embodiment('non_human', 'android') == 'non_human_bounded', 'android should be non_human_bounded')
+    # Explicit embodiment override (#51)
+    check(brief.derive_embodiment('systemic_entity', 'arbitrary role', explicit_embodiment='sessile_entity') == 'sessile_entity', 'explicit embodiment should override')
+    check(brief.derive_embodiment('human', 'oficial científica', explicit_embodiment='embodied_human') == 'embodied_human', 'explicit human should pass')
 
     # 2. check_somatic_drift
     # For embodied_human: never flags human somatic markers

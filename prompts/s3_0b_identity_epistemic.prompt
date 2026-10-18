@@ -7,9 +7,16 @@ This step is run BLIND — it sees only the Kernel below, not the output of any 
 
 --- DEFINITIONS ---
 
-PROTAGONIST IDENTITY is what kind of entity "you" are, and how specifically the Kernel defines that role, at the moment the story begins. It has two parts:
+PROTAGONIST IDENTITY is what kind of entity "you" are, how specifically the Kernel defines that role, and its physical locus of embodiment, at the moment the story begins. It has three parts:
  - type: human, non_human (an animal, an alien, a fantastical creature with an ordinary bounded body), or systemic_entity (an AI, a hive-mind, a ship, a building, or another distributed/non-bodily intelligence). Absent any signal to the contrary, default to human — human is the unmarked case in this pipeline, not something that needs its own evidence.
  - role_descriptor: a short phrase (a few words) naming the protagonist's role or situation as the Kernel establishes it (e.g., "town librarian," "colony-ship maintenance AI," "unnamed drifter") — not a full character sketch, just enough to anchor who "you" are.
+ - embodiment: the physical locus of embodiment that defines how "you" experience, perceive, and act in the world:
+   - embodied_human: an ordinary biological human body with anatomy, limbs, and biological senses (the unmarked default for human protagonists).
+   - non_human_bounded: an animal, alien, creature, cyborg, or android with a single physical bounded body.
+   - distributed_network: an AI, ship core, network of distributed sensors/cameras, or subsystem across multiple nodes without a single physical biological body.
+   - sessile_entity: a stationary intelligence or organism anchored to a fixed structure (a building, hospital, space station, plant, or sessile organism).
+   - swarm: a collective intelligence operating across multiple physical bodies (nanites, hive, ant colony, pack).
+   Absent any contrary signal, default to embodied_human.
 
 This field describes the protagonist ONLY as established at the story's OPENING. Do not attempt to resolve whether the protagonist changes, splits, hands off to someone else, or hops across multiple characters over the course of the story — that question belongs to a separate step focused on viewpoint persistence, not this one. If the Kernel implies multiple potential viewpoint characters or a mid-story handoff, describe only the identity most clearly anchored as the story's STARTING "you," and leave any later shift unresolved here; it is someone else's job to reconcile it.
 
@@ -64,7 +71,7 @@ Include a "note" only when evidence_basis is not "explicit" AND a one-sentence j
 
 --- FIELDS TO EXTRACT ---
 
-protagonist_identity — type and role_descriptor as defined above. (no_signal fallback: type "human", role_descriptor "unspecified")
+protagonist_identity — type, role_descriptor, and embodiment as defined above. (no_signal fallback: type "human", role_descriptor "unspecified", embodiment "embodied_human")
 
 epistemic_gap — present (boolean), gap_description (a short phrase naming the concealed fact; empty string when present is false), design_status as defined above. (no_signal fallback: present false, gap_description "", design_status "not_applicable")
 
@@ -81,7 +88,7 @@ Reason through the judgments once, then write the JSON once:
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape and these keys (no additional keys):
 
 {
-  "protagonist_identity": {"type": string, "role_descriptor": string, "evidence_basis": string, "note": string (optional)},
+  "protagonist_identity": {"type": string, "role_descriptor": string, "embodiment": string, "evidence_basis": string, "note": string (optional)},
   "epistemic_gap": {"present": boolean, "gap_description": string, "design_status": string, "evidence_basis": string, "note": string (optional)},
   "gap_resolution": {"expectation": string, "evidence_basis": string, "note": string (optional)}
 }
@@ -94,7 +101,7 @@ Kernel: "You're a veteran wildlife rehabilitator running a small rescue center o
 Reasoning: Nothing marks the protagonist as non-human or systemic, so type defaults to human — strong_inference, since it's forced by the ordinary embodied work described rather than stated outright. "Wildlife rehabilitator" is stated directly, so role_descriptor is explicit — protagonist_identity as a whole is mixed, since its two parts don't share one source. The Kernel explicitly rules out a hidden backstory ("no secret or hidden backstory here"), so epistemic_gap present is false, explicit. design_status and gap_resolution are both not_applicable, following directly from that.
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "wildlife rehabilitator", "evidence_basis": "mixed", "note": "Human is an unstated default forced by the embodied, physical work described; \"wildlife rehabilitator\" is stated directly."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "wildlife rehabilitator", "embodiment": "embodied_human", "evidence_basis": "mixed", "note": "Human is an unstated default forced by the embodied, physical work described; \"wildlife rehabilitator\" is stated directly."},
   "epistemic_gap": {"present": false, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "explicit", "note": "The Kernel directly states there is no hidden backstory."},
   "gap_resolution": {"expectation": "not_applicable", "evidence_basis": "explicit"}
 }
@@ -104,7 +111,7 @@ Kernel: "Second-person kernel: you've just been assigned as the new night-shift 
 Reasoning: No signal marks the protagonist as non-human; "night-shift keeper" of a physical station is an ordinary embodied human role — strong_inference. The role itself, "night-shift station keeper," is stated directly — explicit. Overall protagonist_identity is mixed for the same reason as Example A. A specific, nameable concealed fact exists (what happened to the previous keeper) and its discovery is explicitly the point of the story ("piece together what actually happened") — present: true, explicit. The deliberate deletion of the logs plus the direct instruction to investigate makes this a designed mystery, not incidental — explicit. The Kernel's instruction to "piece together" what happened implies resolution is the throughline of play, though it doesn't literally guarantee success on every path — always_resolved, strong_inference.
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "night-shift station keeper", "evidence_basis": "mixed", "note": "Human is forced by the embodied station-keeping work; the specific role is stated directly."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "night-shift station keeper", "embodiment": "embodied_human", "evidence_basis": "mixed", "note": "Human is forced by the embodied station-keeping work; the specific role is stated directly."},
   "epistemic_gap": {"present": true, "gap_description": "what actually happened to the previous keeper, whose final week of logs were deliberately deleted", "design_status": "designed", "evidence_basis": "explicit"},
   "gap_resolution": {"expectation": "always_resolved", "evidence_basis": "strong_inference", "note": "\"Piece together what actually happened\" frames investigation as the throughline of play, though success on every path isn't literally promised."}
 }
@@ -114,7 +121,7 @@ Kernel: "Second-person kernel: you're a contestant on a single-elimination cooki
 Reasoning: No non-human or systemic signal; a competition contestant is an ordinary embodied human role — strong_inference for type, explicit for the role_descriptor "cooking-competition contestant." The only unknown here is how the competition will turn out — that's ordinary future-facing competitive suspense, not a withheld existing fact, so present is false. This is a genuine judgment forced by the premise having no mystery/reveal marker at all, so strong_inference rather than no_signal.
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "cooking-competition contestant", "evidence_basis": "mixed", "note": "Human is forced by the embodied competitive role; the specific role is stated directly."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "cooking-competition contestant", "embodiment": "embodied_human", "evidence_basis": "mixed", "note": "Human is forced by the embodied competitive role; the specific role is stated directly."},
   "epistemic_gap": {"present": false, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "strong_inference", "note": "The only real unknown is the competition's outcome, which is ordinary future uncertainty rather than a withheld existing fact."},
   "gap_resolution": {"expectation": "not_applicable", "evidence_basis": "strong_inference"}
 }
@@ -124,7 +131,7 @@ Kernel: "Just make something up. I don't have a genre or setting in mind — wha
 Reasoning: No genre, setting, protagonist, or premise is given at all — there isn't even a genre to associate from, so this is no_signal across every field. Apply the fixed fallbacks: type "human," role_descriptor "unspecified," epistemic_gap present false with design_status "not_applicable," gap_resolution "not_applicable."
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "unspecified", "evidence_basis": "no_signal", "note": "The Kernel names no genre, setting, or role to read identity from."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "unspecified", "embodiment": "embodied_human", "evidence_basis": "no_signal", "note": "The Kernel names no genre, setting, or role to read identity from."},
   "epistemic_gap": {"present": false, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "no_signal", "note": "Nothing in the Kernel points toward or against a concealed fact; absence is the lower-commitment default."},
   "gap_resolution": {"expectation": "not_applicable", "evidence_basis": "no_signal"}
 }
@@ -134,7 +141,7 @@ Kernel: "Second-person kernel: you are the building-management intelligence of a
 Reasoning: The protagonist is explicitly a non-bodily building intelligence — systemic_entity, explicit — and the role ("hospital-conversion building-management AI") is stated directly, so protagonist_identity is explicit throughout, not mixed. A specific, nameable concealed fact exists (the contents of the sealed final-year patient records) — present: true, explicit. The records are deliberately sealed away rather than merely unmentioned, which marks this as a designed device rather than incidental set dressing — explicit. The Kernel directly states that opening the records is optional and available at any point rather than required or forbidden — resolution_optional_or_choice_dependent, explicit.
 Output:
 {
-  "protagonist_identity": {"type": "systemic_entity", "role_descriptor": "hospital-conversion building-management AI", "evidence_basis": "explicit"},
+  "protagonist_identity": {"type": "systemic_entity", "role_descriptor": "hospital-conversion building-management AI", "embodiment": "sessile_entity", "evidence_basis": "explicit"},
   "epistemic_gap": {"present": true, "gap_description": "what's contained in the hospital's sealed final-year patient records", "design_status": "designed", "evidence_basis": "explicit"},
   "gap_resolution": {"expectation": "resolution_optional_or_choice_dependent", "evidence_basis": "explicit"}
 }
@@ -144,7 +151,7 @@ Kernel: "Second-person hostage thriller. You're the hostage, blindfolded and hel
 Reasoning: The protagonist is an ordinary embodied human held captive — strong_inference for type, explicit for role_descriptor "blindfolded hostage." A specific, nameable fact exists (how the standoff outside is actually going, and how close a breach is) and the Kernel explicitly walls it off from the starting protagonist ("no information reaching you") — present: true, explicit. The Kernel explicitly requests a dedicated scene to show this to the reader, making the withholding a designed device rather than incidental — explicit. This is exactly the case where reader knowledge and protagonist knowledge split: the negotiator scene is a genuinely different character's own point of view, not the hostage's memory or body, so the gap must be judged from the blindfolded protagonist's side, not the reader's. Nothing in the Kernel says the hostage is ever told how close the breach was — only that the reader gets to see it happen. Since resolution for the protagonist specifically isn't addressed, and a breach could plausibly end the standoff before the hostage ever learns those details, resolution_optional_or_choice_dependent is the safer read rather than assuming the outside scene means the gap closes for the protagonist too.
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "blindfolded hostage", "evidence_basis": "mixed", "note": "Human is forced by the embodied captive role; the specific role is stated directly."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "blindfolded hostage", "embodiment": "embodied_human", "evidence_basis": "mixed", "note": "Human is forced by the embodied captive role; the specific role is stated directly."},
   "epistemic_gap": {"present": true, "gap_description": "how the standoff outside is actually going and how close law enforcement is to a breach", "design_status": "designed", "evidence_basis": "explicit"},
   "gap_resolution": {"expectation": "resolution_optional_or_choice_dependent", "evidence_basis": "strong_inference", "note": "The negotiator scene shows this information to the reader, not to the blindfolded protagonist; nothing in the Kernel says the hostage is ever told, and a breach could resolve the standoff before that happens."}
 }
@@ -154,7 +161,7 @@ Kernel: "Second-person survival kernel: a rockslide has buried the only pass thr
 Reasoning: An ordinary embodied climber in a physical crisis — strong_inference for type, explicit for role_descriptor "storm-racing mountain climber." The obstacle here is finding a viable route across the mountain before the storm and nightfall — a physical, skill-based problem, not a concealed fact. Nothing behind that obstacle is framed as mattering beyond getting across (no secret about the mountain, the storm, or why the pass is blocked) — this is the mechanical-obstacle case, not a gap. present: false, strong_inference, since the Kernel gives a concrete crisis with no mystery/reveal marker at all.
 Output:
 {
-  "protagonist_identity": {"type": "human", "role_descriptor": "storm-racing mountain climber", "evidence_basis": "mixed", "note": "Human is forced by the embodied climbing crisis; the specific situation is stated directly."},
+  "protagonist_identity": {"type": "human", "role_descriptor": "storm-racing mountain climber", "embodiment": "embodied_human", "evidence_basis": "mixed", "note": "Human is forced by the embodied climbing crisis; the specific situation is stated directly."},
   "epistemic_gap": {"present": false, "gap_description": "", "design_status": "not_applicable", "evidence_basis": "strong_inference", "note": "Finding a route past the rockslide before the storm is a physical, skill-based obstacle, not a concealed fact — nothing behind it is framed as mattering beyond getting across."},
   "gap_resolution": {"expectation": "not_applicable", "evidence_basis": "strong_inference"}
 }

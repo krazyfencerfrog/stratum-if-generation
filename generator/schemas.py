@@ -381,6 +381,34 @@ CONTENT_RATING_JUDGE = obj(
     rating_advisory=S,
 )
 
+# ---------------------------------------------------------------- stage 3.0b identity & epistemic (#51)
+
+IDENTITY_EPISTEMIC = obj(
+    required=['protagonist_identity', 'epistemic_gap', 'gap_resolution'],
+    protagonist_identity=obj(
+        required=['type', 'role_descriptor', 'embodiment', 'evidence_basis'],
+        type=enum(['human', 'non_human', 'systemic_entity']),
+        role_descriptor=S,
+        embodiment=enum(['embodied_human', 'non_human_bounded', 'distributed_network', 'sessile_entity', 'swarm']),
+        evidence_basis=S,
+        note=STR_OR_NULL,
+    ),
+    epistemic_gap=obj(
+        required=['present', 'gap_description', 'design_status', 'evidence_basis'],
+        present=B,
+        gap_description=S,
+        design_status=enum(['designed', 'incidental', 'not_applicable']),
+        evidence_basis=S,
+        note=STR_OR_NULL,
+    ),
+    gap_resolution=obj(
+        required=['expectation', 'evidence_basis'],
+        expectation=enum(['always_resolved', 'resolution_optional_or_choice_dependent', 'deliberately_unresolved', 'not_applicable']),
+        evidence_basis=S,
+        note=STR_OR_NULL,
+    ),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -391,6 +419,7 @@ ALL = {
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
     'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE, 'CAST_JUDGE': CAST_JUDGE,
     'CRAFT_JUDGE': CRAFT_JUDGE, 'CONTENT_RATING_JUDGE': CONTENT_RATING_JUDGE,
+    'IDENTITY_EPISTEMIC': IDENTITY_EPISTEMIC,
 }
 
 

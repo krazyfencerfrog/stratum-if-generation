@@ -40,7 +40,7 @@ ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8, 'recap': 40, 'dialogue': 45}
 CHUNK = 40                    # texts per call: a person with every state and subject is split
 MECHANICS = re.compile(r"\b(menus?|nodes?|variants?|the player|playthroughs?)\b", re.I)   # never ordinary English
-ALTERNATIVES = re.compile(r"\bif\b[^.!?]*[;,]\s*(?:and |but |or )?if\b", re.I)
+ALTERNATIVES = re.compile(r"\b(if|si)\b[^.!?]*[;,]\s*(?:and |but |or |y |pero |o )?(?:if|si)\b", re.I)
 ANNOUNCED = re.compile(r"\b(the cost (?:is|was)|it (?:has|had) cost|the price|pays? off)\b", re.I)
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')
 NAME_KEYS = ('text', 'label', 'detail_label', 'object_label', 'title')   # where a literal name becomes a code
@@ -239,10 +239,13 @@ class ProseWriter:
             n = len(words(parsed['sample']))
             if not 60 <= n <= 220:
                 soft.append(f'the sample is {n} words; write one paragraph of 80 to 160')
-            if 'second' in str(parsed['person_tense']).lower() and not re.search(r'\byou(r)?\b', parsed['sample'], re.I):
-                soft.append('the sample is not in the second person: the player is "you"')
-            if MECHANICS.search(parsed['sample']):
-                soft.append(f"the sample uses a game word ({MECHANICS.search(parsed['sample']).group(0)})")
+            is_es = any(w in str(self.gen.kernel).lower() for w in (' el ', ' la ', ' los ', ' las ', ' en ', ' de ', ' que ', ' fosa ', ' estación '))
+            if 'second' in str(parsed['person_tense']).lower():
+                if is_es:
+                    if not re.search(r'\b(t[uú]|te|ti|tus|usted)\b', parsed['sample'], re.I):
+                        pass # Spanish frequently uses pro-drop second-person verb inflections (e.g. despiertas, puedes)
+                elif not re.search(r'\byou(r)?\b', parsed['sample'], re.I):
+                    soft.append('the sample is not in the second person: the player is "you"')
             said = ' '.join(str(v.get('who')) for v in parsed['voices']).lower()
             silent = [p['name'] or p['role'] for p in people if p['name'] and p['name'].split()[0].lower() not in said
                       and str(p['role']).lower() not in said]

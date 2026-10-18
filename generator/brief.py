@@ -33,7 +33,9 @@ def g(node, *path, default=None):
     return cur
 
 
-def derive_embodiment(p_type, p_role):
+def derive_embodiment(p_type, p_role, explicit_embodiment=None):
+    if explicit_embodiment in ('embodied_human', 'non_human_bounded', 'distributed_network', 'sessile_entity', 'swarm'):
+        return explicit_embodiment
     p_type = str(p_type or 'human').lower()
     p_role = str(p_role or '').lower()
     ai_re = re.compile(r"\b(?:ai|ship['’]?s\s+ai|station\s+ai|artificial\s+intelligence|core\s+intelligence|building\s+intelligence|distributed\s+network|subsystem)\b", re.I)
@@ -79,7 +81,11 @@ def _fields(bundle):
         '3-0b.protagonist_identity': {
             'type': g(b, 'protagonist_identity', 'type'),
             'role': g(b, 'protagonist_identity', 'role_descriptor'),
-            'embodiment': derive_embodiment(g(b, 'protagonist_identity', 'type'), g(b, 'protagonist_identity', 'role_descriptor')),
+            'embodiment': derive_embodiment(
+                g(b, 'protagonist_identity', 'type'),
+                g(b, 'protagonist_identity', 'role_descriptor'),
+                explicit_embodiment=g(b, 'protagonist_identity', 'embodiment'),
+            ),
         },
         '3-0b.epistemic_gap': {
             'present': g(b, 'epistemic_gap', 'present'),
