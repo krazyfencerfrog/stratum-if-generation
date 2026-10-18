@@ -435,7 +435,11 @@ class ArcBuilder:
                 soft.append(f"a line shift must name the node it jumps to, not {sh.get('to')!r} (it is dropped otherwise)")
                 sh['_drop'] = True
             elif sh['does'] == 'line' and sh.get('at') in self.nodes:
-                if set(self.lines_through(sh['to'])) >= set(self.lines_through(sh['at'])):
+                if any(e.get('from') == sh['at'] and e.get('to') == sh['to'] for e in self.story.get('edges') or []):
+                    soft.append(f"line shift {sh['at']} -> {sh['to']}: an edge already directly connects {sh['at']} to {sh['to']} "
+                                f"(it is dropped otherwise)")
+                    sh['_drop'] = True
+                elif set(self.lines_through(sh['to'])) >= set(self.lines_through(sh['at'])):
                     soft.append(f"line shift {sh['at']} -> {sh['to']}: every line through {sh['at']} already "
                                 f"reaches {sh['to']} (it is dropped otherwise)")
                     sh['_drop'] = True

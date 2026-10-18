@@ -36,7 +36,8 @@ def g(node, *path, default=None):
 def derive_embodiment(p_type, p_role):
     p_type = str(p_type or 'human').lower()
     p_role = str(p_role or '').lower()
-    if p_type == 'systemic_entity' or any(w in p_role for w in ('ai', 'ship', 'network', 'subsystem', 'core intelligence', 'building intelligence')):
+    ai_re = re.compile(r"\b(?:ai|ship['’]?s\s+ai|station\s+ai|artificial\s+intelligence|core\s+intelligence|building\s+intelligence|distributed\s+network|subsystem)\b", re.I)
+    if p_type == 'systemic_entity' or ai_re.search(p_role):
         if any(w in p_role for w in ('swarm', 'hive', 'colony', 'nanite')):
             return 'swarm'
         if any(w in p_role for w in ('building', 'facility', 'hospital', 'station', 'sessile', 'anchored')):

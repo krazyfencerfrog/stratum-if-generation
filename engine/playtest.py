@@ -870,8 +870,8 @@ def play(story, style='random', runs=500, max_steps=400, seed=0):
             eng.perform(opt)
             after = eng.state.ending or eng.state.scene
             if after != before:
-                for sid, to, _ in shifts:
-                    if sid == before and to == after:
+                for sid, to, when in shifts:
+                    if sid == before and to == after and evaluate(when, eng.state):
                         shifted[(sid, to)] += 1
                 seen_scenes.add(eng.state.scene)
             n += 1
