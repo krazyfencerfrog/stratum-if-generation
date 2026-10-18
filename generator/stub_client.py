@@ -743,12 +743,26 @@ class StubClient(LlmClient):
                 ht = str(((material.get('hidden_truth') or {}).get('truth')) or '')
                 if any(x in ht.lower() for x in ('secretly has feelings', 'secretly loves', 'likes you', 'wants to be your friend')):
                     return {"id": e, "note": "hidden truth is a tautological restatement of the relationship", "holds": False, "quote": ht}
+                if any(x in ht.lower() for x in ('lost recipe', 'missing recipe', 'recipe card', 'missing key', 'exam condition')):
+                    return {"id": e, "note": "hidden truth is a puzzle fetch-quest rather than human stakes", "holds": False, "quote": ht}
             if e == 'E12':
                 opp = material.get('opposition') or {}
                 shown = str(opp.get('shown_by') or '')
                 means = str(opp.get('means') or '')
                 if any(x in (shown + ' ' + means).lower() for x in ('business card', 'polite tour', 'courteous', 'routine inspection')):
                     return {"id": e, "note": "opposition demonstrates polite workplace routine rather than active friction", "holds": False, "quote": shown or means}
+            if e == 'E13':
+                levers = (material.get('mediation') or {}).get('levers') or []
+                levers_text = ' '.join(str(l) for l in levers).lower()
+                turns_ways = []
+                for t in (material.get('turns') or []):
+                    for w in (t.get('ways_through') or []):
+                        turns_ways.append(str((w or {}).get('way') or ''))
+                ways_text = ' '.join(turns_ways).lower()
+                paper_words = ('folded note', 'secret diary', 'recipe card', 'courier note', 'notebook margin')
+                matched = [p for p in paper_words if p in levers_text or p in ways_text]
+                if matched:
+                    return {"id": e, "note": "material relies on paper messages or notes rather than direct interaction", "holds": False, "quote": matched[0]}
             return {"id": e, "note": "stub", "holds": True, "quote": ""}
 
         engine_results = [engine_entry(e) for e in engine if not (retold and e == 'E6')]

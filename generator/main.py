@@ -1615,11 +1615,15 @@ class StoryGenerator:
                     'not a description of it.'),
             ('E12', 'opposition.shown_by and means demonstrate active interpersonal friction, leverage, or '
                     'disruption, not courteous professional routine or polite workplace cooperation.'),
+            ('E13', 'neither mediation.levers nor turns.ways_through rely on paper messages, folded notes, '
+                    'diaries, recipe cards, or ledgers as the primary driver of drama; confrontations and '
+                    'interactions are carried out directly face-to-face in the room.'),
         ]
         if premise.get('hidden_truth'):
-            items.append(('E11', 'hidden_truth is an external, non-circular complication (a concrete debt, past event, '
+            items.append(('E11', 'hidden_truth is an external, non-circular, human or relational complication (a concrete debt, past event, '
                                  'third-party obligation, health or legal constraint, or concealed conflict), not a '
-                                 'tautological restatement of the relationship or the story\'s core premise.'))
+                                 'tautological restatement of the relationship or the story\'s core premise, and NOT a '
+                                 'puzzle fetch-quest, missing recipe/object, or exam condition.'))
         if premise.get('rules'):
             items.append(('E9', 'each rule\'s terms can be obeyed to the letter (what, how many, on what condition, '
                                 'with what exception), not a mood.'))
