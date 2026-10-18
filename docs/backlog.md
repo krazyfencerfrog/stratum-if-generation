@@ -236,6 +236,9 @@ number the player is shown or must watch, and rule systems the engine lacks.
   a kill.
 
 ## Done
+- 2026-10-18: Eradicated PAPER_ACT regex in favor of atomic micro-prompt judge (s3_5j_rules.prompt,
+  schemas.RULES_JUDGE) for Issue #52. Evaluates contract/magic rule terms semantically to enforce
+  physical conduct over paper/document signing across languages without brittle wordlists.
 - 2026-10-04 (evening): the first live stages B, C and D (kernel35_f5), and what
   they turned up, fixed: duplicate rooms when locations are parts of one place
   (7c22c7d); topics labelled with whole sentences, roles missing, namesakes

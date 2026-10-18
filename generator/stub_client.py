@@ -176,6 +176,7 @@ class StubClient(LlmClient):
             ('You are the setting-lexicon generator', 's3_5d'),
             ('You are step 3.5j1 of', 's3_5j1_agency'),
             ('You are step 3.5j2 of', 's3_5j2_dilemma'),
+            ('You are step 3.5j_rules of', 's3_5j_rules'),
             ('You are step 3.5j of', 's3_5j_cast'),
             ('You are a fidelity auditor', 's3_5v'),
             ('You are a Kernel fidelity checker', 's3_5k'),
@@ -664,6 +665,36 @@ class StubClient(LlmClient):
             "verdict": "pass",
             "agency_issues": [],
             "unrepresented_groups": [],
+        }
+
+    def p_s3_5j_rules(self, p):
+        rules_data = self.section(p, '- the Rules') or []
+        rules = rules_data.get('rules', []) if isinstance(rules_data, dict) else (rules_data or [])
+        violations = []
+        for r in rules:
+            idx = r.get('rule_index', 0) if 'rule_index' in r else r.get('index', 0)
+            thing = r.get('thing', 'the rule')
+            terms = str(r.get('terms', '')).lower()
+            if any(w in terms for w in ('names are on the treaty', 'sign', 'treaty', 'pergamino', 'firmas', 'document', 'paper', 'sealed', 'deeds')):
+                quote = 'both names are on the treaty' if 'names are on the treaty' in terms else (
+                    'estampar sus firmas en el pergamino' if 'firmas' in terms else r.get('terms', '')
+                )
+                violations.append({
+                    'rule_index': idx,
+                    'thing': thing,
+                    'quote': quote,
+                    'reason': 'Terms turn on paper signatures/documents rather than physical human conduct.'
+                })
+        if violations:
+            return {
+                'reading': f"Found {len(violations)} rule term violation(s) turning on paper acts.",
+                'verdict': 'issues_found',
+                'violations': violations,
+            }
+        return {
+            'reading': "All rule terms specify physical human conduct.",
+            'verdict': 'pass',
+            'violations': [],
         }
 
     def p_s3_5k(self, p):

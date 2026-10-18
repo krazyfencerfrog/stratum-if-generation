@@ -384,9 +384,29 @@ def contract_terms_are_conduct_not_paper():
     paper = dict(base, rules=[{'thing': 'the contract', 'terms': 'the crown may be claimed only if both names are on the treaty'}])
     conduct = dict(base, rules=[{'thing': 'the contract', 'terms': 'neither of us touches drink until we are crowned',
                                  'if_broken': 'the one who drinks forfeits his half of the crown'}])
-    probs = gen_main.StoryGenerator.craft_problems(paper)
-    check(probs and probs[0][0] == 'rules[0]' and 'turn on paper' in probs[0][1], f'paper terms should be a craft problem: {probs}')
-    check(not gen_main.StoryGenerator.craft_problems(conduct), 'conduct terms (and an if_broken) are fine')
+    import stub_client
+    test_id = f'{PREFIX}rules_judge_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = gen_main.StoryGenerator(story_id=test_id)
+    gen.client = stub_client.StubClient()
+    findings_paper = gen.check_rule_terms(paper, prefix='paper')
+    check(findings_paper and findings_paper[0]['where'] == 'rules[0]' and 'turn on paper' in findings_paper[0]['problem'],
+          f'paper terms should be flagged by rule terms judge: {findings_paper}')
+    findings_conduct = gen.check_rule_terms(conduct, prefix='conduct')
+    check(not findings_conduct, f'conduct terms should pass rule terms judge: {findings_conduct}')
+
+    # Semantic evaluation works across languages without regex keyword patching (#52)
+    paper_es = dict(base, rules=[{'thing': 'el contrato', 'terms': 'ambos contendientes deben estampar sus firmas en el pergamino'}])
+    findings_es = gen.check_rule_terms(paper_es, prefix='es')
+    check(findings_es and 'turn on paper' in findings_es[0]['problem'],
+          f'Spanish paper terms should be flagged semantically: {findings_es}')
+
+    # craft_problems only evaluates structural presence of terms
+    empty_rule = dict(base, rules=[{'thing': 'the contract', 'terms': ''}])
+    probs_empty = gen_main.StoryGenerator.craft_problems(empty_rule)
+    check(probs_empty and any('states no terms' in p[1] for p in probs_empty), 'empty rule terms are still structural craft problems')
+    check(not gen_main.StoryGenerator.craft_problems(conduct), 'conduct terms are fine in craft_problems')
+    check(not gen_main.StoryGenerator.craft_problems(paper), 'paper terms are no longer evaluated by regex craft_problems')
     check(gen_main.soft_premise_finding({'source': 'craft', 'where': 'price'}) and gen_main.repairable({'source': 'craft'}),
           'a craft finding goes to the repair and is a note after it, never a halt')
 
@@ -2952,7 +2972,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5v', 's3_5k', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5jr', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)

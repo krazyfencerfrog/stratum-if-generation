@@ -112,8 +112,6 @@ DEFAULT_MAX_REPAIRS = 2
 # the audit's quotes were real (41 of 43) and every final-round halt was a
 # real quote misread, so a halt bought a lost run, never a better story.
 HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
-PAPER_ACT = re.compile(r"\b(sign|signs|signed|signing|signature|countersign\w*|papers?|treaty|seals?|sealed|deeds?|"
-                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on)\b", re.I)
 
 
 def repeated_turns(turns):
@@ -1028,13 +1026,6 @@ class StoryGenerator:
             if not str(x.get('terms') or '').strip():
                 out.append((f'rules[{i}]', f'the rule for {x.get("thing") or "a thing"} states no terms that can be '
                                            f'obeyed to the letter'))
-            elif PAPER_ACT.search(str(x.get('terms'))):
-                # 2026-10-07: the King's terms were still "signs a separate paper of surrender ... both names on the
-                # treaty" with the RULES definition in the prompt, and 92% of its nodes turned on papers (Kipling's 25%)
-                out.append((f'rules[{i}]', f'the terms of {x.get("thing") or "the rule"} turn on paper '
-                                           f'("{PAPER_ACT.search(str(x.get("terms"))).group(0)}"): say what the people bound '
-                                           f'by it must and must not do, in what they do with their hands and mouths '
-                                           f'and feet, and put what befalls a breaker in if_broken'))
         opp = premise.get('opposition') if isinstance(premise.get('opposition'), dict) else {}
         if not str(opp.get('shown_by') or '').strip():
             out.append(('opposition.shown_by', 'the opposition is never shown at work: name one early moment in which '
@@ -1377,6 +1368,50 @@ class StoryGenerator:
             print(f'  [cast_judge] fallback: {e}')
             return None
 
+    def judge_rule_terms(self, rules, prefix='s3_5j_rules'):
+        """Runs the atomic rule terms judge (s3_5j_rules.prompt) over contract/magic rules (#52).
+        Verifies that terms specify physical conduct rather than paper acts or document manipulation."""
+        rules_list = [r for r in rules or [] if isinstance(r, dict)]
+        if not rules_list:
+            return {'verdict': 'pass', 'violations': [], 'reading': 'No rules to evaluate.'}
+        rules_summary = [{'rule_index': i, 'thing': r.get('thing', ''), 'terms': r.get('terms', '')}
+                         for i, r in enumerate(rules_list)]
+        try:
+            res = self.run_prompt(prefix, 'rules_judge', {
+                '$$RULES$$': compact_json({'rules': rules_summary}),
+            }, prompt_file='s3_5j_rules.prompt', klass='classify', schema=schemas.RULES_JUDGE)
+            violations = res.get('violations') or [] if res else []
+            return {
+                'verdict': 'issues_found' if violations else 'pass',
+                'reading': res.get('reading', '') if res else '',
+                'violations': violations,
+            }
+        except Exception as e:
+            print(f'  [rules_judge] fallback: {e}')
+            return {'verdict': 'pass', 'violations': []}
+
+    def check_rule_terms(self, premise, round_no=0, prefix=None):
+        """Pipeline validator checking premise['rules'] for paper-act terms via s3_5j_rules (#52)."""
+        rules = [r for r in premise.get('rules') or [] if isinstance(r, dict) and str(r.get('terms') or '').strip()]
+        if not rules:
+            return []
+        pfx = prefix or ('s3_5jr' + (f'_r{round_no}' if round_no else ''))
+        res = self.judge_rule_terms(rules, prefix=pfx)
+        findings = []
+        for v in res.get('violations') or []:
+            idx = v.get('rule_index', 0)
+            thing = v.get('thing') or (rules[idx].get('thing') if idx < len(rules) else 'the rule')
+            quote = v.get('quote', '')
+            findings.append({
+                'source': 'craft',
+                'where': f'rules[{idx}]',
+                'problem': f'the terms of {thing} turn on paper' + (f' ("{quote}")' if quote else '') +
+                           ': say what the people bound by it must and must not do, in what they do with their hands '
+                           'and mouths and feet, and put what befalls a breaker in if_broken',
+                'quote': quote,
+            })
+        return findings
+
     def generate_lexicon(self, engine, cast_seeds):
         """Generates a setting-specific lexicon of names (Stage 3.5d) matching the story's
         culture, geography, and language, dispersing LLM mode collapse (the Kael problem)."""
@@ -1670,7 +1705,7 @@ class StoryGenerator:
         }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='audit',
             schema=schemas.PREMISE_CHECK)
 
-        findings = self.premise_computed_findings(premise) + self.check_kernel_clauses(premise, round_no, clauses)
+        findings = self.premise_computed_findings(premise) + self.check_kernel_clauses(premise, round_no, clauses) + self.check_rule_terms(premise, round_no)
         constraint_text = {str(n): (fid, line) for n, fid, line in constraints}
         check_text = {i: text for i, text in checklist}
         for e in answer.get('constraints') or []:
