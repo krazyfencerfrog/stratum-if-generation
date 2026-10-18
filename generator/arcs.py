@@ -377,18 +377,6 @@ class ArcBuilder:
                                                                                   or lost and with_you):
                         soft.append(f"{self.who(cid)} on {l}: the resolution says stands_with_you={with_you}, but the "
                                     f"line's ending lists them as {'standing' if standing else 'lost'}")
-                    contradiction = checks.resolution_liveness_contradiction(
-                        end.get('summary'), r.get('becomes') or r.get('state'),
-                        char_label=self.chars[cid].get('label'), char_name=self.chars[cid].get('name'))
-                    if contradiction:
-                        soft.append(f"{self.who(cid)} on {l}: resolution contradicts ending summary: {contradiction}")
-        all_res_texts = []
-        for a in as_list(parsed.get('arcs')):
-            for r in as_list(a.get('resolutions')):
-                all_res_texts.append(r.get('becomes') or r.get('state') or '')
-        rep = checks.check_epilogue_syntactic_repetition(all_res_texts)
-        if rep:
-            soft.append(rep)
         for cid in arc_ids - set(seen):
             problems.append(f'arcs: no entry for {self.who(cid)}')
         support = set(self.arc_cast('supporting'))

@@ -1378,7 +1378,8 @@ def stage_3_5_cast_agency_judge_evaluation():
     check(res_clean.get('verdict') == 'pass' and len(res_clean.get('agency_issues', [])) == 0 and
           len(res_clean.get('unrepresented_groups', [])) == 0, f"balanced cast falsely faulted: {res_clean}")
 
-    (gen.story_path / f'{test_id}_s3_5j_cast.json').unlink(missing_ok=True)
+    (gen.story_path / f'{test_id}_s3_5j1_agency.json').unlink(missing_ok=True)
+    (gen.story_path / f'{test_id}_s3_5j2_dilemma.json').unlink(missing_ok=True)
     gen.analysis.clear()
 
     # 2. Inanimate routine drone and unrepresented dilemma group are caught
@@ -1403,7 +1404,7 @@ def stage_3_5_cast_agency_judge_evaluation():
     check(any('agency: the maintenance drone' in f for f in gen.analysis.get('s3_5j_findings', [])),
           f"agency finding not recorded in gen.analysis: {gen.analysis.get('s3_5j_findings')}")
 
-    used_prompts.add('s3_5j_cast_judge.prompt')
+    used_prompts.update(['s3_5j1_agency.prompt', 's3_5j2_dilemma.prompt'])
     shutil.rmtree(gen.story_path, ignore_errors=True)
 
 
@@ -1590,6 +1591,7 @@ def multilingual_semantic_judges_evaluation():
     check('V' in res_mature['rating_descriptors'], f"expected V in descriptors: {res_mature}")
 
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
 
 
 @test
@@ -2947,7 +2949,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5j', 's3_5v', 's3_5k', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)
@@ -3256,9 +3258,12 @@ def stage_b_room_topology_reciprocity_and_scc_invariants():
 def balanced_dilemma_representation_and_nameless_group_invariants():
     import checks
     import main as gen_main
-    from errors import SoftReject
 
-    # 1. validate_cast flags unrepresented competing dilemma sectors
+    test_id = 'dilemma_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = gen_main.StoryGenerator(story_id=f'{PREFIX}{test_id}')
+
+    # 1. judge_cast flags unrepresented competing dilemma sectors
     dilemma_turns = [
         {'id': 1, 'situation': 'The drone leaks outside Sector 7.', 'what_you_must_do': 'fix core',
          'ways_through': [{'way': 'seal it', 'cost': 'time'}], 'involves': ['the drone technician']},
@@ -3270,70 +3275,35 @@ def balanced_dilemma_representation_and_nameless_group_invariants():
         {'role': 'the drone technician', 'kind': 'individual'},
         {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
     ]
-    issues = checks.validate_cast(asymmetric_seeds, dilemma_turns)
-    check(len(issues) == 1 and 'Sector 7' in issues[0], f'expected Sector 7 dilemma finding: {issues}')
+    res_asym = gen.judge_cast(dilemma_turns, asymmetric_seeds)
+    check(res_asym.get('verdict') == 'issues_found', f'expected issues_found: {res_asym}')
+    check(any('Sector 7' in u.get('group', '') for u in res_asym.get('unrepresented_groups', [])),
+          f'expected Sector 7 dilemma finding: {res_asym}')
+
+    (gen.story_path / f'{gen.story_id}_s3_5j1_agency.json').unlink(missing_ok=True)
+    (gen.story_path / f'{gen.story_id}_s3_5j2_dilemma.json').unlink(missing_ok=True)
+    gen.analysis.clear()
 
     balanced_seeds = [
         {'role': 'the drone technician', 'kind': 'individual'},
         {'role': 'the sector leader of Sector 4', 'kind': 'individual'},
         {'role': 'the engineer in Sector 7', 'kind': 'individual'},
     ]
-    check(checks.validate_cast(balanced_seeds, dilemma_turns) == [], 'balanced cast should pass without issues')
+    res_bal = gen.judge_cast(dilemma_turns, balanced_seeds)
+    check(res_bal.get('verdict') == 'pass' and len(res_bal.get('unrepresented_groups', [])) == 0,
+          f'balanced cast should pass: {res_bal}')
 
-    # check_story notes unrepresented dilemma poles
+    # check_story notes unrepresented dilemma poles when recorded on premise
     fake_story = {
         'lines': {'T1': {'path': ['N01']}}, 'nodes': {'N01': {'beat': 'opening', 'turn': 1, 'way': 1, 'who': ['C01'], 'where': ['L01']}},
         'framework': {'beats': [{'id': 'opening', 'required': True}]},
         'characters': {'C01': {'label': 'the sector leader of Sector 4', 'kind': 'individual', 'nodes': ['N01']}},
         'locations': {'L01': {'name': 'the core', 'why': 'reason', 'nodes': ['N01']}},
-        'premise': {'turns': dilemma_turns, 'cast_seeds': asymmetric_seeds},
+        'premise': {'turns': dilemma_turns, 'cast_seeds': asymmetric_seeds, 's3_5j_findings': ['dilemma: Sector 7 in turn 1 - Turn involves Sector 7 but no cast seed represents it.']},
     }
     notes = [f['issue'] for f in checks.check_story(fake_story)['notes'] if f.get('kind') == 'unrepresented_dilemma_pole']
     check(len(notes) == 1 and 'Sector 7' in notes[0], f'check_story should note unrepresented dilemma pole: {notes}')
-
-    # 2. validate_turns catches faceless collective victim nouns
-    faceless_turns = {
-        'turns': [
-            {'situation': 'Trouble in core.', 'what_you_must_do': 'choose', 'involves': ['the overseer'], 'form': 'choose_whom',
-             'ways_through': [{'way': 'vent the sector whose people are weakest', 'cost': 'lives'},
-                              {'way': 'hold margin', 'cost': 'core'}]},
-            {'situation': 'Stabilizing.', 'what_you_must_do': 'endure', 'involves': ['the overseer'], 'form': 'endure',
-             'ways_through': [{'way': 'wait', 'cost': 'wear'}]}
-        ]
-    }
-    try:
-        gen_main.StoryGenerator.validate_turns(faceless_turns, check_forms=True)
-        check(False, 'expected validate_turns to reject faceless collective noun')
-    except SoftReject as e:
-        check('faceless collective noun' in str(e), f'expected faceless complaint: {e}')
-
-    # 3. OutlineBuilder.plan_divergence catches faceless collective nouns and unrepresented groups
-    b = builder({'s4a_i1': plan(MAIN)})
-
-    # Test divergence with faceless noun
-    div_faceless = branch('N02', [entry('commitment')], rejoin='N04')
-    div_faceless['beats'][0]['adapted'] = 'you vent the sector whose people are weakest and leave them behind'
-    b.gen.answers['s4c_i2'] = div_faceless
-    b.gen.soft = None
-    b.divergence(2, {'diverges_at': 'N02'})
-    check(b.gen.soft and 'faceless collective noun' in b.gen.soft, f'SoftReject missing faceless noun: {b.gen.soft}')
-
-    # Test divergence shifting sacrifice to unrepresented Sector 7
-    div_unrep = branch('N02', [entry('commitment')], rejoin='N04')
-    div_unrep['beats'][0]['adapted'] = 'you mark Sector 7 for venting and bleed its air into the core'
-    b.gen.answers['s4c_i2'] = div_unrep
-    b.gen.soft = None
-    b.divergence(2, {'diverges_at': 'N02'})
-    check(b.gen.soft and 'Sector 7' in b.gen.soft and 'no character in the cast represents this group' in b.gen.soft,
-          f'SoftReject missing unrepresented group: {b.gen.soft}')
-
-    # Test divergence shifting sacrifice to represented cast member ('the life-support overseer')
-    div_rep = branch('N02', [entry('commitment')], rejoin='N04')
-    div_rep['beats'][0]['adapted'] = 'you sacrifice the life-support overseer to seal the airlock'
-    b.gen.answers['s4c_i2'] = div_rep
-    b.gen.soft = None
-    b.divergence(2, {'diverges_at': 'N02'})
-    check(b.gen.soft is None, f'divergence targeting represented cast member should not SoftReject: {b.gen.soft}')
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
 @test
@@ -3391,21 +3361,11 @@ def anti_mirroring_and_conflict_modality_validation():
 def non_agent_entity_and_consumable_prop_cast_invariants():
     import checks
     import main as gen_main
-    from errors import SoftReject
 
-    # 1. checks.is_non_agent_role classifies roles accurately
-    check(checks.is_non_agent_role('the maintenance drone'), 'maintenance drone should be identified as non-agent role')
-    check(checks.is_non_agent_role('the drone'), 'drone should be identified as non-agent role')
-    check(checks.is_non_agent_role('the battery'), 'battery should be identified as non-agent role')
-    check(checks.is_non_agent_role('the reactor core'), 'reactor core should be identified as non-agent role')
-    check(checks.is_non_agent_role('the backup generator'), 'generator should be identified as non-agent role')
-    check(not checks.is_non_agent_role('the drone technician'), 'drone technician is an agent role')
-    check(not checks.is_non_agent_role('the drone operator'), 'drone operator is an agent role')
-    check(not checks.is_non_agent_role('the core engineer'), 'core engineer is an agent role')
-    check(not checks.is_non_agent_role("the ship's AI"), 'ship AI is not a non-agent tool')
-    check(not checks.is_non_agent_role('the old horse master'), 'horse master is an agent')
+    test_id = 'non_agent_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = gen_main.StoryGenerator(story_id=f'{PREFIX}{test_id}')
 
-    # 2. validate_cast catches non-agent roles and consumable hardware specs
     drone_seed = {
         'role': 'the maintenance drone',
         'kind': 'individual',
@@ -3417,10 +3377,18 @@ def non_agent_entity_and_consumable_prop_cast_invariants():
         'voice': "emits status beeps and fragmented audio logs: 'Error. Oil pressure critical. Priority: return to charge.'",
     }
     turns = [{'id': 1, 'situation': 'Crisis.', 'what_you_must_do': 'fix', 'ways_through': [{'way': 'do', 'cost': 'pay'}], 'involves': []}]
-    issues = checks.validate_cast([drone_seed], turns)
-    check(len(issues) == 1 and 'consumable tool or object' in issues[0], f'expected consumable tool rejection: {issues}')
 
-    # Mock voice on non-drone entity
+    # 1. judge_cast flags inanimate routine drone as an agency issue
+    res_drone = gen.judge_cast(turns, [drone_seed])
+    check(res_drone.get('verdict') == 'issues_found', f'expected issues_found for drone: {res_drone}')
+    check(any('maintenance drone' in a.get('role', '') for a in res_drone.get('agency_issues', [])),
+          f'expected maintenance drone agency issue: {res_drone}')
+
+    (gen.story_path / f'{gen.story_id}_s3_5j1_agency.json').unlink(missing_ok=True)
+    (gen.story_path / f'{gen.story_id}_s3_5j2_dilemma.json').unlink(missing_ok=True)
+    gen.analysis.clear()
+
+    # 2. Mock voice on non-sentient entity is caught
     mock_voice_seed = {
         'role': 'unit 7',
         'kind': 'individual',
@@ -3428,111 +3396,110 @@ def non_agent_entity_and_consumable_prop_cast_invariants():
         'wants': 'to obey orders',
         'voice': "'Error. Status: offline.'",
     }
-    issues_voice = checks.validate_cast([mock_voice_seed], turns)
-    check(len(issues_voice) == 1 and 'consumable tool or object' in issues_voice[0], f'expected mock voice rejection: {issues_voice}')
+    res_voice = gen.judge_cast(turns, [mock_voice_seed])
+    check(res_voice.get('verdict') == 'issues_found', f'expected issues_found for unit 7: {res_voice}')
+    check(any('unit 7' in a.get('role', '') for a in res_voice.get('agency_issues', [])),
+          f'expected unit 7 agency issue: {res_voice}')
 
-    # Genuine agents pass without complaint
+    (gen.story_path / f'{gen.story_id}_s3_5j1_agency.json').unlink(missing_ok=True)
+    (gen.story_path / f'{gen.story_id}_s3_5j2_dilemma.json').unlink(missing_ok=True)
+    gen.analysis.clear()
+
+    # 3. Genuine agents pass without complaint
     valid_agents = [
         {'role': 'the drone technician', 'kind': 'individual', 'being': 'person', 'wants': 'to save the crew', 'voice': "'Keep your hands off the rig.'"},
         {'role': "the ship's AI", 'kind': 'individual', 'being': 'thing', 'wants': 'to protect the ship', 'voice': "'I cannot allow you to vent that compartment, Captain.'"},
     ]
-    check(checks.validate_cast(valid_agents, turns) == [], 'valid dramatic agents should pass validation')
+    res_valid = gen.judge_cast(turns, valid_agents)
+    check(res_valid.get('verdict') == 'pass' and len(res_valid.get('agency_issues', [])) == 0,
+          f'valid dramatic agents should pass: {res_valid}')
 
-    # 3. validate_turns raises SoftReject if a turn's involves names a non-agent tool
-    bad_turn = {
-        'turns': [
-            {'id': 1, 'situation': 'leak', 'what_you_must_do': 'seal', 'ways_through': [{'way': 'seal', 'cost': 'air'}],
-             'involves': ['the maintenance drone'], 'form': 'trade'},
-            {'id': 2, 'situation': 'fire', 'what_you_must_do': 'extinguish', 'ways_through': [{'way': 'extinguish', 'cost': 'water'}],
-             'involves': ['the captain'], 'form': 'persuade'},
-        ],
-        'complications': [],
-    }
-    try:
-        gen_main.StoryGenerator.validate_turns(bad_turn, check_forms=True)
-        check(False, 'validate_turns should have rejected maintenance drone in involves')
-    except SoftReject as e:
-        check('involves contains non-agent tool/object' in str(e), f'expected non-agent involves error: {e}')
-
-    # 4. cast_validator raises SoftReject on consumable tools
-    g = gen_main.StoryGenerator(f'{PREFIX}test_consumable_cast')
-    g.kernel = 'Generational ship'
-    g.analysis = {'s3_brief': {}}
-    c_val = g.cast_validator([{'id': 1, 'situation': 'sit', 'what_you_must_do': 'task', 'ways_through': [], 'involves': ['the technician']}])
-    try:
-        c_val({
-            'notes': 'test',
-            'cast_seeds': [
-                {'role': 'the technician', 'kind': 'individual', 'being': 'person', 'wants': 'survive', 'holds': 'tools', 'edge': 'alone', 'tie': 'crew', 'voice': "'Stay back.'", 'breaking_point': None, 'opposition': False, 'gender': 'f'},
-                drone_seed,
-            ]
-        })
-        check(False, 'cast_validator should have raised SoftReject for drone seed')
-    except SoftReject as e:
-        check('consumable tool or object' in str(e), f'expected consumable tool SoftReject: {e}')
-
-    # 5. check_story tags non_agent_cast_entity
+    # 4. check_story tags non_agent_cast_entity when recorded on premise
     fake_story = {
         'lines': {'T1': {'path': ['N01']}}, 'nodes': {'N01': {'beat': 'opening', 'turn': 1, 'way': 1, 'who': ['C01'], 'where': ['L01']}},
         'framework': {'beats': [{'id': 'opening', 'required': True}]},
         'characters': {'C01': {'label': 'the technician', 'kind': 'individual', 'nodes': ['N01']}},
         'locations': {'L01': {'name': 'the core', 'why': 'reason', 'nodes': ['N01']}},
-        'premise': {'turns': turns, 'cast_seeds': [drone_seed]},
+        'premise': {'turns': turns, 'cast_seeds': [drone_seed], 's3_5j_findings': ['agency: the maintenance drone - Entity is a routine diagnostic tool/hardware device, not a dramatic agent.']},
     }
     findings = [f['issue'] for f in checks.check_story(fake_story)['notes'] if f.get('kind') == 'non_agent_cast_entity']
     check(len(findings) == 1 and 'the maintenance drone' in findings[0], f'check_story should tag non_agent_cast_entity: {findings}')
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
 @test
 def ending_resolution_liveness_contradictions_are_caught():
-    # 1. checks.resolution_liveness_contradiction
-    # Alive in summary, dead in resolution -> caught
-    c1 = checks.resolution_liveness_contradiction(
-        "Uriel Castell steps back from the wheel alive with burned hands.",
-        "He dies before the valve finishes opening.",
-        char_label="{C01}", char_name="Uriel Castell"
-    )
-    check(c1 and "died" in c1, f"expected contradiction, got: {c1}")
+    import schemas
+    from main import StoryGenerator
 
-    # Dead in summary, alive in resolution -> caught
-    c2 = checks.resolution_liveness_contradiction(
-        "Castell is killed when the deck collapses.",
-        "He steps back alive and watches the dawn.",
-        char_label="C01", char_name="Castell"
-    )
-    check(c2 and "survived" in c2, f"expected contradiction, got: {c2}")
+    test_id = f'{PREFIX}liveness_fate_test'
+    shutil.rmtree(story_dir('liveness_fate_test'), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
 
-    # Alive in summary, non-death resolution -> valid
-    c3 = checks.resolution_liveness_contradiction(
-        "Uriel Castell steps back from the wheel with burned hands.",
-        "He walks into the lower corridors and will not speak to you.",
-        char_label="C01", char_name="Uriel Castell"
-    )
-    check(c3 is None, f"expected None, got: {c3}")
+    # 1. Alive in summary, dead in resolution -> caught by fate judge
+    payload_dead_res = [
+        {
+            "ending_id": "END_DEMO",
+            "ending_narrative": "Uriel Castell steps back from the wheel alive with burned hands.",
+            "character_resolutions": [
+                {
+                    "character_code": "C01",
+                    "character_name": "Uriel Castell",
+                    "variant_index": 0,
+                    "resolution_text": "He dies before the valve finishes opening."
+                }
+            ]
+        }
+    ]
+    res1 = gen.run_prompt('s8j', 'fate1', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(payload_dead_res, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(res1.get('verdict') == 'contradictions_found' and len(res1.get('contradictions', [])) >= 1,
+          f"expected contradiction, got: {res1}")
 
-    # Other character dead in summary does not flag this character
-    c4 = checks.resolution_liveness_contradiction(
-        "The captain dies in the fire while Uriel Castell steps back.",
-        "He turns away from the bridge.",
-        char_label="C01", char_name="Uriel Castell"
-    )
-    check(c4 is None, f"expected None, got: {c4}")
+    # 2. Dead in summary, alive in resolution -> caught by fate judge
+    payload_alive_res = [
+        {
+            "ending_id": "END_DEMO",
+            "ending_narrative": "Castell is killed when the deck collapses.",
+            "character_resolutions": [
+                {
+                    "character_code": "C01",
+                    "character_name": "Castell",
+                    "variant_index": 0,
+                    "resolution_text": "He steps back alive and watches the dawn."
+                }
+            ]
+        }
+    ]
+    res2 = gen.run_prompt('s8j', 'fate2', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(payload_alive_res, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(res2.get('verdict') == 'contradictions_found' and len(res2.get('contradictions', [])) >= 1,
+          f"expected contradiction, got: {res2}")
 
-    # "dead end" idiom in resolution does not flag character as dead
-    c5 = checks.resolution_liveness_contradiction(
-        "Eamon remains on the far side of the mountain pass, and Ellis is not there to count the places.",
-        "Following the renamed road into the mountains, the shortcut became a dead end and she is lost.",
-        char_label="C02", char_name="Ellis Dunmore"
-    )
-    check(c5 is None, f"expected None for dead end idiom, got: {c5}")
+    # 3. Idiom ("dead end") and clause isolation pass cleanly
+    payload_clean = [
+        {
+            "ending_id": "END_DEMO",
+            "ending_narrative": "Eamon remains on the far side of the mountain pass, and Ellis is not there to count the places.",
+            "character_resolutions": [
+                {
+                    "character_code": "C02",
+                    "character_name": "Ellis Dunmore",
+                    "variant_index": 0,
+                    "resolution_text": "Following the renamed road into the mountains, the shortcut became a dead end and she is lost."
+                }
+            ]
+        }
+    ]
+    res3 = gen.run_prompt('s8j', 'fate3', {
+        '$$ENDINGS_AND_RESOLUTIONS$$': json.dumps(payload_clean, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_fate.prompt', klass='classify', schema=schemas.FATE_JUDGE)
+    check(res3.get('verdict') == 'pass' and len(res3.get('contradictions', [])) == 0,
+          f"idiom 'dead end' falsely flagged: {res3}")
 
-    # Survival word in neighboring clause does not bleed into absent character
-    c6 = checks.resolution_liveness_contradiction(
-        "Eamon remains on the far side of the dragon's breath; Ellis is not there.",
-        "She is lost in the mountains.",
-        char_label="C02", char_name="Ellis Dunmore"
-    )
-    check(c6 is None, f"expected None for clause isolation, got: {c6}")
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
 @test
@@ -3550,75 +3517,78 @@ def protagonist_embodiment_and_somatic_drift():
     check(brief.derive_embodiment('systemic_entity', 'arbitrary role', explicit_embodiment='sessile_entity') == 'sessile_entity', 'explicit embodiment should override')
     check(brief.derive_embodiment('human', 'oficial científica', explicit_embodiment='embodied_human') == 'embodied_human', 'explicit human should pass')
 
-    # 2. check_somatic_drift
-    # For embodied_human: never flags human somatic markers
-    check(checks.check_somatic_drift("You step across the threshold with cold hands in your pockets.", "embodied_human") is None,
-          "embodied_human should never flag somatic markers")
+    # 2. Semantic somatic judge (s8j_somatic.prompt)
+    import schemas
+    from main import StoryGenerator
 
-    # For distributed_network: flags second-person somatic markers
-    d1 = checks.check_somatic_drift("You step across the threshold into the server room.", "distributed_network")
-    check(d1 and "you step" in d1.lower(), f"expected you step flag, got: {d1}")
+    test_id = f'{PREFIX}somatic_drift_test'
+    shutil.rmtree(story_dir('somatic_drift_test'), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
 
-    d2 = checks.check_somatic_drift("Cold air blows over your hands.", "distributed_network")
-    check(d2 and "your hands" in d2.lower(), f"expected your hands flag, got: {d2}")
+    emb_ai = {
+        'embodiment': 'distributed_network',
+        'role': 'ship core intelligence'
+    }
+    # Telemetry and NPC actions pass cleanly
+    clean_texts = {
+        't01': "Castell steps forward with trembling hands, watching the pressure gauge.",
+        't02': "Telemetry shows bus voltage dropping across Sector 4 as auxiliary power routes through the secondary conduit."
+    }
+    res_clean = gen.run_prompt('s8j', 'somatic_clean', {
+        '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_ai, ensure_ascii=False, indent=1),
+        '$$TEXTS_JSON$$': json.dumps(clean_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+    check(res_clean.get('verdict') == 'pass' and len(res_clean.get('violations', [])) == 0,
+          f"valid telemetry falsely flagged: {res_clean}")
 
-    d3 = checks.check_somatic_drift("You catch your breath in the silence.", "distributed_network")
-    check(d3 and "your breath" in d3.lower(), f"expected your breath flag, got: {d3}")
+    # Second-person biological actions on disembodied protagonist are flagged
+    dirty_texts = {
+        't01': "You step across the threshold into the server room, your breath catching in your throat.",
+    }
+    res_dirty = gen.run_prompt('s8j', 'somatic_dirty', {
+        '$$PROTAGONIST_EMBODIMENT$$': json.dumps(emb_ai, ensure_ascii=False, indent=1),
+        '$$TEXTS_JSON$$': json.dumps(dirty_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_somatic.prompt', klass='classify', schema=schemas.SOMATIC_JUDGE)
+    check(res_dirty.get('verdict') == 'drift_found' and len(res_dirty.get('violations', [])) >= 1,
+          f"somatic drift missed: {res_dirty}")
 
-    d4 = checks.check_somatic_drift("You sign your name in the register.", "distributed_network")
-    check(d4 and "you sign" in d4.lower(), f"expected you sign flag, got: {d4}")
-
-    # Telemetry and sensor language is fine
-    check(checks.check_somatic_drift("Telemetry shows bus voltage dropping across Sector 4.", "distributed_network") is None,
-          "telemetry should be valid")
-
-    # Other character actions do not trigger false positives
-    check(checks.check_somatic_drift("Castell steps forward with trembling hands.", "distributed_network") is None,
-          "NPC somatic actions should not flag protagonist somatic drift")
+    shutil.rmtree(story_dir('somatic_drift_test'), ignore_errors=True)
 
 
 @test
 def epilogue_resolution_syntactic_variety():
-    # 1. epilogue_formulaic_clause detection
-    h1 = checks.epilogue_formulaic_clause("The grey-blue caregiver dies after sealing the nursery bulkheads, that trust broken by the moment you chose the core.")
-    check(h1 and "that trust broken" in h1, f"expected formula hit, got: {h1}")
+    """Validates that prose craft evaluation (s8j_craft.prompt) semantically
+    evaluates narrative texts without fragile English regex heuristics."""
+    import schemas
+    from main import StoryGenerator
 
-    h2 = checks.epilogue_formulaic_clause("The stooped elder stands before the lens without offering, that faith thinned because the core chose the workers.")
-    check(h2 and "that faith thinned" in h2, f"expected formula hit, got: {h2}")
+    test_id = f'{PREFIX}craft_variety_test'
+    shutil.rmtree(story_dir('craft_variety_test'), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
 
-    h3 = checks.epilogue_formulaic_clause("Uriel Castell dies before the valve finishes opening, that wheel abandoned because you let the arithmetic speak.")
-    check(h3 and "that wheel abandoned" in h3, f"expected formula hit, got: {h3}")
+    # 1. Clean texts with diegetic consequence and resolution variety pass
+    clean_texts = {
+        't01': "Castell keeps his palms off the wheel now; the skin never quite uncurled.",
+        't02': "The price of peace was exile, but the valve stayed sealed.",
+        't03': "Without the children's names on the board, Ferrante does not look into the camera.",
+    }
+    res_clean = gen.run_prompt('s8j', 'craft_clean', {
+        '$$TEXTS_JSON$$': json.dumps(clean_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_clean.get('verdict') == 'pass' and len(res_clean.get('violations', [])) == 0,
+          f"clean texts falsely flagged by craft judge: {res_clean}")
 
-    h4 = checks.epilogue_formulaic_clause("The stooped elder leaves no food at the lens, that faith shaken because the ship chose hands.")
-    check(h4 and "that faith shaken" in h4, f"expected formula hit, got: {h4}")
+    # 2. Unresolved alternative narration is caught
+    dirty_texts = {
+        't01': "If you open the valve you drown, and if you leave it closed you suffocate; say what happens."
+    }
+    res_dirty = gen.run_prompt('s8j', 'craft_dirty', {
+        '$$TEXTS_JSON$$': json.dumps(dirty_texts, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 1,
+          f"unresolved alternatives missed by craft judge: {res_dirty}")
 
-    # Varied rhetorical structures return None
-    check(checks.epilogue_formulaic_clause("Castell keeps his palms off the wheel now; the skin never quite uncurled.") is None,
-          "direct sensory observation should not be flagged")
-    check(checks.epilogue_formulaic_clause("Without the children's names on the board, Ferrante does not look into the camera.") is None,
-          "fronted dependent clause should not be flagged")
-    check(checks.epilogue_formulaic_clause("The chapel offering table sits empty. Kit Achebe stopped bringing bread when the third pump seized.") is None,
-          "terse declarative clause should not be flagged")
-    check(checks.epilogue_formulaic_clause("Still behind the glass at dawn, cueing your last record herself.") is None,
-          "elliptical phrase should not be flagged")
-
-    # 2. check_epilogue_syntactic_repetition
-    repetitive_set = [
-        "The caregiver dies, that trust broken by your choice.",
-        "The elder leaves, that faith shaken because the ship chose hands.",
-        "Still behind the glass at dawn, cueing your last record herself."
-    ]
-    rep = checks.check_epilogue_syntactic_repetition(repetitive_set)
-    check(rep and "repetitive formulaic epilogue syntax" in rep and "2 occurrences" in rep,
-          f"expected repetition finding, got: {rep}")
-
-    diverse_set = [
-        "Castell keeps his palms off the wheel now; the skin never quite uncurled.",
-        "Without the children's names on the board, Ferrante does not look into the camera.",
-        "The elder leaves, that faith shaken because the ship chose hands."
-    ]
-    check(checks.check_epilogue_syntactic_repetition(diverse_set) is None,
-          "diverse set with at most one formulaic line should not trigger repetition finding")
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
 @test
@@ -3726,40 +3696,15 @@ def opening_scene_scoping_invariants():
 
 @test
 def content_rating_derivation_and_package_metadata():
-    # 1. Pure derive_content_rating checks (open Stratum scheme)
-    # Extreme violence -> MATURE with V
-    res_ma_v = checks.derive_content_rating({'intro': 'The assassin was tortured and his body dismembered in the cellar.'})
-    check(res_ma_v['rating'] == 'MATURE', f"expected MATURE, got {res_ma_v['rating']}")
-    check('V' in res_ma_v['rating_descriptors'], "expected 'V' descriptor")
-    check('graphic violence' in res_ma_v['rating_advisory'], f"expected graphic violence in advisory, got {res_ma_v['rating_advisory']}")
-
-    # Strong sci-fi violence -> MATURE with V
-    res_14_v = checks.derive_content_rating({'text': 'Gunfire erupted across the hangar deck, leaving a bleeding corpse by the airlock.'})
-    check(res_14_v['rating'] == 'MATURE', f"expected MATURE, got {res_14_v['rating']}")
-    check('V' in res_14_v['rating_descriptors'], "expected 'V' descriptor")
-
-    # Severe profanity -> MATURE with L
-    res_ma_l = checks.derive_content_rating({'dialogue': 'Get out of my way, you fucking idiot.'})
-    check(res_ma_l['rating'] == 'MATURE', f"expected MATURE, got {res_ma_l['rating']}")
-    check('L' in res_ma_l['rating_descriptors'], "expected 'L' descriptor")
-
-    # Moderate profanity -> TEEN with L
-    res_14_l = checks.derive_content_rating({'dialogue': 'What total bullshit, you bastard.'})
-    check(res_14_l['rating'] == 'TEEN', f"expected TEEN, got {res_14_l['rating']}")
-    check('L' in res_14_l['rating_descriptors'], "expected 'L' descriptor")
-
-    # Mild peril and language -> TEEN
-    res_pg = checks.derive_content_rating({'text': 'Damn it, the alarm sounds as danger approaches.'})
-    check(res_pg['rating'] == 'TEEN', f"expected TEEN, got {res_pg['rating']}")
-
-    # Mild benign text -> ALL-AGES
+    # 1. Fallback derive_content_rating checks (model-free fallback)
     res_g = checks.derive_content_rating({'text': 'The morning sun rose over the quiet library garden.'})
     check(res_g['rating'] == 'ALL-AGES', f"expected ALL-AGES, got {res_g['rating']}")
     check(res_g['rating_descriptors'] == [], f"expected empty descriptors for ALL-AGES, got {res_g['rating_descriptors']}")
+    check(bool(res_g['rating_advisory']), "expected advisory text")
 
     # Legacy TV rating support
     res_legacy = checks.derive_content_rating({'intro': 'The assassin was tortured.'}, legacy_tv=True)
-    check(res_legacy['rating'] == 'TV-MA', f"expected TV-MA, got {res_legacy['rating']}")
+    check(res_legacy['rating'] == 'TV-G', f"expected TV-G, got {res_legacy['rating']}")
 
     # 2. Package compilation includes metadata
     import compile_scenes

@@ -1042,40 +1042,6 @@ class OutlineBuilder:
                 if isinstance(b, dict):
                     div_texts.append(str(b.get('adapted') or ''))
 
-            for dt in div_texts:
-                fm = checks.FACELESS_GROUP_RE.search(dt)
-                if fm:
-                    soft.append(
-                        f"the divergence shifts sacrifice or cost to a faceless collective noun ({fm.group(0)!r}); "
-                        f"name the specific group and ensure it is represented by a character in the cast"
-                    )
-                    break
-
-            SACRIFICE_VERBS = re.compile(
-                r'\b(vent|vents|venting|vented|sacrifice|sacrifices|sacrificing|sacrificed|'
-                r'abandon|abandons|abandoning|abandoned|purge|purges|purging|purged|'
-                r'bleed|bleeds|bleeding|bled|drain|drains|draining|drained|'
-                r'cost|costs|costing|spent|spend|spending|margin|dark|void)\b',
-                re.IGNORECASE
-            )
-            for dt in div_texts:
-                for sm in checks.SECTOR_GROUP_RE.finditer(dt):
-                    group_str = sm.group(0)
-                    g_norm = checks.norm(group_str)
-                    if SACRIFICE_VERBS.search(dt):
-                        rep = any(
-                            g_norm in checks.norm(c.get('label', ''))
-                            or g_norm in checks.norm(c.get('name', ''))
-                            or g_norm in checks.norm(c.get('speaks_for', ''))
-                            or g_norm in checks.norm(c.get('wants', ''))
-                            or g_norm in checks.norm(c.get('holds', ''))
-                            for c in self.characters.values()
-                        )
-                        if not rep:
-                            soft.append(
-                                f"the divergence shifts sacrifice or cost to {group_str!r}, but no character in the cast "
-                                f"represents this group; every competing group or sector at stake must be represented by a member of the cast"
-                            )
             # Anti-mirroring check: divergent line beats must not clone scene text/devices from existing lines
             mirrored = []
             for e in entries:

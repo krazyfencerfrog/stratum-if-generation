@@ -476,9 +476,6 @@ class WorldBuilder:
                 r_desc = str(r.get('description') or '').strip()
                 if len(r_desc.split()) < 15:
                     problems.append(f"room {r['name']!r}: the description is too thin; give it specific details")
-                drift = checks.check_somatic_drift(r_desc, embodiment)
-                if drift:
-                    problems.append(f"room {r['name']!r}: {drift}")
             things = [o for o in as_list(parsed.get('objects')) if isinstance(o, dict) and o.get('name')]
             for o in things:
                 if norm(o.get('room')) not in names:
@@ -496,9 +493,6 @@ class WorldBuilder:
                         low = txt.lower()
                         if low.startswith(('you make your way to', 'you head to', 'you walk to', 'you go to')):
                             problems.append(f"exit {e.get('from')!r} {tk} is generic filler ({txt!r}); describe the physical sensation or threshold of crossing, or use null")
-                        drift = checks.check_somatic_drift(txt, embodiment)
-                        if drift:
-                            problems.append(f"exit {e.get('from')!r} {tk}: {drift}")
             if problems:
                 raise ValueError('; '.join(problems))
             for r in rooms:
@@ -624,17 +618,11 @@ class WorldBuilder:
                         low = txt.lower()
                         if low.startswith(('you make your way to', 'you head to', 'you walk to', 'you go to')):
                             problems.append(f"adjacent {a.get('from_room')!r} {tk} is generic filler ({txt!r}); describe the physical sensation or threshold of crossing")
-                        drift = checks.check_somatic_drift(txt, embodiment)
-                        if drift:
-                            problems.append(f"adjacent {a.get('from_room')!r} {tk}: {drift}")
             for c in as_list(parsed.get('connective')):
                 c_desc = str(c.get('description') or '').strip()
                 if len(c_desc.split()) < 15 or not as_list(c.get('examinable')):
                     problems.append(f"connective place {c.get('name')!r} is a skeleton: give it specific details and "
                                     f"something worth examining that contributes to the story's feel")
-                drift = checks.check_somatic_drift(c_desc, embodiment)
-                if drift:
-                    problems.append(f"connective place {c.get('name')!r}: {drift}")
             if problems:
                 raise ValueError('; '.join(problems))
             cand_names = set(room_names) | {norm(c['name']) for c in as_list(parsed.get('connective')) if c.get('name')}
@@ -810,21 +798,11 @@ class WorldBuilder:
             problems = []
             if not compile_variants(parsed.get('description'), self.states, self.nodes, problems, 'description'):
                 problems.append('description needs at least one variant')
-            for v in as_list(parsed.get('description')):
-                txt = v.get('text') if isinstance(v, dict) else str(v)
-                drift = checks.check_somatic_drift(txt, embodiment)
-                if drift:
-                    problems.append(f"description: {drift}")
             thinks = [t for t in as_list(parsed.get('think')) if isinstance(t, dict) and t.get('label')]
             if len(thinks) < 3:
                 problems.append(f'{len(thinks)} think topics; give at least three (your history, a tie, your need)')
             for t in thinks:
                 compile_variants(t.get('says'), self.states, self.nodes, problems, f"think {t['label']!r}")
-                for v in as_list(t.get('says')):
-                    txt = v.get('text') if isinstance(v, dict) else str(v)
-                    drift = checks.check_somatic_drift(txt, embodiment)
-                    if drift:
-                        problems.append(f"think {t['label']!r}: {drift}")
                 if t.get('known_after') not in (None, '', 'null') and t['known_after'] not in self.nodes:
                     problems.append(f"think {t['label']!r}: known_after is not a node")
             if problems:

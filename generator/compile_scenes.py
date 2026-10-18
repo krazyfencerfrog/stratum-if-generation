@@ -381,31 +381,6 @@ class SceneCompiler:
         if paper_hits:
             out.append(paper.complaint(paper_hits, len(interactions), 'scene interactions'))
         brief = getattr(self.gen, 'analysis', {}).get('s3_brief') or {} if hasattr(self, 'gen') and self.gen else {}
-        prot = getattr(self, 'protagonist', {}) or {}
-        embodiment = prot.get('embodiment')
-        if not embodiment:
-            premise_prot = getattr(self, 'premise_protagonist', lambda: {})() if hasattr(self, 'story') else {}
-            embodiment = (brief.get('fields', {}).get('3-0b.protagonist_identity') or {}).get('embodiment') or (premise_prot.get('embodiment') if isinstance(premise_prot, dict) else None)
-        if embodiment:
-            drift = checks.check_somatic_drift(opening, embodiment)
-            if drift:
-                out.append(f'the opening has {drift}')
-            for it in scene.get('interactions', []):
-                drift = checks.check_somatic_drift(str(it.get('text') or ''), embodiment)
-                if drift:
-                    out.append(f"interaction {it.get('label') or it.get('verb')!r}: {drift}")
-            for a in as_list((parsed or {}).get('actions')):
-                if isinstance(a, dict):
-                    drift = checks.check_somatic_drift(str(a.get('text') or ''), embodiment)
-                    if drift:
-                        out.append(f"action {a.get('label')!r}: {drift}")
-            for m in as_list((parsed or {}).get('moments')):
-                if isinstance(m, dict):
-                    for o in as_list(m.get('options')):
-                        if isinstance(o, dict):
-                            drift = checks.check_somatic_drift(str(o.get('text') or ''), embodiment)
-                            if drift:
-                                out.append(f"moment option {o.get('label')!r}: {drift}")
         premise = getattr(self, 'premise', {})
         world = getattr(self, 'world', {})
         context = [kernel, json.dumps(brief), json.dumps(premise), json.dumps(world.get('objects', {}))]

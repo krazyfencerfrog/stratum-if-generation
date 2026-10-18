@@ -39,9 +39,6 @@ ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 
 TARGETS = {'room': 60, 'action': 50, 'opening': 90, 'ending': 150, 'other': 80, 'unnamed': 8, 'recap': 40, 'dialogue': 45}
 CHUNK = 40                    # texts per call: a person with every state and subject is split
-MECHANICS = re.compile(r"\b(menus?|nodes?|variants?|the player|playthroughs?)\b", re.I)   # never ordinary English
-ALTERNATIVES = re.compile(r"\b(if|si)\b[^.!?]*[;,]\s*(?:and |but |or |y |pero |o )?(?:if|si)\b", re.I)
-ANNOUNCED = re.compile(r"\b(the cost (?:is|was)|it (?:has|had) cost|the price|pays? off)\b", re.I)
 CODE = re.compile(r'\{([A-Za-z_]\w*)\}')
 NAME_KEYS = ('text', 'label', 'detail_label', 'object_label', 'title')   # where a literal name becomes a code
 
@@ -135,7 +132,7 @@ def validate_dialogue_text(original, revised):
     ):
         issues.append("character dialogue should remain spoken dialogue in quotation marks, not indirect narration")
     inner = rev_stripped.strip("'\"“”‘’").strip()
-    if re.match(r"^you\s+(ask|tell|look|say|nod|watch|listen|step|walk)\b", inner, re.I):
+    if re.match(r"^(?:you\s+(?:ask|tell|look|say|nod|watch|listen|step|walk)|t[úu]\s+(?:le\s+)?(?:preguntas|dices|miras|asientes|observas|escuchas))\b", inner, re.I):
         issues.append("narrates player action instead of speaking the character's line; write what the character says aloud")
     return issues
 
@@ -239,13 +236,8 @@ class ProseWriter:
             n = len(words(parsed['sample']))
             if not 60 <= n <= 220:
                 soft.append(f'the sample is {n} words; write one paragraph of 80 to 160')
-            is_es = any(w in str(self.gen.kernel).lower() for w in (' el ', ' la ', ' los ', ' las ', ' en ', ' de ', ' que ', ' fosa ', ' estación '))
-            if 'second' in str(parsed['person_tense']).lower():
-                if is_es:
-                    if not re.search(r'\b(t[uú]|te|ti|tus|usted)\b', parsed['sample'], re.I):
-                        pass # Spanish frequently uses pro-drop second-person verb inflections (e.g. despiertas, puedes)
-                elif not re.search(r'\byou(r)?\b', parsed['sample'], re.I):
-                    soft.append('the sample is not in the second person: the player is "you"')
+            # Person, tense, tone, and register delivery are verified semantically
+            # by s8v_style_check.prompt, retiring brittle pronoun regex heuristics.
             said = ' '.join(str(v.get('who')) for v in parsed['voices']).lower()
             silent = [p['name'] or p['role'] for p in people if p['name'] and p['name'].split()[0].lower() not in said
                       and str(p['role']).lower() not in said]
@@ -439,8 +431,6 @@ class ProseWriter:
                 if k == 'dialogue':
                     for issue in validate_dialogue_text(originals[i], t):
                         soft.append(f'{i}: {issue}')
-                if ALTERNATIVES.search(t):
-                    soft.append(f'{i}: narrates alternatives ("{ALTERNATIVES.search(t).group(0)}"); say what happens')
                 for cid, c in self.chars.items():
                     unnamed = c.get('unnamed')
                     if unnamed and re.search(r'\b' + re.escape(unnamed) + r"['’]s\b", t, re.I):
@@ -452,19 +442,19 @@ class ProseWriter:
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
-            ending_res_texts, ending_res_ids = [], []
-            for i in ids:
-                if i.startswith('t') and i[1:].isdigit():
-                    idx = int(i[1:]) - 1
-                    if 0 <= idx < len(paths):
-                        p = paths[idx]
-                        if p[0] == 'endings' and len(p) >= 6 and p[2] == 'resolutions':
-                            ending_res_texts.append(got[i])
-                            ending_res_ids.append(i)
-            if ending_res_texts:
-                rep = checks.check_epilogue_syntactic_repetition(ending_res_texts)
-                if rep:
-                    soft.append(f"endings: {rep}")
+            if self.gen and hasattr(self.gen, 'thread_client'):
+                try:
+                    client = self.gen.thread_client()
+                    craft_prompt = self.gen.load_prompt('s8j_craft.prompt').replace(
+                        '$$TEXTS_JSON$$', json.dumps(got, ensure_ascii=False, indent=1)
+                    )
+                    _, craft_resp = client.run_prompt(craft_prompt, format=schemas.CRAFT_JUDGE)
+                    craft_parsed = self.gen.lenient_json_loads(craft_resp)
+                    if craft_parsed and craft_parsed.get('verdict') == 'issues_found':
+                        for v in craft_parsed.get('violations') or []:
+                            soft.append(f"{v.get('text_id')}: {v.get('reason')} ({v.get('quote')})")
+                except Exception:
+                    pass
             if earlier:
                 for i in ids:
                     w = words(CODE.sub(' ', got[i]))

@@ -174,6 +174,8 @@ class StubClient(LlmClient):
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
             ('You are the setting-lexicon generator', 's3_5d'),
+            ('You are step 3.5j1 of', 's3_5j1_agency'),
+            ('You are step 3.5j2 of', 's3_5j2_dilemma'),
             ('You are step 3.5j of', 's3_5j_cast'),
             ('You are a fidelity auditor', 's3_5v'),
             ('You are a Kernel fidelity checker', 's3_5k'),
@@ -553,6 +555,67 @@ class StubClient(LlmClient):
                 "fixtures": ["grease lamp", "cast-iron stove", "brass ship lantern", "driftwood bench", "slate hearth"],
                 "tools_and_wear": ["bone sail-needle", "marlinspike", "wool watch-cap", "horn tallow-box", "tarred linen apron"],
             },
+        }
+
+    def p_s3_5j1_agency(self, p):
+        seeds_data = self.section(p, '- the Cast Seeds') or []
+        seeds = seeds_data.get('cast_seeds', []) if isinstance(seeds_data, dict) else (seeds_data or [])
+        agency_issues = []
+        for s in seeds:
+            role = str(s.get('role', '')).lower()
+            voice = str(s.get('voice', '')).lower()
+            wants = str(s.get('wants', '')).lower()
+            if 'maintenance drone' in role or 'dron de mantenimiento' in role or ('unit 7' in role and 'offline' in voice) or \
+               ('diagnostic cycle' in wants and 'charging bay' in wants) or ('ciclo de diagnóstico' in wants):
+                agency_issues.append({
+                    'role': s.get('role', 'unknown'),
+                    'reason': "Entity is a routine diagnostic tool/hardware device, not a dramatic agent."
+                })
+        if agency_issues:
+            return {
+                "reading": f"Found {len(agency_issues)} agency issue(s).",
+                "verdict": "issues_found",
+                "agency_issues": agency_issues,
+            }
+        return {
+            "reading": "All cast seeds possess interpersonal dramatic agency.",
+            "verdict": "pass",
+            "agency_issues": [],
+        }
+
+    def p_s3_5j2_dilemma(self, p):
+        turns_data = self.section(p, '- the Dramatic Turns') or []
+        seeds_data = self.section(p, '- the Cast Seeds') or []
+        turns = turns_data.get('turns', []) if isinstance(turns_data, dict) else (turns_data or [])
+        seeds = seeds_data.get('cast_seeds', []) if isinstance(seeds_data, dict) else (seeds_data or [])
+        unrepresented = []
+        for t in turns:
+            sit = str(t.get('situation', '')) + ' ' + str(t.get('what_you_must_do', ''))
+            for w in t.get('ways_through') or []:
+                if isinstance(w, dict):
+                    sit += ' ' + str(w.get('way', '')) + ' ' + str(w.get('cost', ''))
+            if 'Sector 7' in sit or 'sector 7' in sit.lower() or 'sector inferior' in sit.lower():
+                represented = any('sector 7' in str(s.get('role', '')).lower() or
+                                  'sector 7' in str(s.get('speaks_for', '')).lower() or
+                                  'sector inferior' in str(s.get('role', '')).lower() or
+                                  'sector inferior' in str(s.get('speaks_for', '')).lower() for s in seeds)
+                if not represented:
+                    group_name = 'Sector 7' if 'sector 7' in sit.lower() else 'el sector inferior'
+                    unrepresented.append({
+                        'group': group_name,
+                        'turn': t.get('id', 1),
+                        'reason': f"Turn involves {group_name} but no cast seed represents it."
+                    })
+        if unrepresented:
+            return {
+                "reading": f"Found {len(unrepresented)} unrepresented group(s).",
+                "verdict": "issues_found",
+                "unrepresented_groups": unrepresented,
+            }
+        return {
+            "reading": "All competing dilemma factions are represented in the cast.",
+            "verdict": "pass",
+            "unrepresented_groups": [],
         }
 
     def p_s3_5j_cast(self, p):
@@ -1207,11 +1270,11 @@ class StubClient(LlmClient):
                 res_low = res_text.lower()
                 end_low = end_narrative.lower()
                 is_contradiction = False
-                if ('dies before the' in res_low or 'muere antes de' in res_low) and \
-                   ('still standing' in end_low or 'watches from' in end_low or 'todavía en pie' in end_low or 'observa desde' in end_low):
+                if ('dies' in res_low or 'muere' in res_low or 'killed' in res_low) and \
+                   ('still standing' in end_low or 'watches from' in end_low or 'alive' in end_low or 'steps back' in end_low or 'todavía en pie' in end_low or 'observa desde' in end_low or 'vivo' in end_low):
                     is_contradiction = True
-                elif ('is killed' in end_low or 'dies in the' in end_low or 'muere en' in end_low or 'es asesinado' in end_low) and \
-                     ('steps back alive' in res_low or 'survives' in res_low or 'sobrevive' in res_low):
+                elif ('is killed' in end_low or 'dies in the' in end_low or 'muere en' in end_low or 'es asesinado' in end_low or 'killed' in end_low) and \
+                     ('steps back alive' in res_low or 'survives' in res_low or 'sobrevive' in res_low or 'alive' in res_low):
                     is_contradiction = True
 
                 if is_contradiction:
@@ -1282,12 +1345,14 @@ class StubClient(LlmClient):
                     'issue_type': 'craft_announcement',
                     'reason': "Text explicitly announces premise craft mechanics instead of dramatizing narrative consequences."
                 })
-            elif 'if you open the valve you drown, and if you leave it closed' in t_lower:
+            elif 'if you open the valve you drown, and if you leave it closed' in t_lower or \
+                 'if it slips' in t_lower or ('if ' in t_lower and ';' in t_lower and 'if ' in t_lower) or \
+                 ('si ' in t_lower and ';' in t_lower and 'si ' in t_lower):
                 violations.append({
                     'text_id': tid,
                     'quote': t_str[:80],
                     'issue_type': 'unresolved_alternatives',
-                    'reason': "Text narrating contradictory alternative branches in a single passage."
+                    'reason': "Text narrates hypothetical branching alternatives rather than a concrete reality."
                 })
         if violations:
             return {

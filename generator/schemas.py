@@ -357,6 +357,16 @@ CAST_JUDGE = obj(
     agency_issues=arr(CAST_AGENCY_ISSUE),
     unrepresented_groups=arr(UNREPRESENTED_GROUP),
 )
+AGENCY_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'issues_found']),
+    agency_issues=arr(CAST_AGENCY_ISSUE),
+)
+DILEMMA_JUDGE = obj(
+    reading=S,
+    verdict=enum(['pass', 'issues_found']),
+    unrepresented_groups=arr(UNREPRESENTED_GROUP),
+)
 
 # ---------------------------------------------------------------- stage 8 prose craft judge (#49 Phase 3)
 
@@ -418,6 +428,7 @@ ALL = {
     'WORLD_CHARACTER': WORLD_CHARACTER, 'WORLD_FUNCTIONAL': WORLD_FUNCTIONAL, 'WORLD_PLACE': WORLD_PLACE,
     'WORLD_MAP': WORLD_MAP, 'WORLD_CONVERSATION': WORLD_CONVERSATION, 'WORLD_YOU': WORLD_YOU, 'SCENE': SCENE,
     'FRAME': FRAME, 'FATE_JUDGE': FATE_JUDGE, 'SOMATIC_JUDGE': SOMATIC_JUDGE, 'CAST_JUDGE': CAST_JUDGE,
+    'AGENCY_JUDGE': AGENCY_JUDGE, 'DILEMMA_JUDGE': DILEMMA_JUDGE,
     'CRAFT_JUDGE': CRAFT_JUDGE, 'CONTENT_RATING_JUDGE': CONTENT_RATING_JUDGE,
     'IDENTITY_EPISTEMIC': IDENTITY_EPISTEMIC,
 }

@@ -112,9 +112,10 @@ DEFAULT_MAX_REPAIRS = 2
 # the audit's quotes were real (41 of 43) and every final-round halt was a
 # real quote misread, so a halt bought a lost run, never a better story.
 HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
-# what a contract's terms are about when they are about the paper, not the people bound by it
 PAPER_ACT = re.compile(r"\b(sign|signs|signed|signing|signature|countersign\w*|papers?|treaty|seals?|sealed|deeds?|"
-                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on)\b", re.I)
+                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on|"
+                       r"firmar?|firmas?|firmad[oa]s?|firmando|tratados?|sellos?|sellad[oa]s?|escrituras?|"
+                       r"documentos?|estampillas?|cláusulas?|archivado|tachad[oa]s?)\b", re.I)
 
 
 def repeated_turns(turns):
@@ -238,16 +239,28 @@ RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 # A way through written as a menu pick: the question is not the verb.
 # people the Kernel ties "you" to by kin or bond: when it names them, the premise keeps them as people
-KIN = re.compile(r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|child(?:ren)?|kids?|mother|father|"
-                 r"mum|mom|dad|parents?|brother|sister|siblings?|grand(?:mother|father|son|daughter|parents?)|"
-                 r"uncle|aunt|cousin|nephew|niece|fianc[ée]e?|lover|girlfriend|boyfriend|best friend)\b", re.I)
+KIN = re.compile(
+    r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|child(?:ren)?|kids?|mother|father|"
+    r"mum|mom|dad|parents?|brother|sister|siblings?|grand(?:mother|father|son|daughter|parents?)|"
+    r"uncle|aunt|cousin|nephew|niece|fianc[ée]e?|lover|girlfriend|boyfriend|best friend|"
+    r"familia|familias|esposo|esposa|cónyuge|pareja|hijo|hija|hijos|hijas|niño|niña|niños|niñas|"
+    r"madre|padre|padres|mamá|papá|hermano|hermana|hermanos|hermanas|abuelo|abuela|abuelos|"
+    r"tío|tía|primo|prima|sobrino|sobrina|novio|novia|amante|mejor amigo|mejor amiga|clan|linaje)\b",
+    re.I
+)
 # a role that names a group (one that needs someone to speak for it), not one being
-GROUP_WORD = re.compile(r"\b(?:\w+[^s\W]s|crew|family|families|crowd|council|staff|people|folk|mob|guests?|"
-                        r"household|village|town|court|congregation|gang|band|company|guild|army|troop|police)\b", re.I)
+GROUP_WORD = re.compile(
+    r"\b(?:\w+[^s\W]s|crew|family|families|crowd|council|staff|people|folk|mob|guests?|"
+    r"household|village|town|court|congregation|gang|band|company|guild|army|troop|police|"
+    r"tripulación|familia|multitud|consejo|personal|gente|pueblo|aldea|corte|congregación|"
+    r"banda|compañía|gremio|ejército|tropa|policía)\b",
+    re.I
+)
 MENU_VERB = re.compile(
     r"\byou\s+(?:(?:can|could|may|might|must|shall|should|will|would)\s+)?"
     r"(?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\s+(?:to|whether|between)\b|"
-    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b",
+    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b|"
+    r"\b(?:t[úu]\s+)?(?:puedes\s+)?(?:elegir|eliges|elegiste|decidir|decides|decidiste|optar|optas|optaste)\s+(?:a|entre|si)\b",
     re.I,
 )
 
@@ -1070,16 +1083,6 @@ class StoryGenerator:
             ways = t.get('ways_through')
             if not isinstance(ways, list) or not all(isinstance(w, dict) and w.get('way') for w in ways):
                 problems.append(f'turn {i + 1}: ways_through must be a list of {{"way", "cost"}} objects')
-            elif check_forms:
-                for w in ways:
-                    if isinstance(w, dict):
-                        w_text = f"{w.get('way', '')} {w.get('cost', '')}"
-                        fm = checks.FACELESS_GROUP_RE.search(w_text)
-                        if fm:
-                            bad_forms.append(
-                                f"turn {i + 1}: ways_through uses a faceless collective noun as a dilemma pole/sacrifice ({fm.group(0)!r}); "
-                                f"name the specific competing group/sector and ensure its representative is listed in involves"
-                            )
             involves = t.get('involves')
             involves = involves if isinstance(involves, list) else ([involves] if involves else [])
             t['involves'] = [str(r).strip() for r in involves if str(r).strip()]
@@ -1101,25 +1104,6 @@ class StoryGenerator:
             bad_forms += [problem for _, problem, _ in repeated_turns(turns)]
         if bad_forms and check_forms:
             raise SoftReject('; '.join(bad_forms))
-        bad_involves = []
-        for i, t in enumerate(turns):
-            for r in t.get('involves') or []:
-                if checks.is_non_agent_role(r):
-                    bad_involves.append(
-                        f"turn {i + 1}: involves contains non-agent tool/object {r!r}. "
-                        f"Only dramatic agents (people, creatures, or beings with interpersonal agency) "
-                        f"may be listed in involves. Tools, vehicles, and consumable props belong in situation "
-                        f"and ways_through, not involves"
-                    )
-        if bad_involves and check_forms:
-            raise SoftReject('; '.join(bad_involves))
-        plotty = sorted({r for t in turns for r in t['involves'] if FUNCTION_ROLE.search(r)})
-        if plotty and not check_forms:
-            plotty = []
-        if plotty:
-            raise SoftReject(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
-                             f'Name each by what a reader would see or be told: an occupation, a relation, a '
-                             f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
 
     def with_echo_check(self, validator, keys):
         """Wraps a construction validator with the brief-echo check: a
@@ -1191,17 +1175,6 @@ class StoryGenerator:
                                 f"{'; '.join(copied[:4])}); write this story's own people")
             if problems:
                 raise ValueError('; '.join(problems))
-            soft = []
-            plotty = [s['role'] for s in seeds if norm(s['role']) not in wanted and FUNCTION_ROLE.search(str(s['role']))]
-            if plotty:
-                soft.append(f'these roles describe what the person does in the plot, not who they are: {plotty}. '
-                            f'Name each by what a reader would see or be told: an occupation, a relation, a '
-                            f'visible trait ("the vicar", "the master\'s widow", "the guest with the bandaged hand")')
-            cast_issues = checks.validate_cast(seeds, turns)
-            if cast_issues:
-                soft.extend(cast_issues)
-            if soft:
-                raise SoftReject('; '.join(soft))
         return validate
 
     @staticmethod
@@ -1371,11 +1344,14 @@ class StoryGenerator:
         }, validator=self.cast_validator(turns['turns']), klass='classify', schema=schemas.CAST)
         self.judge_cast(turns['turns'], cast.get('cast_seeds') or [])
         lexicon = self.generate_lexicon(engine, cast.get('cast_seeds') or []) if self.dynamic_names else None
-        return self.name_cast(self.assemble_premise(budget, engine, turns, cast), lexicon=lexicon)
+        premise = self.assemble_premise(budget, engine, turns, cast)
+        if self.analysis.get('s3_5j_findings'):
+            premise['s3_5j_findings'] = list(self.analysis['s3_5j_findings'])
+        return self.name_cast(premise, lexicon=lexicon)
 
     def judge_cast(self, turns, seeds):
-        """Runs the semantic cast & agency judge (s3_5j_cast.prompt) over cast seeds
-        and turns to verify dramatic agency and dilemma representation (#49 Phase 2)."""
+        """Runs the atomic cast agency judge (s3_5j1_agency.prompt) and dilemma
+        symmetry judge (s3_5j2_dilemma.prompt) over cast seeds and turns (#49, #52)."""
         turns_summary = [{
             'id': t.get('id'),
             'situation': t.get('situation'),
@@ -1395,20 +1371,31 @@ class StoryGenerator:
             'tie': s.get('tie')
         } for s in seeds]
         try:
-            res = self.run_prompt('s3_5j', 'cast', {
+            agency_res = self.run_prompt('s3_5j1', 'agency', {
+                '$$CAST_SEEDS$$': compact_json({'cast_seeds': seeds_summary}),
+            }, prompt_file='s3_5j1_agency.prompt', klass='classify', schema=schemas.AGENCY_JUDGE)
+            dilemma_res = self.run_prompt('s3_5j2', 'dilemma', {
                 '$$TURNS$$': compact_json({'turns': turns_summary}),
                 '$$CAST_SEEDS$$': compact_json({'cast_seeds': seeds_summary}),
-            }, prompt_file='s3_5j_cast_judge.prompt', klass='classify', schema=schemas.CAST_JUDGE)
-            if res and res.get('verdict') == 'issues_found':
-                issues = []
-                for a in res.get('agency_issues') or []:
-                    issues.append(f"agency: {a.get('role')} - {a.get('reason')}")
-                for u in res.get('unrepresented_groups') or []:
-                    issues.append(f"dilemma: {u.get('group')} in turn {u.get('turn')} - {u.get('reason')}")
-                if issues:
-                    self.analysis['s3_5j_findings'] = issues
-                    print(f"  [cast_judge] findings: {'; '.join(issues)}")
-            return res
+            }, prompt_file='s3_5j2_dilemma.prompt', klass='classify', schema=schemas.DILEMMA_JUDGE)
+            agency_issues = agency_res.get('agency_issues') or [] if agency_res else []
+            unrep_groups = dilemma_res.get('unrepresented_groups') or [] if dilemma_res else []
+            issues = []
+            for a in agency_issues:
+                issues.append(f"agency: {a.get('role')} - {a.get('reason')}")
+            for u in unrep_groups:
+                issues.append(f"dilemma: {u.get('group')} in turn {u.get('turn')} - {u.get('reason')}")
+            if issues:
+                self.analysis['s3_5j_findings'] = issues
+                print(f"  [cast_judge] findings: {'; '.join(issues)}")
+            verdict = 'issues_found' if (agency_issues or unrep_groups) else 'pass'
+            return {
+                'verdict': verdict,
+                'agency_issues': agency_issues,
+                'unrepresented_groups': unrep_groups,
+                'agency_reading': agency_res.get('reading', '') if agency_res else '',
+                'dilemma_reading': dilemma_res.get('reading', '') if dilemma_res else '',
+            }
         except Exception as e:
             print(f'  [cast_judge] fallback: {e}')
             return None
@@ -1518,18 +1505,11 @@ class StoryGenerator:
             out.append({'source': 'craft', 'where': 'paper', 'problem': paper.complaint(hits, len(items), 'items of the premise'),
                         'quote': ''})
         ties = [t for t in (premise.get('protagonist') or {}).get('ties') or [] if isinstance(t, dict) and t.get('who')]
-        kin = sorted({m.group(0).lower() for m in KIN.finditer(self.kernel or '')})
-        roles = [str(t.get('who')) for t in ties] + [str(sd.get('role')) for sd in premise.get('cast_seeds') or []
-                                                     if isinstance(sd, dict)]
-        if kin and not any(KIN.search(r) for r in roles):
-            add('protagonist.ties', f"the Kernel names {', '.join(kin)}, but no tie or cast seed is one of them: the "
-                                    f"relationship the Kernel turns on is gone. Say who they are, as people, in ties, and "
-                                    f"involve them in the turns")
         involved = {norm(r) for t in premise.get('turns') or [] if isinstance(t, dict) for r in t.get('involves') or []}
         opposition = norm((premise.get('opposition') or {}).get('who_or_what'))
         for t in ties:
             who = norm(t.get('who'))
-            if KIN.search(str(t.get('who'))) and who not in involved and who != opposition \
+            if who and who not in involved and who != opposition \
                     and not any(who in r or r in who for r in involved if r):
                 add('turns', f'"you" are tied to {t.get("who")}, but no turn involves them: a tie the story never '
                              f'tests is a name in a list', str(t.get('who')))
@@ -2224,7 +2204,12 @@ class StoryGenerator:
 
 
 # a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
-FUNCTION_ROLE = re.compile(r"\b(whose|who|which|that)\b|\b(easiest|likeliest|best placed)\b|^(the )?one(\s|$)", re.I)
+FUNCTION_ROLE = re.compile(
+    r"\b(whose|who|which|that|cuyo|cuya|cuyos|cuyas|que|el que|la que)\b|"
+    r"\b(easiest|likeliest|best placed|más fácil|más probable|mejor situado|mejor situada)\b|"
+    r"^(?:the |el |la )?one(\s|$)",
+    re.I
+)
 
 
 BOUNDARY_WHERE = {'number': 'a number the player is shown or must watch',
