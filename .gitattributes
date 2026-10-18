@@ -1,3 +1,3 @@
 # Machine-generated JSON packages: skip textual diffs, treat as binary for merge.
 # Git's pack compression still handles storage efficiently.
-examples/*.json -diff -merge
+examples/*.json binary
