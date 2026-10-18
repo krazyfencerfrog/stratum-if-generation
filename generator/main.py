@@ -113,9 +113,7 @@ DEFAULT_MAX_REPAIRS = 2
 # real quote misread, so a halt bought a lost run, never a better story.
 HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
 PAPER_ACT = re.compile(r"\b(sign|signs|signed|signing|signature|countersign\w*|papers?|treaty|seals?|sealed|deeds?|"
-                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on|"
-                       r"firmar?|firmas?|firmad[oa]s?|firmando|tratados?|sellos?|sellad[oa]s?|escrituras?|"
-                       r"documentos?|estampillas?|cláusulas?|archivado|tachad[oa]s?)\b", re.I)
+                       r"clauses?|documents?|stamp(?:ed|s)?|filed|crossed out|cross(?:es)? out|names? (?:is |are )?on)\b", re.I)
 
 
 def repeated_turns(turns):
@@ -2182,13 +2180,6 @@ class StoryGenerator:
         return prose.write(self, self.analysis.get('story'))
 
 
-# a role written as a plot function: "the guest whose secret is easiest to hear", "the one who knows"
-FUNCTION_ROLE = re.compile(
-    r"\b(whose|who|which|that|cuyo|cuya|cuyos|cuyas|que|el que|la que)\b|"
-    r"\b(easiest|likeliest|best placed|más fácil|más probable|mejor situado|mejor situada)\b|"
-    r"^(?:the |el |la )?one(\s|$)",
-    re.I
-)
 
 
 BOUNDARY_WHERE = {'number': 'a number the player is shown or must watch',

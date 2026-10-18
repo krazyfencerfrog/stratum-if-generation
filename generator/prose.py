@@ -132,7 +132,7 @@ def validate_dialogue_text(original, revised):
     ):
         issues.append("character dialogue should remain spoken dialogue in quotation marks, not indirect narration")
     inner = rev_stripped.strip("'\"“”‘’").strip()
-    if re.match(r"^(?:you\s+(?:ask|tell|look|say|nod|watch|listen|step|walk)|t[úu]\s+(?:le\s+)?(?:preguntas|dices|miras|asientes|observas|escuchas))\b", inner, re.I):
+    if re.match(r"^you\s+(?:ask|tell|look|say|nod|watch|listen|step|walk)\b", inner, re.I):
         issues.append("narrates player action instead of speaking the character's line; write what the character says aloud")
     return issues
 

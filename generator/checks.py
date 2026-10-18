@@ -37,15 +37,6 @@ def speaks_for(character, crowd):
 
 MENU_TRIGGER_RE = re.compile(r'^\s*you\s+(choose|chose|decide|decided|pick|picked|select|selected|opt|opted)\b', re.IGNORECASE)
 
-SECTOR_GROUP_RE = re.compile(
-    r'\b(?:sector|district|ward|block|deck|bay|vault|zone|squad|unit|division|clan|house)\s+([0-9]+|[a-z]\b)',
-    re.IGNORECASE
-)
-
-FACTION_GROUP_RE = re.compile(
-    r'\b(?:the\s+)?([A-Za-z0-9_\'-]+)\s+(?:faction|clan|guild|tribe|syndicate|union)\b',
-    re.IGNORECASE
-)
 
 def as_list(value):
     if value is None:

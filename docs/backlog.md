@@ -12,6 +12,14 @@ overnight batch.
 
 ## Active
 
+### Regex Eradication & Language-Agnostic Validation (#52) [solo]
+Eliminate remaining regex heuristics, language keyword lists, and duplicate engine validator checks that cause bottlenecks or false alarms on non-English runs:
+- Remove fatal `resolution_liveness_contradiction` and `DEATH_WORDS`/`SURVIVAL_WORDS` from `engine/story.py` (fate already checked by `s8j_fate.prompt`).
+- Remove `somatic_patterns` and `EPILOGUE_FORMULA_PATTERN` warnings from `engine/story.py` (embodiment and craft already checked by `s8j_somatic.prompt` and `s8j_craft.prompt`).
+- Clean orphaned regexes (`FUNCTION_ROLE` in `main.py`, `SECTOR_GROUP_RE`/`FACTION_GROUP_RE` in `checks.py`).
+- Clean dialogue player-action regex in `generator/prose.py`.
+- Evaluate language-agnostic enforcement for Rule 11 player deeds and paperwork.
+
 ### Thinking budget investigation [solo, then GPU]
 First look (2026-10-04): kernel35's forced 4a trace was still choosing its
 crisis beat at the 25 KB cut, not re-checking settled decisions; the traces
