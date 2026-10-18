@@ -165,13 +165,32 @@ class ProseWriter:
 
     def prepare_names(self):
         """A named person the protagonist does not already know goes by their
-        role until introduced; a relative or a "your ..." is known."""
-        from main import KIN
+        role until introduced; a relative or a 'your ...' is known."""
+        premise = (self.story.get('premise') or {}) if isinstance(self.story, dict) else {}
+        prot = premise.get('protagonist') or {}
+        prot_ties = {norm_role(t.get('who')) for t in (prot.get('ties') or []) if isinstance(t, dict)}
+        seed_ties = {
+            norm_role(s.get('role')): (s.get('tie') or '').lower()
+            for s in (premise.get('cast_seeds') or []) if isinstance(s, dict)
+        }
+
         for cid, c in self.chars.items():
             if not proper_name(c.get('name')) or c.get('unnamed'):
                 continue
             role = str(c.get('role') or '').strip()
-            if role.lower().startswith('your ') or KIN.search(role):
+            role_norm = norm_role(role)
+            name_norm = norm_role(c.get('name'))
+            role_lower = role.lower()
+
+            tie_text = seed_ties.get(role_norm, '')
+            is_known = (
+                bool(c.get('known'))
+                or any(role_lower.startswith(p) for p in ('your ', 'tu ', 'su '))
+                or role_norm in prot_ties
+                or name_norm in prot_ties
+                or any(w in tie_text for w in ('you', 'your', 'protagonist', 'tú', 'tu'))
+            )
+            if is_known:
                 c['known'] = True
             c['unnamed'] = role or 'a stranger'
 

@@ -238,29 +238,10 @@ RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 
 # A way through written as a menu pick: the question is not the verb.
-# people the Kernel ties "you" to by kin or bond: when it names them, the premise keeps them as people
-KIN = re.compile(
-    r"\b(?:famil(?:y|ies)|wife|husband|spouse|partner|son|daughter|child(?:ren)?|kids?|mother|father|"
-    r"mum|mom|dad|parents?|brother|sister|siblings?|grand(?:mother|father|son|daughter|parents?)|"
-    r"uncle|aunt|cousin|nephew|niece|fianc[ée]e?|lover|girlfriend|boyfriend|best friend|"
-    r"familia|familias|esposo|esposa|cónyuge|pareja|hijo|hija|hijos|hijas|niño|niña|niños|niñas|"
-    r"madre|padre|padres|mamá|papá|hermano|hermana|hermanos|hermanas|abuelo|abuela|abuelos|"
-    r"tío|tía|primo|prima|sobrino|sobrina|novio|novia|amante|mejor amigo|mejor amiga|clan|linaje)\b",
-    re.I
-)
-# a role that names a group (one that needs someone to speak for it), not one being
-GROUP_WORD = re.compile(
-    r"\b(?:\w+[^s\W]s|crew|family|families|crowd|council|staff|people|folk|mob|guests?|"
-    r"household|village|town|court|congregation|gang|band|company|guild|army|troop|police|"
-    r"tripulación|familia|multitud|consejo|personal|gente|pueblo|aldea|corte|congregación|"
-    r"banda|compañía|gremio|ejército|tropa|policía)\b",
-    re.I
-)
 MENU_VERB = re.compile(
     r"\byou\s+(?:(?:can|could|may|might|must|shall|should|will|would)\s+)?"
     r"(?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\s+(?:to|whether|between)\b|"
-    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b|"
-    r"\b(?:t[úu]\s+)?(?:puedes\s+)?(?:elegir|eliges|elegiste|decidir|decides|decidiste|optar|optas|optaste)\s+(?:a|entre|si)\b",
+    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b",
     re.I,
 )
 
@@ -1162,9 +1143,7 @@ class StoryGenerator:
                 if s['kind'] == 'crowd':
                     reps = [o for o in seeds if o['kind'] == 'individual'
                             and norm(o.get('speaks_for')) == norm(s['role'])]
-                    if not reps and not GROUP_WORD.search(str(s['role'])):
-                        s['kind'], s['speaks_for'] = 'individual', None   # one being ("the cat") is not a crowd
-                    elif not reps:
+                    if not reps:
                         problems.append(f'crowd "{s["role"]}" has no individual seed whose speaks_for names it')
             # 2026-10-07: the King's cast copied 80 phrases of the circus example, caught only at the audit and
             # cleaned out over two repair rounds; caught here it costs one informed retry

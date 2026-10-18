@@ -1430,17 +1430,20 @@ def stage_8_craft_and_meta_leakage_judge_evaluation():
     check(res_clean.get('verdict') == 'pass' and len(res_clean.get('violations', [])) == 0,
           f"diegetic technical vocabulary falsely flagged by craft judge: {res_clean}")
 
-    # 2. Text leaking engine mechanics and fourth-wall breaks is caught
+    # 2. Text leaking engine mechanics, fourth-wall breaks, and command-menu picks is caught
     texts_dirty = {
         't04': "In this node, the player can examine the locked cabinet or exit north.",
         't05': "The cost is: one life traded for the station.",
-        't06': "If you open the valve you drown, and if you leave it closed you suffocate; choose wisely."
+        't06': "If you open the valve you drown, and if you leave it closed you suffocate; choose wisely.",
+        't07': "You can choose to surrender or fight to the end."
     }
     res_dirty = gen.run_prompt('s8j', 'craft_dirty', {
         '$$TEXTS_JSON$$': json.dumps(texts_dirty, ensure_ascii=False, indent=1)
     }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
-    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 2,
+    check(res_dirty.get('verdict') == 'issues_found' and len(res_dirty.get('violations', [])) >= 3,
           f"mechanics leakage missed by craft judge: {res_dirty}")
+    types = {v.get('issue_type') for v in res_dirty.get('violations', [])}
+    check('command_menu' in types, f"command_menu issue_type not flagged: {res_dirty}")
 
     # 3. ProseWriter integration: judge_craft records findings
     test_pkg = {

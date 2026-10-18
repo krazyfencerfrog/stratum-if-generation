@@ -1354,6 +1354,13 @@ class StubClient(LlmClient):
                     'issue_type': 'unresolved_alternatives',
                     'reason': "Text narrates hypothetical branching alternatives rather than a concrete reality."
                 })
+            elif any(pick in t_lower for pick in ('you can choose', 'you choose to', 'you decide whether', 'choose to surrender', 'puedes elegir', 'eliges ')):
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'command_menu',
+                    'reason': "Text is phrased as a command-menu choice rather than narrating in-world actions."
+                })
         if violations:
             return {
                 "reading": f"Found {len(violations)} prose craft violation(s).",

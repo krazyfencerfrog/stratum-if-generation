@@ -25,6 +25,14 @@ EVALUATION CRITERIA
 3. UNRESOLVED ALTERNATIVE NARRATION:
    - VIOLATION (Flag): Narrating two contradictory, unchosen paths simultaneously within a single passage as if both or neither happened (e.g. "If you open the door, the guard attacks, but if you climb the window, you escape; say what happens"). The prose must narrate the concrete reality of what happens now.
 
+4. COMMAND-MENU PHRASING:
+   - VIOLATION (Flag): Second-person narration or action options phrased as an interactive menu prompt, parser pick, or meta-choice (e.g. "you choose to...", "you decide whether to...", "you opt to...", "choose to surrender", "tú puedes elegir...", "decides entre..."). Second-person interactive fiction must narrate what you do in the world, not prompt the reader with menu picks.
+   - CONCRETE CHARACTER ACTIONS (Pass): Second-person actions describing physical actions or non-menu decisions must NOT be flagged:
+     - "you pick up the fallen lantern" -> PASS (physical action).
+     - "you pick your way across the slippery rocks" -> PASS (physical locomotion).
+     - "you choose your words with care before answering the magistrate" -> PASS (deliberate speech in-world).
+     - "the regent lets you choose the room" -> PASS (NPC offering an in-world option).
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or after.
@@ -71,6 +79,13 @@ Text t03: "The price of grain was high, but the cost of surrender was higher sti
 
 Text t04: "The cost is: one life traded for the station."
 -> FLAG craft_announcement: Echoes premise craft prompt syntax rather than natural dialogue or description.
+
+Example 3 (Command-menu phrasing vs Concrete actions):
+Text t05: "You choose your words carefully before answering the magistrate."
+-> PASS: Concrete character deliberation in-world.
+
+Text t06: "You can choose to surrender or fight."
+-> FLAG command_menu: Phrased as a menu pick or decision prompt rather than dramatizing action.
 
 USER INPUT FOLLOWS BELOW
 

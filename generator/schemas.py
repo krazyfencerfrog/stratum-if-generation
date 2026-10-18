@@ -373,7 +373,7 @@ DILEMMA_JUDGE = obj(
 CRAFT_VIOLATION = obj(
     text_id=S,
     quote=S,
-    issue_type=enum(['meta_leakage', 'craft_announcement', 'unresolved_alternatives']),
+    issue_type=enum(['meta_leakage', 'craft_announcement', 'unresolved_alternatives', 'command_menu']),
     reason=S,
 )
 CRAFT_JUDGE = obj(
