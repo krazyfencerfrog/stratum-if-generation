@@ -384,7 +384,7 @@ RULES_JUDGE = obj(
 CRAFT_VIOLATION = obj(
     text_id=S,
     quote=S,
-    issue_type=enum(['meta_leakage', 'craft_announcement', 'unresolved_alternatives', 'command_menu']),
+    issue_type=enum(['meta_leakage', 'craft_announcement', 'unresolved_alternatives', 'command_menu', 'unchosen_player_deed']),
     reason=S,
 )
 CRAFT_JUDGE = obj(

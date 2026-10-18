@@ -233,13 +233,7 @@ STAMP_FILE = 'pipeline.json'
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
 
 
-# A way through written as a menu pick: the question is not the verb.
-MENU_VERB = re.compile(
-    r"\byou\s+(?:(?:can|could|may|might|must|shall|should|will|would)\s+)?"
-    r"(?:choose|chose|decide|decided|pick|picked|opt|opted|elect|elected)\s+(?:to|whether|between)\b|"
-    r"(?:^\s*|[.:;!?\"'()\-\—]\s*|\b(?:either|or)\s+)(?:to\s+)?(?:choose|decide|elect|opt)\s+(?:to|whether|between)\b",
-    re.I,
-)
+
 
 
 
@@ -1565,10 +1559,6 @@ class StoryGenerator:
             for w in ways:
                 if not str(w.get('cost') or '').strip():
                     add(f"turns[{t.get('id')}].ways_through", 'a way through has no cost', str(w.get('way')))
-                if MENU_VERB.search(str(w.get('way') or '')):
-                    add(f"turns[{t.get('id')}].ways_through",
-                        'a way through is written as a pick ("you choose to ..."); say what you did and what it '
-                        'brought about, as the other ways do', str(w.get('way')))
         for key in ('protagonist', 'arena', 'pressure', 'opposition', 'mediation'):
             tag = (premise.get(key) or {}).get('serves')
             if tag and not valid_serves(tag, brief):

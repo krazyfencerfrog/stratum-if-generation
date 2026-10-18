@@ -32,7 +32,6 @@ STORIES = os.path.join(THIS_DIR, '..', 'stories')
 
 SCALE_ROOMS = {'room_or_building': (10, 14), 'city_or_region': (12, 24), 'world': (20, 40), 'multi_world': (24, 40)}
 MIDDLE_GROUND = 10        # the floor for every story (the user, 2026-10-04): about ten rooms
-EXPLORING = re.compile(r'\b(adventure|quest|dungeon|crawl|explor\w*|journey|expedition|treasure|odyssey|travel\w*)\b', re.I)
 
 
 def as_list(v):
@@ -144,8 +143,7 @@ def room_target(story, brief=None, promises=None):
     locations = len(story.get('locations') or {})
     lo = max(lo, MIDDLE_GROUND, locations + 2)
     hi = max(hi, lo + 4)
-    genre = ' '.join(str((promises or {}).get(k) or '') for k in ('genre', 'reading', 'player_fantasy'))
-    exploring = bool(EXPLORING.search(genre + ' ' + str(story.get('kernel') or '')))
+    exploring = ceiling in ('world', 'multi_world')
     if exploring:
         lo = (lo + hi) // 2
         hi = max(hi, lo + 8)

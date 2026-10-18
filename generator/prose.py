@@ -443,10 +443,6 @@ class ProseWriter:
                     continue
                 if k == 'recap' and not 8 <= len(words(t)) <= 70:
                     soft.append(f'recap: {len(words(t))} words; one or two sentences')
-                if k == 'recap' and example_guard.player_deed(t):     # the same recap is read whatever they did
-                    soft.append(f'recap: says what the player did ("{example_guard.player_deed(t).group(0)}"); describe '
-                                f'the situation or dilemma confronting the protagonist, not player deeds (no "You take...", '
-                                f'"You let...", "You signed..."), since the journal lists their choices beneath it')
                 if k == 'dialogue':
                     for issue in validate_dialogue_text(originals[i], t):
                         soft.append(f'{i}: {issue}')

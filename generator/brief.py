@@ -33,23 +33,13 @@ def g(node, *path, default=None):
     return cur
 
 
-def derive_embodiment(p_type, p_role, explicit_embodiment=None):
+def derive_embodiment(p_type, p_role=None, explicit_embodiment=None):
     if explicit_embodiment in ('embodied_human', 'non_human_bounded', 'distributed_network', 'sessile_entity', 'swarm'):
         return explicit_embodiment
     p_type = str(p_type or 'human').lower()
-    p_role = str(p_role or '').lower()
-    ai_re = re.compile(r"\b(?:ai|ship['’]?s\s+ai|station\s+ai|artificial\s+intelligence|core\s+intelligence|building\s+intelligence|distributed\s+network|subsystem)\b", re.I)
-    if p_type == 'systemic_entity' or ai_re.search(p_role):
-        if any(w in p_role for w in ('swarm', 'hive', 'colony', 'nanite')):
-            return 'swarm'
-        if any(w in p_role for w in ('building', 'facility', 'hospital', 'station', 'sessile', 'anchored')):
-            return 'sessile_entity'
+    if p_type == 'systemic_entity':
         return 'distributed_network'
     if p_type == 'non_human':
-        if any(w in p_role for w in ('swarm', 'pack', 'hive', 'flock')):
-            return 'swarm'
-        if any(w in p_role for w in ('sessile', 'plant', 'fungus')):
-            return 'sessile_entity'
         return 'non_human_bounded'
     return 'embodied_human'
 

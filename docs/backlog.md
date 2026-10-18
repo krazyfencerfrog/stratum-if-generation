@@ -232,10 +232,13 @@ number the player is shown or must watch, and rule systems the engine lacks.
 - [GPU] Would a larger quant that still fits on the GPU (a Q4 at 32-48k
   context) beat IQ3_XS on quality? Speculative decoding with a small
   draft model?
-- Running unattended: a small queue service that resumes after a reboot or
-  a kill.
-
 ## Done
+- 2026-10-18: Completed Phase 2 of Issue #52: comprehensive eradication of Python regex-based band-aids:
+  - Eradicated `YOU_DID` (~40 past-tense verb regex) and `player_deed` across `example_guard.py`, `prose.py`, and `compile_scenes.py` in favor of semantic evaluation in `prompts/s8j_craft.prompt` (Criterion 5 `unchosen_player_deed`).
+  - Eradicated `MENU_VERB`, `MENU_TRIGGER_RE`, and `MENU_RE` across `generator/main.py`, `generator/checks.py`, and `generator/later/node_build.py` in favor of semantic evaluation in `s3_5v_premise_check` (engine checks) and `s8j_craft` (Criterion 4 `command_menu`).
+  - Eradicated `EXPLORING` adventure/quest keyword regex in `generator/scenes.py` in favor of structured brief scaling (`ceiling in ('world', 'multi_world')`).
+  - Cleaned `derive_embodiment` in `generator/brief.py`: eliminated `ai_re` and substring searches in favor of structured `explicit_embodiment` from prompt `3-0b` (`IDENTITY_EPISTEMIC`).
+  - Cast seed validation strictly enforces `being` (`BEINGS = ('person', 'dead', 'animal', 'creature', 'thing')`) from `s3_5c_cast` and `s4c_divergence`.
 - 2026-10-18: Eradicated PAPER_ACT regex in favor of atomic micro-prompt judge (s3_5j_rules.prompt,
   schemas.RULES_JUDGE) for Issue #52. Evaluates contract/magic rule terms semantically to enforce
   physical conduct over paper/document signing across languages without brittle wordlists.

@@ -99,9 +99,6 @@ def normalize_writes(writes):
     return out
 
 
-MENU_RE = re.compile(r'\b(choose|decide|select|pick)\b', re.IGNORECASE)
-
-
 class Step4Builder:
 
     def __init__(self, gen, max_iterations=4, max_repair_nodes=4):
@@ -804,10 +801,6 @@ class Step4Builder:
                 for it in as_list(room.get('interactions')):
                     if not isinstance(it, dict):
                         continue
-                    if MENU_RE.search(str(it.get('action', ''))) or MENU_RE.match(str(it.get('target', ''))):
-                        findings.append({'kind': 'menu', 'node_ids': [nid],
-                                         'issue': f"interaction '{it.get('action')}' on '{it.get('target')}' in {room.get('room')} is a menu pick",
-                                         'fix': 'replace it with the acts in the world that bring the outcome about, each setting its own state'})
                     if not satisfiable(it.get('requires') or []):
                         findings.append({'kind': 'unsatisfiable_requires', 'node_ids': [nid],
                                          'issue': f"interaction '{it.get('action')}' on '{it.get('target')}' requires "

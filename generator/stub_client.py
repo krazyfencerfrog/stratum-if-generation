@@ -724,13 +724,32 @@ class StubClient(LlmClient):
         block = self.body(p)[self.body(p).rfind('--- LIST 1: CONSTRAINTS ---'):]
         explicit = next((m.group(1) for m in re.finditer(r'^\s*(\d+)\.\s.*\[constraint\]', block, re.M)), None)
         hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
+        turn_picks = {}
+        for t in (material.get('turns') or []):
+            if isinstance(t, dict):
+                tid = f"T{t.get('id')}"
+                for w in (t.get('ways_through') or []):
+                    w_text = str((w or {}).get('way') or '')
+                    if any(pick in w_text.lower() for pick in ('you choose', 'choose to', 'decide whether', 'eliges')):
+                        turn_picks[tid] = w_text
+                        break
+
+        def engine_entry(e):
+            if e in turn_picks:
+                return {"id": e, "note": f"turn {e} is written as a pick ({turn_picks[e]})", "holds": False, "quote": turn_picks[e]}
+            if always and e == 'E1':
+                return {"id": e, "note": "stub", "holds": False, "quote": "stub quote"}
+            return {"id": e, "note": "stub", "holds": True, "quote": ""}
+
+        engine_results = [engine_entry(e) for e in engine if not (retold and e == 'E6')]
+        if retold:
+            engine_results.append({"id": "E6", "note": "stub: turn 2 retells turn 1", "holds": False,
+                                   "quote": material['turns'][1]['ways_through'][1]['way']})
+
         return {
             "constraints": [{"n": int(n), "note": "stub: nothing incompatible", "violated": broken and n == explicit,
                              "quote": "stub quote" if broken and n == explicit else ""} for n in constraints],
-            "engine": [{"id": e, "note": "stub", "holds": not (always and e == 'E1'), "quote": "stub quote" if (always and e == 'E1') else ""}
-                       for e in engine if not (retold and e == 'E6')]
-                      + ([{"id": "E6", "note": "stub: turn 2 retells turn 1", "holds": False,
-                           "quote": material['turns'][1]['ways_through'][1]['way']}] if retold else []),
+            "engine": engine_results,
             "mechanics": ([{"material": self.VIOLATION, "note": "A reputation score the player watches; the engine has no such system.", "kind": "number"}]
                           if hard else []) + ([{"material": loss_quote, "note": "stub: the player loses", "kind": "loss"}] if loss else [])
                          + [{"material": "the override codes", "note": "stub: an object in the story", "kind": "fiction"}],
@@ -1385,12 +1404,23 @@ class StubClient(LlmClient):
                     'issue_type': 'unresolved_alternatives',
                     'reason': "Text narrates hypothetical branching alternatives rather than a concrete reality."
                 })
-            elif any(pick in t_lower for pick in ('you can choose', 'you choose to', 'you decide whether', 'choose to surrender', 'puedes elegir', 'eliges ')):
+            elif any(pick in t_lower for pick in ('you can choose', 'you choose to', 'you decide whether',
+                                                  'choose to surrender', 'to choose to', 'either choose',
+                                                  'decide between', 'you must decide', 'option: decide',
+                                                  '; decide whether', 'puedes elegir', 'eliges ')):
                 violations.append({
                     'text_id': tid,
                     'quote': t_str[:80],
                     'issue_type': 'command_menu',
                     'reason': "Text is phrased as a command-menu choice rather than narrating in-world actions."
+                })
+            elif any(deed in t_lower for deed in ('you take the cold tiller', 'you let him inspect', 'you signed the breaker',
+                                                  'you keep the engine running', 'you decide to hold', 'you agreed to cut', 'tú firmaste')):
+                violations.append({
+                    'text_id': tid,
+                    'quote': t_str[:80],
+                    'issue_type': 'unchosen_player_deed',
+                    'reason': "Recap or opening narrates unchosen past deeds rather than the situation arrived in."
                 })
         if violations:
             return {

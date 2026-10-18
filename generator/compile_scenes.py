@@ -350,12 +350,6 @@ class SceneCompiler:
                         if msg not in out:
                             out.append(msg)
         opening = ' '.join(v.get('text', '') for v in scene.get('opening') or [])
-        m = example_guard.player_deed(opening)
-        if m:
-            sentence = next((x for x in re.split(r'(?<=[.!?])\s+', opening) if m.group(0) in x), m.group(0))
-            out.append(f'the opening narrates something the player does ("{sentence.strip()}"): the player acts only '
-                       f'through the menu. Say what the place and the people are like now; a deed of the player\'s '
-                       f'is an action')
         rooms = {r: self.world['rooms'][r]['name'] for r in scene['rooms']}
         for x in re.split(r'(?<=[.!?])\s+', opening):
             low = x.lower()

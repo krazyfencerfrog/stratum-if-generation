@@ -33,6 +33,13 @@ EVALUATION CRITERIA
      - "you choose your words with care before answering the magistrate" -> PASS (deliberate speech in-world).
      - "the regent lets you choose the room" -> PASS (NPC offering an in-world option).
 
+5. UNCHOSEN PAST PLAYER DEEDS (IN RECAPS OR SCENE OPENINGS):
+   - VIOLATION (Flag): Scene recaps or scene openings that narrate decisive past deeds or actions as if the player chose them (e.g. "You signed the breaker's ledger before the fog set in", "You take the cold tiller and call the boat by its name", "You agreed to cut the lines with a billhook", "Tú firmaste el libro de cuentas"). Scene recaps and openings must describe the situation the player arrives in and what is perceived now, never a past deed the player never chose in play.
+   - SITUATIONAL / IMMERSIVE SETTING (Pass): Passive state, arrivals, presence, or sensory perception must NOT be flagged:
+     - "You were trapped beside the weir as night came on" -> PASS (situational predicament).
+     - "The canal basin lay frozen while the master demanded forty pounds" -> PASS (diegetic state).
+     - "You smell burning timber in the cold air" -> PASS (sensory perception).
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or after.
@@ -86,6 +93,13 @@ Text t05: "You choose your words carefully before answering the magistrate."
 
 Text t06: "You can choose to surrender or fight."
 -> FLAG command_menu: Phrased as a menu pick or decision prompt rather than dramatizing action.
+
+Example 4 (Recap deeds vs Situational descriptions):
+Text t07: "You take the cold tiller with both hands and call the boat by its name."
+-> FLAG unchosen_player_deed: Recap narrates an unchosen past deed rather than the situation arrived in.
+
+Text t08: "You were trapped beside the weir as night came on and the water turned to slush."
+-> PASS: Describes the physical predicament and arrival state without unchosen actions.
 
 USER INPUT FOLLOWS BELOW
 

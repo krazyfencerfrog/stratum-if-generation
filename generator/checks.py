@@ -35,7 +35,6 @@ def speaks_for(character, crowd):
         and norm(character.get('speaks_for')) == norm(crowd.get('label'))
 
 
-MENU_TRIGGER_RE = re.compile(r'^\s*you\s+(choose|chose|decide|decided|pick|picked|select|selected|opt|opted)\b', re.IGNORECASE)
 
 
 def as_list(value):
@@ -271,9 +270,6 @@ def check_story(story):
             else:
                 if not str(dv.get('trigger') or '').strip():
                     findings.append(_finding('no_trigger', f"line {lid} branches at {dv['diverges_at']} with no trigger", [lid], [dv['diverges_at']]))
-                elif MENU_TRIGGER_RE.search(str(dv.get('trigger'))):
-                    notes.append(_finding('menu_trigger', f"line {lid}: the trigger \"{dv.get('trigger')}\" is phrased as a pick; "
-                                          f'a trigger names what the player did in the world', [lid], [dv['diverges_at']]))
                 parent = lines.get(line.get('parent') or '')
                 if not parent or dv['diverges_at'] not in (parent.get('path') or []):
                     findings.append(_finding('unreachable_branch', f"line {lid} branches at {dv['diverges_at']}, which is not on its parent line", [lid], [dv['diverges_at']]))

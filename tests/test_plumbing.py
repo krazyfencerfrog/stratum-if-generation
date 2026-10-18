@@ -168,8 +168,8 @@ def repair_breakage_is_caught_at_once():
     run('repair_breaks', env={'STUB_PREMISE_HARD_ROUNDS': '1', 'STUB_REPAIR_BREAKS': '1'})
     attempts = [c for c in calls('repair_breaks') if c['step'] == 's3_5r']
     check(len(attempts) == 2 and not attempts[0]['ok'] and attempts[1]['ok'], f'expected a rejected repair and a clean retry: {attempts}')
-    check('you choose to' in attempts[0]['error'] and '"choose" is not one of the forms' in attempts[0]['error'],
-          f'the complaint should name both new problems: {attempts[0]["error"]}')
+    check('"choose" is not one of the forms' in attempts[0]['error'],
+          f'the complaint should name the new problem: {attempts[0]["error"]}')
     loop = load('repair_breaks', 's3_5_loop.json')
     check(loop['repair_rounds_used'] == 1 and not loop['still_failing'], 'the caught breakage should not cost another round')
     # a retry that is still broken is accepted and left to the audit round, not fatal
@@ -509,12 +509,10 @@ def world_and_scenes_are_checked_for_how_they_read():
                               {'id': 'e', 'verb': 'use', 'object': 'lane', 'object_label': 'the school lane',
                                'effects': [{'set': 'go_S1__S2'}]}]}
     found = c.reading_problems(scene, {'events': [{'text': 'Rain falls. Hugh Calloway waits in the cabin, and the rain falls.'}]}, {})
-    for want in ("take 'the door'", "take 'the pen' with 'the deed'", "verb 'look'", 'narrates something the player does',
+    for want in ("take 'the door'", "take 'the pen' with 'the deed'", "verb 'look'",
                  'opening puts Hugh Calloway in the cabin', 'event 1 retells the opening', "use 'the school lane' leads on"):
         check(any(want in f for f in found), f'missing {want!r} in {found}')
-    check(len(found) == 7, f'taking a pen is fine: {found}')
-    scene['opening'] = [{'text': 'The boat will not move until you sign.'}]
-    check(not any('narrates' in f for f in c.reading_problems(scene, {}, {})), 'a condition is not a deed')
+    check(len(found) == 6, f'taking a pen is fine: {found}')
     long_action = {'id': 'f', 'verb': 'use', 'object': 'pen', 'detail_label': "put the letter before Hugh Calloway's cup and say the boat is sold"}
     found_long = c.reading_problems({'rooms': ['deck'], 'cast': {}, 'interactions': [long_action], 'opening': []}, {}, {})
     check(any('menu labels must be concise action phrases under 40 characters' in f for f in found_long),
@@ -1861,9 +1859,6 @@ def checks_catch_broken_graphs():
     def cycle(s):
         s['lines']['T1']['path'] = t1[:2] + [t1[0]] + t1[2:]
     check({'repeated_node', 'cycle'} & mutated(cycle), 'cycle not caught')
-    menu = json.loads(json.dumps(good))
-    menu['lines']['T2']['divergence']['trigger'] = 'You choose to vent the sector'
-    check('menu_trigger' in {f['kind'] for f in checks.check_story(menu)['notes']}, 'a menu-phrased trigger was not noted')
     dup = json.loads(json.dumps(good))
     dup['lines']['T2']['ending'].update(answer='pole_b', standing=['the nursery warden', 'the hydroponics foreman'], lost=[])
     for l in dup['lines'].values():
@@ -2060,6 +2055,12 @@ def malformed_premise_sections_are_rejected_early():
 def menu_verb_does_not_flag_third_person_decisions():
     sys.path.insert(0, GEN)
     import main as pipeline
+    import schemas
+    from main import StoryGenerator
+
+    test_id = f'{PREFIX}menu_craft_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
 
     # Must NOT match third-person decision clauses or player actions forcing NPC decisions
     must_not = [
@@ -2076,8 +2077,12 @@ def menu_verb_does_not_flag_third_person_decisions():
         "you pick your way across the frozen mud",
         "you choose your words carefully before answering the magistrate",
     ]
-    for s in must_not:
-        check(not pipeline.MENU_VERB.search(s), f"MENU_VERB false positive on: {s!r}")
+    payload_not = {f"t{i}": s for i, s in enumerate(must_not)}
+    res_not = gen.run_prompt('s8j', 'craft_menu_pass', {
+        '$$TEXTS_JSON$$': json.dumps(payload_not, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_not.get('verdict') == 'pass' and len(res_not.get('violations', [])) == 0,
+          f"expected valid actions to pass command_menu check, got: {res_not}")
 
     # Must match second-person picks and imperative menu choices
     must_match = [
@@ -2092,39 +2097,12 @@ def menu_verb_does_not_flag_third_person_decisions():
         "Wait outside; decide whether to enter",
         "Option: decide between two paths",
     ]
-    for s in must_match:
-        check(bool(pipeline.MENU_VERB.search(s)), f"MENU_VERB missed pick: {s!r}")
-
-    # Also check through premise_computed_findings
-    gen = pipeline.StoryGenerator.__new__(pipeline.StoryGenerator)
-    gen.analysis = {}
-    gen.budget = lambda: 'medium'
-    gen.kernel = ''
-    premise_valid = {
-        'turns': [{
-            'id': 1, 'form': 'discover',
-            'ways_through': [
-                {'way': 'you step into the council chamber and sit where the child can see you, so the regent must decide whether to acknowledge you in front of the council', 'cost': 'exposure'},
-                {'way': 'you hold back behind the curtain and wait for the reading of the decree', 'cost': 'delay'},
-            ]
-        }]
-    }
-    findings = gen.premise_computed_findings(premise_valid)
-    menu_findings = [f for f in findings if 'written as a pick' in f.get('problem', '')]
-    check(not menu_findings, f"premise_computed_findings false positive: {menu_findings}")
-
-    premise_pick = {
-        'turns': [{
-            'id': 1, 'form': 'discover',
-            'ways_through': [
-                {'way': 'choose to surrender', 'cost': 'captivity'},
-                {'way': 'fight to the end', 'cost': 'death'},
-            ]
-        }]
-    }
-    findings = gen.premise_computed_findings(premise_pick)
-    menu_findings = [f for f in findings if 'written as a pick' in f.get('problem', '')]
-    check(len(menu_findings) == 1, f"premise_computed_findings failed to flag pick: {menu_findings}")
+    payload_match = {f"t{i}": s for i, s in enumerate(must_match)}
+    res_match = gen.run_prompt('s8j', 'craft_menu_flag', {
+        '$$TEXTS_JSON$$': json.dumps(payload_match, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_match.get('verdict') == 'issues_found' and len(res_match.get('violations', [])) == len(must_match),
+          f"expected command_menu violations for all menu picks, got: {res_match}")
 
 
 # ---------------------------------------------------------------- pure helpers
@@ -3527,18 +3505,17 @@ def ending_resolution_liveness_contradictions_are_caught():
 
 @test
 def protagonist_embodiment_and_somatic_drift():
-    # 1. derive_embodiment mapping
-    check(brief.derive_embodiment('systemic_entity', 'ship core intelligence') == 'distributed_network', 'systemic AI should be distributed_network')
-    check(brief.derive_embodiment('systemic_entity', 'station orbital hospital') == 'sessile_entity', 'systemic station should be sessile_entity')
-    check(brief.derive_embodiment('systemic_entity', 'nanite swarm') == 'swarm', 'systemic swarm should be swarm')
-    check(brief.derive_embodiment('human', 'detective') == 'embodied_human', 'human should be embodied_human')
-    check(brief.derive_embodiment('human', 'new night manager at a failing seaside hotel') == 'embodied_human', 'failing seaside hotel manager should be embodied_human')
-    check(brief.derive_embodiment('non_human', 'alien pack') == 'swarm', 'non_human pack should be swarm')
-    check(brief.derive_embodiment('non_human', 'sessile fungus') == 'sessile_entity', 'sessile non_human should be sessile_entity')
-    check(brief.derive_embodiment('non_human', 'android') == 'non_human_bounded', 'android should be non_human_bounded')
-    # Explicit embodiment override (#51)
-    check(brief.derive_embodiment('systemic_entity', 'arbitrary role', explicit_embodiment='sessile_entity') == 'sessile_entity', 'explicit embodiment should override')
-    check(brief.derive_embodiment('human', 'oficial científica', explicit_embodiment='embodied_human') == 'embodied_human', 'explicit human should pass')
+    # 1. derive_embodiment mapping: explicit prompt output takes precedence, type fallback without regex
+    check(brief.derive_embodiment('systemic_entity', explicit_embodiment='distributed_network') == 'distributed_network', 'explicit distributed_network')
+    check(brief.derive_embodiment('systemic_entity', explicit_embodiment='sessile_entity') == 'sessile_entity', 'explicit sessile_entity')
+    check(brief.derive_embodiment('systemic_entity', explicit_embodiment='swarm') == 'swarm', 'explicit swarm')
+    check(brief.derive_embodiment('non_human', explicit_embodiment='non_human_bounded') == 'non_human_bounded', 'explicit non_human_bounded')
+    check(brief.derive_embodiment('human', explicit_embodiment='embodied_human') == 'embodied_human', 'explicit human')
+    # Default fallbacks when explicit_embodiment is null
+    check(brief.derive_embodiment('systemic_entity') == 'distributed_network', 'systemic default')
+    check(brief.derive_embodiment('non_human') == 'non_human_bounded', 'non_human default')
+    check(brief.derive_embodiment('human') == 'embodied_human', 'human default')
+    check(brief.derive_embodiment('human', 'oficial científica', explicit_embodiment='embodied_human') == 'embodied_human', 'multilingual explicit human')
 
     # 2. Semantic somatic judge (s8j_somatic.prompt)
     import schemas
@@ -3899,7 +3876,9 @@ def stage_d_moment_option_count_and_neutral_discipline():
 def prose_recap_guidance_and_player_deed_validation():
     import prose, example_guard
 
-    # 1. Verify player deed detection in recap
+    # 1. Verify semantic player deed detection in recaps via s8j_craft.prompt (#52)
+    import schemas
+    from main import StoryGenerator
     deed_texts = [
         "You take the cold tiller with both hands and call the boat by its name.",
         "You let him inspect while Laurent stands in the doorway.",
@@ -3908,20 +3887,31 @@ def prose_recap_guidance_and_player_deed_validation():
         "You decide to hold the price firm at five pounds.",
         "You agreed to cut the lines with a billhook.",
     ]
-    for dt in deed_texts:
-        m = example_guard.player_deed(dt)
-        check(m is not None, f"expected player deed detection in '{dt}'")
-
-    # 2. Verify non-deed situational/dilemma recaps pass cleanly
     valid_recaps = [
         "The canal basin lay frozen beneath the weir while {C01} demanded forty pounds.",
         "Soots billowed from the open stove, and {C02} stood shivering in the doorway with his wrench.",
         "A low paper price was on the table, unaware that the mooring chain was still held from inside.",
         "You were trapped beside the weir as night came on and the water turned to slush."
     ]
-    for vr in valid_recaps:
-        m = example_guard.player_deed(vr)
-        check(m is None, f"unexpected player deed detection in valid recap '{vr}': {m}")
+
+    test_id = f'{PREFIX}deed_judge_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+
+    payload_deeds = {f"t{i}": dt for i, dt in enumerate(deed_texts)}
+    res_deeds = gen.run_prompt('s8j', 'craft_deeds', {
+        '$$TEXTS_JSON$$': json.dumps(payload_deeds, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_deeds.get('verdict') == 'issues_found' and len(res_deeds.get('violations', [])) == len(deed_texts),
+          f"expected semantic player deed detection in all recaps, got: {res_deeds}")
+
+    # 2. Verify non-deed situational/dilemma recaps pass cleanly
+    payload_valid = {f"t{i}": vr for i, vr in enumerate(valid_recaps)}
+    res_valid = gen.run_prompt('s8j', 'craft_valid', {
+        '$$TEXTS_JSON$$': json.dumps(payload_valid, ensure_ascii=False, indent=1)
+    }, prompt_file='s8j_craft.prompt', klass='classify', schema=schemas.CRAFT_JUDGE)
+    check(res_valid.get('verdict') == 'pass' and len(res_valid.get('violations', [])) == 0,
+          f"unexpected player deed detection in valid recaps: {res_valid}")
 
     # 3. Check GUIDANCE['scene'] includes the negative constraint
     scene_guidance = prose.GUIDANCE.get('scene', '')
