@@ -1,0 +1,4 @@
+--- GENERAL SEMANTIC AUDIT GUIDELINES ---
+1. VERIFY AGENCY: Confirm the protagonist takes active initiatives and is not reduced to a bystander.
+2. VERIFY DILEMMA INTEGRITY: Confirm turns have two or three viable, distinct ways through with real trade-offs.
+3. VERIFY RESOLUTION: Confirm that promised endings and thematic resolutions are structurally achievable.

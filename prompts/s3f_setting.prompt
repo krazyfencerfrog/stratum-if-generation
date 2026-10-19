@@ -60,6 +60,9 @@ A label formed by combining two or more separately-stated details into a new syn
 
 Include a "note" only when evidence_basis is not "explicit" AND a one-sentence justification would meaningfully help a human reviewer. Otherwise omit "note" entirely.
 
+--- GENRE SETTING CONVENTIONS ---
+$$GENRE_SETTINGS$$
+
 --- FIELDS TO EXTRACT ---
 
 setting_structure — ceiling and floor, each one of: "single", "clustered", "dispersed" (ordered single < clustered < dispersed; floor's position in this order must not exceed ceiling's).

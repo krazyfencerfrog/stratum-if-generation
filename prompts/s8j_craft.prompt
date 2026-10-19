@@ -47,6 +47,9 @@ EVALUATION CRITERIA
      - "If you're late tomorrow, don't bother coming in" -> PASS (workplace warning).
      - "I've been on my feet fourteen hours; don't start with me" -> PASS (natural dialogue).
 
+GENRE AUDIT INVARIANTS:
+$$GENRE_JUDGES$$
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or after.

@@ -85,6 +85,8 @@ What you write, naming rooms, people and things exactly as the packet does:
       actions and movement represent telemetry, data bus queries, radio commands, or
       sensor sweeps; never use human bipedal locomotion ("step down", "walk into", "climb")
       or physical anatomy ("your hands", "in your pocket", "catch your breath").
+    * GENRE OPTIONS & SCENE DISCIPLINE:
+$$GENRE_OPTIONS$$
  - events: the event_here (if any) and anything the scene does by itself,
    each with when it happens (after a number of turns, or after a node).
    An event is something new that happens later in the scene, never the

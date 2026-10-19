@@ -1,0 +1,3 @@
+--- GENERAL SCENE OPTIONS & AGENCY GUIDELINES ---
+1. SECOND-PERSON AGENCY: Options must offer meaningful verbs and stances for "you", representing genuinely distinct tactical, moral, or interpersonal attitudes.
+2. CONSEQUENCE VISIBILITY: The player should understand what is risked or offered by each option without exposing the underlying game state numbers.

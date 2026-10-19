@@ -39,6 +39,9 @@ WHAT TO WRITE
    tense you chose. Every later step reads it as the voice to match, so
    make it the best paragraph you can write.
 
+GENRE PROSE CONVENTIONS:
+$$GENRE_PROSE$$
+
 OUTPUT FORMAT (JSON)
 
 Output ONLY valid JSON, no markdown code fences, no commentary before or

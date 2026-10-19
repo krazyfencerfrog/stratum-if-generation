@@ -62,6 +62,7 @@ import example_guard
 import names
 import terms
 import paper
+import genre
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPT_DIR = os.path.join(THIS_DIR, "..", "prompts")
@@ -305,8 +306,9 @@ class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
                  branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1,
-                 dynamic_names=False):
+                 dynamic_names=False, genre=''):
         self.story_id = story_id
+        self.genre = (genre or '').strip().lower()
         self.dynamic_names = bool(dynamic_names or os.environ.get('STRATUM_DYNAMIC_NAMES') == '1')
         self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
@@ -366,7 +368,8 @@ class StoryGenerator:
             value = f.read()
         if not value:
             raise ValueError(f"prompt {file_name} not found (or empty) in prompt directory {PROMPT_DIR}")
-        return terms.expand(value)
+        expanded = terms.expand(value)
+        return genre.expand(expanded, getattr(self, 'genre', None) or 'general')
 
     def check_schema_stamp(self):
         """Every story directory is stamped with the schema version that
@@ -850,6 +853,45 @@ class StoryGenerator:
         self.kernel = parsed['content_kernel'].strip()
         self.save_story_file('s2_kernel.txt', self.kernel)
 
+    def s2_classify_genre(self):
+        """Identifies the target Genre Craft Pack for this story (Issue #53).
+        Uses explicit CLI --genre if given, else restores from s2_genre.json,
+        else runs s2_genre.prompt against available packs."""
+        saved = self.load_story_file('s2_genre.json')
+        if saved:
+            try:
+                parsed = self.lenient_json_loads(saved)
+                self.genre = parsed.get('genre', 'general').lower().strip()
+                self.analysis['s2_genre'] = parsed
+                return parsed
+            except Exception:
+                pass
+
+        if self.genre and self.genre != 'general':
+            # Explicitly set via CLI or constructor
+            parsed = {'genre': self.genre, 'confidence': 'high', 'reason': 'Specified via command-line argument or parameter'}
+            self.analysis['s2_genre'] = parsed
+            self.save_story_json('s2_genre.json', parsed)
+            return parsed
+
+        available = [g for g in genre.available_genres() if g != 'general']
+        clauses = self.get_kernel_clauses()
+        clauses_str = json.dumps([{'n': n, 'clause': c} for n, c in clauses], ensure_ascii=False)
+        parsed = self.run_prompt('s2', 'genre', {
+            '$$KERNEL$$': self.kernel,
+            '$$CLAUSES$$': clauses_str,
+            '$$AVAILABLE_GENRES$$': json.dumps(available),
+        }, prompt_file='s2_genre.prompt', klass='classify', schema=schemas.GENRE_CLASSIFICATION)
+
+        selected_genre = str(parsed.get('genre') or 'general').lower().strip()
+        if selected_genre not in genre.available_genres():
+            selected_genre = 'general'
+        self.genre = selected_genre
+        parsed['genre'] = selected_genre
+        self.analysis['s2_genre'] = parsed
+        self.save_story_json('s2_genre.json', parsed)
+        return parsed
+
     # ------------------------------------------------------------------ phase 3 helpers
 
     def step3_bundle(self):
@@ -1199,6 +1241,8 @@ class StoryGenerator:
     # ------------------------------------------------------------------ the pipeline
 
     def run_phase3(self):
+        if not getattr(self, 'genre', None):
+            self.s2_classify_genre()
         replace_kernel_only = {'$$KERNEL$$': self.kernel}
         self.run_prompt('s3_0a', 'interactive_question', replace_kernel_only)
         self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only, schema=schemas.IDENTITY_EPISTEMIC)
@@ -2340,6 +2384,8 @@ def main(argv=None):
     parser.add_argument("--parallel", type=int, default=1,
                         help="run independent per-item calls (stage B characters and conversations, stage D "
                              "scenes) this many at once; for remote clients (agy). Default 1: one at a time")
+    parser.add_argument("--genre", default='',
+                        help="genre pack to use (default: auto-detected or 'general')")
     args = parser.parse_args(argv)
 
     story_id = slugify(args.story_id)
@@ -2353,7 +2399,7 @@ def main(argv=None):
                              force_answer=not args.no_force_answer, promises=not args.no_promises,
                              branching=args.branching, outline_judge=not args.no_outline_judge,
                              author=args.author, parallel=args.parallel,
-                             dynamic_names=args.dynamic_names)
+                             dynamic_names=args.dynamic_names, genre=args.genre)
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
@@ -2374,6 +2420,7 @@ def main(argv=None):
         gen.s2_apply_rating(rating=args.rating)
 
         gen.s2_split_shape()
+        gen.s2_classify_genre()
         if args.stop_after == '2':
             finish()
 

@@ -159,6 +159,7 @@ class StubClient(LlmClient):
         flat = head.replace('\n', ' ')
         checks = [
             ('You are a narrative classification and adaptation engine', 'filter'),
+            ('You are the genre classifier', 's2_genre'),
             ('You are the kernel clause extractor', 'kernel_clauses'),
             ('You are the shape-split step', 'shape'),
             ('You are an interactive-contract analyst', 's3_0a'),
@@ -303,6 +304,14 @@ class StubClient(LlmClient):
             ]}
         kernel = p.split('--- USER KERNEL ---')[-1].strip() if '--- USER KERNEL ---' in p else p.split('USER KERNEL')[-1].strip()
         return {"clauses": [{"n": i, "clause": c} for i, c in kernel_clauses(kernel)]}
+
+    def p_s2_genre(self, p):
+        user_input = p.split('USER INPUT FOLLOWS BELOW')[-1].lower() if 'USER INPUT FOLLOWS BELOW' in p else p.lower()
+        if 'romance' in user_input or 'seaside hotel' in user_input or '海辺のホテル' in user_input or 'courtship' in user_input:
+            return {'genre': 'romance', 'confidence': 'high', 'reason': 'Identified romance premise.'}
+        if 'dragon' in user_input or 'hedge-witch' in user_input or 'fantasy' in user_input:
+            return {'genre': 'fantasy_adventure', 'confidence': 'high', 'reason': 'Identified fantasy adventure.'}
+        return {'genre': 'general', 'confidence': 'high', 'reason': 'General premise.'}
 
     def p_shape(self, p):
         kernel = self.text_after(p, '- the Kernel\n')

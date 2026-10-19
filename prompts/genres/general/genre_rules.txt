@@ -1,0 +1,4 @@
+--- GENERAL INTERACTIVE FICTION RULES ---
+1. PLAYER AGENCY & INITIATIVE: The protagonist is an active participant with personal stakes, direct agency, and skin in the game. Never reduce the player to a passive observer or spectator.
+2. TONE FIDELITY: Honor the tone and constraints established in the Kernel and Brief. What is promised must be tangibly delivered.
+3. CAUSAL INTEGRITY: Every outcome, divergence, and ending must flow causally from player choices, companion loyalties, and world state.

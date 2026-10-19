@@ -1,0 +1,4 @@
+--- GENERAL PREMISE & DRAMATIC ENGINE GUIDELINES ---
+1. ACTIVE OPPOSITION: The opposition must have its own agenda, tangible means, and an early concrete demonstration (`shown_by`). It must actively contest the protagonist's goals rather than passively waiting.
+2. PRICE DISCIPLINE: The story's price is an irreversible loss or concession scaled to the genre and failure model. It must be something a reader winces at or grieves, never an abstract mood.
+3. CONCRETE MEDIATION: Levers, barriers, and mediation mechanisms must be physical, social, or institutional realities in the setting, not vague mental states.

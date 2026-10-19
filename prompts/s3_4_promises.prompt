@@ -64,10 +64,8 @@ RULES
     surprised is asking for something bold.
  6. ACTIVE DRAMATIC AGENCY:
     The player_fantasy and promises must give "you" active, direct presence and agency in the world—NOT a passive role as an unseen observer, voyeur, or shadow-lurker decoding silences from afar.
- 7. HUMAN CONFLICT, ROMANTIC RIVALRY & GENRE PROMISES:
-    In relationship, social, or workplace stories, drama lives in direct face-to-face friction, spoken banter, confrontation, and physical presence—NEVER in silent mime, passing folded notes, reading diaries, or decoding handwriting in margins.
-    If the Kernel names a rival pursuing or attracting the player (e.g. "あなたの気を引こうとするライバル"), the rival must actively court, flirt with, or charm the protagonist—creating tangible jealousy and urgency in the love interest, NOT acting as an impersonal corporate recruiter or HR interviewer.
-    If the Kernel mandates that the relationship bears fruit in at least one ending, the promises and fantasies must honor that fruition: at least one pathway must deliver mutual romantic realization and togetherness, without artificially punishing the characters with career destruction or separation.
+ 7. GENRE CRAFT RULES & PROMISES:
+$$GENRE_PROMISES$$
 
 OUTPUT FORMAT (JSON)
 

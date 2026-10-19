@@ -1,0 +1,4 @@
+--- FANTASY ADVENTURE SEMANTIC AUDIT GUIDELINES ---
+1. VERIFY PARTY DYNAMICS: Confirm that companions are active dramatic agents whose distinct loyalties and codes matter to the narrative.
+2. VERIFY JOURNEY & SETTING DIVERSITY: Confirm that the story moves through distinct physical settings across its turns and does not collapse into a single room.
+3. VERIFY MYTHIC PAYOFF: Confirm that the dragon or ancient threat is confronted directly and that resolution costs are meaningful.

@@ -1,0 +1,5 @@
+--- GENERAL TURNS & DILEMMAS GUIDELINES ---
+1. ESCALATING TENSION: Each successive turn must cost or risk more than the previous turn.
+2. DIVERSE DILEMMAS: Each turn must employ a distinct dramatic form (discover, persuade, trade, confront, conceal_or_reveal, sabotage, endure, choose_whom, rescue, escape).
+3. ACTIVE WAYS & COSTS: Ways through must be picturable actions with tangible costs that leave the world, resources, or alliances permanently changed.
+4. MANDATED RESOLUTION: If the premise requires a specific positive resolution or fruition, at least one path through the final turn must deliver that payoff without nullifying penalties.

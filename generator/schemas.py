@@ -65,6 +65,12 @@ KERNEL_CLAUSES = obj(
     clauses=arr(obj(n=I, clause=S))
 )
 
+GENRE_CLASSIFICATION = obj(
+    genre=S,
+    confidence=enum(['high', 'moderate', 'low']),
+    reason=S,
+)
+
 # ---------------------------------------------------------------- 3.4
 
 PROMISES = obj(
@@ -447,6 +453,7 @@ ALL = {
     'RULES_JUDGE': RULES_JUDGE,
     'CRAFT_JUDGE': CRAFT_JUDGE, 'CONTENT_RATING_JUDGE': CONTENT_RATING_JUDGE,
     'IDENTITY_EPISTEMIC': IDENTITY_EPISTEMIC,
+    'GENRE_CLASSIFICATION': GENRE_CLASSIFICATION,
 }
 
 

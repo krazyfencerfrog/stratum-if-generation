@@ -1,0 +1,11 @@
+--- FANTASY ADVENTURE CASTING GUIDELINES ---
+1. PARTY COMPANION ARCHETYPES:
+   - Each companion represents a distinct worldview, martial/magical tradition, and cultural code (e.g. the disgraced knight seeking redemption, the street-smart guide who knows the old ways, the scholarly seeker with a hidden private agenda).
+   - Companions hold critical knowledge, keys, or combat capabilities the protagonist lacks.
+2. BREAKING POINT DISCIPLINE:
+   - A companion's breaking_point is triggered when the party's actions violate their core sacred code:
+     - Disgraced knight: leaves or turns if you slaughter defenseless captives or break a knightly oath.
+     - Rogue guide: flees if the odds turn suicidal without a plan, or if cheated of agreed share.
+     - Scholar: breaks if rare ancient knowledge or an essential artifact is destroyed out of blind superstition.
+3. THE BEAST / ANTAGONIST:
+   - The ancient dragon or antagonist speaks with terrifying intelligence, age, and alien perspective—not a mindless beast.
