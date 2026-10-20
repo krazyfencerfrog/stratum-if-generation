@@ -173,6 +173,8 @@ class StubClient(LlmClient):
             ('interactivity-complexity analyst', 's3g'),
             ('You are a coherence auditor', 's3h'),
             ('You are a premise builder', 's3_5a'),
+            ('You are the dramatic turn spine builder', 's3_5b1'),
+            ('You are the turn ways-through builder', 's3_5b2'),
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
             ('You are the setting-lexicon generator', 's3_5d'),
@@ -497,6 +499,28 @@ class StubClient(LlmClient):
                         "payoff": "at the crisis the frosted valve is the one manual route that still opens"}],
             "rules": [{"thing": "the override codes", "terms": "a code vents one sector, once, and only with two council voices",
                        "if_broken": "a code used with one voice locks every vent on the ring for a day"}],
+        }
+
+    def p_s3_5b1(self, p):
+        out = self._s3_5b(p)
+        return {
+            "turns": [{k: v for k, v in t.items() if k != 'ways_through'} for t in out.get('turns', [])],
+            "complications": out.get('complications', []),
+        }
+
+    def p_s3_5b2(self, p):
+        spine = self.section(p, '- the dramatic turn spine')
+        out = self.p_s3_5b(p)
+        base_ways = [t.get('ways_through', []) for t in out.get('turns', [])]
+        if spine and isinstance(spine.get('turns'), list):
+            ways_by_turn = []
+            for i, t in enumerate(spine['turns']):
+                tid = t.get('id', i + 1)
+                w = base_ways[i] if i < len(base_ways) else base_ways[-1]
+                ways_by_turn.append({"id": tid, "ways_through": w})
+            return {"ways_by_turn": ways_by_turn}
+        return {
+            "ways_by_turn": [{"id": t['id'], "ways_through": t.get('ways_through', [])} for t in out.get('turns', [])],
         }
 
     def p_s3_5b(self, p):

@@ -1111,6 +1111,41 @@ class StoryGenerator:
         if bad_forms and check_forms:
             raise SoftReject('; '.join(bad_forms))
 
+    @staticmethod
+    def validate_turn_spine(parsed, check_forms=True):
+        """Validates the turn spine (situations, forms, involves, set pieces).
+        Ways through are generated in a separate subsequent step (s3_5b2)."""
+        if not isinstance(parsed, dict):
+            raise ValueError('expected a JSON object')
+        turns = parsed.get('turns')
+        if not isinstance(turns, list) or len(turns) < 2:
+            raise ValueError('turns must be a list of at least two turns')
+        problems, bad_forms = [], []
+        for i, t in enumerate(turns):
+            if not isinstance(t, dict):
+                raise ValueError('each turn must be an object')
+            t['id'] = i + 1
+            for k in ('situation', 'what_you_must_do'):
+                if not t.get(k):
+                    problems.append(f'turn {i + 1}: {k} is missing')
+            involves = t.get('involves')
+            involves = involves if isinstance(involves, list) else ([involves] if involves else [])
+            t['involves'] = [str(r).strip() for r in involves if str(r).strip()]
+            t['form'] = str(t.get('form') or '').strip().lower()
+            if t['form'] not in TURN_FORMS:
+                bad_forms.append(f'turn {i + 1}: form "{t["form"]}" is not one of the forms: {", ".join(TURN_FORMS)} '
+                                 f'(a choice between people is choose_whom; a choice between ways is the form of '
+                                 f'what you do to get through)')
+            sp = t.get('set_piece')
+            t['set_piece'] = str(sp).strip() if isinstance(sp, str) and sp.strip().lower() not in ('', 'null', 'none') else None
+        if not isinstance(parsed.get('complications'), list):
+            parsed['complications'] = []
+        if problems:
+            raise ValueError('; '.join(problems))
+        if bad_forms and check_forms:
+            raise SoftReject('; '.join(bad_forms))
+
+
     def with_echo_check(self, validator, keys):
         """Wraps a construction validator with the brief-echo check: a
         phrase of five or more words copied from the brief's own field text
@@ -1325,16 +1360,83 @@ class StoryGenerator:
         }, validator=self.paper_check(self.with_echo_check(self.engine_validator, ('mediation', 'pressure', 'opposition', 'events')),
                                       paper.engine_items, "of the engine's levers, events, pressure, opposition, setups and mediation"),
             klass='build', schema=schemas.ENGINE)
-        turns = self.run_prompt('s3_5b', 'turns', {
-            '$$BRIEF_LINES$$': table,
-            '$$PROMISES$$': self.promises_block(),
-            '$$ENRICHMENT_BUDGET$$': budget,
-            '$$COMPLICATION_COUNT$$': COMPLICATION_TEXT.get(budget, '2 or 3'),
-            '$$ENGINE_JSON$$': self.to_json(engine),
-            '$$KERNEL$$': self.kernel,
-        }, validator=self.paper_check(self.with_echo_check(self.validate_turns, ('turns',)),
-                                      lambda t: paper.way_items(t.get('turns')), 'ways through'),
-            klass='build', schema=schemas.TURNS)
+        existing_turns = self.load_story_file('s3_5b_turns.json')
+        if existing_turns and not self.load_story_file('s3_5b1_spine.json'):
+            turns = self.lenient_json_loads(existing_turns)
+            self.validate_turns(turns)
+            self.analysis['s3_5b_turns'] = turns
+        else:
+            spine = self.run_prompt('s3_5b1', 'spine', {
+                '$$BRIEF_LINES$$': table,
+                '$$PROMISES$$': self.promises_block(),
+                '$$ENRICHMENT_BUDGET$$': budget,
+                '$$COMPLICATION_COUNT$$': COMPLICATION_TEXT.get(budget, '2 or 3'),
+                '$$ENGINE_JSON$$': self.to_json(engine),
+                '$$KERNEL$$': self.kernel,
+            }, validator=self.with_echo_check(self.validate_turn_spine, ('turns',)),
+                klass='build', schema=schemas.TURN_SPINE)
+
+            def ways_validator(parsed):
+                if not isinstance(parsed, dict) or not isinstance(parsed.get('ways_by_turn'), list):
+                    raise ValueError('expected an object with a ways_by_turn list')
+                ways_list = parsed['ways_by_turn']
+                spine_turns = spine.get('turns', [])
+                if len(ways_list) != len(spine_turns):
+                    raise ValueError(f'ways_by_turn has {len(ways_list)} entries, but spine has {len(spine_turns)} turns')
+                problems = []
+                merged_turns = []
+                ways_map = {item['id']: item.get('ways_through', []) for item in ways_list if isinstance(item, dict) and 'id' in item}
+                for i, st in enumerate(spine_turns):
+                    t = dict(st)
+                    tid = t.get('id', i + 1)
+                    t_ways = ways_map.get(tid) or (ways_list[i].get('ways_through', []) if i < len(ways_list) else [])
+                    if not isinstance(t_ways, list) or len(t_ways) < 2:
+                        problems.append(f'turn {tid}: ways_through must be a list of at least two {{"way", "cost"}} objects')
+                    else:
+                        for j, w in enumerate(t_ways):
+                            if not isinstance(w, dict) or not str(w.get('way') or '').strip() or not str(w.get('cost') or '').strip():
+                                problems.append(f'turn {tid} way {j + 1}: must have non-empty "way" and "cost"')
+                    t['ways_through'] = t_ways
+                    merged_turns.append(t)
+                if problems:
+                    raise ValueError('; '.join(problems))
+                full = {'turns': merged_turns, 'complications': spine.get('complications', [])}
+                soft = []
+                try:
+                    self.validate_turns(full)
+                except SoftReject as e:
+                    soft.append(str(e))
+                way_items = paper.way_items(merged_turns)
+                hits = paper.heavy(way_items, self.kernel)
+                if hits:
+                    soft.append(paper.complaint(hits, len(way_items), 'ways through'))
+                echoes = example_guard.brief_echoes({'turns': merged_turns}, self.analysis.get('s3_brief'))
+                if echoes:
+                    soft.append('these phrases are the brief\'s own wording copied in as if they were things in the '
+                                'story: ' + '; '.join(f'"{e}"' for e in echoes[:4]) + '. Name each thing in the '
+                                'story\'s own words (what it is, what it does when used), everywhere it appears')
+                if soft:
+                    raise SoftReject(' Also, '.join(soft))
+
+            ways_res = self.run_prompt('s3_5b2', 'ways', {
+                '$$SPINE_JSON$$': self.to_json(spine),
+                '$$ENGINE_JSON$$': self.to_json(engine),
+                '$$BRIEF_LINES$$': table,
+                '$$KERNEL$$': self.kernel,
+            }, validator=ways_validator,
+                klass='build', schema=schemas.TURN_WAYS)
+
+            ways_map = {item['id']: item.get('ways_through', []) for item in ways_res.get('ways_by_turn', []) if isinstance(item, dict) and 'id' in item}
+            merged_turns = []
+            for i, st in enumerate(spine.get('turns', [])):
+                t = dict(st)
+                tid = t.get('id', i + 1)
+                t['ways_through'] = ways_map.get(tid) or (ways_res['ways_by_turn'][i].get('ways_through', []) if i < len(ways_res.get('ways_by_turn', [])) else [])
+                merged_turns.append(t)
+            turns = {'turns': merged_turns, 'complications': spine.get('complications', [])}
+            self.validate_turns(turns)
+            self.analysis['s3_5b_turns'] = turns
+            self.save_story_json('s3_5b_turns.json', turns)
         roles = []
         for t in turns['turns']:
             for r in t.get('involves') or []:
@@ -1570,7 +1672,7 @@ class StoryGenerator:
         elif cannot.lower() == str(prot.get('can_do') or '').strip().lower():
             add('protagonist.cannot_do', 'cannot_do restates can_do', cannot)
         copied = example_guard.copied_phrases(
-            premise, ['s3_5a_engine.prompt', 's3_5b_turns.prompt', 's3_5c_cast.prompt'],
+            premise, ['s3_5a_engine.prompt', 's3_5b1_spine.prompt', 's3_5b2_ways.prompt', 's3_5c_cast.prompt'],
             [self.kernel or '', json.dumps(brief or {})])
         if len(copied) >= example_guard.MIN_HITS:
             add('premise', f"the premise copies the prompts' calibration example ({len(copied)} of its phrases); "

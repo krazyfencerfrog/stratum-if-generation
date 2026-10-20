@@ -112,6 +112,16 @@ TURNS = obj(
     complications=arr(obj(description=S, serves=S)),
 )
 
+TURN_SPINE = obj(
+    turns=arr(obj(id=I, situation=S, what_you_must_do=S,
+                  involves=arr(S), form=enum(TURN_FORMS), set_piece=STR_OR_NULL, serves=S)),
+    complications=arr(obj(description=S, serves=S)),
+)
+
+TURN_WAYS = obj(
+    ways_by_turn=arr(obj(id=I, ways_through=arr(obj(way=S, cost=S)))),
+)
+
 CAST = obj(
     notes=S,
     cast_seeds=arr(obj(role=S, kind=enum(['individual', 'crowd']), being=enum(BEINGS), speaks_for=STR_OR_NULL,

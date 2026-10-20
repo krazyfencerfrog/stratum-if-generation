@@ -185,7 +185,7 @@ def repair_breakage_is_caught_at_once():
 @test
 def bad_turn_form_costs_a_retry_not_a_round():
     run('badform', env={'STUB_BAD_FORM': '1'}, args=['--stop-after=3.5'])
-    attempts = [c for c in calls('badform') if c['step'] == 's3_5b']
+    attempts = [c for c in calls('badform') if c['step'] in ('s3_5b', 's3_5b1')]
     check(len(attempts) == 2 and 'is not one of the forms' in (attempts[0].get('error') or ''), f'3.5b attempts: {attempts}')
     check(load('badform', 's3_5_loop.json')['repair_rounds_used'] == 0, 'a bad turn form still cost a repair round')
 
@@ -427,9 +427,10 @@ def paper_is_counted_at_every_step():
     check(not paper.heavy(items[:5] + items[5:7], ''), 'two of seven is within the rule')
     # 3.5b: ways through on paper cost one informed retry
     run('paper', env={'STUB_PAPER': '1'})
-    attempts = [c for c in calls('paper') if c['step'] == 's3_5b']
+    attempts = [c for c in calls('paper') if c['step'] in ('s3_5b', 's3_5b2')]
     check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
-    prompt = load('paper', 's3_5b_raw_input_prompt.txt')
+    prompt_file = 's3_5b2_raw_input_prompt.txt' if os.path.isfile(os.path.join(story_dir('paper'), f'{PREFIX}paper_s3_5b2_raw_input_prompt.txt')) else 's3_5b_raw_input_prompt.txt'
+    prompt = load('paper', prompt_file)
     check('turn on paper' in prompt and 'treaty' in prompt, 'the retry should name the ways on paper')
 
 
@@ -452,9 +453,10 @@ def retold_turns_are_found_and_the_right_one_changes():
         {'way': 'you set the sword in the niche and let it calm the water'}]}]), 'different outcomes are not a repeat')
     # 3.5b: a retold turn costs one informed retry
     run('retold', env={'STUB_REPEAT_TURN': '1'})
-    attempts = [c for c in calls('retold') if c['step'] == 's3_5b']
+    attempts = [c for c in calls('retold') if c['step'] in ('s3_5b', 's3_5b2')]
     check(len(attempts) == 2 and not attempts[0]['ok'], f'expected a rejected 3.5b then an accepted one: {attempts}')
-    check('retells turn' in load('retold', 's3_5b_raw_input_prompt.txt'), 'the retry should name the retold turn')
+    prompt_file = 's3_5b2_raw_input_prompt.txt' if os.path.isfile(os.path.join(story_dir('retold'), f'{PREFIX}retold_s3_5b2_raw_input_prompt.txt')) else 's3_5b_raw_input_prompt.txt'
+    check('retells turn' in load('retold', prompt_file), 'the retry should name the retold turn')
 
 
 @test
@@ -2208,8 +2210,8 @@ def menu_verb_does_not_flag_third_person_decisions():
 @test
 def example_copies_are_caught():
     import example_guard, re as _re
-    pf = ['s3_5a_engine.prompt', 's3_5b_turns.prompt', 's3_5c_cast.prompt']
-    text = open(os.path.join(ROOT, 'prompts', 's3_5b_turns.prompt')).read()
+    pf = ['s3_5a_engine.prompt', 's3_5b1_spine.prompt', 's3_5b2_ways.prompt', 's3_5c_cast.prompt']
+    text = open(os.path.join(ROOT, 'prompts', 's3_5a_engine.prompt')).read()
     _, examples = example_guard.split_prompt(text)
     check(examples and 'CALIBRATION' in examples and '$$' not in examples, 'the examples section was not isolated')
     first = _re.search(r'Output:\n(\{.*?\n\})\n', examples, _re.S)
@@ -3048,7 +3050,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5jr', 's3_5v', 's3_5k', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5b1', 's3_5b2', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5jr', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)
@@ -4191,7 +4193,7 @@ def modular_genre_craft_packs_and_macro_expansion():
         used_prompts.add('s2_genre.prompt')
 
         # Test prompts expand with genre macros
-        for p_name in ('s3_4_promises.prompt', 's3_5a_engine.prompt', 's3_5b_turns.prompt', 's3_5c_cast.prompt'):
+        for p_name in ('s3_4_promises.prompt', 's3_5a_engine.prompt', 's3_5b1_spine.prompt', 's3_5b2_ways.prompt', 's3_5c_cast.prompt'):
             p_text = gen.load_prompt(p_name)
             check('$$GENRE_' not in p_text, f"{p_name} has unexpanded genre macros: {p_text}")
     finally:

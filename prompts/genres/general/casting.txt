@@ -1,4 +1,4 @@
 --- GENERAL CASTING GUIDELINES ---
 1. DISTINCT AGENTS: Every cast member must have an individual want, something they hold (authority, key, secret, skill), an edge, and a tie to the protagonist.
 2. BREAKING POINTS: A companion's breaking_point must represent a genuine moral rupture, betrayal, or fatal compromise. It must never trigger on the protagonist performing the core positive action the premise promises.
-3. VOICE DISCIPLINE: Each character's dialogue voice must reflect their role, status, and history in the world, distinct from the protagonist's voice.
+3. VOICE DISCIPLINE: Each character's dialogue voice describes concrete speech mannerisms and cadence (blunt, formal, clipped, measured), vocabulary domain, and social posture. STRICTLY FORBIDDEN: Do not write sample quotes, aphorisms, symmetrical definitions ("X is not a Y, it is a Z"), or paradoxical wordplay.

@@ -35,6 +35,7 @@ The hidden truth must introduce fresh friction, irreversible stakes, or external
 
 === RULES ===
 THE TERMS of a magic, a curse, a bargain, an oath or a contract are what the people bound by it must and must not do, and on what condition, stated so they can be obeyed to the letter ("neither of us touches drink until we are crowned"; "the river carries one crossing for each coin dropped at the ford"), never a mood ("the river is jealous") and never what happens to the paper it is written on (signed, sealed, cut, filed). What befalls whoever breaks the terms is said apart from them (if_broken), and it is the story's price, never a way for the player to lose.
+NO INVENTED METAPHORICAL RULES: Never invent a magical or narrative rule that outlaws standard dramatic actions (weapons, combat, speech, movement, or magic) unless the Kernel explicitly mandates it. Rules are strictly for binding oaths, legal contracts, or explicit world mechanisms (e.g. "a vampire cannot cross running water"), NOT arbitrary narrative taboos that ban physical agency or turn climaxes into riddle games. If the Kernel does not name a binding oath, contract, or magical law, rules MUST be empty.
 
 === BEINGS ===
 WHAT A CAST MEMBER IS (being):
