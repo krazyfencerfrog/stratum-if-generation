@@ -381,8 +381,14 @@ class Engine:
             st.introduced.add(opt['object'])     # a first conversation is an introduction
         if src and src[0] == 'interaction':
             it = src[1]
+            room_before = st.room
             self.queue.append(pick_text(it.get('text'), st, it['id']))
             self._apply(it.get('effects'))
+            if st.room != room_before:
+                moved_room = True
+                for cid in self.accompanies():
+                    if st.placements.get(cid) == room_before:
+                        st.placements[cid] = st.room
             if it.get('once'):
                 st.used.add(it['id'])
             moment = self.moment_of(it['id'])

@@ -11,9 +11,12 @@ Four kinds:
  - opportunity: a small situation where the player does or says one of two
    or three things. Each option is an act ("hand her the headphones",
    "tell the caller the station is closed"), never a moral label ("be
-   kind"). Each moves a named state (the states listed), or none. What each
-   option means must be readable from the situation, so the player knows
-   roughly what they are choosing. About one opportunity in three on a line
+   kind"). In each opportunity, at least one option (and usually each option)
+   MUST move a named state (the states listed) using:
+   "moves": [{"state": "<state name>", "direction": "up | down"}]
+   What each option means must be readable from the situation, so the player
+   knows roughly what they are choosing. Never leave all options in an
+   opportunity with empty "moves": []. About one opportunity in three on a line
    also offers an ACTIVE attempt: a physical try at changing the situation
    (fix it, take it, go there, stop it) that can succeed, fail or be
    stopped. Mark it "active": true. A failed attempt has its own effect;
@@ -35,6 +38,10 @@ rewind, so a surprise must show early.
 
 Rules:
  - A small choice moves a state; it never changes the line by itself.
+ - Every opportunity must move an arc: in each opportunity node, at least
+   one option (and typically each option) must have a non-empty "moves" list
+   with a declared state and direction ("up" or "down"). An opportunity
+   where no option moves a state will fail validation.
  - Do not make every choice a trade between two people. Most options move
    ONE person's state, and their cost is in the world (time lost, a thing
    given up, a risk taken, someone else watching), not automatically the
@@ -88,7 +95,7 @@ Output ONLY valid JSON, no markdown code fences, no commentary.
      "warns": "<state name, for a warning demonstration; else omit>"}
   ]
 }
-Options and tell are for opportunities only.
+Options and tell are for opportunities only. Every opportunity MUST have at least one option with a non-empty "moves" list.
 
 EXAMPLE (one line of a late-night radio phone-in story; for shape only)
 

@@ -779,7 +779,7 @@ class StoryGenerator:
         if len(previous) > 24000:
             previous = previous[:24000] + '\n... (truncated)'
         return (f"\n\n{RETRY_MARKER}\nA computed check found this wrong with it:\n - {problem}\n"
-                f"Return the whole JSON again with only that fixed. Keep everything else exactly as it was.\n"
+                f"Fix every listed problem in your response. Ensure you apply the required changes rather than repeating the previous answer verbatim. Keep everything else that was valid unchanged.\n"
                 f"Your previous answer:\n{previous}\n")
 
     # ------------------------------------------------------------------ s1 / s2

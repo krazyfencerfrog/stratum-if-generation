@@ -27,6 +27,7 @@ Output: <id>_package_draft.json (stratum-story/1 draft, before prose revision) a
 """
 
 import argparse
+import difflib
 import io
 import json
 import os
@@ -430,7 +431,17 @@ class SceneCompiler:
             return None
         if key in extra:
             return extra[key]
-        return names.get(key)
+        if key in names:
+            return names[key]
+        if extra:
+            close = difflib.get_close_matches(key, extra.keys(), n=1, cutoff=0.85)
+            if close:
+                return extra[close[0]]
+        if names:
+            close = difflib.get_close_matches(key, names.keys(), n=1, cutoff=0.85)
+            if close:
+                return names[close[0]]
+        return None
 
     def build(self, sc, answer, problems=None):
         """The model's scene, by name, compiled to engine data. With
@@ -462,7 +473,8 @@ class SceneCompiler:
             cid = self.resolve(pl.get('who'), names, open_, self.people())
             room = open_names.get(norm(pl.get('room')))
             if cid not in self.world['characters']:
-                problems.append(f"placement: {pl.get('who')!r} is not a person in the world")
+                known = sorted({x.get('name') for x in self.world['characters'].values() if x.get('name')})
+                problems.append(f"placement: {pl.get('who')!r} is not a person in the world (known characters: {known})")
             elif not room:
                 problems.append(f"placement: {pl.get('who')!r} is put in {pl.get('room')!r}, which this scene does not open")
             else:
@@ -519,6 +531,10 @@ class SceneCompiler:
             keys.add(key)
             if not it['text']:
                 problems.append(f'{where}: no text')
+            if verb == 'go' and obj in open_ and not any(str(e.get('set', '')).startswith(f'go_{sid}__') for e in effects or []):
+                effects = list(effects or [])
+                if not any('room' in e for e in effects):
+                    effects.append({'room': obj})
             if effects:
                 it['effects'] = effects
             if a.get('frame'):
