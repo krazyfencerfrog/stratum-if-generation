@@ -310,7 +310,7 @@ WORLD_YOU = obj(
 
 SCENE_ACTION = obj(required=['verb', 'object', 'detail', 'label', 'room', 'text'],
                    verb=S, object=STR_OR_NULL, detail=STR_OR_NULL, label=S, room=STR_OR_NULL, text=S,
-                   neutral=B, reveals=arr(S), leads_to=STR_OR_NULL, once=B, frame=FRAME_OR_NULL)
+                   neutral=B, reveals=arr(S), leads_to=STR_OR_NULL, once=B, when=STR_OR_NULL, frame=FRAME_OR_NULL)
 SCENE = obj(
     required=['notes', 'opening', 'start_room', 'placement', 'room_text', 'moments', 'actions', 'events', 'nudges', 'props'],
     notes=S, opening=S, start_room=S,

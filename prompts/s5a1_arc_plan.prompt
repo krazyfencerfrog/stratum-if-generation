@@ -16,14 +16,13 @@ For each character in the arc cast:
  - MOMENTS on the outline's major nodes (cite node ids): where the arc
    turns, is revealed, is tested, or is shown. Give them a moment on every
    line they appear in.
- - RESOLUTIONS: how they end, on each line they appear in. A resolution is
-   either fixed by the line (direction null: on this line they always end
-   this way) or depends on the state (direction up or down: two
-   resolutions on the same line, one for each). Agree with the line's
-   ending: someone it lists as standing stands with you; someone it lists
-   as lost does not. A state-dependent resolution is the story's way of
-   letting the player's accumulated choices decide what the line could
-   not.
+ - RESOLUTIONS: how they end, on each line they appear in. For every arc character,
+   on each line they appear on, you MUST provide TWO state-dependent resolutions:
+   one for direction "up" (what they become if their arc state was nurtured and stands with you),
+   and one for direction "down" (what they become if their arc state was neglected or alienated).
+   Do NOT provide only one resolution per line: the player's choices across the story must decide
+   whether their companion stands redeemed or broken. Agree with the line's ending: someone it
+   lists as standing stands with you in their up resolution; someone it lists as lost does not.
    CRITICAL LIVENESS INVARIANT: Respect the physical status established in the
    line's ending summary. If the summary describes a character surviving,
    stepping back, watching, or remaining alive, your resolution must NOT state

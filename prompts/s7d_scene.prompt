@@ -53,14 +53,15 @@ What you write, naming rooms, people and things exactly as the packet does:
     - each REVELATION node becomes an action that finds it out ("reveals":
       [the node id]): read the letter, open the drawer, ask at the right
       moment;
-    - two to four incidental activities: help with a chore, share a drink,
-      play with the dog. They make the place lived in;
+    - action economy: at most ONE optional environmental action, and only if it reveals essential
+      world lore or provides a tool. Strictly avoid mundane prop filler (do NOT invent actions like
+      dragging sticks over ruts, polishing black pins, or fiddling with door latches);
     - for EVERY entry in "leaving", the action that takes it ("leads_to": its target):
-        * Default / linear progression: findable from every state of the scene, never hidden;
-          one that moves the player somewhere (out a door, down a lane, through an exit) is a go,
-          where a player looks to leave, labelled with how ("out the front door"). Leaving the scene
-          through an exit must always use verb "go" (or "talk" for departures with a character),
-          never "take" or "use".
+        * Default / linear progression: leaving the scene through an exit must always use verb "go"
+          (or "talk" for departures with a character), never "take" or "use", labelled with how ("out the front door").
+          EXIT GATING: In scenes containing opportunity moments, Python automatically gates exits on
+          resolving the scene's core dilemma. Do not author exits that pretend the player can slip away
+          unaddressed before facing the companions or challenge present;
         * BRANCH DIVERGENCE (when "kind" is "branch"):
           A branch is NEVER an unannounced booby trap or an ambiguous prop poke. The packet provides
           the branch's full divergence context ("trigger", "instead", "shift", "branch_title", "branch_motivation").
@@ -126,6 +127,8 @@ Rules:
    "required": true in the packet, append exactly one final neutral option marked
    "neutral": true (something taking no side). Never add extraneous options and
    never omit an option.
+ - Option Deduplication: Never generate duplicate or near-identical options across moments or actions (e.g. do not offer "The Ember Road" in one moment and "The Ember Road. You lead" in another). Every option must present a distinct tactical, moral, or narrative stance.
+ - Strict Action Budget: A scene should contain 3 to 6 total actions (the opportunity moments, true revelation actions if any, at most one incidental activity, and the exit actions), never 8 to 13. High action counts dilute tension into aimless clicking.
  - Stakes live in bodies, places and things; paper only where the story is
    about it.
  - Keep each text short: this is a placeholder a later prose pass rewrites,

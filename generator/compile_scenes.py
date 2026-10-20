@@ -537,6 +537,8 @@ class SceneCompiler:
                     effects.append({'room': obj})
             if effects:
                 it['effects'] = effects
+            if a.get('when'):
+                it['when'] = str(a['when']).strip()
             if a.get('frame'):
                 it['frame'] = a['frame']
             if verb not in CORE_VERBS:
@@ -606,9 +608,26 @@ class SceneCompiler:
                 exits.append({'to': target, 'when': sh['when'], 'kind': 'accumulated'})
         leading = {e['to']: e for e in self.out_edges(sc)}
         led = set()
-        for k, a in enumerate(as_list(answer.get('actions')), 1):
-            if not isinstance(a, dict):
+        gate_moment = None
+        if moments:
+            req = [m for m in moments if m.get('required')]
+            target_m = req[0] if req else moments[0]
+            gate_moment = target_m['id'].split('.')[-1]
+
+        raw_actions = as_list(answer.get('actions'))
+        filtered_actions = []
+        incidental_count = 0
+        for act in raw_actions:
+            if not isinstance(act, dict):
                 continue
+            if act.get('leads_to') or act.get('reveals'):
+                filtered_actions.append(act)
+            else:
+                if incidental_count < 2:
+                    filtered_actions.append(act)
+                    incidental_count += 1
+
+        for k, a in enumerate(filtered_actions, 1):
             effects = []
             to = a.get('leads_to')
             if to:
@@ -626,6 +645,12 @@ class SceneCompiler:
                     it['once'] = True
                 if to and leading[to]['kind'] == 'branch':
                     it['weight'] = 'major'
+                if to and gate_moment:
+                    moment_flag = f'flags.done_{gate_moment}'
+                    if it.get('when'):
+                        it['when'] = f"({it['when']}) and {moment_flag}"
+                    else:
+                        it['when'] = moment_flag
                 interactions.append(it)
         for to, e in leading.items():
             if to not in led:

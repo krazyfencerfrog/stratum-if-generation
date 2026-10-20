@@ -717,7 +717,13 @@ class ArcBuilder:
                 for r in sorted(res, key=lambda r: r['direction'] is None):
                     when = expr(st, r['direction'], k, RESOLUTION_SHARE) if r['direction'] else 'true'
                     variants.append({'when': when, 'text': r.get('becomes') or r.get('state') or ''})
-                if variants[-1]['when'] != 'true':
+                if len(variants) == 1 and variants[0]['when'] != 'true':
+                    fallback_text = (
+                        f"{{{a['id']}}} stands apart from the company, their purpose worn down by the trail; "
+                        f"they walk back without meeting your eyes."
+                    )
+                    variants.append({'when': 'true', 'text': fallback_text, 'note': f'fallback when not {variants[0]["when"]}'})
+                elif variants[-1]['when'] != 'true':
                     variants[-1] = dict(variants[-1], when='true', note='fallback: the last variant holds otherwise')
                 for sh in shifts:
                     if (sh.get('does') == 'resolution' and sh.get('when') and sh['state'] == st
