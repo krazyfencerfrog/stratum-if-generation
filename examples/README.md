@@ -14,6 +14,7 @@ Each package is a standalone JSON file compliant with the Stratum engine specifi
 | `kernel37_the_wire_and_the_gun.json` | *The Wire and the Gun* | Frontier / Mechanical tension | 12 | 3 |
 | `kernel40_the_saddle_in_the_square.json` | *The Saddle in the Square* | Frontier town / Cattle baron water rights | 15 | 3 |
 | `kernel31_the_loose_knot.json` | *The Loose Knot* | Epic fantasy / Dragon awakening & companion loyalties | 19 | 4 |
+| `kernel31_the_name_the_wind_keeps.json` | *The Name the Wind Keeps* | Fantasy adventure (Genre Pack) / Dragon awakening & companion loyalties | 21 | 4 |
 | `kernel1_the_red_line.json` | *The Red Line* | Generation ship AI / Survival of the fittest vs. collective empathy | 19 | 6 |
 
 ## How to Play
