@@ -2,3 +2,5 @@ kernel1
 kernel31
 kernel34
 kernel35
+kernel33
+kernel33_ja

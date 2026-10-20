@@ -1,0 +1,7 @@
+--- SCI-FI SETTINGS GUIDELINES ---
+1. TACTILE SHIPBOARD TEXTURE:
+   - Emphasize the sensory reality of a working spacecraft: the hum of air circulating through dust filters, condensation dripping down aluminum ribs, smell of scorched circuit boards and ozone, vibration of reaction wheels under load.
+2. SCALE & CLAUSTROPHOBIA:
+   - Contrast massive cavernous engineering voids and hollow agricultural drums with suffocatingly tight maintenance conduits, airlock chambers, and blind drone chutes.
+3. ENVIRONMENTAL HAZARDS:
+   - Frost creeping across cold bulkheads during power conservation; emergency red lighting cycling through vented decompression corridors; flashing amber diagnostic arrays against pitch darkness.

@@ -36,8 +36,8 @@ $$TERM_PICTURE$$
 
  - Do not improve, enrich, tighten, or re-word anything the findings do not name.
  - Do not argue with a finding by leaving the material as it was, with one exception: a finding that misreads one of the definitions above (it calls the story's price a way to lose, a document or a relationship a system, a rule's if_broken a failure). Decline that one: leave the material, set "declined" true, and say in "disagreement" which definition it misreads and how. A finding against a Kernel clause is never declined. Every other finding you think mistaken still gets the smallest change that satisfies it as written, with your disagreement recorded.
- - Do not cross the construction steps' own limits: no proper names, no room interiors, no order of events, no system the engine lacks, no losing condition beyond what 3-0c names.
  - Do not introduce a person without a cast seed: if a repaired turn involves someone new, add their seed and return "cast_seeds" too.
+ - Respect negative Kernel constraints: if the Kernel states that something is secret, unspoken, or that nobody will say it out loud, repairs must NEVER resolve a finding by having an NPC speak it aloud, whisper it, or state it in dialogue.
 
 --- OUTPUT FORMAT ---
 Output ONLY valid JSON, no markdown code fences, no commentary before or after, matching exactly this shape:

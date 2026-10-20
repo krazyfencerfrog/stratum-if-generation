@@ -1,0 +1,9 @@
+--- SCI-FI PREMISE & DRAMATIC ENGINE GUIDELINES ---
+1. OPPOSITION ARCHETYPE:
+   - The primary opposition is systemic entropy and physical law: a decaying reactor core, micrometeoroid puncture cascades, decaying orbital trajectories, or rogue automatic maintenance protocols.
+   - Secondary opposition comes from human factions under pressure: mutinous surviving crew, desperate faction leaders demanding life-support priority, or saboteurs trying to breach sealed sectors.
+2. PRICE & FAILURE DISCIPLINE:
+   - Prices are measured in physical hardware and biological consumables: venting oxygen from residential rings, dumping emergency coolant, burning out drone chassis in radioactive conduits, or sacrificing power to hydroponics.
+   - Failure is physical decompression, reactor core breach, or generational mission extinction.
+3. MEDIATION LEVERS:
+   - Physical levers: bulkhead pneumatic overrides, manual coolant diverter valves, diagnostic relay switches, optical drone feeds, auxiliary battery banks, and frequency-locked maintenance keys.

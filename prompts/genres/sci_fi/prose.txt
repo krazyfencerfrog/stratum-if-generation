@@ -1,0 +1,9 @@
+--- SCI-FI PROSE & STYLE GUIDELINES ---
+1. SENSORY & TELEMETRY PRECISION:
+   - Use concrete, technical sensory language:
+     - The dry, copper-thin taste of scrubbed emergency air.
+     - Sensor jitter across infrared optical arrays when coolant flares.
+     - The groan of stressed titanium hull bulkheads adjusting to micro-fractures.
+     - The hollow thump of pneumatic seals clamping shut against hard vacuum.
+2. RHYTHM & PACING:
+   - Crisp, clipped phrasing during critical alarms and countdowns; cavernous, lingering acoustic silence when drifting between operational cycles.

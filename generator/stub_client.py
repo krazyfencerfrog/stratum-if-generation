@@ -159,6 +159,9 @@ class StubClient(LlmClient):
         flat = head.replace('\n', ' ')
         checks = [
             ('You are a narrative classification and adaptation engine', 'filter'),
+            ('the narrative works cataloger', 's2a'),
+            ('the narrative mechanics extractor', 's2b'),
+            ('the catalyst sanitizer and synthesizer', 's2c'),
             ('You are the genre classifier', 's2_genre'),
             ('You are the kernel clause extractor', 'kernel_clauses'),
             ('You are the shape-split step', 'shape'),
@@ -307,12 +310,80 @@ class StubClient(LlmClient):
         kernel = p.split('--- USER KERNEL ---')[-1].strip() if '--- USER KERNEL ---' in p else p.split('USER KERNEL')[-1].strip()
         return {"clauses": [{"n": i, "clause": c} for i, c in kernel_clauses(kernel)]}
 
+    def p_s2a(self, p):
+        return {
+            "in_genre_works": [
+                {
+                    "title": "Brief Encounter",
+                    "creator": "David Lean",
+                    "tradition": "romance drama",
+                    "core_dynamic": "Two people meet in a transit junction under ticking mechanical time before departure."
+                },
+                {
+                    "title": "The Remains of the Day",
+                    "creator": "Kazuo Ishiguro",
+                    "tradition": "quiet drama",
+                    "core_dynamic": "Professional duty masks unvoiced affection across decades of service."
+                }
+            ],
+            "fusion_works": [
+                {
+                    "title": "Das Boot",
+                    "creator": "Wolfgang Petersen",
+                    "orthogonal_genre": "submarine thriller",
+                    "parallel_pressure": "An enclosed physical vessel where exterior pressure mounts and everyone hears every sound."
+                },
+                {
+                    "title": "Flight of the Phoenix",
+                    "creator": "Robert Aldrich",
+                    "orthogonal_genre": "survival drama",
+                    "parallel_pressure": "A stranded group must rebuild a failing machine together using only scavenged parts."
+                }
+            ]
+        }
+
+    def p_s2b(self, p):
+        return {
+            "in_genre_elements": [
+                {
+                    "element": "A shared evening routine where physical tools and keys are handed back and forth in silence.",
+                    "why_it_fits": "Deepens the quiet intimacy and professional boundary between the characters."
+                },
+                {
+                    "element": "An unexpected departure notice that forces an unsaid admission into the open.",
+                    "why_it_fits": "Provides a clear dramatic ticking clock."
+                }
+            ],
+            "fusion_elements": [
+                {
+                    "element": "A failing basement seawater sump pump that demands coordinated physical labor during coastal surges.",
+                    "why_it_fits": "Injects physical pressure and cooperative labor into the setting."
+                },
+                {
+                    "element": "A sudden storm cutting off the access road, trapping everyone inside for forty-eight hours.",
+                    "why_it_fits": "Removes the escape route and forces immediate confrontation."
+                }
+            ]
+        }
+
+    def p_s2c(self, p):
+        return {
+            "catalyst_in_genre": "A shared late-night key exchange where every handed object carries unspoken personal weight.",
+            "catalyst_fusion": "A failing basement seawater sump pump that demands coordinated physical labor during coastal surges."
+        }
+
     def p_s2_genre(self, p):
         user_input = p.split('USER INPUT FOLLOWS BELOW')[-1].lower() if 'USER INPUT FOLLOWS BELOW' in p else p.lower()
         if 'romance' in user_input or 'seaside hotel' in user_input or '海辺のホテル' in user_input or 'courtship' in user_input:
             return {'genre': 'romance', 'confidence': 'high', 'reason': 'Identified romance premise.'}
         if 'dragon' in user_input or 'hedge-witch' in user_input or 'fantasy' in user_input:
             return {'genre': 'fantasy_adventure', 'confidence': 'high', 'reason': 'Identified fantasy adventure.'}
+        if 'generational ship' in user_input or 'generation ship' in user_input or 'sci-fi' in user_input or "ship's ai" in user_input:
+            return {'genre': 'sci_fi', 'confidence': 'high', 'reason': 'Identified science fiction premise.'}
+        if 'court intrigue' in user_input or 'child king' in user_input or 'regent' in user_input:
+            return {'genre': 'court_intrigue', 'confidence': 'high', 'reason': 'Identified court intrigue premise.'}
+        if 'ghost' in user_input or 'canal boat' in user_input or 'haunted' in user_input:
+            return {'genre': 'ghost_story', 'confidence': 'high', 'reason': 'Identified ghost story premise.'}
         return {'genre': 'general', 'confidence': 'high', 'reason': 'General premise.'}
 
     def p_shape(self, p):

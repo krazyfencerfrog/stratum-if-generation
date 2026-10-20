@@ -71,6 +71,22 @@ GENRE_CLASSIFICATION = obj(
     reason=S,
 )
 
+CATALYST_WORKS = obj(
+    in_genre_works=arr(obj(title=S, creator=STR_OR_NULL, tradition=S, core_dynamic=S)),
+    fusion_works=arr(obj(title=S, creator=STR_OR_NULL, orthogonal_genre=S, parallel_pressure=S)),
+)
+
+CATALYST_ELEMENTS = obj(
+    in_genre_elements=arr(obj(element=S, why_it_fits=S)),
+    fusion_elements=arr(obj(element=S, why_it_fits=S)),
+)
+
+CATALYST_FINAL = obj(
+    catalyst_in_genre=S,
+    catalyst_fusion=S,
+)
+
+
 # ---------------------------------------------------------------- 3.4
 
 PROMISES = obj(

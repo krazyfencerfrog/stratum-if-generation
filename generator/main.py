@@ -892,6 +892,97 @@ class StoryGenerator:
         self.save_story_json('s2_genre.json', parsed)
         return parsed
 
+    def s2_generate_catalysts(self):
+        """Generates random creative catalysts (in-genre and cross-genre fusion)
+        in Stage 2 to prevent predictable narrative mode collapse."""
+        saved = self.load_story_file('s2_catalysts.json')
+        if saved:
+            try:
+                parsed = self.lenient_json_loads(saved)
+                self.analysis['s2_catalysts'] = parsed
+                return parsed
+            except Exception:
+                pass
+
+        if not getattr(self, 'genre', None):
+            self.s2_classify_genre()
+
+        # 1. Step 2a: Generate candidate works (10 in-genre, 10 fusion)
+        works = self.run_prompt('s2a', 'catalyst_works', {
+            '$$KERNEL$$': self.kernel,
+            '$$GENRE$$': getattr(self, 'genre', 'general') or 'general',
+        }, prompt_file='s2a_catalyst_works.prompt', klass='classify', schema=schemas.CATALYST_WORKS)
+
+        in_genre_list = works.get('in_genre_works') or []
+        fusion_list = works.get('fusion_works') or []
+        if not in_genre_list or not fusion_list:
+            raise ValueError('s2a_catalyst_works returned empty in_genre_works or fusion_works')
+
+        # Python random selection of works
+        chosen_in_genre = random.choice(in_genre_list)
+        chosen_fusion = random.choice(fusion_list)
+
+        # 2. Step 2b: Extract mechanical elements from the chosen works
+        elements = self.run_prompt('s2b', 'catalyst_elements', {
+            '$$KERNEL$$': self.kernel,
+            '$$CHOSEN_IN_GENRE$$': json.dumps(chosen_in_genre, ensure_ascii=False),
+            '$$CHOSEN_FUSION$$': json.dumps(chosen_fusion, ensure_ascii=False),
+        }, prompt_file='s2b_catalyst_elements.prompt', klass='classify', schema=schemas.CATALYST_ELEMENTS)
+
+        in_genre_elems = elements.get('in_genre_elements') or []
+        fusion_elems = elements.get('fusion_elements') or []
+        if not in_genre_elems or not fusion_elems:
+            raise ValueError('s2b_catalyst_elements returned empty elements')
+
+        # Python random selection of elements
+        chosen_elem_in_genre = random.choice(in_genre_elems)
+        chosen_elem_fusion = random.choice(fusion_elems)
+
+        # 3. Step 2c: Sanitize and synthesize into native story catalysts
+        sanitized = self.run_prompt('s2c', 'catalyst_sanitize', {
+            '$$KERNEL$$': self.kernel,
+            '$$RAW_IN_GENRE_ELEMENT$$': str(chosen_elem_in_genre.get('element') or ''),
+            '$$RAW_FUSION_ELEMENT$$': str(chosen_elem_fusion.get('element') or ''),
+        }, prompt_file='s2c_catalyst_sanitize.prompt', klass='classify', schema=schemas.CATALYST_FINAL)
+
+        catalysts_bundle = {
+            'chosen_in_genre_work': chosen_in_genre,
+            'chosen_fusion_work': chosen_fusion,
+            'chosen_in_genre_element': chosen_elem_in_genre,
+            'chosen_fusion_element': chosen_elem_fusion,
+            'catalyst_in_genre': str(sanitized.get('catalyst_in_genre') or '').strip(),
+            'catalyst_fusion': str(sanitized.get('catalyst_fusion') or '').strip(),
+        }
+
+        self.analysis['s2_catalysts'] = catalysts_bundle
+        self.save_story_json('s2_catalysts.json', catalysts_bundle)
+        return catalysts_bundle
+
+    def catalyst_block(self):
+        """Formats the active catalysts as a clear block for downstream prompts."""
+        cats = self.analysis.get('s2_catalysts')
+        if not cats:
+            saved = self.load_story_file('s2_catalysts.json')
+            if saved:
+                try:
+                    cats = self.lenient_json_loads(saved)
+                    self.analysis['s2_catalysts'] = cats
+                except Exception:
+                    cats = None
+        if not cats or not isinstance(cats, dict):
+            return ''
+        c1 = str(cats.get('catalyst_in_genre') or '').strip()
+        c2 = str(cats.get('catalyst_fusion') or '').strip()
+        lines = []
+        if c1:
+            lines.append(f'- In-Genre Dramatic Catalyst: {c1}')
+        if c2:
+            lines.append(f'- Cross-Genre Fusion Catalyst: {c2}')
+        if not lines:
+            return ''
+        return '\nDRAMATIC CATALYSTS (narrative seeds to enrich character motives, obstacles, and stakes):\n' + '\n'.join(lines) + '\n'
+
+
     # ------------------------------------------------------------------ phase 3 helpers
 
     def step3_bundle(self):
@@ -1278,6 +1369,8 @@ class StoryGenerator:
     def run_phase3(self):
         if not getattr(self, 'genre', None):
             self.s2_classify_genre()
+        if 's2_catalysts' not in self.analysis:
+            self.s2_generate_catalysts()
         replace_kernel_only = {'$$KERNEL$$': self.kernel}
         self.run_prompt('s3_0a', 'interactive_question', replace_kernel_only)
         self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only, schema=schemas.IDENTITY_EPISTEMIC)
@@ -1357,6 +1450,7 @@ class StoryGenerator:
             '$$PROMISES$$': self.promises_block(),
             '$$ENRICHMENT_BUDGET$$': budget,
             '$$KERNEL$$': self.kernel,
+            '$$CATALYSTS$$': self.catalyst_block(),
         }, validator=self.paper_check(self.with_echo_check(self.engine_validator, ('mediation', 'pressure', 'opposition', 'events')),
                                       paper.engine_items, "of the engine's levers, events, pressure, opposition, setups and mediation"),
             klass='build', schema=schemas.ENGINE)
@@ -1373,6 +1467,7 @@ class StoryGenerator:
                 '$$COMPLICATION_COUNT$$': COMPLICATION_TEXT.get(budget, '2 or 3'),
                 '$$ENGINE_JSON$$': self.to_json(engine),
                 '$$KERNEL$$': self.kernel,
+                '$$CATALYSTS$$': self.catalyst_block(),
             }, validator=self.with_echo_check(self.validate_turn_spine, ('turns',)),
                 klass='build', schema=schemas.TURN_SPINE)
 
@@ -1423,6 +1518,7 @@ class StoryGenerator:
                 '$$ENGINE_JSON$$': self.to_json(engine),
                 '$$BRIEF_LINES$$': table,
                 '$$KERNEL$$': self.kernel,
+                '$$CATALYSTS$$': self.catalyst_block(),
             }, validator=ways_validator,
                 klass='build', schema=schemas.TURN_WAYS)
 
@@ -2523,6 +2619,7 @@ def main(argv=None):
 
         gen.s2_split_shape()
         gen.s2_classify_genre()
+        gen.s2_generate_catalysts()
         if args.stop_after == '2':
             finish()
 

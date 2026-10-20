@@ -7,7 +7,12 @@ AVAILABLE GENRE PACKS:
 $$AVAILABLE_GENRES$$
 
 RULES:
-1. Match against the available genre packs above. If the story premise is a romance, courtship, or romantic rivalry, select "romance". If it is a quest, party journey, or epic fantasy, select "fantasy_adventure".
+1. Match against the available genre packs above:
+   - "romance": romance, courtship, romantic rivalry, intimate slow-burn relationships.
+   - "fantasy_adventure": epic quests, party journeys, dragons, magic, mythic beasts.
+   - "sci_fi": space exploration, generation ships, AI protagonists, system failures, hard technical stakes.
+   - "court_intrigue": political succession, regents, courtiers, power struggles, countdown to coronation.
+   - "ghost_story": hauntings, spirits, apparitions, cursed vessels/estates, uncanny horror/comedy.
 2. If the story premise does not clearly fit any of the specialized genre packs, or if it is a general interactive fiction story, select "general".
 3. Confidence: "high" if explicit in the kernel, "moderate" if strongly implied, "low" if uncertain.
 

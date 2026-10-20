@@ -5,5 +5,7 @@ kernel17
 kernel28
 kernel31
 kernel32
+kernel33
+kernel33_ja
 kernel34
 kernel35

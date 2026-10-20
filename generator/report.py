@@ -34,10 +34,10 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # (label, regex over the step id). First match wins.
 STAGES = [
-    ('step 2: shape split / rating', r'^s2$'),
+    ('step 2: shape split / rating', r'^s2(_.*|[a-c])?$'),
     ('phase 3: extraction + cross-check', r'^s3(_0[abc]|[b-h])$'),
     ('3.4 genre promises', r'^s3_4$'),
-    ('3.5 premise: build', r'^s3_5[abc]?$'),
+    ('3.5 premise: build', r'^s3_5([abc]|b[12])?$'),
     ('3.5 premise: verify', r'^s3_5[vk]$'),
     ('3.5 premise: repair', r'^s3_5r$'),
     ('3.6 / 3.7 cast and world (now stage B)', r'^s3_[67]$'),

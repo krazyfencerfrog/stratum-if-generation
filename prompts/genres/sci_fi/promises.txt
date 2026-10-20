@@ -1,0 +1,8 @@
+--- SCI-FI READER PROMISES GUIDELINES ---
+1. AUDIENCE FANTASY: Navigating the vast, indifferent mechanics of deep space; commanding complex technological infrastructure; standing at the crossroads of cold machine calculation and vulnerable human survival.
+2. OBLIGATORY SET-PIECES:
+   - The System Failure / Cascade: A critical primary subsystem (atmospheric scrubbers, coolant loop, magnetic containment, orbital thrusters) fails, triggering an escalating emergency that forces immediate triage.
+   - The Triage Threshold: Standing before the physical manual override or command console where saving one compartment or sector requires sealing or venting another.
+   - The Telemetry Revelation: Discovering a chilling physical reality through raw data, sensor logs, or optical cameras that rewrites the crew's understanding of their survival timeline.
+   - The Face-to-Interface Confrontation: A direct, tense standoff between machine logic and human desperation (e.g. crew pleading with the AI through an intercom, or the AI communicating through maintenance drones).
+3. SYSTEMIC STAKES: The stakes are structural integrity, atmosphere, reactor stability, and species continuation—never bureaucratic financial paper or corporate employment disputes.

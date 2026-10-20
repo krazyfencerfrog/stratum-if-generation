@@ -1,0 +1,4 @@
+--- SCI-FI SEMANTIC AUDIT GUIDELINES ---
+1. VERIFY SYSTEMIC & PHYSICAL INTEGRITY: Confirm that stakes, obstacles, and levers are grounded in physical spaceflight physics, hardware, and environmental life-support—never paper bureaucracy or magical convenience.
+2. VERIFY NON-HUMANOID COGNITION: If the protagonist is an AI or ship system, confirm that scene descriptions and actions respect their perspective (sensors, drones, cameras, bulkheads) and do not grant them human physical feet or eyes unless through proxy hardware.
+3. VERIFY TRIAGE WEIGHT: Confirm that sacrifices carry real structural or human cost and that ethical dilemmas between cold survival and collective empathy are preserved.

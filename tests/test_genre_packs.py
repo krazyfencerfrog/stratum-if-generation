@@ -24,6 +24,9 @@ class TestGenrePacks(unittest.TestCase):
         self.assertIn('general', genres)
         self.assertIn('romance', genres)
         self.assertIn('fantasy_adventure', genres)
+        self.assertIn('sci_fi', genres)
+        self.assertIn('court_intrigue', genres)
+        self.assertIn('ghost_story', genres)
 
     def test_load_components(self):
         # Romance pack
@@ -43,6 +46,21 @@ class TestGenrePacks(unittest.TestCase):
         fantasy_promises = genre.load_component('fantasy_adventure', 'PROMISES')
         self.assertIn('Campfire on the Road', fantasy_promises)
         self.assertIn('dragon', fantasy_promises.lower())
+
+        # Sci-Fi pack
+        scifi_rules = genre.load_component('sci_fi', 'RULES')
+        self.assertIn('SCI-FI CRAFT RULES', scifi_rules)
+        self.assertIn('MACHINE & AI COGNITION', scifi_rules)
+
+        # Court Intrigue pack
+        court_rules = genre.load_component('court_intrigue', 'RULES')
+        self.assertIn('COURT INTRIGUE CRAFT RULES', court_rules)
+        self.assertIn('TICKING CLOCK', court_rules)
+
+        # Ghost Story pack
+        ghost_rules = genre.load_component('ghost_story', 'RULES')
+        self.assertIn('GHOST STORY CRAFT RULES', ghost_rules)
+        self.assertIn('SPECTRAL ANCHOR', ghost_rules)
 
         # General pack
         gen_rules = genre.load_component('general', 'RULES')
@@ -95,8 +113,33 @@ class TestGenrePacks(unittest.TestCase):
             prompt = gen.load_prompt('s3_4_promises.prompt')
             self.assertNotIn('$$GENRE_', prompt)
             self.assertIn('FANTASY ADVENTURE READER PROMISES GUIDELINES', prompt)
+
+            # Test sci_fi
+            gen_sci = gen_main.StoryGenerator(story_id=f'{story_id}_scifi')
+            gen_sci.kernel = "A hard sci-fi story on a generational ship where you play as the ship's AI."
+            parsed_sci = gen_sci.s2_classify_genre()
+            self.assertEqual(parsed_sci['genre'], 'sci_fi')
+            prompt_sci = gen_sci.load_prompt('s3_4_promises.prompt')
+            self.assertIn('SCI-FI READER PROMISES GUIDELINES', prompt_sci)
+
+            # Test court_intrigue
+            gen_court = gen_main.StoryGenerator(story_id=f'{story_id}_court')
+            gen_court.kernel = "Court intrigue. You're the tutor to a child king whose uncle, the regent, plots usurpation."
+            parsed_court = gen_court.s2_classify_genre()
+            self.assertEqual(parsed_court['genre'], 'court_intrigue')
+            prompt_court = gen_court.load_prompt('s3_4_promises.prompt')
+            self.assertIn('COURT INTRIGUE READER PROMISES GUIDELINES', prompt_court)
+
+            # Test ghost_story
+            gen_ghost = gen_main.StoryGenerator(story_id=f'{story_id}_ghost')
+            gen_ghost.kernel = "A ghost story on an inherited canal boat with a ghost captain."
+            parsed_ghost = gen_ghost.s2_classify_genre()
+            self.assertEqual(parsed_ghost['genre'], 'ghost_story')
+            prompt_ghost = gen_ghost.load_prompt('s3_4_promises.prompt')
+            self.assertIn('GHOST STORY READER PROMISES GUIDELINES', prompt_ghost)
         finally:
-            shutil.rmtree(story_path, ignore_errors=True)
+            for s in ('', '_scifi', '_court', '_ghost'):
+                shutil.rmtree(Path(REPO_ROOT) / 'stories' / f'{story_id}{s}', ignore_errors=True)
 
 
 if __name__ == '__main__':

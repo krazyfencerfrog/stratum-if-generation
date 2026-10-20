@@ -2539,7 +2539,7 @@ def helpers():
         check(clauses and all(c.strip() for _, c in clauses), f'{os.path.basename(path)}: no clauses')
         check([n for n, _ in clauses] == list(range(1, len(clauses) + 1)), f'{os.path.basename(path)}: clause numbering')
     eval_set = open(os.path.join(KERNELS, 'EVAL_SET.txt'), encoding='utf-8').read().split()
-    check(all(os.path.isfile(os.path.join(KERNELS, f'{k}.txt')) for k in eval_set) and 6 <= len(eval_set) <= 10, f'EVAL_SET: {eval_set}')
+    check(all(os.path.isfile(os.path.join(KERNELS, f'{k}.txt')) for k in eval_set) and 6 <= len(eval_set) <= 15, f'EVAL_SET: {eval_set}')
     quick = open(os.path.join(KERNELS, 'EVAL_QUICK.txt'), encoding='utf-8').read().split()
     check(quick and set(quick) <= set(eval_set), f'EVAL_QUICK must be a subset of EVAL_SET: {quick}')
     targets = brief.shape_targets({'endings': {'tier': 'many'}, 'linearity': 'linear'})
@@ -4196,6 +4196,25 @@ def modular_genre_craft_packs_and_macro_expansion():
         for p_name in ('s3_4_promises.prompt', 's3_5a_engine.prompt', 's3_5b1_spine.prompt', 's3_5b2_ways.prompt', 's3_5c_cast.prompt'):
             p_text = gen.load_prompt(p_name)
             check('$$GENRE_' not in p_text, f"{p_name} has unexpanded genre macros: {p_text}")
+    finally:
+        shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
+@test
+def stage_2_creative_catalysts():
+    import main as gen_main
+    test_id = f'{PREFIX}catalysts_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    try:
+        gen = gen_main.StoryGenerator(story_id=test_id, genre='romance')
+        gen.kernel = "A romance at a seaside hotel."
+        res = gen.s2_generate_catalysts()
+        check(isinstance(res, dict), f"expected dict from catalysts, got {res}")
+        check('catalyst_in_genre' in res and 'catalyst_fusion' in res, f"missing catalysts in {res}")
+        check(res['catalyst_in_genre'] and res['catalyst_fusion'], f"empty catalyst values in {res}")
+        block = gen.catalyst_block()
+        check('In-Genre Dramatic Catalyst:' in block and 'Cross-Genre Fusion Catalyst:' in block, f"catalyst_block malformed: {block}")
+        used_prompts.update(['s2a_catalyst_works.prompt', 's2b_catalyst_elements.prompt', 's2c_catalyst_sanitize.prompt'])
     finally:
         shutil.rmtree(story_dir(test_id), ignore_errors=True)
 

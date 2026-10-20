@@ -1,0 +1,10 @@
+--- SCI-FI TURNS & DILEMMAS GUIDELINES ---
+1. PROGRESSION & PACING:
+   - Early turns establish baseline ship telemetry, structural decay symptoms, and initial compartmentalization tensions.
+   - Middle turns force critical triage events (e.g. reactor heat runaway, atmospheric leak, food synthesizer failure) where the player must choose which sector or population bears the cost.
+   - Penultimate turns bring human desperation to a boiling point—mutiny, manual override attempts, or communication breakdown between sectors.
+   - Final turn resolves the core mission dilemma: ruthless utilitarian survival (culling sectors to reach the destination) versus empathetic preservation (running reactor margins to the redline to save everyone).
+2. DILEMMA TAXONOMY:
+   - Dilemmas test calculation vs. conscience, central authority vs. sector autonomy, and immediate short-term survival vs. long-term generational viability.
+3. WAYS THROUGH:
+   - Every turn must offer divergent mechanical and moral paths (e.g. rerouting power from cryo to life support, using remote drones for suicide repair runs, or opening secure channels to negotiate with insurgent engineers).
