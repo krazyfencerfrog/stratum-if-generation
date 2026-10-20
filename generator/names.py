@@ -83,46 +83,6 @@ def material_palette(story_id, lexicon=None):
         'tools_and_wear': [str(x).strip() for x in mat.get('tools_and_wear', []) if str(x).strip().lower() not in AVOID_PROPS],
     }
 
-# keyword -> pool; whole words only. The kernel's own words count three
-# times; the premise's once. Era and culture pools score in full; the two
-# tone pools (romance, adventure) at half, so "a romance in Regency London"
-# lands in regency and "an epic fantasy adventure" in fantasy. Ties go to
-# the earlier pool in PRIORITY.
-GENRE_WORDS = {
-    pool: r'\b(?:' + words + r')\b' for pool, words in {
-        'japanese_historical': r'samurai|shogun\w*|ronin|edo|feudal japan|daimyo|ninjas?|katanas?|geishas?',
-        'chinese_historical': r'wuxia|jianghu|kung fu|martial sects?|imperial china|forbidden city|'
-                              r'(?:tang|song|ming|qing|han) dynasty',
-        'ancient_egyptian': r'egypt\w*|pharaohs?|nile|pyramids?|scarabs?|sphinx|mumm(?:y|ies)|anubis|osiris|hieroglyph\w*',
-        'ancient_roman': r'rome|roman|legions?|legionar\w*|centurions?|senat(?:e|or)s?|gladiators?|caesar|praetorians?|'
-                         r'pompeii|consuls?|colosseum',
-        'ancient_greek': r'ancient greece|greek|athens|athenian|spartans?|sparta|olympus|oracle|delphi|triremes?|'
-                         r'hoplites?|agora|minotaur|troy|trojans?',
-        'norse': r'vikings?|norse|fjords?|longships?|valhalla|jarls?|skalds?|odin|runes?|sagas?',
-        'regency': r'regency|ballrooms?|debutantes?|the ton|almack\w*|dukes?|duchess\w*|earls?|viscounts?|marquess\w*',
-        'victorian': r'victorian|edwardian|gaslight|hansom|steampunk|1[89][0-9]0s|nineteenth century',
-        'western': r'wild west|western|cowboys?|frontier|sheriffs?|outlaws?|saloons?|ranch\w*|gunslingers?|'
-                   r'stagecoach\w*|homestead\w*|cattle\w*|railroads?|wyoming|montana|dakota|texas|arizona|nevada|'
-                   r'ranchers?|rustl\w*|posse',
-        'age_of_sail': r'pirates?|galleons?|royal navy|buccaneers?|privateers?|frigates?|age of sail|corsairs?',
-        'medieval': r'medieval|monaster\w*|abbey|plague|feudal|crusades?|serfs?|barons?|child king|regents?|'
-                    r'courtiers?|court intrigue|thrones?|usurp\w*|coronation',
-        'scifi': r'sci-fi|science fiction|starships?|spaceships?|generation(?:al)? ship|space station|planets?|'
-                 r'colon(?:y|ies)|androids?|robots?|ai|cyber\w*|orbit\w*|asteroids?|arcology|airlocks?|reactors?|'
-                 r'drones?|terraform\w*|interstellar',
-        'fantasy': r'fantasy|dragons?|witch(?:es)?|hedge-witch|wizards?|mages?|magic(?:al)?|swords?|elf|elves|dwarf|'
-                   r'dwarves|kingdoms?|quests?|dungeons?|sorcer\w*|fae|curse[sd]?|knights?|castles?|realms?|spells?|'
-                   r'enchant\w*|goblins?|trolls?|orcs?|necromanc\w*|prophec\w*',
-        'period': r'19[0-6]0s|noir|cold war|prohibition|wartime|detectives?|gangsters?|speakeas\w*',
-        'romance': r'romance|romantic|love story|in love|lovers?|rom-?com|meet-cute|courtship|dating|'
-                   r'enemies to lovers|second chance',
-        'adventure': r'action|adventures?|treasure|heists?|jungle|expeditions?|mercenar\w*|explorers?|'
-                     r'archaeolog\w*|spies|spy|thriller|smugglers?|chase|casinos?|vaults?|safecrack\w*',
-    }.items()
-}
-PRIORITY = list(GENRE_WORDS) + ['modern']
-TONE_POOLS = ('romance', 'adventure')
-
 # a character's own people, from words in the role: overrides the story's pool
 # for that one character ("the elven archer" in a human fantasy)
 RACE_WORDS = [('elven', re.compile(r'\b(elf|elves|elven|elvish)\b', re.I)),
@@ -146,20 +106,47 @@ NOT_A_PERSON = re.compile(r"\b(dragon|sword|blade|ai|ship|computer|machine|beast
                           r"rat|mouse|snake|adder|serpent|fox|bear|terrier|spaniel|mare|stallion|pony|falcon|hawk)\b", re.I)
 
 
-def pool_scores(kernel, *texts):
-    return {pool: (0.5 if pool in TONE_POOLS else 1) * (3 * len(re.findall(rx, (kernel or '').lower()))
-                                                        + sum(len(re.findall(rx, (t or '').lower())) for t in texts))
-            for pool, rx in GENRE_WORDS.items()}
-
-
 def pool_for(kernel, *texts):
-    scores = pool_scores(kernel, *texts)
-    best = max(PRIORITY[:-1], key=lambda p: (scores[p], -PRIORITY.index(p)))
-    if scores[best] == 0:
-        return 'modern'
-    if best == 'medieval' and scores['fantasy'] >= scores['medieval']:
+    """Fallback name pool heuristic when no LLM generator is present (e.g. offline unit tests).
+    In the main pipeline, the micro-prompt (s3_5np_name_pool.prompt) classifies the setting."""
+    text = f"{kernel or ''} {' '.join(str(t) for t in texts)}".lower()
+
+    def match(*words):
+        return any(re.search(r'\b' + re.escape(w) + r'\b', text) for w in words)
+
+    if match('starship', 'spaceships', 'generation ship', 'space station', 'reactor', 'scifi', 'sci-fi', 'space', 'sector', 'hydroponics', 'interstellar'):
+        return 'scifi'
+    if match('regency', 'duke', 'the ton', 'ballroom', 'debutante'):
+        return 'regency'
+    if match('gladiator', 'ancient rome', 'rome', 'roman', 'caesar', 'colosseum', 'legion'):
+        return 'ancient_roman'
+    if match('pyramid', 'egypt', 'pharaoh', 'nile', 'tomb'):
+        return 'ancient_egyptian'
+    if match('viking', 'fjord', 'norse', 'jarl', 'longship'):
+        return 'norse'
+    if match('samurai', 'ronin', 'shogun', 'feudal japan', 'edo'):
+        return 'japanese_historical'
+    if any(w in text for w in ('温泉', '宿', 'ryokan', 'onsen', 'tokyo', 'kyoto', 'osaka')) or match('japan', 'japanese'):
+        return 'modern:japanese'
+    if match('lagos', 'nigeria', 'west african', 'west_african'):
+        return 'modern:west_african'
+    if match('frontier', 'gunslinger', 'western', 'cowboy', 'saloon', 'sheriff', 'ranch'):
+        return 'western'
+    if match('noir', '1940', '1940s', 'detective', 'prohibition', 'speakeasy'):
+        return 'period'
+    if match('pirate', 'pirates', 'galleon', 'age of sail', 'privateer', 'frigate'):
+        return 'age_of_sail'
+    if match('medieval', 'coronation', 'child king', 'regent', 'abbey', 'feudal'):
+        return 'medieval'
+    if match('dragon', 'wizard', 'witch', 'magic', 'quest', 'dungeon', 'fantasy'):
         return 'fantasy'
-    return best
+    if match('canal boat', 'canal', 'british', 'london'):
+        return 'modern:british'
+    if match('romance', 'baker', 'love story'):
+        return 'romance'
+    if match('adventure', 'treasure', 'heist', 'jungle', 'expedition'):
+        return 'adventure'
+    return 'modern'
 
 
 def gender_hint(role, texts, own=()):
@@ -337,7 +324,7 @@ def home_culture(pool_name, story_id, texts=()):
     if not cultures:
         return None
     text = ' '.join(str(t) for t in texts).lower()
-    scores = {name: sum(len(re.findall(r'\b' + re.escape(cue) + r'\b', text)) for cue in c.get('cues') or [])
+    scores = {name: sum(1 for cue in c.get('cues') or [] if cue in text)
               for name, c in cultures.items()}
     best = max(scores, key=lambda k: (scores[k], k == pool.get('default_home')))
     if scores[best]:

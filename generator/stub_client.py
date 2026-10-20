@@ -181,6 +181,7 @@ class StubClient(LlmClient):
             ('You are the turn builder', 's3_5b'),
             ('You are the cast-sketch step', 's3_5c'),
             ('You are the setting-lexicon generator', 's3_5d'),
+            ('cultural and historical name pool classifier', 's3_5np'),
             ('You are step 3.5j1 of', 's3_5j1_agency'),
             ('You are step 3.5j2 of', 's3_5j2_dilemma'),
             ('You are step 3.5j_rules of', 's3_5j_rules'),
@@ -677,6 +678,38 @@ class StubClient(LlmClient):
                 "tools_and_wear": ["bone sail-needle", "marlinspike", "wool watch-cap", "horn tallow-box", "tarred linen apron"],
             },
         }
+
+    def p_s3_5np(self, p):
+        low = p.split('USER INPUT FOLLOWS BELOW')[-1].lower() if 'USER INPUT FOLLOWS BELOW' in p else p.lower()
+        if any(w in low for w in ('starship', 'spaceships', 'reactor', 'scifi', 'sci-fi', 'space', 'sector', 'hydroponics', 'generation ship')):
+            return {"pool": "scifi", "reason": "stub sci-fi setting"}
+        if any(w in low for w in ('regency', 'duke', 'the ton', 'ballroom')):
+            return {"pool": "regency", "reason": "stub regency setting"}
+        if any(w in low for w in ('gladiator', 'ancient rome', 'roman', 'caesar', 'colosseum', 'legion')):
+            return {"pool": "ancient_roman", "reason": "stub roman setting"}
+        if any(w in low for w in ('pyramid', 'egypt', 'pharaoh', 'nile', 'tomb')):
+            return {"pool": "ancient_egyptian", "reason": "stub egyptian setting"}
+        if any(w in low for w in ('viking', 'fjord', 'norse', 'jarl', 'longship')):
+            return {"pool": "norse", "reason": "stub norse setting"}
+        if any(w in low for w in ('samurai', 'ronin', 'shogun', 'feudal japan', 'edo')):
+            return {"pool": "japanese_historical", "reason": "stub feudal japan setting"}
+        if any(w in low for w in ('japan', 'japanese', '温泉', '宿', 'ryokan', 'onsen', 'tokyo', 'kyoto', 'osaka')):
+            return {"pool": "modern:japanese", "reason": "stub japanese setting"}
+        if any(w in low for w in ('lagos', 'nigeria', 'west african', 'west_african')):
+            return {"pool": "modern:west_african", "reason": "stub west african setting"}
+        if any(w in low for w in ('canal boat', 'canal', 'british', 'london')):
+            return {"pool": "modern:british", "reason": "stub british setting"}
+        if any(w in low for w in ('frontier', 'gunslinger', 'western', 'cowboy', 'saloon', 'sheriff')):
+            return {"pool": "western", "reason": "stub western setting"}
+        if any(w in low for w in ('noir', '1940', 'detective', 'prohibition', 'speakeasy')):
+            return {"pool": "period", "reason": "stub period setting"}
+        if any(w in low for w in ('pirate', 'galleon', 'age of sail', 'privateer', 'frigate')):
+            return {"pool": "age_of_sail", "reason": "stub age of sail setting"}
+        if any(w in low for w in ('medieval', 'coronation', 'child king', 'regent', 'abbey')):
+            return {"pool": "medieval", "reason": "stub medieval setting"}
+        if any(w in low for w in ('romance', 'baker', 'love story')):
+            return {"pool": "romance", "reason": "stub romance setting"}
+        return {"pool": "fantasy", "reason": "stub fantasy setting"}
 
     def p_s3_5j1_agency(self, p):
         seeds_data = self.section(p, '- the Cast Seeds') or []

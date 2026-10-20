@@ -2377,6 +2377,31 @@ def modern_names_keep_a_culture():
 
 
 @test
+def name_pool_microprompt_classification_and_i18n():
+    import stub_client
+    import main as gen_main
+    import names
+
+    for sid_suffix, kernel, arena, seeds, expected in [
+        ('ja', '山奥の古い温泉宿の若女将と、東京から来た写真家。', 'A secluded Japanese hot spring ryokan in the mountains.',
+         [{'role': 'the innkeeper', 'gender': 'f'}, {'role': 'the photographer', 'gender': 'm'}], 'modern:japanese'),
+        ('sci', 'A failing life-support system aboard a generational ark.', 'Generation starship command deck.',
+         [{'role': 'the engineer', 'gender': 'f'}, {'role': 'the warden', 'gender': 'm'}], 'scifi'),
+        ('wa', 'A market trader in Lagos uncovers counterfeit gold.', 'Lagos street markets.',
+         [{'role': 'the trader', 'gender': 'f'}, {'role': 'the goldsmith', 'gender': 'm'}], 'modern:west_african'),
+    ]:
+        sid = f'{PREFIX}np_{sid_suffix}'
+        shutil.rmtree(story_dir(sid), ignore_errors=True)
+        gen = gen_main.StoryGenerator(story_id=sid)
+        gen.client = stub_client.StubClient()
+        gen.kernel = kernel
+        premise = {'arena': {'description': arena}, 'cast_seeds': seeds}
+        pool = gen.classify_name_pool(premise)
+        check(pool == expected, f'{kernel} should classify to {expected}, got {pool}')
+        shutil.rmtree(story_dir(sid), ignore_errors=True)
+
+
+@test
 def protagonist_is_named_first():
     import names
     you = {'who': 'You inherited a canal boat.', 'gender': 'm'}
@@ -2576,6 +2601,26 @@ def helpers():
     kernel2 = open(os.path.join(KERNELS, 'kernel2.txt'), encoding='utf-8').read()
     check([c['id'] for c in frameworks.shortlist(b, kernel2, 'x')['candidates']] == ['freytag'], 'a named form must be the only candidate')
     check({m['id'] for m in frameworks.available_modifiers(b)} >= {'none', 'countdown'}, 'modifiers')
+    b_quiet = {'fields': {
+        '3b.primary_trajectory': {'shape': 'escalating'},
+        '3b.transgression': {'ceiling': 2},
+        '3b.tone': {'descriptors': ['intimate', 'lyrical']},
+        '3-0c.failure_presence': {'value': 'soft'},
+        '3-0c.failure_triggers': {'types': ['time_pressure']},
+        '3e.timeline_duration': {'ceiling': 'hours_to_days'},
+    }}
+    b_hazard = {'fields': {
+        '3b.primary_trajectory': {'shape': 'escalating'},
+        '3b.transgression': {'ceiling': 5},
+        '3b.tone': {'descriptors': ['tense', 'technical']},
+        '3-0c.failure_presence': {'value': 'hard'},
+        '3-0c.failure_triggers': {'types': ['resource_depletion']},
+        '3e.timeline_duration': {'ceiling': 'hours_to_days'},
+    }}
+    check(frameworks.score_all(b_quiet)['fichtean_curve']['score'] < 0,
+          'quiet intimate story with low transgression must not score positive for fichtean_curve')
+    check(frameworks.score_all(b_hazard)['fichtean_curve']['score'] >= 5,
+          'hard survival crisis with resource depletion must score high for fichtean_curve')
     json.dumps(schemas.ALL)
     json.dumps(schemas.story_form(['a'], ['none']))
     for path in glob.glob(os.path.join(GEN, '*.py')) + glob.glob(os.path.join(GEN, 'later', '*.py')):
@@ -3050,7 +3095,7 @@ def ab_harness_replays_from_phase3():
     sid = f'{base}_vj'
     check(len(calls('basic')) == n_before, 'the variant run touched the source directory')
     cs = calls(f'basic_vj')
-    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5b1', 's3_5b2', 's3_5c', 's3_5d', 's3_5j', 's3_5j1', 's3_5j2', 's3_5jr', 's3_5v', 's3_5k', 's3_8')],
+    check(cs and not [c for c in cs if c['step'].startswith('s3') and c['step'] not in ('s3_4', 's3_5a', 's3_5b', 's3_5b1', 's3_5b2', 's3_5c', 's3_5d', 's3_5np', 's3_5j', 's3_5j1', 's3_5j2', 's3_5jr', 's3_5v', 's3_5k', 's3_8')],
           f'the variant should start after phase 3: {[c["step"] for c in cs]}')
     check(not [c for c in cs if c['step'] in ('s4p', 's4e')] and [c for c in cs if c['step'] == 's4d'], 'variant flags were not applied')
     story = assert_story_ok('basic_vj', min_lines=2)

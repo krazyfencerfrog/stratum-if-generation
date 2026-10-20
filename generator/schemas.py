@@ -164,6 +164,11 @@ LEXICON = obj(
     ),
 )
 
+NAME_POOL = obj(
+    pool=S,
+    reason=S,
+)
+
 KERNEL_CHECK = obj(clauses=arr(obj(n=I, requires=S, premise_says=S, note=S, contradiction=B, quote=S)))
 
 PREMISE_CHECK = obj(

@@ -1687,6 +1687,57 @@ class StoryGenerator:
             mat.setdefault('tools_and_wear', [])
         return True
 
+    def classify_name_pool(self, premise):
+        """Micro-prompt (s3_5_name_pool.prompt) to determine the cultural and historical
+        name pool for the cast, replacing regex keyword heuristics for i18n support."""
+        cast_seeds = premise.get('cast_seeds') or []
+        roles_text = '\n'.join(f" - {s.get('role')} ({s.get('gender', 'n')})"
+                               for s in cast_seeds if isinstance(s, dict))
+        setting_text = str((premise.get('arena') or {}).get('description') or '')
+        try:
+            res = self.run_prompt('s3_5np', 'name_pool', {
+                '$$KERNEL$$': self.kernel,
+                '$$SETTING$$': setting_text or self.kernel,
+                '$$TONE$$': self.tone_line(),
+                '$$CAST_ROLES$$': roles_text or ' (none)',
+            }, validator=self.validate_name_pool, klass='classify', schema=schemas.NAME_POOL)
+            return self.normalize_name_pool(res.get('pool'))
+        except Exception as e:
+            print(f'  [name_pool] classification failed, falling back: {e}')
+            return 'fantasy'
+
+    @staticmethod
+    def normalize_name_pool(pool_name):
+        if not pool_name:
+            return 'fantasy'
+        pool_name = str(pool_name).strip().lower()
+        if pool_name in names.POOLS:
+            if pool_name == 'modern':
+                return 'modern:british'
+            return pool_name
+        if pool_name.startswith('modern:'):
+            cult = pool_name.split(':', 1)[1]
+            if cult in names.POOLS.get('modern', {}).get('cultures', {}):
+                return pool_name
+            return 'modern:british'
+        # Check if bare culture name like 'japanese' or 'west_african' was given
+        if pool_name in names.POOLS.get('modern', {}).get('cultures', {}):
+            return f'modern:{pool_name}'
+        return 'fantasy'
+
+    @staticmethod
+    def validate_name_pool(parsed):
+        if not isinstance(parsed, dict) or not parsed.get('pool'):
+            raise ValueError('name_pool output must be an object with a "pool" field')
+        pool = str(parsed['pool']).strip().lower()
+        top_pools = set(names.POOLS.keys())
+        modern_cultures = set(names.POOLS.get('modern', {}).get('cultures', {}).keys())
+        if pool in top_pools or pool in modern_cultures:
+            return True
+        if pool.startswith('modern:') and pool.split(':', 1)[1] in modern_cultures:
+            return True
+        raise ValueError(f'unknown name pool: {pool}')
+
     def name_cast(self, premise, lexicon=None):
         """Names for the cast come from Python (generator/names.py), not the
         model: the role stays the key, the name rides along. Keeps any name a
@@ -1700,7 +1751,7 @@ class StoryGenerator:
         texts = [self.kernel or ''] + names.premise_texts(premise)
         pool = premise.get('name_pool') or (
             f"dynamic:{lexicon.get('setting_culture', 'custom')}" if lexicon else
-            names.with_culture(names.pool_for(*texts), self.story_id, texts)
+            self.classify_name_pool(premise)
         )
         identity = ((self.analysis.get('s3_brief') or {}).get('fields') or {}).get('3-0b.protagonist_identity') or {}
         human = str(identity.get('type') or 'human').lower() == 'human'

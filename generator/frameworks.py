@@ -109,7 +109,7 @@ def features(brief, kernel=''):
 
 
 LIGHT_TONE = ('funny', 'comic', 'light', 'playful', 'wry', 'warm', 'swashbuckling', 'adventurous', 'romp')
-QUIET_TONE = ('cozy', 'cosy', 'quiet', 'gentle', 'relaxing', 'contemplative', 'tender', 'wistful', 'elegiac')
+QUIET_TONE = ('cozy', 'cosy', 'quiet', 'gentle', 'relaxing', 'contemplative', 'tender', 'wistful', 'elegiac', 'intimate', 'lyrical', 'restrained')
 DARK_VALENCE = ('tragic', 'pyrrhic', 'hollow', 'doomed', 'ruin', 'bleak', 'nihilis', 'downfall', 'damn')
 
 
@@ -121,17 +121,19 @@ def _any(words, text):
 RULES = [
     ('fichtean_curve', 2, '3b.primary_trajectory is escalating', lambda x: x['trajectory'] == 'escalating'),
     ('fichtean_curve', 1, '3e.timeline_duration is hours_to_days', lambda x: x['duration'] == 'hours_to_days'),
-    ('fichtean_curve', 1, '3-0c names a failure the pressure can run into', lambda x: x['failure'] in ('soft', 'hard')),
-    ('fichtean_curve', 1, '3-0c.failure_triggers gives the crises a clock or a stock',
-     lambda x: bool(x['triggers'] & {'time_pressure', 'resource_depletion', 'hazard_or_wrong_turn', 'incapacitation_or_death'})),
+    ('fichtean_curve', 1, '3-0c names a hard failure the pressure can run into', lambda x: x['failure'] == 'hard'),
+    ('fichtean_curve', 2, 'crises driven by systemic drain, death, or physical hazard',
+     lambda x: bool(x['triggers'] & {'resource_depletion', 'hazard_or_wrong_turn', 'incapacitation_or_death'})),
     ('fichtean_curve', 1, '3e.timeline_structure is single_moment', lambda x: x['timeline'] == 'single_moment'),
-    ('fichtean_curve', -2, 'no failure and a gentle ceiling leave nothing for crises to threaten',
-     lambda x: x['failure'] == 'none' and x['transgression'] <= 2),
+    ('fichtean_curve', -2, 'gentle transgression ceiling (<=2) leaves no physical stakes for crises',
+     lambda x: x['transgression'] <= 2),
+    ('fichtean_curve', -2, 'quiet or intimate tone escalates through emotional stakes rather than crises',
+     lambda x: _any(QUIET_TONE, x['tone'])),
 
     ('seven_point', 2, '3-0b.epistemic_gap is designed: the last piece is a revelation', lambda x: x['gap_designed']),
     ('seven_point', 1, '3-0a.decision_mechanism is single_fork: the story builds to one choice', lambda x: x['mechanism'] == 'single_fork'),
-    ('seven_point', 1, '3-0c.failure_triggers names exposure or a wrong answer',
-     lambda x: bool(x['triggers'] & {'detection_or_exposure', 'incorrect_resolution'})),
+    ('seven_point', 1, '3-0c.failure_triggers names relational collapse, exposure, or a wrong answer',
+     lambda x: bool(x['triggers'] & {'relational_collapse', 'detection_or_exposure', 'incorrect_resolution'})),
     ('seven_point', 1, '3b.primary_trajectory rises (escalating or arc)', lambda x: x['trajectory'] in ('escalating', 'arc')),
     ('seven_point', 1, '3-0c.failure_presence is hard', lambda x: x['failure'] == 'hard'),
 
