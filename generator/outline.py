@@ -334,6 +334,9 @@ class OutlineBuilder:
             print(f'--- step 4, iteration {n}')
             if n == 1:
                 line, new_ids = self.apply_main_line(self.main_line())
+                if getattr(self.gen, 'stop_after', '') == '4a':
+                    self.stop_reason = 'stopped after 4a (main line plan)'
+                    break
             else:
                 if self.branching == 'plan':
                     seed = planned.pop(0)

@@ -2561,7 +2561,7 @@ def main(argv=None):
     parser.add_argument("--no-breakers", action="store_true",
                         help="do not cut off calls that exceed their class's thinking or time limit")
     parser.add_argument("--stop-after", default='',
-                        help="stop after this step: 2, 3, 3.4, 3.5, 3.75, 3.8 (default: run through the outline loop)")
+                        help="stop after this step: 2, 3, 3.4, 3.5, 3.75, 3.8, 4a (default: run through the outline loop)")
     parser.add_argument("--stage-a", action="store_true",
                         help="after the outline, run stage A (arcs and node expansion: <id>_arcs.json, <id>_arcs.md); "
                              "on a finished story directory only stage A makes model calls")
@@ -2598,6 +2598,7 @@ def main(argv=None):
                              branching=args.branching, outline_judge=not args.no_outline_judge,
                              author=args.author, parallel=args.parallel,
                              dynamic_names=args.dynamic_names, genre=args.genre)
+        gen.stop_after = args.stop_after
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
@@ -2651,6 +2652,8 @@ def main(argv=None):
 
         # step 4: the outline loop. Main line, the branch plan, then one divergent line per iteration.
         gen.run_outline(max_iterations=args.max_iterations)
+        if args.stop_after == '4a':
+            finish()
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
         gen.run_outline_judge()
         if args.stage_a or args.stage_b or args.stage_d or args.prose:
