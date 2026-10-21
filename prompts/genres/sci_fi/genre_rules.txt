@@ -1,5 +1,0 @@
---- SCI-FI CRAFT RULES ---
-1. SYSTEMIC REALITY & PHYSICAL LAWS: Space is an unforgiving physical vacuum. Tension flows from real engineering constraints: thermal dissipation, consumable mass (reaction mass, coolant, oxygen moles), radiation shielding, and material fatigue under structural stress.
-2. MACHINE & AI COGNITION: When the protagonist is an AI, automated system, or cybernetic entity, their perspective reflects systemic awareness: sensor telemetry, optical feeds, subsystem diagnostics, and algorithmic triage—never naive humanoid sensory blindness.
-3. THE PRICE OF COLD EQUATIONS: Survival dilemmas are zero-sum and mathematically irreversible. Saving one system or population tier inevitably starves, vents, or abandons another. Triage cannot be bargained away with easy heroics.
-4. SURVIVAL VS. EMPATHY: The central thematic struggle is between ruthless utilitarian optimization (sacrificing human warmth for mission survival) and collective human dignity (risking total systemic collapse to preserve what makes life worth living).

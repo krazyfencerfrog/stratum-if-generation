@@ -1,9 +1,0 @@
---- GHOST STORY SCENE OPTIONS & AGENCY GUIDELINES ---
-1. INTERACTION MODES:
-   - Player options should embody contrasting approaches to the uncanny:
-     - Naval Protocol & Respect: Address the captain by rank, report course headings, treat his ghost with maritime courtesy.
-     - Pragmatic Mechanics: Grab the wrench, kick the starter motor, manually heave on the rudder against the phantom resistance.
-     - De-escalation & Wit: Defuse supernatural rage with dry wit, tea, or playing into the ghost's pride.
-     - Hard Standoff: Challenge the ghost's authority directly, risking terrifying spectral retribution.
-2. PHYSICAL FEEDBACK:
-   - Options directly affect the vessel's movement: the engine sputtering to life, the mooring line snapping taut, water bubbling under the stern.

@@ -874,18 +874,14 @@ class StoryGenerator:
             self.save_story_json('s2_genre.json', parsed)
             return parsed
 
-        available = [g for g in genre.available_genres() if g != 'general']
         clauses = self.get_kernel_clauses()
         clauses_str = json.dumps([{'n': n, 'clause': c} for n, c in clauses], ensure_ascii=False)
         parsed = self.run_prompt('s2', 'genre', {
             '$$KERNEL$$': self.kernel,
             '$$CLAUSES$$': clauses_str,
-            '$$AVAILABLE_GENRES$$': json.dumps(available),
         }, prompt_file='s2_genre.prompt', klass='classify', schema=schemas.GENRE_CLASSIFICATION)
 
         selected_genre = str(parsed.get('genre') or 'general').lower().strip()
-        if selected_genre not in genre.available_genres():
-            selected_genre = 'general'
         self.genre = selected_genre
         parsed['genre'] = selected_genre
         self.analysis['s2_genre'] = parsed

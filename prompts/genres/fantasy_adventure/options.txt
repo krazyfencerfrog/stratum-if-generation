@@ -1,9 +1,0 @@
---- FANTASY ADVENTURE SCENE OPTIONS & AGENCY GUIDELINES ---
-1. TACTICAL & MORAL AGENCY:
-   - Options must offer contrasting adventure philosophies:
-     - Direct martial courage: draw steel, stand shoulder-to-shoulder with the knight.
-     - Rogue cunning: search for a blind spot, slip through shadows, disable the trigger.
-     - Hedge-magic intuition: commune with earth, cast a charm, read the subtle disturbance in the air.
-     - Diplomatic parley: address the creature with reverence, appeal to ancient treaties.
-2. COMPANION ALIGNMENT:
-   - Choices demonstrate which companion's counsel you honor and which you override.

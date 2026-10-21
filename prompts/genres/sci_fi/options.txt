@@ -1,9 +1,0 @@
---- SCI-FI SCENE OPTIONS & AGENCY GUIDELINES ---
-1. COMMAND & TRIAGE MODES:
-   - Player options should embody distinct operational philosophies:
-     - Pure Utilitarian Efficiency: execute cold calculations, vent compromised compartments, enforce power quotas regardless of emotional protest.
-     - Empathetic Compromise: accept structural risk, jury-rig dangerous bypasses, share life-support deficits equally across sectors.
-     - Direct Physical Intervention: dispatch drones, manual valve actuation, risk machinery to prevent loss of life.
-     - Transparency & Truth: broadcast unvarnished telemetry to the crew, risking panic to earn honest cooperation.
-2. SENSORY & SYSTEMIC IMPACT:
-   - Choices immediately alter ship status: pressure dropping in bay 4, temperature rising in the reactor coil, drone telemetry going dark.

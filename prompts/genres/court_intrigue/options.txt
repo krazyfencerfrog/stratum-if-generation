@@ -1,9 +1,0 @@
---- COURT INTRIGUE SCENE OPTIONS & AGENCY GUIDELINES ---
-1. POLITICAL STANCES:
-   - Player options should embody distinct court maneuvers:
-     - The Subtle Probe: Asking the pointed, polite question with double meaning during formal tea or dinner.
-     - The Daring Gambit: Offering dangerous secrets or promises to win an uncommitted lord.
-     - The Protective Shield: Interposing oneself between the regent and the child, absorbing the regent's subtle wrath.
-     - The Ruthless Trap: Planting compromising evidence or feeding false rumors into the palace grape-vine.
-2. CONSEQUENCE VISIBILITY:
-   - Choices alter court standing: the regent smiles colder, the child grips your sleeve tighter, a courtier avoids your gaze in the hallway.

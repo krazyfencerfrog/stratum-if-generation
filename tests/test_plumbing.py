@@ -4210,11 +4210,9 @@ def modular_genre_craft_packs_and_macro_expansion():
     # 1. Available packs discovery
     packs = genre.available_genres()
     check('general' in packs, "general pack missing from available_genres")
-    check('romance' in packs, "romance pack missing from available_genres")
-    check('fantasy_adventure' in packs, "fantasy_adventure pack missing from available_genres")
 
-    # 2. Components loading and non-empty checks
-    for p in ('general', 'romance', 'fantasy_adventure'):
+    # 2. Components loading and non-empty checks with cascading fallback
+    for p in ('general', 'romance', 'fantasy_adventure', 'sci_fi', 'court_intrigue', 'ghost_story'):
         for c in ('RULES', 'PROMISES', 'PREMISE', 'TURNS', 'CASTING', 'SETTINGS', 'OPTIONS', 'PROSE', 'JUDGES'):
             content = genre.load_component(p, c)
             check(len(content) > 20, f"pack {p} component {c} missing or too short: '{content}'")
@@ -4222,8 +4220,8 @@ def modular_genre_craft_packs_and_macro_expansion():
     # 3. Macro expansion and fallback
     sample = "Test: $$GENRE_RULES$$ | $$GENRE_CASTING$$"
     exp_rom = genre.expand(sample, 'romance')
-    check('ROMANCE' in exp_rom, f"expected romance rules in expansion: {exp_rom}")
-    check('BREAKING POINT DISCIPLINE' in exp_rom, f"expected romance casting discipline: {exp_rom}")
+    check('GENERAL INTERACTIVE FICTION RULES' in exp_rom, f"expected general rules in expansion: {exp_rom}")
+    check('DISTINCT AGENTS' in exp_rom, f"expected general casting discipline: {exp_rom}")
     check('$$GENRE_' not in exp_rom, f"unexpanded macros in romance: {exp_rom}")
 
     # 4. End-to-end prompt expansion through StoryGenerator
