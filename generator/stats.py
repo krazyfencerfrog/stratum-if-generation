@@ -93,7 +93,7 @@ CALL_CLASSES = {
     'build': {
         'think': None,
         'target_thinking_bytes': 20000, 'target_seconds': 900,
-        'limit_thinking_bytes': 25000, 'limit_seconds': 1800, 'limit_response_bytes': 24000,
+        'limit_thinking_bytes': 35000, 'limit_seconds': 1800, 'limit_response_bytes': 48000,
         'num_predict': 14000, 'fallback': 'no_think', 'force_answer': True,
     },
     # prose revision and targeted entity rewrites: thinking off,

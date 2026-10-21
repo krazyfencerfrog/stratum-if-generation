@@ -18,7 +18,7 @@ import re
 
 # evaluate.PAPERWORK (the metric, unchanged so old numbers compare) plus the acts done to paper
 PAPER = re.compile(r"\b(ledgers?|receipts?|contracts?|papers?|forms?|signatures?|signed|signing|signs?|countersign\w*|"
-                   r"logbooks?|registers?|files?|filed|seals?|sealed|oaths?|letters?|fees?|clauses?|deeds?|documents?|"
+                   r"logbooks?|registers?|files?|filed|seals?|sealed|letters?|fees?|clauses?|deeds?|documents?|"
                    r"invoices?|accounts?|tickets?|permits?|certificates?|licen[cs]es?|warrants?|writs?|petitions?|"
                    r"treat(?:y|ies)|charters?|bills? of|stamp(?:ed|s)?|crossed out|cross(?:es)? out)\b", re.I)
 SHARE = 0.25
