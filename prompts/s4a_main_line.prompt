@@ -90,9 +90,15 @@ RULES
     engine's roles cannot carry a beat.
 $$TERM_PRICE$$
 $$TERM_ENGINE$$
-10. Say what physically happens: who goes where, what is said to whom,
-    what is handed over, taken, broken, burned or lost. If the engine
-    uses a strange term, write what the thing is, not the term alone.
+10. CONCRETE ACTIONS AND DIALOGUE:
+    - Say what physically happens: who goes where, what is said to whom,
+      what is handed over, taken, broken, burned or lost. If the engine
+      uses a strange term, write what the thing is, not the term alone.
+    - NO VAGUE EUPHEMISMS: Never write placeholder phrases like 'say the true
+      thing', 'speak the feeling', 'name the silence', or make the climactic
+      action merely 'speaking someone's name'. State what is actually asked,
+      confessed, refused, promised, or given. If feelings or loyalties are
+      expressed, say the concrete commitment or truth that is spoken.
 11. If the engine states a hidden_truth, the main line decides where it
     is first suspected and where it comes out (or that, on this line, it
     never comes out, and what that costs), and says so in those entries.
@@ -160,10 +166,10 @@ anyone on a stage who refuses to go on, or dismiss the hall's crew.
 Opposition: the company manager, who wants the bill played exactly as
 printed so that the backer stays, and who controls the wardrobe trunks
 and the dressing room keys. Events: 1 (early) the town's
-paper prints the star's name across the front page; 2 (middle) the backer
+paper publishes a review praising the absent star; 2 (middle) the backer
 arrives a day early, with his nephew; 3 (late) the hall's owner lets the
 second week to a travelling circus. Companions: the understudy (breaking
-point: leaves if she is sent on under another woman's name twice), the old
+point: leaves if she is sent on without a stage rehearsal), the old
 character man (breaking point: walks the night his scene is cut). Price:
 the backer, gone for good once he is told the truth. Setups: 1. plant: the
 hall's one spotlight has to be thumped to stay lit, and only the old
@@ -182,7 +188,7 @@ with their ways:
    the backer leaves.
  4 (conceal_or_reveal) the opening-night house, which paid to see the
    star. Way 1: the audience is told before the curtain. Way 2: the
-   playbill stands and the understudy plays under the star's name.
+   manager locks the stage door and forces the understudy on in the dark.
 Framework: three-act (setup, inciting_incident, commitment, midpoint,
 crisis, climax, resolution).
 Output:
@@ -193,16 +199,16 @@ Output:
     "strategy": "Mend each gap with the people you have, and say out loud what you did.",
     "turning_point": "The backer's nephew. Refusing him costs the money, and once the money is gone there is nothing left that pretending would protect."
   },
-  "ending": { "title": "A Half House", "summary": "The company opens as what it is: the understudy under her own name, to the half of the house that stayed. It has cost a week of the tour, the backer, and your standing with the manager.",
-              "answer": "pole_b", "standing": ["the understudy", "the old character man", "the dresser"], "lost": ["the backer"], "changed": "the tour is a week shorter and has no backer; the understudy's name is on the bills", "pays_price": true },
+  "ending": { "title": "A Half House", "summary": "The company opens as what it is: the understudy stepping out in the spotlight to the half of the house that stayed. It has cost a week of the tour, the backer, and your standing with the manager.",
+              "answer": "pole_b", "standing": ["the understudy", "the old character man", "the dresser"], "lost": ["the backer"], "changed": "the tour is a week shorter and has no backer; the stage door lock is broken and the cast is paid from the gate", "pays_price": true },
   "beats": [
-    { "beat": "setup", "turn": null, "way": null, "event": 1, "plants": [1], "pays": [], "adapted": "At the morning call in the town hall you read out the day's sheet under a spotlight the old character man has to thump to keep lit; the leading actress's place is empty, and the town's paper is on every chair with her name across the front. The company manager tells the company she has a cold, and tells you the bill stays as printed." },
+    { "beat": "setup", "turn": null, "way": null, "event": 1, "plants": [1], "pays": [], "adapted": "At the morning call in the town hall you read out the day's sheet under a spotlight the old character man has to thump to keep lit; the leading actress's place is empty, and the town's paper on every chair praises her performance in the previous town. The company manager tells the company she has a cold, and tells you the bill stays as printed." },
     { "beat": "inciting_incident", "plants": [], "pays": [], "turn": 1, "way": 1, "event": null, "adapted": "Her dresser tells you what she has told nobody: the actress has gone to a rival management over unpaid salary and is not coming back. You have the truth, and the dresser has spent the one confidence she had to trade." },
     { "beat": "commitment", "plants": [], "pays": [], "turn": 2, "way": 1, "event": null, "adapted": "You rehearse the understudy yourself through the night in the empty hall. By morning she can carry the part, and the run-through the rest of the company was promised has gone to her; the old character man, who gave up his sleep to read opposite her, has decided you are worth following." },
     { "beat": "midpoint", "plants": [], "pays": [], "turn": 3, "way": 2, "event": 2, "adapted": "The backer arrives a day early with his nephew, who has come for the part the manager promised him. You refuse him and tell the backer why; the backer walks out where he stands, and from then on the manager speaks to you only through the call sheet." },
     { "beat": "crisis", "plants": [], "pays": [], "turn": null, "way": null, "event": 3, "adapted": "With no backer, the manager lets the hall's owner give the second week to the circus, and posts a notice that the star will appear as billed. You are left holding a company that has read both, half of it packing, and a circus unloading elephants in the yard." },
     { "beat": "climax", "turn": 4, "way": 1, "event": null, "plants": [], "pays": [1], "adapted": "An hour before the curtain you go out in front of it and tell the house who is playing tonight, and the lights die in the uproar; the old character man thumps the spotlight on and the understudy steps into it. Half the house walks out in protest, and the manager locks the stage door in fury because you have left him no other way to open." },
-    { "beat": "resolution", "plants": [], "pays": [], "turn": null, "way": null, "event": null, "adapted": "The understudy plays to the half of the house that stayed knowing who she was. You close the prompt book on a tour that is a week shorter and a backer poorer, with her name on the bills for the next town." }
+    { "beat": "resolution", "plants": [], "pays": [], "turn": null, "way": null, "event": null, "adapted": "The understudy plays to the half of the house that stayed knowing who she was. You close the prompt book on a tour that is a week shorter and a backer poorer, with the stage door lock broken and the company playing honestly." }
   ]
 }
 (Seven entries; four turns in order, each in the beat whose job it does;
