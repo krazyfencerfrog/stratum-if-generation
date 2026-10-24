@@ -36,6 +36,7 @@ import sys
 
 import checks
 import schemas
+import stats
 from errors import SoftReject
 import example_guard
 import paper
@@ -828,9 +829,10 @@ class SceneCompiler:
         out = io.StringIO()
         # scenes explored at once in worker processes; a quick playtest is over before they would start
         jobs = int(os.environ.get('STRATUM_PLAYTEST_JOBS') or (1 if quick else engine_playtest.default_jobs()))
-        result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
-                                     styled_runs=10 if quick else None, scene_states=1500 if quick else None,
-                                     jobs=jobs)
+        with stats.stage(getattr(self, 'gen', None), 'stage D: engine playtest'):
+            result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
+                                         styled_runs=10 if quick else None, scene_states=1500 if quick else None,
+                                         jobs=jobs)
         metrics = extract_playtest_metrics(story, result)
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report

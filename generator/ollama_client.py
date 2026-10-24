@@ -491,6 +491,8 @@ class OllamaClient(LlmClient):
             'output_tokens': final.get('eval_count'),
             'eval_seconds': round(eval_ns / 1e9, 2) if eval_ns else None,
             'load_seconds': round((final.get('load_duration') or 0) / 1e9, 2) if final.get('load_duration') else None,
+            'prompt_eval_seconds': (round(final['prompt_eval_duration'] / 1e9, 2)
+                                    if final.get('prompt_eval_duration') else None),
             'think_sent': payload.get('think'),
             'soft_no_think': str(payload.get('prompt', '')).rstrip().endswith('/no_think'),
             'format_sent': 'format' in payload,

@@ -12,7 +12,9 @@ prefix, mode (think / no_think), prompt characters, thinking bytes,
 response bytes, seconds, whether the answer was accepted, and any circuit
 breaker that fired. This script totals them by stage, flags the calls that
 went over their class's target (stats.CALL_CLASSES), and, given a
-baseline, shows the difference stage by stage.
+baseline, shows the difference stage by stage. For runs that recorded it,
+the timing of each run follows: every stage's wall time split into the
+time spent waiting on the model and the time spent in Python.
 
 --from-logs rebuilds the same records for a story directory that has no
 run_stats.json (anything run before this script existed) from what is on
@@ -28,7 +30,7 @@ import os
 import re
 import sys
 
-from stats import call_profile, step_of
+from stats import call_profile, step_of, timing_lines
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -151,7 +153,7 @@ def fmt_min(seconds):
 
 
 def print_calls(calls):
-    print(f"{'call':34s} {'mode':8s} {'prompt':>7s} {'think KB':>9s} {'resp KB':>8s} {'min':>7s} {'B/s':>5s}  flags")
+    print(f"{'call':34s} {'mode':8s} {'prompt':>7s} {'think KB':>9s} {'resp KB':>8s} {'min':>7s} {'B/s':>5s} {'py s':>6s}  flags")
     for c in calls:
         out_bytes = (c.get('thinking_bytes') or 0) + (c.get('response_bytes') or 0)
         rate = out_bytes / c['seconds'] if c.get('seconds') else 0
@@ -162,8 +164,19 @@ def print_calls(calls):
             flags.append('rejected' if not c.get('breaker') else 'cut')
         label = c['prefix'] + (f"_{c['name']}" if c.get('name') else '') + (f" #{c['attempt']}" if c.get('attempt', 1) > 1 else '')
         prompt = f"{c['prompt_chars']:7d}" if c.get('prompt_chars') else '      -'
+        check = f"{c['check_seconds']:6.1f}" if c.get('check_seconds') is not None else '     -'
         print(f"{label[:34]:34s} {c.get('mode', ''):8s} {prompt} {(c.get('thinking_bytes') or 0) / 1000:9.1f} "
-              f"{(c.get('response_bytes') or 0) / 1000:8.1f} {fmt_min(c.get('seconds') or 0)} {rate:5.0f}  {', '.join(flags)}")
+              f"{(c.get('response_bytes') or 0) / 1000:8.1f} {fmt_min(c.get('seconds') or 0)} {rate:5.0f} {check}  "
+              f"{', '.join(flags)}")
+
+
+def print_timing(stats):
+    """Each recorded run: its stages' wall, model and Python time."""
+    for s in stats.get('sessions') or []:
+        print()
+        print(f"run started {s.get('started')}, {s.get('outcome')}: {' '.join(s.get('argv') or [])}")
+        for line in timing_lines(s):
+            print('  ' + line)
 
 
 def print_stages(stats, baseline=None):
@@ -240,6 +253,7 @@ def main():
     else:
         print()
         print('every call was inside its target.')
+    print_timing(stats)
     return 0
 
 

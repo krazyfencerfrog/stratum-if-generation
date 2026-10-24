@@ -47,7 +47,7 @@ from llm_client import LlmCallError
 from errors import SoftReject, PipelineHalt
 from brief import (build_brief, brief_lines, constraint_fields, kernel_clauses,
                    valid_serves, ending_tier_from_stated, promises_lines, shape_targets)
-from stats import RunStats, call_profile, sampler_for, step_of, SCHEMA_VERSION
+from stats import RunStats, call_profile, sampler_for, step_of, duration, SCHEMA_VERSION
 import frameworks
 import schemas
 import checks
@@ -567,10 +567,12 @@ class StoryGenerator:
                         (thinking, response) = client.run_prompt(full_prompt, **kwargs)
                     except LlmCallError as e:
                         thinking, response, call_error = e.thinking, e.response, e
+            ended = time.time()
             info = getattr(client, 'last_call', None) or {}
             thinking, response = thinking or '', response or ''
             rec.update({
-                'seconds': round(time.time() - started, 2),
+                'model_started': started, 'model_ended': ended,
+                'seconds': round(ended - started, 2),
                 'thinking_bytes': len(thinking.encode('utf-8')),
                 'response_bytes': len(response.encode('utf-8')),
                 'done_reason': info.get('done_reason'),
@@ -578,6 +580,11 @@ class StoryGenerator:
                 'output_tokens': info.get('output_tokens'),
                 'format_sent': info.get('format_sent'),
             })
+            # how the client's own clock splits the wait: Ollama's model load,
+            # prompt reading and generation; Claude's API time and usage-limit waits
+            for key in ('load_seconds', 'prompt_eval_seconds', 'eval_seconds', 'api_seconds', 'limit_wait_seconds'):
+                if info.get(key):
+                    rec[key] = info[key]
             if info.get('crash_retries'):
                 rec['crash_retries'] = info['crash_retries']
             if info.get('forced_answer'):
@@ -684,7 +691,10 @@ class StoryGenerator:
                     continue
                 break
             rec['ok'] = True
-            self.stats.record(**rec)
+            done = self.stats.record(**rec)
+            print(f"[timing] {output_member_name}: {duration(done['seconds'])} model + "
+                  f"{duration(done.get('check_seconds'))} python checking the answer"
+                  + (f' (attempt {attempt})' if attempt > 1 else ''))
             self.analysis[output_member_name] = parsed
             if is_json:
                 self.save_story_json(output_file_name, parsed)
@@ -2664,10 +2674,13 @@ def main(argv=None):
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
         sys.exit(2)
 
-    def finish(code=0):
+    def finish(code=0, outcome='ok'):
+        gen.stats.end_session(outcome)
         for line in gen.stats.summary_lines():
             print(line)
         sys.exit(code)
+
+    stage = gen.stats.stage
 
     try:
         if args.kernel_file:
@@ -2676,60 +2689,78 @@ def main(argv=None):
         else:
             print('enter kernel and close stdin:')
             kernel_text = sys.stdin.read()
-        gen.s1_take_kernel(kernel_text)
-        gen.s2_apply_rating(rating=args.rating)
+        # timed from here: each stage below prints a [timing] line as it ends
+        gen.stats.start_session(sys.argv[1:] if argv is None else argv)
+        with stage('step 1-2: kernel, rating, shape, genre, catalysts'):
+            gen.s1_take_kernel(kernel_text)
+            gen.s2_apply_rating(rating=args.rating)
 
-        gen.s2_split_shape()
-        gen.s2_classify_genre()
-        gen.s2_generate_catalysts()
+            gen.s2_split_shape()
+            gen.s2_classify_genre()
+            gen.s2_generate_catalysts()
         if args.stop_after == '2':
             finish()
 
-        gen.run_phase3()
+        with stage('phase 3: extractions and cross-check'):
+            gen.run_phase3()
         if args.stop_after == '3':
             finish()
 
         # 3.4: what the genre owes the audience, as defaults for 3.5 and step 4.
-        gen.run_promises()
+        with stage('3.4: genre promises'):
+            gen.run_promises()
         if args.stop_after == '3.4':
             finish()
 
         # 3.5: the first step that CONSTRUCTS. Builds the dramatic engine
         #  (protagonist, pressure, opposition, events, mediation, turns, cast seeds).
-        gen.run_premise_expansion()
+        with stage('3.5: premise build, verify, repair'):
+            gen.run_premise_expansion()
         if args.stop_after == '3.5':
             finish()
 
         # 3.75 (opt-in): the craft spine; the line calls read its want/need.
         if args.craft_spine:
-            gen.run_craft_spine()
+            with stage('3.75: craft spine'):
+                gen.run_craft_spine()
         if args.stop_after == '3.75':
             finish()
 
         # 3.8: what kind of story this is; the framework the lines are laid over.
-        gen.run_story_form()
+        with stage('3.8: story form'):
+            gen.run_story_form()
         if args.stop_after == '3.8':
             finish()
 
         # step 4: the outline loop. Main line, the branch plan, then one divergent line per iteration.
-        gen.run_outline(max_iterations=args.max_iterations)
+        with stage('step 4: outline loop'):
+            gen.run_outline(max_iterations=args.max_iterations)
         if args.stop_after == '4a':
             finish()
         # 4e: one cheap scoring call over the finished outline, plus the computed metrics.
-        gen.run_outline_judge()
+        with stage('4e: outline judge'):
+            gen.run_outline_judge()
         if args.stage_a or args.stage_b or args.stage_d or args.prose:
-            arcs_result = gen.run_arcs()
+            with stage('stage A: arcs'):
+                arcs_result = gen.run_arcs()
             if args.stage_b or args.stage_d or args.prose:
-                world_result = gen.run_world(arcs_result=arcs_result)
+                with stage('stage B: world'):
+                    world_result = gen.run_world(arcs_result=arcs_result)
                 if args.stage_d or args.prose:
-                    gen.run_package(arcs_result=arcs_result, world_result=world_result)
+                    with stage('stages C-D: scenes and package'):
+                        gen.run_package(arcs_result=arcs_result, world_result=world_result)
                     if args.prose:
-                        gen.run_prose()
+                        with stage('stage 8: prose'):
+                            gen.run_prose()
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)
-        finish(2)
-    except Exception:
+        finish(2, outcome='halted')
+    except KeyboardInterrupt:
+        gen.stats.end_session('interrupted')
+        raise
+    except Exception as e:
         # print what ran before the error, then fail with the traceback
+        gen.stats.end_session(f'error: {type(e).__name__}')
         for line in gen.stats.summary_lines():
             print(line)
         raise

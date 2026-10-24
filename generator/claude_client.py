@@ -187,6 +187,10 @@ class ClaudeClient(LlmClient):
                 'format_sent': format_sent,
                 'aborted': None,
                 'crash_retries': attempt - 1,
+                # the CLI's time waiting on the API (the rest of `seconds` is the CLI itself),
+                # and what this call spent asleep on usage limits before it ran
+                'api_seconds': round(data['duration_api_ms'] / 1000, 2) if data.get('duration_api_ms') else None,
+                'limit_wait_seconds': limit_waited or None,
             }
 
             if self.echo:

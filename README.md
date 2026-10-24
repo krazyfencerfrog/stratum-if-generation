@@ -201,6 +201,13 @@ conversations, and stage D's scenes. The outline loop, stage A's line expansions
 sequential, because each of those calls is shown what the earlier ones already wrote. The output is the same
 as a serial run. The default is 1; leave it there on a local Ollama GPU.
 
+Every run logs where its time went. Each model call prints a `[timing]` line (time waiting on the model, then
+the Python that checked the answer), each stage prints one as it ends (its wall time split into model time and
+Python time, overlapping calls counted once), and the run ends with a table of every stage. The same numbers are
+saved in `<id>_run_stats.json`: each call's `started`, `seconds` and `check_seconds` (plus the client's own
+breakdown where it has one: Ollama's `load_seconds`, `prompt_eval_seconds` and `eval_seconds`, Claude's
+`api_seconds` and `limit_wait_seconds`), and each run under `sessions` with its stages. `report.py` prints them.
+
 You can also run internal developer tools from `generator/`:
 
 ```bash
@@ -209,7 +216,7 @@ cd generator
 # Probe local Ollama server capabilities (context speed, structured output, breakers)
 python probe_ollama.py
 
-# Inspect call timings, token counts, and circuit breaker interventions
+# Inspect call timings, token counts, circuit breaker interventions, and each run's model/Python time by stage
 python report.py my_story --baseline ../docs/baseline_kernel1_run_stats.json
 ```
 

@@ -38,6 +38,7 @@ import checks
 from checks import as_list
 import playtest
 import schemas
+import stats
 from errors import SoftReject
 
 norm = checks.norm
@@ -863,14 +864,15 @@ class ArcBuilder:
         for n, l in enumerate(self.order, 1):
             self.a2_line(l, n)
             built.add(l)
-        shifts = self.compose_shifts()
-        endings = self.compose_endings(shifts)
-        graph = self.expanded_graph(shifts)
-        findings = self.final_checks(shifts, endings)
-        st = playtest.Story(graph)
-        plays = playtest.playthroughs(st)
-        play_findings = playtest.check(st, plays)
-        more, report = playtest.shift_checks(st)
+        with stats.stage(self.gen, 'stage A: checks and playtest'):
+            shifts = self.compose_shifts()
+            endings = self.compose_endings(shifts)
+            graph = self.expanded_graph(shifts)
+            findings = self.final_checks(shifts, endings)
+            st = playtest.Story(graph)
+            plays = playtest.playthroughs(st)
+            play_findings = playtest.check(st, plays)
+            more, report = playtest.shift_checks(st)
         result = {
             'story_id': self.story.get('story_id'), 'stage': 'arcs',
             'tiers': self.tiers, 'plan': self.plan, 'states': self.states(),

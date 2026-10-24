@@ -13,10 +13,19 @@ off, so one runaway trace costs a bounded amount instead of the run.
 Every attempt of every call is appended to stories/<id>/<id>_run_stats.json;
 generator/report.py reads it.
 
+Timing: each call records when it started, how long it waited on the model
+(`seconds`) and how long the Python after the answer took (`check_seconds`:
+parsing, validating, saving). Each run is a session in the file's
+`sessions`, and each stage of the run a span in it: its wall time split
+into model time (the time calls were in flight, overlapping calls counted
+once) and Python time (the rest). A `[timing]` line is printed as each
+stage ends, and a table at the end of the run.
+
 The numbers come from the archived kernel1 run (qwen 27B-class, about 17
 output bytes per second end to end): 25 KB of thinking is about 25 minutes.
 """
 
+import contextlib
 import json
 import os
 import re
@@ -148,8 +157,58 @@ def step_of(prefix):
     return p
 
 
+def stamp(t):
+    """An epoch time as local ISO time to the millisecond."""
+    return time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(t)) + f'.{int(t % 1 * 1000):03d}'
+
+
+def duration(seconds):
+    """0.04s, 12.3s, 4m05s, 1h02m."""
+    seconds = seconds or 0
+    if seconds < 10:
+        return f'{seconds:.2f}s'
+    if seconds < 60:
+        return f'{seconds:.1f}s'
+    if seconds < 3600:
+        return f'{int(seconds // 60)}m{int(seconds % 60):02d}s'
+    return f'{int(seconds // 3600)}h{int(seconds % 3600 // 60):02d}m'
+
+
+def busy_seconds(intervals, start, end):
+    """How much of [start, end] the (t0, t1) intervals cover, overlaps once."""
+    total, reach = 0.0, start
+    for t0, t1 in sorted((max(a, start), min(b, end)) for a, b in intervals):
+        if t1 > reach:
+            total += t1 - max(t0, reach)
+            reach = t1
+    return total
+
+
+def timing_lines(session):
+    """A session's stages as a table: wall, model and Python time each.
+    Nested stages are indented under the stage they ran in."""
+    rows = [('  ' * st.get('depth', 0) + st['stage'] + ('' if st.get('outcome', 'ok') == 'ok' else f" ({st['outcome']})"), st)
+            for st in session.get('stages') or [] if 'seconds' in st]
+    if 'seconds' in session:
+        rows.append(('TOTAL', session))
+    width = max([len('stage')] + [len(label) for label, _ in rows])
+    lines = [f"{'stage':{width}s} {'calls':>5s} {'wall':>8s} {'model':>8s} {'python':>8s}"]
+    for label, st in rows:
+        lines.append(f"{label:{width}s} {st.get('calls', 0):5d} {duration(st.get('seconds')):>8s} "
+                     f"{duration(st.get('model_seconds')):>8s} {duration(st.get('python_seconds')):>8s}")
+    return lines
+
+
+def stage(owner, name):
+    """owner.stats.stage(name), or nothing for an owner without run stats
+    (a test's stand-in generator)."""
+    stats = getattr(owner, 'stats', None)
+    return stats.stage(name) if isinstance(stats, RunStats) else contextlib.nullcontext()
+
+
 class RunStats:
-    """Appends one record per call attempt to <id>_run_stats.json."""
+    """Appends one record per call attempt to <id>_run_stats.json, and the
+    timing of each run (session) and its stages."""
 
     def __init__(self, path, story_id):
         self.path = path
@@ -167,15 +226,25 @@ class RunStats:
                 self.extra = {}
         self.session_start = len(self.calls)
         self.lock = threading.RLock()       # parallel calls record from worker threads
+        self.intervals = []                 # (start, end) of this session's model waits, epoch seconds
+        self.current = None                 # this session's record in extra['sessions']
+        self.open_stages = []
 
     def record_extra(self, key, value):
         with self.lock:
             self.extra[key] = value
             self.save()
 
-    def record(self, **rec):
+    def record(self, model_started=None, model_ended=None, **rec):
+        """One call attempt. model_started/model_ended (epoch seconds) are
+        when the client was called and when it returned: stored as the
+        call's `started`, and what came after as its `check_seconds`."""
         profile = call_profile(rec.get('klass'))
+        now = time.time()
         rec.setdefault('at', time.strftime('%Y-%m-%dT%H:%M:%S'))
+        if model_started is not None and model_ended is not None:
+            rec['started'] = stamp(model_started)
+            rec['check_seconds'] = round(now - model_ended, 3)
         rec['target_thinking_bytes'] = profile['target_thinking_bytes']
         rec['target_seconds'] = profile['target_seconds']
         over = []
@@ -186,8 +255,76 @@ class RunStats:
         rec['over_target'] = over
         with self.lock:
             self.calls.append(rec)
+            if model_started is not None and model_ended is not None:
+                self.intervals.append((model_started, model_ended))
             self.save()
         return rec
+
+    # ------------------------------------------------------------ timing
+
+    def start_session(self, argv=None):
+        """Opens this run's record in `sessions`; end_session closes it."""
+        self.session_t0 = time.time()
+        with self.lock:
+            self.current = {'started': stamp(self.session_t0), 'argv': list(argv or []), 'stages': [],
+                            'outcome': 'running'}
+            self.extra.setdefault('sessions', []).append(self.current)
+            self.save()
+
+    def _spent(self, t0, t1, first_call):
+        """(calls, model seconds) for this session's calls from first_call on, within [t0, t1]."""
+        with self.lock:
+            calls = len(self.intervals) - first_call
+            model = busy_seconds(self.intervals[first_call:], t0, t1)
+        return calls, model
+
+    @contextlib.contextmanager
+    def stage(self, name):
+        """Times a stage of the run: its wall time, the model time of the
+        calls made inside it and the Python time around them. Stages nest.
+        Without an open session (a test driving the generator directly)
+        it only runs the body."""
+        if self.current is None:
+            yield
+            return
+        t0 = time.time()
+        first = len(self.intervals)
+        depth = len(self.open_stages)
+        self.open_stages.append(name)
+        # in the list from the start, so stages stay in the order they began
+        rec = {'stage': name, 'depth': depth, 'started': stamp(t0), 'outcome': 'running'}
+        with self.lock:
+            self.current['stages'].append(rec)
+        outcome = 'ok'
+        try:
+            yield
+        except BaseException as e:
+            outcome = type(e).__name__
+            raise
+        finally:
+            self.open_stages.pop()
+            t1 = time.time()
+            calls, model = self._spent(t0, t1, first)
+            with self.lock:
+                rec.update({'seconds': round(t1 - t0, 3), 'model_seconds': round(model, 3),
+                            'python_seconds': round(t1 - t0 - model, 3), 'calls': calls, 'outcome': outcome})
+                self.save()
+            print(f"[timing] {'  ' * depth}{name}: {duration(rec['seconds'])} wall = "
+                  f"{duration(rec['model_seconds'])} model ({calls} call{'' if calls == 1 else 's'}) + "
+                  f"{duration(rec['python_seconds'])} python" + ('' if outcome == 'ok' else f' [{outcome}]'),
+                  flush=True)
+
+    def end_session(self, outcome='ok'):
+        if self.current is None:
+            return
+        t1 = time.time()
+        calls, model = self._spent(self.session_t0, t1, 0)
+        with self.lock:
+            self.current.update({'ended': stamp(t1), 'seconds': round(t1 - self.session_t0, 3),
+                                 'model_seconds': round(model, 3),
+                                 'python_seconds': round(t1 - self.session_t0 - model, 3),
+                                 'calls': calls, 'outcome': outcome})
+            self.save()
 
     def save(self):
         with open(self.path, 'w', encoding='utf-8') as f:
@@ -203,11 +340,12 @@ class RunStats:
         which calls went over."""
         calls = self.session()
         if not calls:
-            return ['run stats: no model calls this session (everything was loaded from saved files)']
-        seconds = sum(c.get('seconds', 0) for c in calls)
-        thinking = sum(c.get('thinking_bytes', 0) for c in calls)
-        lines = [f'run stats: {len(calls)} model call(s) this session, {seconds / 60:.1f} min, '
-                 f'{thinking / 1000:.1f} KB of thinking -> {os.path.basename(self.path)}']
+            lines = ['run stats: no model calls this session (everything was loaded from saved files)']
+        else:
+            seconds = sum(c.get('seconds', 0) for c in calls)
+            thinking = sum(c.get('thinking_bytes', 0) for c in calls)
+            lines = [f'run stats: {len(calls)} model call(s) this session, {seconds / 60:.1f} min, '
+                     f'{thinking / 1000:.1f} KB of thinking -> {os.path.basename(self.path)}']
         for c in calls:
             flags = list(c.get('over_target') or [])
             if c.get('breaker'):
@@ -218,4 +356,7 @@ class RunStats:
                 lines.append(f"  {c.get('prefix')}_{c.get('name')} attempt {c.get('attempt')}: "
                              f"{c.get('thinking_bytes', 0) / 1000:.1f} KB thinking, {c.get('seconds', 0) / 60:.1f} min "
                              f"[{', '.join(flags)}]")
+        if self.current is not None and 'seconds' in self.current:
+            lines.append(f"run timing ({self.current['outcome']}):")
+            lines += ['  ' + line for line in timing_lines(self.current)]
         return lines

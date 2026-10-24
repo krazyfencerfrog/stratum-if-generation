@@ -34,6 +34,7 @@ import py_compile
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -3110,6 +3111,60 @@ def ab_harness_replays_from_phase3():
     # a source without phase 3 is skipped, not run
     proc = subprocess.run([sys.executable, 'ab.py', 'run', '--variant', 'vj', '--kernels', PREFIX + 'nowhere'], cwd=GEN, env=e, capture_output=True)
     check(proc.returncode == 0 and b'no source directory' in proc.stderr, 'a missing source should be skipped with a message')
+
+
+@test
+def timing_splits_model_and_python_time():
+    # overlapping calls count once; the rest of a stage's wall time is Python
+    check(stats_mod.busy_seconds([(1, 4), (2, 5), (7, 8)], 0, 10) == 5, 'overlapping intervals')
+    check(stats_mod.busy_seconds([(1, 4)], 2, 3) == 1, 'intervals are clipped to the span')
+    check(stats_mod.duration(4.25) == '4.25s' and stats_mod.duration(125) == '2m05s'
+          and stats_mod.duration(3725) == '1h02m', 'duration format')
+    tmp = tempfile.mkdtemp()
+    try:
+        st = stats_mod.RunStats(os.path.join(tmp, 'run_stats.json'), 'timing')
+        with st.stage('before any session'):
+            pass                                # a stand-in generator's stages record nothing
+        check('sessions' not in st.extra, 'a stage outside a session was recorded')
+        st.start_session(['--x'])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            with st.stage('outer'):
+                with st.stage('inner'):
+                    asked = time.time()
+                    time.sleep(0.2)             # the model's answer
+                    st.record(prefix='s3b', name='affect', klass='extract', seconds=0.2, ok=True,
+                              model_started=asked, model_ended=time.time())
+                time.sleep(0.05)
+            try:
+                with st.stage('failing'):
+                    raise ValueError('x')
+            except ValueError:
+                pass
+        st.end_session('ok')
+        session = json.load(open(st.path))['sessions'][0]
+        outer, inner, failing = session['stages']
+        check([outer['stage'], inner['stage']] == ['outer', 'inner'] and inner['depth'] == 1,
+              f'stages out of start order: {session["stages"]}')
+        check(inner['calls'] == 1 and 0.15 < inner['model_seconds'] < 0.25, f'inner: {inner}')
+        check(outer['python_seconds'] >= 0.05 and abs(outer['seconds'] - outer['model_seconds'] - outer['python_seconds']) < 0.01,
+              f'outer: {outer}')
+        check(failing['outcome'] == 'ValueError', f'failing: {failing}')
+        check(session['calls'] == 1 and session['outcome'] == 'ok' and session['argv'] == ['--x'], f'session: {session}')
+        call = st.calls[0]
+        check(call['started'] and call['check_seconds'] >= 0, f'call timing: {call}')
+        check('[timing]   inner:' in out.getvalue() and 'model (1 call)' in out.getvalue(), out.getvalue())
+        check(any(line.startswith('run timing (ok)') for line in st.summary_lines()), 'no timing table at the end')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    # a real run: every stage timed, every call stamped, a table at the end
+    _, out = run('timing', args=['--stop-after=3.5'])
+    session = load('timing', 'run_stats.json')['sessions'][0]
+    check([s['stage'] for s in session['stages']][:2] == ['step 1-2: kernel, rating, shape, genre, catalysts',
+                                                         'phase 3: extractions and cross-check'], f"stages: {session['stages']}")
+    check(session['outcome'] == 'ok' and session['calls'] == len(calls('timing')), f'session: {session}')
+    check(all(c.get('started') and 'check_seconds' in c for c in calls('timing')), 'a call without its timing')
+    check('[timing] phase 3: extractions and cross-check:' in out and 'run timing (ok):' in out, out[-2000:])
 
 
 @test(group='basic')
