@@ -4,6 +4,11 @@
     python tests/test_plumbing.py            # from the repo root, or anywhere
     python tests/test_plumbing.py --keep     # leave the test story directories
     python tests/test_plumbing.py -k linear  # only tests whose name contains "linear"
+    python tests/test_plumbing.py -j 0       # one worker process per CPU (-j N: N of them)
+
+With -j, tests run in worker processes (tests/harness.py). Tests that read a
+story directory another test writes are in one @test(group=...), which keeps
+them in one worker, in file order.
 
 Runs the whole pipeline on the stub client (generator/stub_client.py) under
 every scenario the stub can stage, and asserts what must hold whatever a
@@ -31,7 +36,6 @@ import subprocess
 import sys
 import threading
 import time
-import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,16 +54,13 @@ from llm_client import LlmCallError   # noqa: E402
 from ollama_client import OllamaClient  # noqa: E402
 from agy_client import AgyClient        # noqa: E402
 from claude_client import ClaudeClient  # noqa: E402
+import harness           # noqa: E402
 
 os.environ.setdefault('STRATUM_CLIENT', 'stub')
 
 TESTS = []
 used_prompts = set()
-
-
-def test(fn):
-    TESTS.append(fn)
-    return fn
+test = harness.registrar(TESTS)
 
 
 def check(cond, message):
@@ -124,7 +125,7 @@ def assert_story_ok(name, min_lines=1):
 
 # ---------------------------------------------------------------- pipeline scenarios
 
-@test
+@test(group='basic')
 def basic_run_and_resume():
     run('basic')
     story = assert_story_ok('basic', min_lines=2)
@@ -225,7 +226,7 @@ def setups_are_planted_before_they_are_paid():
           'a main line that never pays its setup must be a complaint')
 
 
-@test
+@test(group='basic')
 def hidden_truth_and_cast_edges():
     run('gap', env={'STUB_GAP': '1'}, args=['--stop-after=3.5'])
     premise = load('gap', 's3_5_premise_accepted.json')
@@ -625,7 +626,7 @@ def sloppy_answers_are_normalized():
     check(all(isinstance(n['turn'], (int, type(None))) for n in story['nodes'].values()), 'a turn id stayed a string')
 
 
-@test
+@test(group='basic')
 def breaker_falls_back_to_no_think():
     run('breaker', env={'STUB_ABORT': 's4a'})
     attempts = [c for c in calls('breaker') if c['step'] == 's4a']
@@ -692,7 +693,7 @@ def craft_spine_opt_in():
     check('(or none)\nnone' in prompt, 'without --craft-spine the main line should receive "none"')
 
 
-@test
+@test(group='graph')
 def rejoin_new_cast_and_nothing():
     run('graph', args=['--max-iterations=6', '--branching=judge'],
         env={'STUB_NEW_CAST_ON': '2', 'STUB_REJOIN_ON': '3', 'STUB_NOTHING_ON': '4', 'STUB_STOP_AFTER': '9'})
@@ -782,7 +783,7 @@ def judge_mode_seeds_one_line_at_a_time():
     check(all((l.get('ending') or {}).get('answer') for l in story['lines'].values()), 'every line should state its ending world')
 
 
-@test
+@test(group='basic')
 def branch_plan_designs_every_divergence():
     story = assert_story_ok('basic', min_lines=3)
     check(story['branching'] == 'plan' and story['plan'] and len(story['plan']['seeds']) >= 2, 'the branch plan was not stored')
@@ -1274,7 +1275,7 @@ def stage_8_semantic_judges_evaluation():
     import schemas
     from main import StoryGenerator
 
-    test_id = 's8j_test'
+    test_id = f'{PREFIX}s8j_test'
     gen = StoryGenerator(story_id=test_id)
     shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
@@ -1718,8 +1719,9 @@ def multilingual_semantic_judges_evaluation():
 @test
 def parallel_calls_match_a_serial_run():
     # the same story id both times: names are seeded from it
-    env = {'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick'}
-    outputs = ('world.json', 'package_draft.json')
+    # a premise repair round, so the audits run together twice
+    env = {'STUB_NEW_CAST_ON': '2', 'STUB_FUNCTIONAL': '1', 'STRATUM_PLAYTEST': 'quick', 'STUB_PREMISE_HARD_ROUNDS': '1'}
+    outputs = ('s3h_cross_check.json', 's3_5_loop.json', 's3_5_premise_accepted.json', 'world.json', 'package_draft.json')
     run('par', args=['--stage-d'], env=env)
     serial = {suffix: load('par', suffix) for suffix in outputs}
     n_serial = len(calls('par'))
@@ -1777,7 +1779,7 @@ def map_calls_keeps_order_and_isolates_clients():
     check(gen.map_calls(lambda i: i * 2, range(3)) == [0, 2, 4], 'serial path')
 
 
-@test
+@test(group='staged')
 def stages_c_and_d_compile_a_playable_package():
     sys.path.insert(0, os.path.join(ROOT, 'engine'))
     from story import Story as EngineStory, validate as engine_validate
@@ -1834,7 +1836,7 @@ def stages_c_and_d_compile_a_playable_package():
     check(pt['errors_count'] == 0, f"playtest errors_count: {pt.get('errors_count')}")
 
 
-@test
+@test(group='staged')
 def stage_d_blocks_and_halts_on_unreachable_scenes_or_stuck_states():
     from main import StoryGenerator, PipelineHalt
     from compile_scenes import SceneCompiler
@@ -1918,7 +1920,7 @@ def kinds(story):
     return {f['kind'] for f in checks.check_story(story)['findings']}
 
 
-@test
+@test(group='graph')
 def checks_catch_broken_graphs():
     good = load('graph', 'story.json') if os.path.isdir(story_dir('graph')) else None
     if good is None:
@@ -2289,7 +2291,7 @@ def being_decides_who_is_named():
           'a seed without being is read from its role, as before')
 
 
-@test
+@test(group='basic')
 def cast_names_come_from_python():
     import names
     premise = load('basic', 's3_5_premise_accepted.json')
@@ -2417,7 +2419,7 @@ def protagonist_is_named_first():
     check(names.name_protagonist(you, 'demo35', 'modern') == name, 'naming is not stable for a protagonist that already has a name')
 
 
-@test
+@test(group='basic')
 def playtest_walks_outlines_and_patterns():
     import playtest
     story = json.load(open(os.path.join(story_dir('basic'), f'{PREFIX}basic_story.json')))
@@ -2554,7 +2556,7 @@ def late_forks_are_noted():
     check(checks.repeated_nodes(nodes) == [('N02', 'T2N01')], f'repeated nodes: {checks.repeated_nodes(nodes)}')
 
 
-@test
+@test(group='basic')
 def helpers():
     kernel_files = sorted(glob.glob(os.path.join(KERNELS, 'kernel*.txt')))
     check(len(kernel_files) >= 35, f'expected the kernel batch, found {len(kernel_files)}')
@@ -3081,7 +3083,7 @@ def ctrl_c_stops_a_run_started_with_sigint_ignored():
     check(proc.returncode != 0 and 'KeyboardInterrupt' in out, f'ctrl-c did not stop the run:\n{out[-1000:]}')
 
 
-@test
+@test(group='basic')
 def ab_harness_replays_from_phase3():
     e = dict(os.environ, STRATUM_CLIENT='stub')
     for k in list(e):
@@ -3110,7 +3112,7 @@ def ab_harness_replays_from_phase3():
     check(proc.returncode == 0 and b'no source directory' in proc.stderr, 'a missing source should be skipped with a message')
 
 
-@test
+@test(group='basic')
 def report_script():
     proc = subprocess.run([sys.executable, 'report.py', PREFIX + 'breaker', '--baseline', '../docs/baseline_kernel1_run_stats.json'],
                           cwd=GEN, capture_output=True)
@@ -4269,20 +4271,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--keep', action='store_true', help='keep the test story directories')
     parser.add_argument('-k', default='', help='run only tests whose name contains this')
+    harness.add_jobs_argument(parser)
     args = parser.parse_args()
-    failed = 0
     started = time.time()
-    for fn in TESTS:
-        if args.k and (args.k not in fn.__name__ or fn.__name__ == 'every_prompt_is_exercised'):
-            continue        # the prompt-coverage test only means something after every scenario has run
-        t = time.time()
-        try:
-            fn()
-            print(f'ok    {fn.__name__} ({time.time() - t:.1f}s)')
-        except Exception:
-            failed += 1
-            print(f'FAIL  {fn.__name__}')
-            traceback.print_exc()
+    # the prompt-coverage test only means something after every scenario has run
+    tests = [fn for fn in TESTS if not args.k or (args.k in fn.__name__ and fn is not every_prompt_is_exercised)]
+    last = [fn for fn in tests if fn is every_prompt_is_exercised]
+    failed = harness.run(tests, __file__, jobs=harness.jobs_from(args), collect='used_prompts', into=used_prompts, last=last)
     if not args.keep:
         for d in glob.glob(os.path.join(STORIES, PREFIX + '*')):
             shutil.rmtree(d, ignore_errors=True)

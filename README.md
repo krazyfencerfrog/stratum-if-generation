@@ -163,6 +163,9 @@ python tests/test_engine.py
 python tests/test_plumbing.py
 ```
 
+Both run one test at a time by default. `-j N` spreads the tests over N worker processes and `-j 0` over one
+per CPU.
+
 ### Running the Pipeline
 Run the pipeline directly from the repository root:
 
@@ -191,8 +194,10 @@ completion with schema-constrained output. Non-thinking steps run at `--effort l
 `STRATUM_CLAUDE_EFFORT` (default `high`). When the subscription usage limit is hit it sleeps and retries
 (`STRATUM_CLAUDE_LIMIT_WAIT`, default 900s, up to `STRATUM_CLAUDE_LIMIT_MAX`, default 6h).
 
-With a remote client (such as `STRATUM_CLIENT=agy`), `--parallel N` runs the independent per-item calls N
-at a time: stage B's characters and conversations, and stage D's scenes. Places and the prose pass stay
+With a remote client (such as `STRATUM_CLIENT=claude` or `agy`), `--parallel N` runs independent calls N
+at a time: phase 3's blind extractions (seven at once, then 3f and 3g), each 3.5 round's audits (3.5v, the
+Kernel check and the rule-terms check), stage B's characters (with the functional people's call) and
+conversations, and stage D's scenes. The outline loop, stage A's line expansions, places and the prose pass stay
 sequential, because each of those calls is shown what the earlier ones already wrote. The output is the same
 as a serial run. The default is 1; leave it there on a local Ollama GPU.
 

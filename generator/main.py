@@ -762,6 +762,12 @@ class StoryGenerator:
             raise errors[min(errors)]
         return results
 
+    def run_together(self, *calls):
+        """map_calls over zero-argument calls: [call() for call in calls],
+        up to self.parallel at a time, for model calls that read none of
+        each other's answers."""
+        return self.map_calls(lambda call: call(), calls)
+
     def keep_rejected(self, prefix, attempt, thinking, response):
         """A rejected attempt's output is kept beside the accepted one (the
         retry overwrites the plain raw_output files), so a retry can be
@@ -1368,24 +1374,28 @@ class StoryGenerator:
         if 's2_catalysts' not in self.analysis:
             self.s2_generate_catalysts()
         replace_kernel_only = {'$$KERNEL$$': self.kernel}
-        self.run_prompt('s3_0a', 'interactive_question', replace_kernel_only)
-        self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only, schema=schemas.IDENTITY_EPISTEMIC)
-        self.run_prompt('s3_0c', 'consequence_failure_model', replace_kernel_only)
-        self.run_prompt('s3b', 'affect', replace_kernel_only)
-        self.run_prompt('s3c', 'theme', replace_kernel_only)
-        self.run_prompt('s3d', 'viewpoint', replace_kernel_only)
-        self.run_prompt('s3e', 'timeline', replace_kernel_only)
-        self.run_prompt('s3f', 'setting', {
-            '$$VIEWPOINT_EXCURSIONS_JSON$$': self.to_json(self.analysis.get('s3d_viewpoint')),
-            '$$KERNEL$$': self.kernel
-        })
-        # 3g is chained, not blind: branching density and tracked state aren't
-        #  well-defined without the decision (3-0a) and the failure model (3-0c).
-        self.run_prompt('s3g', 'complexity', {
-            '$$INTERACTIVE_QUESTION_JSON$$': self.to_json(self.analysis.get('s3_0a_interactive_question')),
-            '$$FAILURE_MODEL_JSON$$': self.to_json(self.analysis.get('s3_0c_consequence_failure_model')),
-            '$$KERNEL$$': self.kernel
-        })
+        # the blind extractions read only the Kernel, so they run together
+        self.run_together(
+            lambda: self.run_prompt('s3_0a', 'interactive_question', replace_kernel_only),
+            lambda: self.run_prompt('s3_0b', 'identity_epistemic', replace_kernel_only, schema=schemas.IDENTITY_EPISTEMIC),
+            lambda: self.run_prompt('s3_0c', 'consequence_failure_model', replace_kernel_only),
+            lambda: self.run_prompt('s3b', 'affect', replace_kernel_only),
+            lambda: self.run_prompt('s3c', 'theme', replace_kernel_only),
+            lambda: self.run_prompt('s3d', 'viewpoint', replace_kernel_only),
+            lambda: self.run_prompt('s3e', 'timeline', replace_kernel_only))
+        # 3f reads 3d. 3g is chained, not blind: branching density and tracked
+        #  state aren't well-defined without the decision (3-0a) and the failure
+        #  model (3-0c). Neither reads the other.
+        self.run_together(
+            lambda: self.run_prompt('s3f', 'setting', {
+                '$$VIEWPOINT_EXCURSIONS_JSON$$': self.to_json(self.analysis.get('s3d_viewpoint')),
+                '$$KERNEL$$': self.kernel
+            }),
+            lambda: self.run_prompt('s3g', 'complexity', {
+                '$$INTERACTIVE_QUESTION_JSON$$': self.to_json(self.analysis.get('s3_0a_interactive_question')),
+                '$$FAILURE_MODEL_JSON$$': self.to_json(self.analysis.get('s3_0c_consequence_failure_model')),
+                '$$KERNEL$$': self.kernel
+            }))
         # 3h: the phase's own cross-check. Classification only; fixes nothing.
         self.run_prompt('s3h', 'cross_check', {
             '$$STEP3_BUNDLE_JSON$$': self.step3_bundle_json(),
@@ -2009,16 +2019,20 @@ class StoryGenerator:
                 raise ValueError('; '.join(problems))
 
         prefix = 's3_5v' + (f'_r{round_no}' if round_no else '')
-        answer = self.run_prompt(prefix, 'premise_check', {
-            '$$CONSTRAINTS$$': '\n'.join(f' {n}. {line}' for n, _, line in constraints) or ' (the brief has no constraint-class field)',
-            '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {text}' for i, text in checklist),
-            '$$FAILURE_MODEL$$': brief_lines(brief, only=('3-0c',)),
-            '$$PREMISE_JSON$$': self.to_json(premise),
-            '$$KERNEL$$': self.kernel,
-        }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='audit',
-            schema=schemas.PREMISE_CHECK)
+        # the audit, the Kernel check and the rule-terms check each read only the premise
+        answer, clause_findings, rule_findings = self.run_together(
+            lambda: self.run_prompt(prefix, 'premise_check', {
+                '$$CONSTRAINTS$$': '\n'.join(f' {n}. {line}' for n, _, line in constraints) or ' (the brief has no constraint-class field)',
+                '$$ENGINE_CHECKS$$': '\n'.join(f' {i}. {text}' for i, text in checklist),
+                '$$FAILURE_MODEL$$': brief_lines(brief, only=('3-0c',)),
+                '$$PREMISE_JSON$$': self.to_json(premise),
+                '$$KERNEL$$': self.kernel,
+            }, prompt_file='s3_5v_premise_check.prompt', validator=validate, klass='audit',
+                schema=schemas.PREMISE_CHECK),
+            lambda: self.check_kernel_clauses(premise, round_no, clauses),
+            lambda: self.check_rule_terms(premise, round_no))
 
-        findings = self.premise_computed_findings(premise) + self.check_kernel_clauses(premise, round_no, clauses) + self.check_rule_terms(premise, round_no)
+        findings = self.premise_computed_findings(premise) + clause_findings + rule_findings
         constraint_text = {str(n): (fid, line) for n, fid, line in constraints}
         check_text = {i: text for i, text in checklist}
         for e in answer.get('constraints') or []:

@@ -3,7 +3,7 @@
 play through the hand-written demo, rewind, save and load. No model, no
 network, about a second.
 
-    python tests/test_engine.py [-k name]
+    python tests/test_engine.py [-k name] [-j jobs]   # -j 0: one worker process per CPU
 """
 
 import argparse
@@ -15,7 +15,6 @@ import random
 import sys
 import tempfile
 import time
-import traceback
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENGINE = os.path.join(ROOT, 'engine')
@@ -29,13 +28,10 @@ from state import GameState                             # noqa: E402
 from story import Story, validate                       # noqa: E402
 import cli                                              # noqa: E402
 import playtest                                         # noqa: E402
+import harness                                          # noqa: E402
 
 TESTS = []
-
-
-def test(fn):
-    TESTS.append(fn)
-    return fn
+test = harness.registrar(TESTS)
 
 
 def check(cond, message):
@@ -535,16 +531,30 @@ def playtest_explores_scene_by_scene():
         check(label in labels, f'walkthrough step {label!r} is not offered')
         eng.act(labels[label])
     check(eng.state.ending == 'END_DEMO', 'the walkthrough does not end the story')
-    # the stuck state from the test below, found within its scene
+
+
+def stuck_demo():
+    """The demo with the stuck state from playtest_finds_stuck_states_and_missed_choices."""
     data = demo_data()
     s2 = data['scenes']['S02']['interactions']
     next(i for i in s2 if i['id'] == 'S02.jump')['effects'] = [{'take': 'bow_line'}, {'set': 'jumped'}]
     for it in s2:
         if it['id'] != 'S02.jump':
             it['when'] = 'not flags.reported and not flags.jumped'
-    story = Story(data)
+    return Story(data)
+
+
+# the scene-by-scene tests are separate so a parallel run spreads their searches over workers
+@test
+def playtest_finds_a_stuck_state_within_its_scene():
+    story = stuck_demo()
     errors, _ = playtest.scene_findings(story, playtest.explore_scenes(story))
     check(any(e.startswith('STUCK') and 'S02' in e and 'jump for it' in e for e in errors), f'stuck state missed: {errors}')
+
+
+@test
+def playtest_reports_scene_by_scene():
+    story = stuck_demo()
     out = io.StringIO()
     report = playtest.run(story, runs=20, styled_runs=10, out=out, by_scene=True)
     check('explored scene by scene' in out.getvalue() and any(e.startswith('STUCK') for e in report['errors']),
@@ -1652,20 +1662,10 @@ def story_package_metadata_and_discovery_info():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', default='', help='run only tests whose name contains this')
+    harness.add_jobs_argument(parser)
     args = parser.parse_args()
-    failed = 0
     started = time.time()
-    for fn in TESTS:
-        if args.k and args.k not in fn.__name__:
-            continue
-        t = time.time()
-        try:
-            fn()
-            print(f'ok    {fn.__name__} ({time.time() - t:.1f}s)')
-        except Exception:
-            failed += 1
-            print(f'FAIL  {fn.__name__}')
-            traceback.print_exc()
+    failed = harness.run([fn for fn in TESTS if args.k in fn.__name__], __file__, jobs=harness.jobs_from(args))
     print(f"\n{'ALL PASSED' if not failed else str(failed) + ' FAILED'} in {time.time() - started:.1f}s")
     return 1 if failed else 0
 
