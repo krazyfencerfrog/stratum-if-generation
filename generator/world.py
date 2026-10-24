@@ -376,8 +376,10 @@ class WorldBuilder:
         self.world['characters'][cid] = ch_entry
 
     def b1_functional(self, cids):
+        """The one call for every functional person; add_functional folds the
+        answer in, so the call can run beside the major characters'."""
         if not cids:
-            return
+            return None
         packet = [{'who': self.who(c), 'sketch': {k: self.chars[c].get(k) for k in ('wants', 'holds', 'voice') if self.chars[c].get(k)},
                    'scenes': [s['title'] for s in self.scenes_with(cid=c)]} for c in cids]
 
@@ -398,7 +400,10 @@ class WorldBuilder:
         answer = self.gen.run_prompt('s6b1_functional', 'functional', {
             '$$KERNEL$$': self.gen.kernel, '$$TONE$$': self.gen.tone_line(), '$$PEOPLE_JSON$$': compact(packet),
         }, prompt_file='s6b1f_functional.prompt', validator=validate, klass='classify', schema=schemas.WORLD_FUNCTIONAL)
-        for x in as_list(answer.get('people')):
+        return answer
+
+    def add_functional(self, answer):
+        for x in as_list((answer or {}).get('people')):
             cid = self.resolve(x.get('who'))
             if cid:
                 c = self.chars[cid]
@@ -901,9 +906,12 @@ class WorldBuilder:
     def run(self):
         people = [c for c, ch in self.chars.items() if ch.get('kind') != 'crowd']
         major = [c for c in people if self.tiers.get(c) in ('arc', 'supporting')]
-        for cid, answer in zip(major, self.gen.map_calls(self.b1_character, major)):
+        # the functional people's call reads only the plan, like each major character's
+        *answers, functional = self.gen.run_together(*[lambda cid=cid: self.b1_character(cid) for cid in major],
+                                                     lambda: self.b1_functional([c for c in people if c not in major]))
+        for cid, answer in zip(major, answers):
             self.add_character(cid, answer)
-        self.b1_functional([c for c in people if c not in major])
+        self.add_functional(functional)
         # each place is told the rooms and things already built, so these stay one at a time
         for lid in self.locations:
             self.b2_place(lid)

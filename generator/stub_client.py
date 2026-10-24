@@ -103,6 +103,7 @@ Scenario knobs (environment variables):
 import json
 import os
 import re
+import threading
 from llm_client import LlmClient
 
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
@@ -119,9 +120,15 @@ class StubClient(LlmClient):
 
     def __init__(self):
         self.calls = []
-        self.premise_verifies = 0
-        self.repair_breaks = 0
+        # in one dict, so the shallow copies parallel calls run on share them
+        self.counts = {'premise_verifies': 0, 'repair_breaks': 0}
+        self.count_lock = threading.Lock()
         self.last_call = {}
+
+    def bump(self, key):
+        with self.count_lock:
+            self.counts[key] += 1
+            return self.counts[key]
 
     def run_prompt(self, prompt, **kwargs):
         kind = self.classify(prompt)
@@ -862,21 +869,21 @@ class StubClient(LlmClient):
                             for n in clauses]}
 
     def p_s3_5v(self, p):
-        self.premise_verifies += 1
+        verifies = self.bump('premise_verifies')
         constraints = self.listed(p, '--- LIST 1: CONSTRAINTS ---')
         engine = self.listed(p, '--- LIST 2: ENGINE CHECKS ---')
         material = self.section(p, '--- THE PREMISE TO AUDIT ---') or {}
         has_meter = 'crew-trust score' in json.dumps(material)
         always = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 1
         broken = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 2
-        retold = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 5 and self.premise_verifies == 1
+        retold = env_int('STUB_PREMISE_ALWAYS_HARD', 0) == 5 and verifies == 1
         loss = env_int('STUB_PREMISE_LOSS', 0)
         loss_quote = (str((material.get('price') or {}).get('what') or '') if loss == 2 else
                       str(((material.get('complications') or [{}])[-1] or {}).get('description') or ''))
         # =2 breaks a constraint read in the Kernel (an inferred one left standing is a note, not a halt)
         block = self.body(p)[self.body(p).rfind('--- LIST 1: CONSTRAINTS ---'):]
         explicit = next((m.group(1) for m in re.finditer(r'^\s*(\d+)\.\s.*\[constraint\]', block, re.M)), None)
-        hard = has_meter and self.premise_verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
+        hard = has_meter and verifies <= env_int('STUB_PREMISE_HARD_ROUNDS', 0)
         turn_picks = {}
         for t in (material.get('turns') or []):
             if isinstance(t, dict):
@@ -945,8 +952,8 @@ class StubClient(LlmClient):
     def p_s3_5r(self, p):
         revised = {"complications": [{"description": self.FIXED, "serves": "3c.core_thematic_axis"}]}
         breaks = env_int('STUB_REPAIR_BREAKS', 0)
-        if self.repair_breaks < breaks:
-            self.repair_breaks += 1
+        if self.counts['repair_breaks'] < breaks:
+            self.bump('repair_breaks')
             turns = self.p_s3_5b(p)['turns']
             turns[2] = dict(turns[2], form='choose',
                             ways_through=[{"way": "you choose to tell the sector first", "cost": "they barricade the valve"},
