@@ -98,12 +98,15 @@ Scenario knobs (environment variables):
                                  0 plans none, so the loop stops after the main line
     STUB_ECHO=1                  3.5a's first answer copies a phrase of the
                                  brief's analytic wording into a lever (soft)
+    STUB_DELAY=0.2               every call waits this many seconds before it
+                                 answers, like a model (tests the run timing)
 """
 
 import json
 import os
 import re
 import threading
+import time
 from llm_client import LlmClient
 
 RETRY_MARKER = '--- YOUR PREVIOUS ANSWER WAS REJECTED ---'
@@ -133,6 +136,9 @@ class StubClient(LlmClient):
     def run_prompt(self, prompt, **kwargs):
         kind = self.classify(prompt)
         self.calls.append(kind)
+        delay = float(os.environ.get('STUB_DELAY') or 0)
+        if delay:
+            time.sleep(delay)
         no_think = kwargs.get('think') is False
         if os.environ.get('STUB_ABORT') == kind and (not no_think or env_int('STUB_ABORT_ALWAYS', 0)):
             thinking = 'stub runaway reasoning. ' * 40

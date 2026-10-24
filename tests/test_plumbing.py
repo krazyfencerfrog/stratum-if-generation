@@ -3165,6 +3165,12 @@ def timing_splits_model_and_python_time():
     check(session['outcome'] == 'ok' and session['calls'] == len(calls('timing')), f'session: {session}')
     check(all(c.get('started') and 'check_seconds' in c for c in calls('timing')), 'a call without its timing')
     check('[timing] phase 3: extractions and cross-check:' in out and 'run timing (ok):' in out, out[-2000:])
+    # parallel calls: phase 3's model time is the time calls were in flight, not the sum of their waits
+    run('timing_par', args=['--stop-after=3', '--parallel', '4'], env={'STUB_DELAY': '0.3'})
+    phase3 = next(s for s in load('timing_par', 'run_stats.json')['sessions'][0]['stages'] if s['stage'].startswith('phase 3'))
+    waits = sum(c['seconds'] for c in calls('timing_par') if c['step'].startswith('s3'))
+    check(phase3['calls'] == 10 and phase3['model_seconds'] < 0.6 * waits, f'phase 3 {phase3} against {waits:.2f}s of waits')
+    check(phase3['model_seconds'] <= phase3['seconds'] and phase3['python_seconds'] >= 0, f'phase 3: {phase3}')
 
 
 @test(group='basic')
