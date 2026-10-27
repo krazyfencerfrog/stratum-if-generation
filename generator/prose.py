@@ -32,6 +32,7 @@ import sys
 import example_guard
 import schemas
 import checks
+import stats
 from errors import SoftReject
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -673,8 +674,18 @@ class ProseWriter:
         self.style()
         codes = set(self.chars)
         self.convert_names()            # the model is shown codes, never names, in the text it revises
-        for unit in self.units():
-            self.edit(unit, codes)
+        units = self.units()
+        # "scene 5 of 15 · part 5 of 34" on the dashboard: a long unit's chunks count as one of its kind
+        of_kind = {}
+        for u in units:
+            ids = of_kind.setdefault(u['kind'], [])
+            if u['of'] not in ids:
+                ids.append(u['of'])
+        for i, unit in enumerate(units, 1):
+            ids = of_kind[unit['kind']]
+            label = 'the opening, you and the endings' if unit['kind'] == 'rest' else unit['kind']
+            with stats.working_on(self.gen, label, ids.index(unit['of']) + 1, len(ids), part=(i, len(units))):
+                self.edit(unit, codes)
         self.convert_names()            # any name a revision wrote anyway
         self.judge_somatic()
         self.judge_fates()

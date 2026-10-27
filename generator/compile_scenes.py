@@ -872,6 +872,11 @@ class SceneCompiler:
             result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
                                          styled_runs=10 if quick else None, scene_states=1500 if quick else None,
                                          jobs=jobs)
+            # the scenes explored in worker processes: their time beyond the wall time is Python a
+            # one-at-a-time run would also have spent
+            timing = (result.get('explore') or {}).get('timing') or {}
+            stats.parallel_work(getattr(self, 'gen', None), sum((timing.get('scene_seconds') or {}).values()),
+                                timing.get('seconds') or 0)
         metrics = extract_playtest_metrics(story, result)
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report
@@ -915,7 +920,7 @@ class SceneCompiler:
     def run(self):
         """Reconcile and compile; returns the package (check it with check())."""
         self.reconcile()
-        for sc, answer in zip(self.plan['scenes'], self.gen.map_calls(self.compile_scene, self.plan['scenes'])):
+        for sc, answer in zip(self.plan['scenes'], self.gen.map_calls(self.compile_scene, self.plan['scenes'], label='scene')):
             self.compiled[sc['id']] = self.build(sc, answer)
         return self.package()
 

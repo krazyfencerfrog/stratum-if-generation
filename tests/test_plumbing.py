@@ -1779,6 +1779,24 @@ def map_calls_keeps_order_and_isolates_clients():
     gen.parallel = 1
     check(gen.map_calls(lambda i: i * 2, range(3)) == [0, 2, 4], 'serial path')
 
+    # each item's calls carry which item it is ("scene 2 of 3"), serially and on worker threads, for the dashboard
+    def where(_):
+        return main_mod.working_on_text(getattr(gen._local, 'batch', None))
+    for gen.parallel in (1, 4):
+        check(gen.map_calls(where, 'abc', label='scene') == ['scene 1 of 3', 'scene 2 of 3', 'scene 3 of 3'],
+              f'labels with parallel {gen.parallel}')
+    check(where(None) is None, 'a label outlived its loop')
+    with gen.working_on('scene', 5, 15, part=(6, 34)):
+        check(where(None) == 'scene 5 of 15 · part 6 of 34', where(None))
+        with gen.working_on('the endings', 1, 1):
+            check(where(None) == 'the endings', 'one item needs no "1 of 1"')
+        check(where(None) == 'scene 5 of 15 · part 6 of 34', 'an inner label was not undone')
+    check(where(None) is None, 'working_on was not undone')
+    gen.set_working_on('line', 1)
+    check(where(None) == 'line 1', 'a label with no total yet')
+    gen.set_working_on()
+    check(where(None) is None, 'set_working_on() clears it')
+
 
 @test(group='staged')
 def stages_c_and_d_compile_a_playable_package():
@@ -2977,12 +2995,34 @@ def claude_client_unit_test():
     from unittest.mock import patch, MagicMock
     import main as main_mod
 
-    def proc_for(payload, returncode=0):
-        p = MagicMock()
-        p.returncode = returncode
-        p.stdout = json.dumps(payload)
-        p.stderr = ""
-        return p
+    class Stdin(io.StringIO):
+        def close(self):
+            self.sent = self.getvalue()     # what the client wrote, kept past close
+
+    class FakePopen:
+        """claude as the client runs it: stdout lines to read, a prompt written to stdin."""
+        def __init__(self, stdout, returncode=0):
+            self.stdin, self.stdout, self.stderr = Stdin(), io.StringIO(stdout + "\n"), io.StringIO("")
+            self.returncode = returncode
+
+        def wait(self, timeout=None):
+            return self.returncode
+
+        def kill(self):
+            pass
+
+    started = []        # the FakePopens the client started, in order
+
+    def proc_for(*payloads, returncode=0):
+        return lambda: FakePopen("\n".join(json.dumps(p) for p in payloads), returncode)
+
+    def popen(*makes):
+        """subprocess.Popen patched to start each of `makes` in turn (the last one again after that)."""
+        def fake(cmd, **kwargs):
+            started.append(makes[min(len(started), len(makes) - 1)]())
+            return started[-1]
+        started.clear()
+        return patch("subprocess.Popen", side_effect=fake)
 
     ok_payload = {
         "type": "result", "subtype": "success", "is_error": False,
@@ -2994,7 +3034,7 @@ def claude_client_unit_test():
     }
 
     # 1. Mocked call: schema, effort, isolation flags, token accounting
-    with patch("subprocess.run", return_value=proc_for(ok_payload)) as mock_run:
+    with popen(proc_for(ok_payload)) as mock_run:
         client = ClaudeClient(model="opus", claude_path="claude", echo=False)
         schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
         thinking, response = client.run_prompt("test prompt", format=schema, think=False)
@@ -3014,14 +3054,50 @@ def claude_client_unit_test():
         check(cmd[cmd.index("--effort") + 1] == "low", "think=False should run at low effort")
         check(cmd[cmd.index("--tools") + 1] == "", "tools not disabled")
         check("--no-session-persistence" in cmd and "--strict-mcp-config" in cmd, "isolation flags missing")
-        check(kwargs['input'] == "test prompt", "input not passed to stdin")
+        check(started[0].stdin.sent == "test prompt", "input not passed to stdin")
         check(kwargs['cwd'] == client.workdir and not os.listdir(client.workdir), "not run in an empty workdir")
         check(kwargs.get('start_new_session') is True, "claude must not share the terminal's session")
+        check(cmd[cmd.index("--output-format") + 1] == "stream-json" and "--verbose" in cmd
+              and "--include-partial-messages" in cmd,
+              "stream-json output (it carries the usage windows) needs --verbose with -p; partial messages stream the answer")
+        check(client.last_call['usage_limits'] is None, "a plain result has no usage windows")
+
+    # 1b. stream-json: the result is the last line, the usage windows come from the rate_limit_event
+    limits_event = {"type": "rate_limit_event", "rate_limit_info": {
+        "status": "allowed", "rateLimitType": "five_hour", "resetsAt": 1792815000,
+        "unifiedWindows": {"five_hour": {"utilization": 0.34, "resetsAt": 1792815000},
+                           "seven_day": {"utilization": 0.12, "resetsAt": 1793271600}}}}
+    stream = proc_for({"type": "system", "subtype": "init"}, {"type": "assistant", "message": {}}, limits_event, ok_payload)
+    with popen(stream):
+        client = ClaudeClient(claude_path="claude", echo=False)
+        _, response = client.run_prompt("p", format={"type": "object"})
+        check(response == '{"answer": "ok"}', f"stream-json response: {response}")
+        check(client.last_call['usage_limits'] == {
+            'five_hour': {'used': 0.34, 'resets_at': 1792815000},
+            'seven_day': {'used': 0.12, 'resets_at': 1793271600}, 'status': 'allowed'},
+            f"usage windows: {client.last_call['usage_limits']}")
+        check(client.last_call['seconds'] == 1.25 and client.last_call['prompt_tokens'] == 150, "stream-json accounting")
+    line = stats_mod.usage_line(client.last_call['usage_limits'])
+    check(line.startswith('5h 34% (resets ') and ', week 12% (resets ' in line, f'usage line: {line}')
+    tmp = tempfile.mkdtemp()
+    try:
+        st = stats_mod.RunStats(os.path.join(tmp, 'run_stats.json'), 'usage')
+        st.start_session([])
+        st.record(prefix='s3b', name='affect', klass='extract', seconds=1, ok=True,
+                  usage_limits=client.last_call['usage_limits'])
+        saved = json.load(open(st.path))
+        check(saved['calls'][0]['usage_limits']['seven_day']['used'] == 0.12
+              and saved['sessions'][0]['usage_limits']['five_hour']['used'] == 0.34
+              and saved['sessions'][0]['usage_limits']['at'], f"usage not saved: {saved}")
+        check(any(l.startswith('claude usage after the last call: 5h 34%') for l in st.summary_lines()),
+              'no usage line in the end-of-run summary')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
     # 2. Plain-text result, thinking effort, no model given
     text_payload = dict(ok_payload, result="```json\n{\"a\": 1}\n```", structured_output=None,
                         stop_reason="max_tokens")
-    with patch("subprocess.run", return_value=proc_for(text_payload)) as mock_run:
+    with popen(proc_for(text_payload)) as mock_run:
         client = ClaudeClient(claude_path="claude", echo=False)
         client.model = None
         _, response = client.run_prompt("p", think=True)
@@ -3032,17 +3108,27 @@ def claude_client_unit_test():
         check(client.last_call['done_reason'] == 'length', "max_tokens should map to length")
 
     # 3. Usage limit waits without spending an attempt; other errors retry then raise
-    limit = proc_for({"type": "result", "is_error": True, "result": "You've hit your limit · resets 3pm"}, 1)
-    with patch("subprocess.run", side_effect=[limit, limit, proc_for(ok_payload)]), \
+    limit = proc_for({"type": "result", "is_error": True, "result": "You've hit your limit · resets 3pm"}, returncode=1)
+    with popen(limit, limit, proc_for(ok_payload)), \
             patch("time.sleep") as mock_sleep:
         client = ClaudeClient(claude_path="claude", echo=False)
         _, response = client.run_prompt("p")
         check(response == '{"answer": "ok"}', "did not recover after usage limit")
         check(client.last_call['crash_retries'] == 0, "limit waits counted as retries")
         check(mock_sleep.call_count == 2, f"expected 2 limit sleeps, got {mock_sleep.call_count}")
+        reports = []
+        client.progress = lambda force=False, **f: reports.append(f)
+        started.clear()
+        mock_sleep.reset_mock()
+        with popen(limit, proc_for(ok_payload)):
+            client.run_prompt("p")
+        waits = [r for r in reports if r.get('phase') == 'usage limit']
+        check(len(waits) == 1 and waits[0]['waiting_until'] > time.time() and 'hit your limit' in waits[0]['limit_message'],
+              f"a usage-limit wait is reported with when it ends: {reports}")
+        check(reports[-1].get('phase') != 'usage limit', 'still shown as waiting after the wait')
 
-    broken = proc_for({"type": "result", "is_error": True, "subtype": "error_during_execution", "result": "boom"}, 1)
-    with patch("subprocess.run", return_value=broken) as mock_run, patch("time.sleep"):
+    broken = proc_for({"type": "result", "is_error": True, "subtype": "error_during_execution", "result": "boom"}, returncode=1)
+    with popen(broken) as mock_run, patch("time.sleep"):
         client = ClaudeClient(claude_path="claude", echo=False)
         try:
             client.run_prompt("p")
@@ -3050,6 +3136,36 @@ def claude_client_unit_test():
         except LlmCallError as e:
             check("boom" in str(e), f"error text: {e}")
         check(mock_run.call_count == 3, f"expected 3 attempts, got {mock_run.call_count}")
+
+    # 3b. Streamed: the phase, thinking tokens, time to first token and answer size are reported
+    # as the lines arrive, the answer is echoed to the call's log, and the token lines are not parsed
+    def delta(**d):
+        return {"type": "stream_event", "event": {"type": "content_block_delta", "delta": d}}
+    streamed = proc_for(
+        {"type": "system", "subtype": "init"},
+        {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50},
+        delta(type="thinking_delta", thinking="", estimated_tokens=50),
+        {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 274},
+        delta(type="input_json_delta", partial_json='{"answer": '), delta(type="input_json_delta", partial_json='"ok"}'),
+        {"type": "stream_event", "event": {"type": "message_delta", "usage": {"output_tokens": 25}}},
+        limits_event, ok_payload)
+    reports = []
+    with popen(streamed), contextlib.redirect_stdout(io.StringIO()) as log:
+        client = ClaudeClient(model="opus", claude_path="claude", echo=True)
+        client.progress = lambda force=False, **f: reports.append(f)
+        _, response = client.run_prompt("p", format={"type": "object"})
+    merged = {}
+    for r in reports:
+        merged.update(r)
+    phases = [r['phase'] for r in reports if 'phase' in r]
+    check(response == '{"answer": "ok"}', f"streamed response: {response}")
+    check(phases[0] == 'requesting' and 'thinking' in phases and phases[-1] == 'writing', f"phases: {phases}")
+    check(merged['thinking_tokens'] == 274 and merged['answer_chars'] == 16 and merged['output_tokens'] == 25
+          and merged['first_token_seconds'] is not None and merged['usage_limits']['five_hour']['used'] == 0.34,
+          f"progress: {merged}")
+    check('[answer] {"answer": "ok"}' in log.getvalue(), f"answer not echoed to the log: {log.getvalue()!r}")
+    check(client.describe(True) == {'model': 'opus', 'effort': 'high'} and client.describe(False)['effort'] == 'low',
+          'describe')
 
     # 4. get_client() dispatching
     old_client_env = os.environ.get("STRATUM_CLIENT")
@@ -3171,6 +3287,136 @@ def timing_splits_model_and_python_time():
     waits = sum(c['seconds'] for c in calls('timing_par') if c['step'].startswith('s3'))
     check(phase3['calls'] == 10 and phase3['model_seconds'] < 0.6 * waits, f'phase 3 {phase3} against {waits:.2f}s of waits')
     check(phase3['model_seconds'] <= phase3['seconds'] and phase3['python_seconds'] >= 0, f'phase 3: {phase3}')
+
+
+@test
+def dashboard_follows_a_run():
+    import dashboard
+    import main as gen_main
+    # the calls in flight are on disk while they run, and gone once they end
+    tmp = tempfile.mkdtemp()
+    try:
+        os.makedirs(os.path.join(tmp, 'dash'))
+        st = stats_mod.RunStats(os.path.join(tmp, 'dash', 'dash_run_stats.json'), 'dash')
+        st.start_session(['--x'], plan=['outer', 'later'])
+        with contextlib.redirect_stdout(io.StringIO()):
+            with st.stage('outer'):
+                with st.in_flight(prefix='s3b', name='affect', attempt=1, klass='extract', mode='think', log='dash_s3b_1.log'):
+                    open(os.path.join(tmp, 'dash', 'dash_s3b_1.log'), 'w').write('thinking so far')
+                    detail = dashboard.story_detail(tmp, 'dash')
+                    session = detail['session']
+                    check(detail['state'] == 'running' and [c['name'] for c in session['running']] == ['affect'],
+                          f'in flight: {detail}')
+                    check(session['running'][0]['log_bytes'] == 15 and session['stages'][0]['outcome'] == 'running',
+                          f'running call and stage: {session}')
+                    check(dashboard.log_tail(tmp, 'dash', 'dash_s3b_1.log', 100)['text'] == 'thinking so far', 'log tail')
+                    st.record(prefix='s3b', name='affect', klass='extract', seconds=0.01, ok=True,
+                              model_started=time.time(), model_ended=time.time())
+        check(json.load(open(st.path))['sessions'][0]['running'] == [], 'a finished call is still listed as running')
+        detail = dashboard.story_detail(tmp, 'dash')
+        check(detail['totals']['calls'] == 1 and detail['session']['stages'][0]['outcome'] == 'ok', f'after: {detail}')
+        # a run whose process is gone without closing its session reads as stopped
+        gone = subprocess.Popen([sys.executable, '-c', 'pass'])
+        gone.wait()
+        st.current['pid'] = gone.pid
+        with contextlib.redirect_stdout(io.StringIO()), st.stage('later'):
+            detail = dashboard.story_detail(tmp, 'dash')
+        check(detail['state'] == 'stopped' and detail['session']['stages'][-1]['outcome'] == 'stopped', f'stopped: {detail}')
+        check(dashboard.log_tail(tmp, 'dash', '../dash/dash_s3b_1.log', 100) is None
+              and dashboard.story_detail(tmp, '..') is None, 'a path outside the story directory was served')
+        # the page and the story list over HTTP, with the newest Claude usage reading
+        st.record(prefix='s3c', name='theme', klass='extract', seconds=0.01, ok=True,
+                  usage_limits={'five_hour': {'used': 0.5, 'resets_at': None}, 'status': 'allowed'})
+        dashboard.Handler.root = tmp
+        server = ThreadingHTTPServer(('127.0.0.1', 0), dashboard.Handler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            base = f'http://127.0.0.1:{server.server_address[1]}'
+            import urllib.request
+            page = urllib.request.urlopen(base + '/').read().decode()
+            listing = json.load(urllib.request.urlopen(base + '/api/stories'))
+            check('<title>Stratum Runs</title>' in page, 'the page')
+            check([s['story_id'] for s in listing['stories']] == ['dash'], f'story list: {listing}')
+            check(listing['claude_usage']['five_hour']['used'] == 0.5, f"claude usage: {listing.get('claude_usage')}")
+        finally:
+            server.shutdown()
+            server.server_close()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    # a stopped run and the run that resumed it read as one story: each stage's work added up
+    tmp = tempfile.mkdtemp()
+    try:
+        os.makedirs(os.path.join(tmp, 'res'))
+        with contextlib.redirect_stdout(io.StringIO()):
+            st = stats_mod.RunStats(os.path.join(tmp, 'res', 'res_run_stats.json'), 'res')
+            st.start_session([], plan=['a', 'b'])
+            with st.stage('a'):
+                t = time.time()
+                time.sleep(0.05)
+                st.record(prefix='s1', name='x', klass='extract', seconds=0.05, ok=True, model_started=t, model_ended=time.time())
+            gone = subprocess.Popen([sys.executable, '-c', 'pass'])
+            gone.wait()
+            st.current['pid'] = gone.pid
+            killed_in = st.stage('b')           # killed in b: the record is never closed
+            killed_in.__enter__()
+            t = time.time()
+            time.sleep(0.05)
+            st.record(prefix='s2', name='y', klass='extract', seconds=0.05, ok=True, model_started=t, model_ended=time.time())
+            st = stats_mod.RunStats(os.path.join(tmp, 'res', 'res_run_stats.json'), 'res')
+            st.start_session([], plan=['a', 'b'])
+            with st.stage('a'):
+                pass                            # loaded from its saved files
+            with st.stage('b'):
+                t = time.time()
+                time.sleep(0.05)
+                st.record(prefix='s2', name='z', klass='extract', seconds=0.05, ok=True, model_started=t, model_ended=time.time())
+            st.end_session('ok')
+        whole = dashboard.story_detail(tmp, 'res')
+        latest = dashboard.story_detail(tmp, 'res', 'latest')
+        stages = {s['stage']: s for s in whole['session']['stages']}
+        check(whole['runs'] == 2 and whole['totals']['calls'] == 3 and latest['totals']['calls'] == 1,
+              f"calls over all runs and the latest: {whole['totals']} {latest['totals']}")
+        check(stages['a']['calls'] == 1 and stages['a']['runs'] == 1 and stages['a']['outcome'] == 'ok', f"a: {stages['a']}")
+        check(stages['b']['calls'] == 2 and stages['b']['runs'] == 2 and stages['b']['outcome'] == 'ok'
+              and stages['b']['model_seconds'] >= 0.09, f"b, split over the two runs: {stages['b']}")
+        check(whole['session']['elapsed'] >= latest['session']['elapsed'], 'all runs took less time than the latest')
+    finally:
+        with contextlib.redirect_stdout(io.StringIO()):
+            killed_in.gen.close()               # closed here, not by the garbage collector after tmp is gone
+        shutil.rmtree(tmp, ignore_errors=True)
+    # one at a time: overlapping calls' waits and their checking added up, the Python outside any call,
+    # and work done in parallel worker processes beyond their wall time
+    overlapping = [{'started': stats_mod.stamp(1000 + a), 'seconds': w, 'check_seconds': c}
+             for a, w, c in ((0, 10, 1), (2, 10, 1), (4, 10, 1))]          # three calls overlapping in 0-15
+    model, python = dashboard.serial_time(overlapping, [], 1000, 20, 0, 2000)
+    check(model == 30 and abs(python - (3 + 5)) < 0.01, f'serial time: {model} model + {python} python')
+    model, python = dashboard.serial_time(overlapping, [{'elapsed': 4}], 1000, 20, 7, 1018)
+    check(model == 34 and abs(python - (3 + 2 + 7)) < 0.01, f'with a call in flight and worker time: {model} + {python}')
+    tmp = tempfile.mkdtemp()
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            st = stats_mod.RunStats(os.path.join(tmp, 'run_stats.json'), 'par')
+            st.parallel_work(50, 10)                # outside a session: nothing to record it on
+            st.start_session([])
+            with st.stage('outer'):
+                with st.stage('inner'):
+                    st.parallel_work(50, 10)        # 40s of worker time beyond the 10s it took
+                    st.parallel_work(5, 10)         # workers that were not busy add nothing
+            st.end_session('ok')
+        session = json.load(open(st.path))['sessions'][0]
+        check([s.get('parallel_python_seconds') for s in session['stages']] == [40, 40]
+              and session['parallel_python_seconds'] == 40, f'worker time on every open stage: {session}')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    # a real run's plan names the stages it then times
+    run('dash', args=['--stop-after=3.5'])
+    session = load('dash', 'run_stats.json')['sessions'][0]
+    check(session['plan'] == [s['stage'] for s in session['stages'] if s['depth'] == 0], f'plan against stages: {session}')
+    args = argparse.Namespace(stop_after='', craft_spine=False, stage_a=False, stage_b=False, stage_d=False, prose=True)
+    check(gen_main.planned_stages(args)[-3:] == ['stage B: world', 'stages C-D: scenes and package', 'stage 8: prose'],
+          'a --prose run plans through stage 8')
+    detail = dashboard.story_detail(STORIES, PREFIX + 'dash')
+    check(detail['state'] == 'ok' and detail['totals']['calls'] == len(calls('dash')), f'detail: {detail}')
 
 
 @test(group='basic')

@@ -192,7 +192,10 @@ STRATUM_CLIENT=claude STRATUM_CLAUDE_MODEL=opus python -m generator --story-id=m
 The Claude backend (`generator/claude_client.py`) runs each call as a stateless, tool-less `claude -p`
 completion with schema-constrained output. Non-thinking steps run at `--effort low`, thinking steps at
 `STRATUM_CLAUDE_EFFORT` (default `high`). When the subscription usage limit is hit it sleeps and retries
-(`STRATUM_CLAUDE_LIMIT_WAIT`, default 900s, up to `STRATUM_CLAUDE_LIMIT_MAX`, default 6h).
+(`STRATUM_CLAUDE_LIMIT_WAIT`, default 900s, up to `STRATUM_CLAUDE_LIMIT_MAX`, default 6h). Each call logs how much
+of the subscription's 5-hour and weekly usage is used and when each resets (`| claude usage: 5h 34% (resets 15:00),
+week 12% (resets Mon 10:00)` on its `[timing]` line), saves it as the call's `usage_limits` in `<id>_run_stats.json`,
+and the run ends with the last reading.
 
 With a remote client (such as `STRATUM_CLIENT=claude` or `agy`), `--parallel N` runs independent calls N
 at a time: phase 3's blind extractions (seven at once, then 3f and 3g), each 3.5 round's audits (3.5v, the
@@ -207,6 +210,25 @@ Python time, overlapping calls counted once), and the run ends with a table of e
 saved in `<id>_run_stats.json`: each call's `started`, `seconds` and `check_seconds` (plus the client's own
 breakdown where it has one: Ollama's `load_seconds`, `prompt_eval_seconds` and `eval_seconds`, Claude's
 `api_seconds` and `limit_wait_seconds`), and each run under `sessions` with its stages. `report.py` prints them.
+
+To follow a run as it goes, start the dashboard in another terminal and open http://127.0.0.1:8765:
+
+```bash
+python generator/dashboard.py              # --port N, --stories DIR
+```
+
+It lists the stories, newest first, and for one story shows its latest run: how far it has got through the stages
+it planned, the calls in flight, each stage's model and Python time, and every call so far. Next to each wall time it
+shows how long the same work would have taken one thing at a time (every call's wait and checking added up, plus the
+time the engine playtest's worker processes spent beyond their wall time), so you can see what `--parallel` and
+`STRATUM_PLAYTEST_JOBS` saved. Each call in flight shows
+its stage and place in a parallel batch, the model and effort, how long it has run against its class's target and
+cut-off, why it is a retry, and links to the tail of its log and the prompt it was sent. On Claude the call also
+streams: its phase (requesting, thinking, writing), the thinking tokens so far (`-p` withholds the thinking itself),
+the time to its first answer token and the answer's size, with the answer itself written to the log as it arrives;
+a call sleeping out a usage limit shows when it will try again. Above that, for Claude runs, it shows the 5-hour and weekly usage as the newest call left them. It reads
+`<id>_run_stats.json`, which the run saves as each stage and call starts, so it can be opened
+before, during or after a run. A run that was killed shows as stopped.
 
 You can also run internal developer tools from `generator/`:
 

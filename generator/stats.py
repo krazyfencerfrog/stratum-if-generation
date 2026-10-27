@@ -21,6 +21,13 @@ into model time (the time calls were in flight, overlapping calls counted
 once) and Python time (the rest). A `[timing]` line is printed as each
 stage ends, and a table at the end of the run.
 
+Progress: the open session also holds its process id, the stages the run
+means to go through (`plan`) and the calls in flight (`running`), and the
+file is saved as each stage and call starts, so generator/dashboard.py
+can show a run while it is going. On the Claude backend each call also
+records the subscription's 5-hour and weekly usage (`usage_limits`), and
+the session keeps the newest reading.
+
 The numbers come from the archived kernel1 run (qwen 27B-class, about 17
 output bytes per second end to end): 25 KB of thinking is about 25 minutes.
 """
@@ -174,6 +181,25 @@ def duration(seconds):
     return f'{int(seconds // 3600)}h{int(seconds % 3600 // 60):02d}m'
 
 
+# a Claude subscription's usage windows (claude_client.usage_limits_from) and their labels
+USAGE_WINDOWS = (('five_hour', '5h'), ('seven_day', 'week'))
+
+
+def usage_line(limits):
+    """'5h 34% (resets 15:00), week 12% (resets Mon 10:00)'."""
+    parts = []
+    for key, label in USAGE_WINDOWS:
+        w = (limits or {}).get(key)
+        if not w:
+            continue
+        reset = ''
+        if w.get('resets_at'):
+            fmt = '%H:%M' if w['resets_at'] - time.time() < 86400 else '%a %H:%M'
+            reset = f" (resets {time.strftime(fmt, time.localtime(w['resets_at']))})"
+        parts.append(f"{label} {w['used'] * 100:.0f}%{reset}")
+    return ', '.join(parts)
+
+
 def busy_seconds(intervals, start, end):
     """How much of [start, end] the (t0, t1) intervals cover, overlaps once."""
     total, reach = 0.0, start
@@ -197,6 +223,27 @@ def timing_lines(session):
         lines.append(f"{label:{width}s} {st.get('calls', 0):5d} {duration(st.get('seconds')):>8s} "
                      f"{duration(st.get('model_seconds')):>8s} {duration(st.get('python_seconds')):>8s}")
     return lines
+
+
+def working_on(owner, label, i, n=None, part=None):
+    """owner.working_on(...) (the item a loop is on, for the dashboard),
+    or nothing for a test's stand-in generator."""
+    fn = getattr(owner, 'working_on', None)
+    return fn(label, i, n, part) if callable(fn) else contextlib.nullcontext()
+
+
+def set_working_on(owner, label=None, i=None, n=None, part=None):
+    """owner.set_working_on(...), where owner has it."""
+    fn = getattr(owner, 'set_working_on', None)
+    if callable(fn):
+        fn(label, i, n, part)
+
+
+def parallel_work(owner, work_seconds, wall_seconds):
+    """owner.stats.parallel_work(...), where the owner keeps run stats."""
+    st = getattr(owner, 'stats', None)
+    if isinstance(st, RunStats):
+        st.parallel_work(work_seconds, wall_seconds)
 
 
 def stage(owner, name):
@@ -229,6 +276,8 @@ class RunStats:
         self.intervals = []                 # (start, end) of this session's model waits, epoch seconds
         self.current = None                 # this session's record in extra['sessions']
         self.open_stages = []
+        self.open_recs = []                 # their records, for parallel_work()
+        self.last_progress_save = 0.0
 
     def record_extra(self, key, value):
         with self.lock:
@@ -257,16 +306,21 @@ class RunStats:
             self.calls.append(rec)
             if model_started is not None and model_ended is not None:
                 self.intervals.append((model_started, model_ended))
+            if rec.get('usage_limits') and self.current is not None:
+                # the newest reading of the subscription's windows, for the dashboard and the summary
+                self.current['usage_limits'] = dict(rec['usage_limits'], at=stamp(now))
             self.save()
         return rec
 
     # ------------------------------------------------------------ timing
 
-    def start_session(self, argv=None):
-        """Opens this run's record in `sessions`; end_session closes it."""
+    def start_session(self, argv=None, plan=None):
+        """Opens this run's record in `sessions`; end_session closes it.
+        plan: the top-level stages the run means to go through."""
         self.session_t0 = time.time()
         with self.lock:
-            self.current = {'started': stamp(self.session_t0), 'argv': list(argv or []), 'stages': [],
+            self.current = {'started': stamp(self.session_t0), 'argv': list(argv or []), 'pid': os.getpid(),
+                            'first_call': len(self.calls), 'plan': list(plan or []), 'stages': [], 'running': [],
                             'outcome': 'running'}
             self.extra.setdefault('sessions', []).append(self.current)
             self.save()
@@ -295,6 +349,8 @@ class RunStats:
         rec = {'stage': name, 'depth': depth, 'started': stamp(t0), 'outcome': 'running'}
         with self.lock:
             self.current['stages'].append(rec)
+            self.open_recs.append(rec)
+            self.save()
         outcome = 'ok'
         try:
             yield
@@ -303,6 +359,8 @@ class RunStats:
             raise
         finally:
             self.open_stages.pop()
+            with self.lock:
+                self.open_recs.remove(rec)
             t1 = time.time()
             calls, model = self._spent(t0, t1, first)
             with self.lock:
@@ -314,12 +372,56 @@ class RunStats:
                   f"{duration(rec['python_seconds'])} python" + ('' if outcome == 'ok' else f' [{outcome}]'),
                   flush=True)
 
+    def parallel_work(self, work_seconds, wall_seconds):
+        """Python done in worker processes (the engine playtest's scenes):
+        `work_seconds` of it in all, over `wall_seconds`. What the workers
+        did beyond that wall time is counted, as `parallel_python_seconds`,
+        on every stage open now and on the session: the dashboard adds it
+        to say how long the run would have taken one thing at a time."""
+        extra = max(0.0, work_seconds - wall_seconds)
+        if self.current is None or not extra:
+            return
+        with self.lock:
+            for rec in self.open_recs + [self.current]:
+                rec['parallel_python_seconds'] = round(rec.get('parallel_python_seconds', 0) + extra, 3)
+            self.save()
+
+    def progress(self, call, force=False, **fields):
+        """Adds to a call's in-flight record (from in_flight) as the client
+        reports it. Streamed tokens report many times a second, so the
+        file is saved at most once a second unless `force`."""
+        with self.lock:
+            call.update(fields)
+            live = any(c is call for c in self.current['running'])
+            if live and (force or time.time() - self.last_progress_save >= 1):
+                self.last_progress_save = time.time()
+                self.save()
+
+    @contextlib.contextmanager
+    def in_flight(self, **call):
+        """Lists a call under the session's `running` while its body runs,
+        and yields its record for progress()."""
+        if self.current is None:
+            yield
+            return
+        call['started'] = stamp(time.time())
+        with self.lock:
+            self.current['running'].append(call)
+            self.save()
+        try:
+            yield call
+        finally:
+            with self.lock:
+                self.current['running'].remove(call)
+                # saved by the record() that follows
+
     def end_session(self, outcome='ok'):
         if self.current is None:
             return
         t1 = time.time()
         calls, model = self._spent(self.session_t0, t1, 0)
         with self.lock:
+            self.current['running'] = []
             self.current.update({'ended': stamp(t1), 'seconds': round(t1 - self.session_t0, 3),
                                  'model_seconds': round(model, 3),
                                  'python_seconds': round(t1 - self.session_t0 - model, 3),
@@ -327,10 +429,14 @@ class RunStats:
             self.save()
 
     def save(self):
-        with open(self.path, 'w', encoding='utf-8') as f:
+        """Written whole and then renamed into place, so a reader (the
+        dashboard) never sees half a file."""
+        tmp = self.path + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
             data = {'schema_version': SCHEMA_VERSION, 'story_id': self.story_id, 'calls': self.calls}
             data.update(self.extra)
             json.dump(data, f, indent=1, ensure_ascii=False)
+        os.replace(tmp, self.path)
 
     def session(self):
         return self.calls[self.session_start:]
@@ -356,6 +462,8 @@ class RunStats:
                 lines.append(f"  {c.get('prefix')}_{c.get('name')} attempt {c.get('attempt')}: "
                              f"{c.get('thinking_bytes', 0) / 1000:.1f} KB thinking, {c.get('seconds', 0) / 60:.1f} min "
                              f"[{', '.join(flags)}]")
+        if self.current is not None and self.current.get('usage_limits'):
+            lines.append(f"claude usage after the last call: {usage_line(self.current['usage_limits'])}")
         if self.current is not None and 'seconds' in self.current:
             lines.append(f"run timing ({self.current['outcome']}):")
             lines += ['  ' + line for line in timing_lines(self.current)]

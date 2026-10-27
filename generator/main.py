@@ -47,7 +47,7 @@ from llm_client import LlmCallError
 from errors import SoftReject, PipelineHalt
 from brief import (build_brief, brief_lines, constraint_fields, kernel_clauses,
                    valid_serves, ending_tier_from_stated, promises_lines, shape_targets)
-from stats import RunStats, call_profile, sampler_for, step_of, duration, SCHEMA_VERSION
+from stats import RunStats, call_profile, sampler_for, step_of, duration, usage_line, SCHEMA_VERSION
 import frameworks
 import schemas
 import checks
@@ -113,6 +113,20 @@ DEFAULT_MAX_REPAIRS = 2
 # the audit's quotes were real (41 of 43) and every final-round halt was a
 # real quote misread, so a halt bought a lost run, never a better story.
 HARD_PREMISE_SOURCES = ('computed', 'kernel clause')
+
+
+def working_on_text(step):
+    """StoryGenerator.set_working_on's record as the dashboard shows it:
+    'scene 5 of 15 · part 5 of 34', '3 of 7', 'line 1'."""
+    if not step:
+        return None
+    alone = step.get('label') and step.get('n') == 1      # "the endings", not "the endings 1 of 1"
+    text = step['label'] if alone else ' '.join(str(x) for x in (step.get('label'), step.get('i')) if x)
+    if step.get('n') and not alone:
+        text += f" of {step['n']}"
+    if step.get('part'):
+        text += f" · part {step['part'][0]} of {step['part'][1]}"
+    return text
 
 
 def repeated_turns(turns):
@@ -548,6 +562,7 @@ class StoryGenerator:
             if schema is not None and is_json:
                 kwargs['format'] = schema
             full_prompt = prompt + feedback
+            retry_of = rec.get('error') if attempt > 1 else None     # why the attempt before this one failed
             rec = {'prefix': prefix, 'name': name, 'step': step_of(prefix), 'klass': klass, 'mode': mode,
                    'attempt': attempt, 'prompt_file': prompt_file_name, 'prompt_chars': len(full_prompt),
                    'ok': False, 'breaker': None, 'error': None}
@@ -561,12 +576,30 @@ class StoryGenerator:
             thinking, response, call_error = '', '', None
             if hasattr(client, 'last_call'):
                 client.last_call = {}
-            with open(log_path, "w", encoding="utf-8") as f:
-                with self.log_to(f):
-                    try:
-                        (thinking, response) = client.run_prompt(full_prompt, **kwargs)
-                    except LlmCallError as e:
-                        thinking, response, call_error = e.thinking, e.response, e
+            batch = getattr(self._local, 'batch', None)
+            with self.stats.in_flight(prefix=prefix, name=name, attempt=attempt, klass=klass, mode=mode,
+                                      log=log_path.name, prompt=Path(self.story_file_path(f'{prefix}_raw_input_prompt.txt')).name,
+                                      prompt_chars=len(full_prompt),
+                                      stage=self.stats.open_stages[-1] if self.stats.open_stages else None,
+                                      batch=working_on_text(batch), step=batch,
+                                      target_seconds=profile['target_seconds'],
+                                      limit_seconds=kwargs['limits'].get('max_seconds'),
+                                      retry_of=(retry_of or '')[:300] or None,
+                                      **(client.describe(think) if hasattr(client, 'describe') else {})) as live:
+                # the client reports the call's phase and tokens as they stream (LlmClient.report)
+                hooked = live is not None and hasattr(client, 'report')
+                if hooked:
+                    client.progress = lambda force=False, **fields: self.stats.progress(live, force=force, **fields)
+                try:
+                    with open(log_path, "w", encoding="utf-8") as f:
+                        with self.log_to(f):
+                            try:
+                                (thinking, response) = client.run_prompt(full_prompt, **kwargs)
+                            except LlmCallError as e:
+                                thinking, response, call_error = e.thinking, e.response, e
+                finally:
+                    if hooked:
+                        client.progress = None
             ended = time.time()
             info = getattr(client, 'last_call', None) or {}
             thinking, response = thinking or '', response or ''
@@ -582,7 +615,9 @@ class StoryGenerator:
             })
             # how the client's own clock splits the wait: Ollama's model load,
             # prompt reading and generation; Claude's API time and usage-limit waits
-            for key in ('load_seconds', 'prompt_eval_seconds', 'eval_seconds', 'api_seconds', 'limit_wait_seconds'):
+            # (and, on Claude, the subscription's 5-hour and weekly usage after the call)
+            for key in ('load_seconds', 'prompt_eval_seconds', 'eval_seconds', 'api_seconds', 'limit_wait_seconds',
+                        'usage_limits'):
                 if info.get(key):
                     rec[key] = info[key]
             if info.get('crash_retries'):
@@ -694,7 +729,8 @@ class StoryGenerator:
             done = self.stats.record(**rec)
             print(f"[timing] {output_member_name}: {duration(done['seconds'])} model + "
                   f"{duration(done.get('check_seconds'))} python checking the answer"
-                  + (f' (attempt {attempt})' if attempt > 1 else ''))
+                  + (f' (attempt {attempt})' if attempt > 1 else '')
+                  + (f" | claude usage: {usage_line(done['usage_limits'])}" if done.get('usage_limits') else ''))
             self.analysis[output_member_name] = parsed
             if is_json:
                 self.save_story_json(output_file_name, parsed)
@@ -726,7 +762,25 @@ class StoryGenerator:
             sys.stdout = ThreadStdout(sys.stdout)
         return sys.stdout.to(f)
 
-    def map_calls(self, fn, items):
+    def set_working_on(self, label=None, i=None, n=None, part=None):
+        """Names the item this thread is working on, for the dashboard:
+        label 'scene', i 5, n 15 reads "scene 5 of 15"; part (i, n) adds
+        the place among all the loop's items when they are of several kinds
+        ("· part 21 of 34"). The calls made from here on carry it; no
+        label and no i clears it."""
+        self._local.batch = {'label': label, 'i': i, 'n': n, 'part': part} if (label or i) else None
+
+    @contextlib.contextmanager
+    def working_on(self, label, i, n=None, part=None):
+        """set_working_on for the length of the block."""
+        before = getattr(self._local, 'batch', None)
+        self.set_working_on(label, i, n, part)
+        try:
+            yield
+        finally:
+            self._local.batch = before
+
+    def map_calls(self, fn, items, label=None):
         """[fn(item) for item in items], up to self.parallel at a time.
 
         For loops whose calls are independent of each other: fn makes the
@@ -739,7 +793,11 @@ class StoryGenerator:
         they started and exits without waiting for them."""
         items = list(items)
         if self.parallel <= 1 or len(items) <= 1:
-            return [fn(x) for x in items]
+            results = []
+            for i, x in enumerate(items, 1):
+                with self.working_on(label, i, len(items)):     # "scene 3 of 7" on the dashboard
+                    results.append(fn(x))
+            return results
         base = self.thread_client()
         results, errors = [None] * len(items), {}
         todo = queue.Queue()
@@ -753,10 +811,13 @@ class StoryGenerator:
                     i, x = todo.get_nowait()
                 except queue.Empty:
                     return
+                self.set_working_on(label, i + 1, len(items))     # "scene 3 of 7" on the dashboard
                 try:
                     results[i] = fn(x)
                 except BaseException as e:      # noqa: B036 (re-raised by the main thread)
                     errors[i] = e
+                finally:
+                    self._local.batch = None
 
         threads = [threading.Thread(target=work, daemon=True) for _ in range(min(self.parallel, len(items)))]
         for t in threads:
@@ -2592,6 +2653,32 @@ def csv(value):
     return [s.strip() for s in (value or '').split(',') if s.strip()]
 
 
+def planned_stages(args):
+    """The top-level stages main() will time for these arguments, in order:
+    the dashboard's progress bar. Keep in step with main()'s stage names."""
+    plan = ['step 1-2: kernel, rating, shape, genre, catalysts', 'phase 3: extractions and cross-check',
+            '3.4: genre promises', '3.5: premise build, verify, repair']
+    stops = {'2': 1, '3': 2, '3.4': 3, '3.5': 4}
+    if args.stop_after in stops:
+        return plan[:stops[args.stop_after]]
+    if args.craft_spine:
+        plan.append('3.75: craft spine')
+    if args.stop_after == '3.75':
+        return plan
+    plan.append('3.8: story form')
+    if args.stop_after == '3.8':
+        return plan
+    plan.append('step 4: outline loop')
+    if args.stop_after == '4a':
+        return plan
+    plan.append('4e: outline judge')
+    later = [('stage A: arcs', args.stage_a or args.stage_b or args.stage_d or args.prose),
+             ('stage B: world', args.stage_b or args.stage_d or args.prose),
+             ('stages C-D: scenes and package', args.stage_d or args.prose),
+             ('stage 8: prose', args.prose)]
+    return plan + [name for name, wanted in later if wanted]
+
+
 def main(argv=None):
     # an inherited ignore (background job without job control) would make ctrl-c a no-op
     if signal.getsignal(signal.SIGINT) is signal.SIG_IGN:
@@ -2690,7 +2777,7 @@ def main(argv=None):
             print('enter kernel and close stdin:')
             kernel_text = sys.stdin.read()
         # timed from here: each stage below prints a [timing] line as it ends
-        gen.stats.start_session(sys.argv[1:] if argv is None else argv)
+        gen.stats.start_session(sys.argv[1:] if argv is None else argv, plan=planned_stages(args))
         with stage('step 1-2: kernel, rating, shape, genre, catalysts'):
             gen.s1_take_kernel(kernel_text)
             gen.s2_apply_rating(rating=args.rating)

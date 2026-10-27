@@ -862,7 +862,8 @@ class ArcBuilder:
         self.a1_plan()
         built = set()
         for n, l in enumerate(self.order, 1):
-            self.a2_line(l, n)
+            with stats.working_on(self.gen, 'line', n, len(self.order)):
+                self.a2_line(l, n)
             built.add(l)
         with stats.stage(self.gen, 'stage A: checks and playtest'):
             shifts = self.compose_shifts()

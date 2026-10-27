@@ -55,6 +55,7 @@ import paper
 
 from brief import brief_lite, shape_targets
 from errors import SoftReject
+import stats
 from stats import SCHEMA_VERSION
 import checks
 from checks import as_list
@@ -332,6 +333,10 @@ class OutlineBuilder:
         planned = []        # seeds still to build, in plan mode
         while n <= self.max_iterations:
             print(f'--- step 4, iteration {n}')
+            # "line 2 of 4" on the dashboard: the total is known once the branch plan is
+            planned_total = (min(self.max_iterations, 1 + len(self.plan.get('seeds') or []))
+                             if self.branching == 'plan' and self.plan else None)
+            stats.set_working_on(self.gen, 'line', n, planned_total)
             if n == 1:
                 line, new_ids = self.apply_main_line(self.main_line())
                 if getattr(self.gen, 'stop_after', '') == '4a':
@@ -384,6 +389,7 @@ class OutlineBuilder:
             if self.stop_reason:
                 break
             n += 1
+        stats.set_working_on(self.gen)
 
         if not self.stop_reason:
             self.stop_reason = 'loop ended'

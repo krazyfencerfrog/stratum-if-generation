@@ -42,6 +42,7 @@ import example_guard
 import names as names_mod
 import paper
 import schemas
+import stats
 from errors import SoftReject
 
 norm = checks.norm
@@ -913,11 +914,12 @@ class WorldBuilder:
             self.add_character(cid, answer)
         self.add_functional(functional)
         # each place is told the rooms and things already built, so these stay one at a time
-        for lid in self.locations:
-            self.b2_place(lid)
+        for k, lid in enumerate(self.locations, 1):
+            with stats.working_on(self.gen, 'place', k, len(self.locations)):
+                self.b2_place(lid)
         self.b2_map()
         # a conversation reads the world's subjects and changes only its own person's topics
-        self.gen.map_calls(self.b1c_conversation, list(self.world['characters']))
+        self.gen.map_calls(self.b1c_conversation, list(self.world['characters']), label='conversation')
         self.b3_you()
         return {'story_id': self.story.get('story_id'), 'stage': 'world', 'world': self.world,
                 'protagonist': self.protagonist, 'done_flags': done_flags({'w': self.world, 'p': self.protagonist}),

@@ -14,8 +14,24 @@ class LlmCallError(RuntimeError):
 
 
 class LlmClient:
+    # set by the pipeline for the length of one call: progress(**fields)
+    # adds to the call's in-flight record (what the dashboard shows)
+    progress = None
+
     def __init__(self):
         pass
+
+    def report(self, **fields):
+        """Tell the pipeline how the call in flight is going: its phase,
+        tokens so far, a usage-limit wait. Does nothing outside a call."""
+        if self.progress is not None:
+            self.progress(**fields)
+
+    def describe(self, think=None):
+        """What a call with this think setting runs on, for the dashboard:
+        {'model': ..., 'effort': ...}."""
+        model = getattr(self, 'model', None)
+        return {'model': model} if model else {}
 
     def run_prompt(self, prompt, **kwargs):
         """Returns (thinking, response).

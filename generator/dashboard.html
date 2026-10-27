@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stratum Runs</title>
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --line: #e3e2dc; --text: #1f1f1c; --muted: #6d6c66;
+  --accent: #2f6fdf; --ok: #2e8b57; --warn: #b7791f; --bad: #c0392b; --model: #5b7fd6; --python: #d29a3a;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151614; --panel: #1e1f1d; --line: #30312e; --text: #e8e7e2; --muted: #9a9993;
+    --accent: #6c9bf2; --ok: #5cbf86; --warn: #e0a94a; --bad: #ef6f5f; --model: #7d9cf0; --python: #e2b05a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, sans-serif; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line);
+  background: var(--panel); position: sticky; top: 0; z-index: 2; }
+header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+header .live { margin-left: auto; color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; }
+.dot.on { background: var(--ok); animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.wrap { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 49px); }
+nav { border-right: 1px solid var(--line); background: var(--panel); padding: 8px 0; overflow-y: auto; }
+nav a { display: block; padding: 8px 16px; color: inherit; text-decoration: none; border-left: 3px solid transparent; }
+nav a:hover { background: var(--bg); }
+nav a.sel { border-left-color: var(--accent); background: var(--bg); }
+nav .id { font-weight: 600; word-break: break-all; }
+nav .sub { font-size: 12px; color: var(--muted); }
+main { padding: 16px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+.panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.tile .k { font-size: 12px; color: var(--muted); }
+.tile .s { font-size: 12px; color: var(--muted); }
+.tile .v { font-size: 20px; font-weight: 600; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  border: 1px solid currentColor; }
+.s-running { color: var(--accent); } .s-ok { color: var(--ok); } .s-stopped, .s-interrupted, .s-halted { color: var(--warn); }
+.s-error { color: var(--bad); } .s-pending { color: var(--muted); }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; display: flex; margin: 10px 0 4px; }
+.bar span { display: block; height: 100%; }
+.legend { font-size: 12px; color: var(--muted); display: flex; gap: 14px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.depth1 td:first-child { padding-left: 28px; }
+tr.depth2 td:first-child { padding-left: 48px; }
+tr.pending td { color: var(--muted); }
+.scroll { overflow-x: auto; }
+.mark { display: inline-block; width: 1.2em; }
+.calls { max-height: 420px; overflow-y: auto; }
+.flight { display: grid; gap: 8px; }
+.call { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; cursor: pointer; display: grid; gap: 3px; }
+.call.sel { border-color: var(--accent); }
+.call .row { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.call .nm { font-family: var(--mono); font-weight: 600; word-break: break-all; }
+.call .meta { color: var(--muted); font-size: 12px; }
+.call .t { margin-left: auto; font-family: var(--mono); }
+.call .budget { position: relative; }
+.call .budget .bar { margin: 4px 0 2px; height: 6px; }
+.call .budget .tick { position: absolute; top: 2px; width: 2px; height: 10px; background: var(--text); opacity: .5; }
+.call .budget .sub { font-size: 11px; color: var(--muted); }
+.call .links { display: flex; gap: 14px; font-size: 12px; }
+.call .links a { color: var(--accent); text-decoration: none; }
+.call .links a.on { font-weight: 600; text-decoration: underline; }
+pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin: 10px 0 0;
+  max-height: 360px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.empty { color: var(--muted); }
+.switch { margin-left: auto; display: flex; gap: 4px; text-transform: none; letter-spacing: 0; }
+.switch a { padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+  text-decoration: none; font-weight: 500; }
+.switch a.on { border-color: var(--accent); color: var(--accent); }
+.usage { display: grid; grid-template-columns: 70px 1fr 48px minmax(120px, auto); gap: 12px; align-items: center; }
+.usage .bar { margin: 6px 0; }
+.usage .k { font-size: 13px; color: var(--muted); }
+.usage .v { font-family: var(--mono); font-weight: 600; text-align: right; }
+.usage .sub { font-size: 12px; color: var(--muted); }
+.err { color: var(--bad); }
+.argv { font-family: var(--mono); font-size: 12px; color: var(--muted); word-break: break-all; margin-top: 6px; }
+@media (max-width: 760px) {
+  .wrap { grid-template-columns: 1fr; }
+  nav { border-right: 0; border-bottom: 1px solid var(--line); max-height: 180px; }
+  main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Stratum runs</h1>
+  <span id="root" class="sub" style="color:var(--muted);font-size:12px"></span>
+  <span class="live"><span id="dot" class="dot"></span><span id="updated">connecting…</span></span>
+</header>
+<div class="wrap">
+  <nav id="stories"></nav>
+  <main id="main"><p class="empty">Loading…</p></main>
+</div>
+<script>
+const POLL_MS = 2000;
+let selected = decodeURIComponent(location.hash.slice(1)) || null;
+let openLog = null;          // log file name shown under "in flight"
+let detail = null, fetchedAt = 0;
+let usage = null;            // the newest Claude usage reading any run saved
+// 'all': every run of the story added up (a stopped and resumed story reads as one); 'latest': the newest run alone
+let view = 'all';
+try { view = localStorage.getItem('stratum-view') === 'latest' ? 'latest' : 'all'; } catch (e) {}
+
+function duration(s) {
+  // the same shape as stats.duration(): 0.04s, 12.3s, 4m05s, 1h02m
+  if (s == null || isNaN(s)) return '–';
+  if (s < 10) return s.toFixed(2) + 's';
+  if (s < 60) return s.toFixed(1) + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm' + String(Math.floor(s % 60)).padStart(2, '0') + 's';
+  return Math.floor(s / 3600) + 'h' + String(Math.floor(s % 3600 / 60)).padStart(2, '0') + 'm';
+}
+const kb = b => b == null ? '–' : (b / 1000).toFixed(1);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const stateClass = s => 's-' + (String(s).startsWith('error') ? 'error' : String(s).split(' ')[0]);
+// to the minute: just now, 5m ago, 2h05m ago, 3d ago
+function ago(t) {
+  const m = Math.floor((Date.now() / 1000 - t) / 60);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  if (m < 24 * 60) return Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0') + 'm ago';
+  return Math.floor(m / (24 * 60)) + 'd ago';
+}
+
+async function getJSON(url) {
+  const r = await fetch(url, {cache: 'no-store'});
+  if (!r.ok) throw new Error(r.status + ' ' + url);
+  return r.json();
+}
+
+async function poll() {
+  try {
+    const list = await getJSON('/api/stories');
+    document.getElementById('root').textContent = list.root;
+    usage = list.claude_usage;
+    if (!selected && list.stories.length) selected = list.stories[0].story_id;
+    renderList(list.stories);
+    if (selected) {
+      detail = await getJSON('/api/story/' + encodeURIComponent(selected) + '?view=' + view);
+      fetchedAt = Date.now() / 1000;
+      if (openLog) await loadLog();
+    } else {
+      detail = null;
+    }
+    render();
+    document.getElementById('dot').className = 'dot' + (detail && detail.state === 'running' ? ' on' : '');
+    document.getElementById('updated').textContent = 'updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('dot').className = 'dot';
+    document.getElementById('updated').textContent = 'dashboard server unreachable';
+  }
+}
+
+function renderList(stories) {
+  const nav = document.getElementById('stories');
+  if (!stories.length) { nav.innerHTML = '<p class="empty" style="padding:0 16px">No runs yet.</p>'; return; }
+  nav.innerHTML = stories.map(s => `
+    <a href="#${encodeURIComponent(s.story_id)}" class="${s.story_id === selected ? 'sel' : ''}" data-id="${esc(s.story_id)}">
+      <div class="id">${esc(s.story_id)}</div>
+      <div class="sub"><span class="${stateClass(s.state)}">${esc(s.state)}</span> · ${ago(s.updated)}</div>
+      ${s.stage ? `<div class="sub">${esc(s.stage)}</div>` : ''}
+    </a>`).join('');
+}
+
+// how long a stage or the run would have taken one thing at a time, ticking between polls:
+// each call in flight adds its own waiting, and with none in flight the Python clock runs
+function serialNow(rec, calls, d) {
+  if (rec.serial_seconds == null) return null;
+  return rec.serial_seconds + (d ? (calls.length ? d * calls.length : d) : 0);
+}
+const serialTitle = (rec, total) => `one at a time: ${duration(total)} = ${duration(rec.serial_model_seconds)} waiting on the model `
+  + `(every call's wait added up) + ${duration(rec.serial_python_seconds)} of Python`
+  + (rec.parallel_python_seconds ? ` (${duration(rec.parallel_python_seconds)} of it done in parallel workers)` : '');
+
+// where a stage's loop has got, from its calls in flight: "scene 5 of 15 · part 5 of 34",
+// or "scenes 3, 4, 5 of 15" when a parallel batch has several going
+function progressOf(calls) {
+  const going = calls.filter(c => c.step && c.batch);
+  if (!going.length) return '';
+  if (going.length === 1) return going[0].batch;
+  const {label, n} = going[0].step;
+  if (going.every(c => c.step.label === label && c.step.n === n)) {
+    const items = going.map(c => c.step.i).sort((a, b) => a - b).join(', ');
+    return `${label ? label + 's ' : ''}${items}${n ? ' of ' + n : ''}`;
+  }
+  return going.map(c => c.batch).join('; ');
+}
+
+// one call in flight: what it is, what it runs on, how it is going, and how long it has against its budget
+function flightCard(c, elapsed) {
+  const now = Date.now() / 1000;
+  const meta = [c.stage, c.batch, [c.model, c.effort].filter(Boolean).join(' · '), c.klass + (c.mode === 'no_think' ? ' (no think)' : '')]
+    .filter(Boolean).map(esc).join(' · ');
+  let phase = c.phase || '';
+  let phaseText = esc(phase);
+  if (phase === 'thinking') phaseText = `thinking${c.thinking_tokens ? ' · ~' + c.thinking_tokens.toLocaleString() + ' tokens' : ''}`;
+  else if (phase === 'writing') phaseText = `writing · ${kb(c.answer_chars)} KB${c.thinking_tokens ? ' · thought ~' + c.thinking_tokens.toLocaleString() + ' tokens' : ''}`;
+  else if (phase === 'usage limit' && c.waiting_until) {
+    const t = new Date(c.waiting_until * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    phaseText = `waiting on the usage limit · retrying at ${t} (in ${duration(Math.max(0, c.waiting_until - now))})`;
+  } else if (phase === 'retrying') phaseText = `retrying after an error: ${esc(c.retry_reason || '')}`;
+  const phaseClass = phase === 'usage limit' || phase === 'retrying' ? 's-stopped' : 's-running';
+  const extras = [c.first_token_seconds != null ? `first token after ${duration(c.first_token_seconds)}` : '',
+                  c.output_tokens ? `${c.output_tokens.toLocaleString()} output tokens` : '',
+                  c.retry ? `CLI retry ${c.retry}` : ''].filter(Boolean).join(' · ');
+  // elapsed against the class's target and the point where the call is cut off
+  const limit = c.limit_seconds, target = c.target_seconds;
+  const scale = Math.max(limit || target || 0, elapsed);
+  let budget = '';
+  if (scale > 0 && (limit || target)) {
+    const over = limit && elapsed > 0.8 * limit ? 'var(--bad)' : target && elapsed > target ? 'var(--warn)' : 'var(--accent)';
+    budget = `<div class="budget">
+      <div class="bar"><span style="width:${100 * elapsed / scale}%;background:${over}"></span></div>
+      ${target ? `<i class="tick" style="left:${100 * target / scale}%" title="target ${duration(target)}"></i>` : ''}
+      <div class="sub">${target ? 'target ' + duration(target) : ''}${target && limit ? ' · ' : ''}${limit ? 'cut off at ' + duration(limit) : ''}</div>
+    </div>`;
+  }
+  return `<div class="call ${c.log === openLog ? 'sel' : ''}" data-log="${esc(c.log)}">
+    <div class="row"><span class="nm">${esc(c.prefix)}_${esc(c.name)}</span>
+      ${c.attempt > 1 ? `<span class="s-stopped">attempt ${c.attempt}</span>` : ''}
+      <span class="t">${duration(elapsed)}</span></div>
+    <div class="meta">${meta}</div>
+    <div class="row">${phase ? `<span class="${phaseClass}">${phaseText}</span>` : ''}
+      ${extras ? `<span class="meta">${extras}</span>` : ''}</div>
+    ${budget}
+    ${c.retry_of ? `<div class="meta">retry of: ${esc(c.retry_of)}</div>` : ''}
+    <div class="links">
+      <a href="#" data-open="${esc(c.log)}" class="${openLog === c.log ? 'on' : ''}">log ${kb(c.log_bytes)} KB</a>
+      ${c.prompt ? `<a href="#" data-open="${esc(c.prompt)}" class="${openLog === c.prompt ? 'on' : ''}">prompt ${kb(c.prompt_chars)} KB</a>` : ''}
+    </div>
+  </div>`;
+}
+
+// the Claude subscription's 5-hour and weekly windows, as the newest call left them
+function usagePanel() {
+  if (!usage) return '';
+  const now = Date.now() / 1000;
+  const when = t => {
+    const d = new Date(t * 1000);
+    const time = d.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    return t - now < 86400 ? time : d.toLocaleDateString([], {weekday: 'short'}) + ' ' + time;
+  };
+  const rows = [['five_hour', '5-hour'], ['seven_day', 'Weekly']].filter(([k]) => usage[k]).map(([k, label]) => {
+    const w = usage[k], pct = Math.round(w.used * 100);
+    const reset = w.resets_at && w.resets_at <= now;
+    const color = pct >= 90 ? 'var(--bad)' : pct >= 70 ? 'var(--warn)' : 'var(--accent)';
+    return `<div class="usage">
+      <div class="k">${label}</div>
+      <div class="bar"><span style="width:${reset ? 0 : Math.min(pct, 100)}%;background:${color}"></span></div>
+      <div class="v">${reset ? '<span class="empty">reset</span>' : pct + '%'}</div>
+      <div class="sub">${w.resets_at ? (reset ? 'reset at ' : 'resets ') + when(w.resets_at) : ''}</div>
+    </div>`;
+  }).join('');
+  const status = usage.status && usage.status !== 'allowed' ? ` · <span class="s-stopped">${esc(usage.status)}</span>` : '';
+  return `<div class="panel"><h2>Claude usage</h2>${rows}
+    <div class="legend" style="margin-top:6px"><span>as of the last Claude call, ${esc((usage.at || '').replace('T', ' ').slice(0, 16))}${status}</span></div></div>`;
+}
+
+// seconds since the last poll, so running clocks tick between polls
+const drift = () => detail && detail.state === 'running' ? Date.now() / 1000 - fetchedAt : 0;
+
+function render() {
+  const main = document.getElementById('main');
+  if (!detail) { setMain(usagePanel() + '<p class="empty">No story selected.</p>'); return; }
+  const s = detail.session, t = detail.totals, d = drift();
+  if (!s) {
+    setMain(usagePanel() + `<div class="panel"><h2>${esc(detail.story_id)}</h2>
+      <p class="empty">No run of this story has been timed yet (its runs predate run timing), so there is no progress
+      to show. The calls on file are below.</p></div>` + callsPanel('Calls on file'));
+    return;
+  }
+  const stages = s.stages || [];
+  const top = stages.filter(st => (st.depth || 0) === 0);
+  const plan = s.plan && s.plan.length ? s.plan : top.map(st => st.stage);
+  const doneTop = top.filter(st => st.outcome === 'ok').length;
+  const elapsed = s.elapsed != null ? s.elapsed + d : null;
+  // a running run's model clock moves while calls are in flight, its Python clock while none are
+  const model = s.model_seconds != null ? s.model_seconds + (s.running.length ? d : 0) : null;
+  const python = s.python_seconds != null ? s.python_seconds + (s.running.length ? 0 : d) : null;
+  const serial = serialNow(s, s.running, d);
+  const current = [...top].reverse().find(st => st.outcome === 'running');
+
+  const combined = detail.view === 'all' && detail.runs > 1;
+  const switcher = detail.runs > 1 ? `<span class="switch">
+      <a href="#" data-view="all" class="${detail.view === 'all' ? 'on' : ''}">all ${detail.runs} runs</a>
+      <a href="#" data-view="latest" class="${detail.view === 'latest' ? 'on' : ''}">run ${detail.runs} only</a></span>` : '';
+  let html = usagePanel() + `<div class="panel">
+    <h2 style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">${esc(detail.story_id)} · ${combined ? `all ${detail.runs} runs` : 'run ' + detail.runs}${switcher}</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="badge ${stateClass(detail.state)}">${esc(detail.state)}</span>
+      <span>${current ? 'now: <b>' + esc(current.stage) + '</b>' + (progressOf(s.running) ? ' · <b>' + esc(progressOf(s.running)) + '</b>' : '')
+                      : (detail.state === 'running' ? 'starting' : 'started ' + esc(s.started))}</span>
+    </div>
+    ${detail.state === 'stopped' ? '<p class="err">The run is marked running but its process is gone: killed or crashed before it could close its record.</p>' : ''}
+    <div class="bar" title="${doneTop} of ${plan.length} stages">
+      <span style="width:${plan.length ? 100 * doneTop / plan.length : 0}%;background:var(--ok)"></span>
+      ${current ? `<span style="width:${100 / plan.length}%;background:var(--accent);opacity:.55"></span>` : ''}
+    </div>
+    <div class="legend"><span>${doneTop} of ${plan.length} stages done</span></div>
+    <div class="tiles" style="margin-top:14px">
+      <div class="tile"><div class="k">Wall clock</div><div class="v">${duration(elapsed)}</div></div>
+      <div class="tile" title="${serialTitle(s, serial)}"><div class="k">One at a time</div><div class="v">${duration(serial)}</div>
+        ${serial && elapsed && serial > elapsed * 1.02 ? `<div class="s">parallel saved ${duration(serial - elapsed)} (${(serial / elapsed).toFixed(1)}×)</div>` : ''}</div>
+      <div class="tile"><div class="k">Model calls</div><div class="v">${t.calls}${s.running.length ? ' <small style="font-size:13px;color:var(--accent)">+' + s.running.length + ' live</small>' : ''}</div></div>
+      <div class="tile"><div class="k">Model time</div><div class="v" style="color:var(--model)">${duration(model)}</div></div>
+      <div class="tile"><div class="k">Python time</div><div class="v" style="color:var(--python)">${duration(python)}</div></div>
+      <div class="tile"><div class="k">Thinking</div><div class="v">${kb(t.thinking_bytes)} KB</div></div>
+      <div class="tile"><div class="k">Rejected attempts</div><div class="v" style="${t.rejected ? 'color:var(--warn)' : ''}">${t.rejected}</div></div>
+    </div>
+    <div class="argv">${esc((s.argv || []).join(' '))}</div>
+  </div>`;
+
+  // in flight
+  html += `<div class="panel"><h2>In flight</h2>`;
+  if (!s.running.length) {
+    html += `<p class="empty">${detail.state === 'running' ? 'No model call right now (Python is working).' : 'Nothing: the run is not going.'}</p>`;
+  } else {
+    html += '<div class="flight">' + s.running.map(c => flightCard(c, c.elapsed + d)).join('') + '</div>';
+  }
+  if (openLog) html += `<pre class="log" id="log" data-scroll="log">${esc(logText)}</pre>`;
+  html += '</div>';
+
+  // stages
+  html += `<div class="panel"><h2>Stages</h2><div class="scroll" data-scroll="stages"><table>
+    <tr><th>Stage</th><th class="n">Calls</th><th class="n">Wall</th><th class="n" title="how long it would have taken with every call and all the Python one at a time">One at a time</th><th class="n">Model</th><th class="n">Python</th><th style="width:20%">Split</th></tr>`;
+  const seen = new Set();
+  const rows = [];
+  for (const st of stages) { rows.push(st); if ((st.depth || 0) === 0) seen.add(st.stage); }
+  for (const name of plan) if (!seen.has(name)) rows.push({stage: name, depth: 0, outcome: 'pending'});
+  for (const st of rows) {
+    const running = st.outcome === 'running', pending = st.outcome === 'pending';
+    const wall = st.seconds ?? (running && st.elapsed != null ? st.elapsed + d : null);
+    const mark = pending ? '○' : running ? '◐' : st.outcome === 'ok' ? '✓' : '✗';
+    const cls = pending ? 's-pending' : running ? 's-running' : st.outcome === 'ok' ? 's-ok'
+      : st.outcome === 'stopped' ? 's-stopped' : 's-error';
+    // a running stage's clocks tick like the run's: model while calls are in flight, Python while none are
+    const tick = running && st.model_seconds != null;
+    const m = st.model_seconds != null ? st.model_seconds + (tick && s.running.length ? d : 0) : null;
+    const p = st.python_seconds != null ? st.python_seconds + (tick && !s.running.length ? d : 0) : null;
+    const tot = (m || 0) + (p || 0);
+    const one = pending ? null : serialNow(st, running ? s.running.filter(c => c.stage === st.stage || st.depth === 0) : [], running ? d : 0);
+    html += `<tr class="depth${Math.min(st.depth || 0, 2)} ${pending ? 'pending' : ''}">
+      <td><span class="mark ${cls}">${mark}</span>${esc(st.stage)}${!pending && !running && st.outcome !== 'ok' ? ` <span class="${cls}">(${esc(st.outcome)})</span>` : ''}${st.runs > 1 ? ` <span class="empty" title="work from more than one run, added up">· ${st.runs} runs</span>` : ''}${running && progressOf(s.running.filter(c => c.stage === st.stage)) ? ` <span class="s-running">· ${esc(progressOf(s.running.filter(c => c.stage === st.stage)))}</span>` : ''}</td>
+      <td class="n">${st.calls ?? (running ? '…' : '')}</td>
+      <td class="n">${pending ? '' : duration(wall)}</td>
+      <td class="n" title="${one != null ? serialTitle(st, one) : ''}">${one != null ? duration(one) : ''}${one && wall && one > wall * 1.05 ? ` <span class="empty">${(one / wall).toFixed(1)}×</span>` : ''}</td>
+      <td class="n">${m != null ? duration(m) : ''}</td>
+      <td class="n">${p != null ? duration(p) : ''}</td>
+      <td>${tot > 0 ? `<div class="bar" style="margin:6px 0"><span style="width:${100 * m / tot}%;background:var(--model)"></span><span style="width:${100 * p / tot}%;background:var(--python)"></span></div>` : ''}</td>
+    </tr>`;
+  }
+  html += `</table></div>
+    <div class="legend" style="margin-top:8px"><span><i style="background:var(--model)"></i>model</span><span><i style="background:var(--python)"></i>python</span></div></div>`;
+
+  html += callsPanel(combined ? `Calls, all ${detail.runs} runs` : 'Calls this run');
+
+  const logEl = document.getElementById('log');
+  const stick = logEl && logEl.scrollTop + logEl.clientHeight >= logEl.scrollHeight - 20;
+  setMain(html);
+  const newLog = document.getElementById('log');
+  if (newLog && (stick || !logEl)) newLog.scrollTop = newLog.scrollHeight;
+}
+
+// redraws the page without losing where its scrolling boxes (the calls list, the
+// log, wide tables) were scrolled to: each is marked data-scroll="<name>"
+function setMain(html) {
+  const main = document.getElementById('main');
+  const kept = {};
+  for (const el of main.querySelectorAll ? main.querySelectorAll('[data-scroll]') : []) {
+    kept[el.dataset.scroll] = [el.scrollTop, el.scrollLeft];
+  }
+  main.innerHTML = html;
+  for (const el of main.querySelectorAll ? main.querySelectorAll('[data-scroll]') : []) {
+    const at = kept[el.dataset.scroll];
+    if (at) [el.scrollTop, el.scrollLeft] = at;
+  }
+}
+
+// the finished calls, newest first
+function callsPanel(title) {
+  const calls = [...detail.calls].reverse();
+  let html = `<div class="panel"><h2>${title} (${calls.length})</h2>`;
+  if (!calls.length) {
+    html += '<p class="empty">None finished yet.</p>';
+  } else {
+    html += `<div class="calls scroll" data-scroll="calls"><table>
+      <tr><th>Call</th><th>Class</th><th class="n">Model</th><th class="n">Python</th><th class="n">Thinking KB</th><th class="n">Answer KB</th><th>Result</th></tr>` +
+      calls.map(c => {
+        const result = c.ok ? '<span class="s-ok">ok</span>'
+          : c.breaker ? `<span class="s-stopped">breaker: ${esc(c.breaker)}</span>`
+          : `<span class="s-error" title="${esc(c.error)}">rejected</span>`;
+        const over = (c.over_target || []).length ? ` <span class="s-stopped" title="over target: ${esc(c.over_target.join(', '))}">▲</span>` : '';
+        return `<tr><td style="font-family:var(--mono)">${esc(c.prefix)}_${esc(c.name)}${c.attempt > 1 ? ' <span style="color:var(--muted)">#' + c.attempt + '</span>' : ''}</td>
+          <td>${esc(c.klass)}${c.mode === 'no_think' ? ' <span style="color:var(--muted)">(no think)</span>' : ''}</td>
+          <td class="n">${duration(c.seconds)}${over}</td><td class="n">${c.check_seconds != null ? duration(c.check_seconds) : '–'}</td>
+          <td class="n">${kb(c.thinking_bytes)}</td><td class="n">${kb(c.response_bytes)}</td><td>${result}</td></tr>`;
+      }).join('') + '</table></div>';
+  }
+  return html + '</div>';
+}
+
+let logText = '';
+async function loadLog() {
+  try {
+    const r = await getJSON(`/api/story/${encodeURIComponent(selected)}/log/${encodeURIComponent(openLog)}`);
+    logText = (r.truncated ? '…\n' : '') + (r.text || '(empty so far)');
+  } catch (e) {
+    logText = '(log not found)';
+  }
+}
+
+document.getElementById('main').addEventListener('click', async e => {
+  const pick = e.target.closest('[data-view]');
+  if (pick) {
+    e.preventDefault();
+    view = pick.dataset.view;
+    try { localStorage.setItem('stratum-view', view); } catch (err) {}
+    poll();
+    return;
+  }
+  // a card's "log" or "prompt" link, or the card itself (its log)
+  const link = e.target.closest('[data-open]'), card = e.target.closest('.call');
+  if (!link && !card) return;
+  e.preventDefault();
+  const name = link ? link.dataset.open : card.dataset.log;
+  openLog = openLog === name ? null : name;
+  if (openLog) await loadLog();
+  render();
+});
+window.addEventListener('hashchange', () => {
+  selected = decodeURIComponent(location.hash.slice(1)) || null;
+  openLog = null;
+  poll();
+});
+// tick the running clocks between polls
+setInterval(() => { if (detail && detail.state === 'running' && !document.getSelection().toString()) render(); }, 1000);
+poll();
+setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>
