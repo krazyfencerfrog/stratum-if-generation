@@ -41,6 +41,7 @@ import json
 import os
 import random
 import sys
+import time
 from collections import Counter, deque
 
 from expressions import evaluate, parse
@@ -594,7 +595,13 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
 
     With jobs > 1, the scenes whose feeding scenes are done are explored at
     once, in worker processes. Entry states and endings are merged in scene
-    order either way, so the result is the same as one at a time."""
+    order either way, so the result is the same as one at a time.
+
+    `timing` says how long that took: `seconds` from start to finish, and
+    `scene_seconds`, the time each scene's exploration took wherever it
+    ran (their sum is how long one at a time would have taken)."""
+    t_start = time.time()
+    scene_seconds = {}
     norm = Normalizer(story)
     eng = Engine(story)
     eng.start(seed=SEED)
@@ -626,7 +633,9 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
         for sid in order:
             todo = entries(sid)
             if todo:
+                t0 = time.time()
                 scenes[sid] = explore_scene(story, sid, todo, norm, max_states)
+                scene_seconds[sid] = time.time() - t0
     else:
         import concurrent.futures
         import multiprocessing
@@ -649,7 +658,7 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
                     finished, _ = concurrent.futures.wait(running, return_when=concurrent.futures.FIRST_COMPLETED)
                     for f in finished:
                         sid = running.pop(f)
-                        scenes[sid] = f.result()
+                        scenes[sid], scene_seconds[sid] = f.result()
                         done.add(sid)
         scenes = {sid: scenes[sid] for sid in order if sid in scenes}
 
@@ -660,7 +669,8 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
                 if c not in endings.setdefault(e, {}) or len(path) < len(endings[e][c]):
                     endings[e][c] = path
     return {'scenes': scenes, 'endings': endings, 'sampled': sampled,
-            'arrived': {s: len(bs) for s, bs in arriving().items()}}
+            'arrived': {s: len(bs) for s, bs in arriving().items()},
+            'timing': {'seconds': time.time() - t_start, 'scene_seconds': scene_seconds}}
 
 
 def scene_findings(story, result):

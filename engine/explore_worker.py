@@ -7,6 +7,7 @@ generator/playtest.py would shadow it); this one is loaded by path instead.
 
 import importlib.util
 import os
+import time
 
 _spec = importlib.util.spec_from_file_location(
     'stratum_engine_playtest', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'playtest.py'))
@@ -24,4 +25,7 @@ def init(data, max_states):
 
 
 def explore(sid, entries):
-    return _playtest.explore_scene(_story, sid, entries, _norm, _max_states)
+    """(the scene's exploration, the seconds it took in this worker)."""
+    t0 = time.time()
+    result = _playtest.explore_scene(_story, sid, entries, _norm, _max_states)
+    return result, time.time() - t0

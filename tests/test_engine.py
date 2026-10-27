@@ -573,12 +573,17 @@ def playtest_explores_scenes_in_parallel_as_it_does_serially():
             r = dict(r, states=[st.to_dict() for st in r['states']])
             r['leaving'] = {t: {b: (st.to_dict(), path) for b, (st, path) in bs.items()} for t, bs in r['leaving'].items()}
             scenes[sid] = r
-        return dict(result, scenes=scenes)
+        return dict({k: v for k, v in result.items() if k != 'timing'}, scenes=scenes)     # how long it took differs
     serial = playtest.explore_scenes(story, max_states=50)
     parallel = playtest.explore_scenes(story, max_states=50, jobs=4)
     check(len(serial['scenes']) == len(story.scenes), f"only {len(serial['scenes'])} scenes explored")
     check(list(parallel['scenes']) == list(serial['scenes']), 'scenes explored in another order')
     check(plain(parallel) == plain(serial), 'the parallel exploration differs from the serial one')
+    # how long each scene's exploration took, wherever it ran: what a one-at-a-time run would have spent
+    for result in (serial, parallel):
+        timing = result['timing']
+        check(set(timing['scene_seconds']) == set(result['scenes']) and timing['seconds'] > 0
+              and all(t >= 0 for t in timing['scene_seconds'].values()), f'timing: {timing}')
     order = playtest.scene_order(story)
     feeds = playtest.scene_feeds(story, order)
     check(all(order.index(s) < order.index(t) for t, fs in feeds.items() for s in fs), 'a scene fed by a later one')
