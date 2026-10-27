@@ -3184,6 +3184,46 @@ def report_script():
 
 
 @test
+def scene_conditions_name_nodes_by_their_flags():
+    # a scene's "when" written as a node id means "after that node": it compiles to the node's done flag;
+    # a condition the engine cannot read is a scene problem (a retry), not a package that fails whole
+    import compile_scenes as cs
+
+    class Compiler:
+        nodes = {'N03c': {}, 'T2N03a': {}}
+        scene_condition = cs.SceneCompiler.scene_condition
+
+    c = Compiler()
+    check(c.scene_condition('N03c') == ('flags.done_N03c', None), c.scene_condition('N03c'))
+    check(c.scene_condition('(T2N03a) and flags.done_N03a') == ('(flags.done_T2N03a) and flags.done_N03a', None),
+          'a node id inside a larger condition')
+    check(c.scene_condition('not N03c or turns > 3') == ('not flags.done_N03c or turns > 3', None), 'with operators')
+    for kept in ("has('N03c')", 'flags.N03c', "pattern('josie_confidence', 'up', 3, 0.75)", 'turns_in_scene >= 2'):
+        check(c.scene_condition(kept) == (kept, None), f'{kept!r} should be left as written')
+    for bad in ('josie_trusts', 'N03c and', 'open(1)'):
+        fixed, problem = c.scene_condition(bad)
+        check(problem and 'not one the engine can read' in problem, f'{bad!r} should be a scene problem: {problem}')
+    # scenes compile on parallel threads: the first ones to check a condition load the engine's condition
+    # language together, and none may see it half loaded
+    for _ in range(5):
+        cs._expressions = None
+        results, start = [], threading.Barrier(16)
+
+        def condition():
+            start.wait()
+            try:
+                results.append(c.scene_condition('N03c'))
+            except Exception as e:      # noqa: BLE001 (a half-loaded module raises AttributeError)
+                results.append(e)
+        threads = [threading.Thread(target=condition) for _ in range(16)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        check(results == [('flags.done_N03c', None)] * 16, f'checked on parallel threads: {results}')
+
+
+@test
 def downstream_paper_and_example_guards():
     import world, compile_scenes as cs, example_guard, paper
     from errors import SoftReject

@@ -33,6 +33,7 @@ import json
 import os
 import re
 import sys
+import threading
 
 import checks
 import schemas
@@ -48,6 +49,26 @@ ENGINE = os.path.join(THIS_DIR, '..', 'engine')
 CORE_VERBS = ('look', 'examine', 'go', 'talk', 'take', 'give', 'show', 'use', 'think', 'wait', 'inventory')
 LAPSE_AFTER = 4
 ENGINE_VERBS = ('look', 'examine', 'wait', 'inventory', 'think')     # the engine makes these; a scene's own is a misuse
+# a bare name in a condition: not after a dot (flags.x), not a call (has(...)), not inside quotes
+BARE_NAME = re.compile(r'''(?<![\w.'"])([A-Za-z_]\w*)(?![\w('"])''')
+_expressions = None
+_expressions_lock = threading.Lock()
+
+
+def engine_expressions():
+    """engine/expressions.py, loaded by path like the engine playtest: the
+    condition language, to check a scene's conditions as it compiles.
+    Scenes compile on parallel threads, so it is loaded once, under a
+    lock, and only handed out once it has finished loading."""
+    global _expressions
+    with _expressions_lock:
+        if _expressions is None:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('engine_expressions', os.path.join(ENGINE, 'expressions.py'))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            _expressions = module
+    return _expressions
 
 
 class SceneCompiler:
@@ -426,6 +447,22 @@ class SceneCompiler:
                                 out.append(msg)
         return out
 
+    def scene_condition(self, text):
+        """(the condition, a problem or None) for an action's `when`. The
+        model writes a node's id ("N03c") for "after that node": each bare
+        name that is a node becomes the flag the node sets (flags.done_N03c;
+        package() sets any done flag a condition reads on entering the
+        node's scene). Anything else the engine could not read is a problem,
+        so the scene is retried rather than the package failing whole."""
+        fixed = BARE_NAME.sub(lambda m: f'flags.done_{m.group(1)}' if m.group(1) in self.nodes else m.group(1), text)
+        ex = engine_expressions()
+        try:
+            ex.references(fixed)
+        except ex.ExpressionError as e:
+            return fixed, (f'condition {text!r} is not one the engine can read ({e}); write it in the condition '
+                           f'language (flags.done_<node> for "after that node"), or leave "when" out')
+        return fixed, None
+
     def resolve(self, name, names, open_rooms, extra=()):
         key = norm(name)
         if not key:
@@ -539,7 +576,9 @@ class SceneCompiler:
             if effects:
                 it['effects'] = effects
             if a.get('when'):
-                it['when'] = str(a['when']).strip()
+                it['when'], problem = self.scene_condition(str(a['when']).strip())
+                if problem:
+                    problems.append(f'{where}: {problem}')
             if a.get('frame'):
                 it['frame'] = a['frame']
             if verb not in CORE_VERBS:
