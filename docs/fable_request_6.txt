@@ -1,0 +1,32 @@
+so the idea of this project is to be able to generate a *good* interactive fiction story/game from a minimal kernel with hopefully no additional human interaction.  the ideal solution would all allow a medium sized offline model (like qwen 3.8 27B or similar) to do the generation without the reliance on a horizon-level model.
+
+we certainly aren't there yet.  I believe our current state is that we have good infrastructure, tooling and automation, and perhaps a solid overall concept.  I *know* that the local model currently has many issues with the generation, mostly appearing to stem from being overwhelmed by negative prompting and being influenced by examples bleeding into its decisions.
+
+I additionally think that even with the horizon models, our current architecture is not going to make enjoyable interactive fiction stories.  So, what we are going to do is test using the current architecture with the best horizon model (you) and evaluate at each point in the generation if we are truly achieving the goals that we want.  Crucial point here: I'm not worried about the actual prose yet. My main concern is the generated story concept and all of the pieces (structure, choices, characters, events, settings, ...).  I believe that prose is something we can always fix, I don't want to overfocus on it initially.   Specifically I think we should:
+
+1) select or create a kernel representing a classic IF situation/storyline
+2) kick off a horizon model end-to-end story generation for that kernel using our current architecture (a generous person added support for parallel processing so this might be faster than it used to be)
+3) analyze the goals/input/output of each stage, looking for (at minimum, you would know better than me if you want to look for more):
+  a) are we achieving the goal of an interesting story?
+  b) is it coherent?
+  c) does the player have agency?
+     *) do the choices have meaningful impact
+     *) are the consequences of the choices at least partially telegraphed or expected? or does it feel like the consequences are random?
+     *) do the choices allow the player to really differentiate themselves in different playthroughs?
+     *) do the choices make sense for the situation?
+  d) are there interesting non-player characters?
+     *) do they have backgrounds?
+     *) do they (some at least) have arcs? are they resolved in at least one path?
+     *) do their motivations make sense?
+     *) are they all too similar?
+  e) does the player character have a motivation/backstory/arc?
+  f) does the story structure make sense? is it appropriate?  is there meaningful tension/climax?  does the story have rythym (accelleration, slow periods, is it flat)?
+  g) does the ending feel earned?  does it make sense?  does it fit with the sotry? does it wrap things up?
+  h) are there points where the character can optionally learn more about the story via interaction that isn't required by the story?  are these interesting? are these varied?
+  i) does it *feel* like an interactive fiction?
+  j) would anyone who wasn't insane want to play it?
+  k) would they actually enjoy it if they did?
+  l,m,n,o,p,q,r,s,t,u,v,w,x,y,z): ****HOW DO WE MAKE IT SO THE PREVIOUS THREE POINTS ARE 'YES'*****
+
+Allright, good luck with the analysis.  I believe we can improve this and get it into a state that we are very happy with, it will just take work.
+
