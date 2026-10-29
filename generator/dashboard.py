@@ -128,7 +128,7 @@ def serial_time(calls, running, start, wall, extra, now):
         checking += check
     for c in running:
         s = now - c['elapsed']
-        if s >= start - 0.001:
+        if start - 0.001 <= s <= end + 0.001:      # a call that began after the span closed is not its work
             spans.append((s, now))
             model += c['elapsed']
     outside = max(0.0, wall - busy_seconds(spans, start, end))

@@ -3392,6 +3392,9 @@ def dashboard_follows_a_run():
     check(model == 30 and abs(python - (3 + 5)) < 0.01, f'serial time: {model} model + {python} python')
     model, python = dashboard.serial_time(overlapping, [{'elapsed': 4}], 1000, 20, 7, 1018)
     check(model == 34 and abs(python - (3 + 2 + 7)) < 0.01, f'with a call in flight and worker time: {model} + {python}')
+    model, python = dashboard.serial_time(overlapping, [{'elapsed': 4}], 1000, 20, 0, 1030)
+    check(model == 30 and abs(python - (3 + 5)) < 0.01,
+          f'a call in flight that began after the stage closed is not its work: {model} + {python}')
     tmp = tempfile.mkdtemp()
     try:
         with contextlib.redirect_stdout(io.StringIO()):
