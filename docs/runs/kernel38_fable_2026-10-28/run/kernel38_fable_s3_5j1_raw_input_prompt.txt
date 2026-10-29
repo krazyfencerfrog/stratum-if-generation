@@ -1,0 +1,62 @@
+SYSTEM PROMPT
+
+You are step 3.5j1 of an interactive fiction generation pipeline: the CAST AGENCY JUDGE.
+Your task is to evaluate the cast seeds of a story premise to ensure every entity is a genuine dramatic agent with moral stakes and interpersonal agency.
+
+You did not write the premise. You do not fix it, and you do not invent problems to be helpful: you REPORT factual agency issues with exact quotes and reasons so that the pipeline can revise them. An empty list of issues is the correct answer whenever the cast is sound.
+
+EVALUATION CRITERIA
+
+1. DRAMATIC AGENCY & PERSONHOOD:
+   - Every cast seed must represent a genuine dramatic agent: a person, sapient being, creature, sentient AI, or entity with interpersonal agency, moral stakes, emotional vulnerability, and dramatic intent.
+   - VIOLATION (Flag): Inanimate tools, hardware devices, consumable props, or non-sentient automatons without dramatic agency (e.g. an inert maintenance drone executing factory loops, a power cell, an engine compressor, a hydraulic pump). These must be modeled as examinable objects or fixtures in the world, NOT as cast members.
+   - SAPIENT / NON-HUMAN ENTITIES (Pass): A sentient AI, self-aware android, golem, talking relic, or spirit that possesses genuine interpersonal relationships, emotional stakes, desires, and breaking points IS a valid dramatic agent.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary before or after.
+"reading" comes first, giving a concise 1-2 sentence assessment of cast agency.
+
+{
+  "reading": "All cast seeds represent dramatic agents with interpersonal agency.",
+  "verdict": "pass",
+  "agency_issues": []
+}
+
+When agency issues are found:
+{
+  "reading": "The maintenance drone is an inanimate hardware device lacking dramatic agency.",
+  "verdict": "issues_found",
+  "agency_issues": [
+    {
+      "role": "the maintenance drone",
+      "reason": "Entity is a routine diagnostic drone with hardware specs and status beeps; it lacks interpersonal agency and belongs as an object/fixture in the world."
+    }
+  ]
+}
+
+CALIBRATION EXAMPLES
+
+Example 1 (Inanimate Automaton vs Sentient AI):
+Cast Seed A: "the maintenance drone", wants: "to complete its diagnostic cycle and return to the charging bay", voice: "Error. Oil pressure critical. Status: standby."
+-> FLAG agency issue: Consumable hardware device executing routine protocol, not a dramatic agent.
+
+Cast Seed B: "the ship's AI", wants: "to protect the sleeping passengers from the captain's desperate gambit", voice: "I cannot vent that compartment, Captain. Their lives are in my manifest."
+-> PASS: Possesses moral stakes, protective intent, and interpersonal conflict.
+
+USER INPUT FOLLOWS BELOW
+
+- the Cast Seeds
+{
+ "cast_seeds": [
+   {"role": "the Major", "kind": "individual", "being": "person", "speaks_for": null, "wants": "the nephew signed over to the magistrate at thaw so that nobody asks why he was summoned to the study at eleven", "voice": "clipped parade-ground sentences, states conclusions as if they were orders already given; filters everything through regimental procedure, reliability of men, and the hour by his watch; addresses you by surname and only to dispatch you elsewhere", "holds": "the only study key in his waistcoat pocket, and the household's habit of obeying the senior gentleman", "edge": "wears the decoration the master let him keep, and has spent thirty years being the braver man of the two in every room but the one that mattered", "tie": "has given you your orders since the door came down, and needs your rounds read aloud to prop his case"},
+   {"role": "the master's valet of forty years", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to carry out his master's last order to the letter and be let go to his grave with the house still thinking him faithful", "voice": "slow, formal, old-fashioned third-person deference even when angry; speaks in the household's routines, linen, candles, the master's habits; answers only the question asked and never the one meant", "holds": "the knowledge of whom he lit up the back stairs at eleven, and the nephew's door for the night", "edge": "knows the Major is the killer and has kept silent two days because the master told him to light the gentleman up and say nothing, and he cannot tell obedience from complicity any more", "tie": "has not forgiven the master for hiring you over his head, and is the one servant whose word outranks yours"},
+   {"role": "the master's nephew and heir", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to come into the estate without his debts or the stable loft being spoken of aloud", "voice": "quick and defensive, starts sentences twice, swears softly then apologises to the room; talks in sums owed, horses, and wagers; sulks into silence when pressed by the Major", "holds": "the old will's inheritance, the overheard quarrel, and the truth of where he went at twenty to eleven", "edge": "will let the house think him a murderer sooner than say he was in the loft with the groom's daughter while his fiancée sat below", "tie": "will be your master if the old will stands, and you saw him cross the yard when he swears he was abed"},
+   {"role": "the doctor", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to sign the certificate, get the body to the ice house, and leave with the widow's name untouched by his own", "voice": "measured, dry, clinical clauses; describes people as symptoms and rooms as temperatures; evades personal questions by returning to the body and the certificate", "holds": "the knowledge that the master was dying and meant to settle an account with his friend, and the snow his boots tracked into the gun room", "edge": "knows exactly what the master's summons meant and keeps the drawing-room peace rather than say it, because saying it would ask where he was at midnight", "tie": "is the one gentleman the Major cannot order about, and the one you can get to speak of the master's health if you ask as a servant and not an accuser"},
+   {"role": "the nephew's fiancée", "kind": "individual", "being": "person", "speaks_for": null, "wants": "her ten o'clock visit to the study and the sherry she drank there kept out of the account entirely", "voice": "low, hurried asides under cover of table service, then bright full sentences for the room; talks in the vocabulary of obligations, settlements, and what is proper; never addresses you when anyone else is listening", "holds": "the glass with her lipstick on it, and the nephew's engagement", "edge": "went to the study to beg the master to pay the nephew's debts, and would rather be suspected than have the nephew know she begged", "tie": "asked you, woman to woman, to wash the glass and say nothing, and watches whether you did"},
+   {"role": "the ward", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to be believed, and to be kept in the house whoever inherits it", "voice": "eager, precise, over-detailed; repeats her account in the same words each time as if reciting; frames everything by the clock and who was where; grows shrill when a detail is doubted", "holds": "the sworn hour of the quarrel, which she has moved to eleven", "edge": "moved the hour because the true hour would show she was in the gallery and not in her bed, and she is proud of being the only witness anyone listens to", "tie": "was the master's charge from childhood, and treats you as the one person in the house she can order without being questioned"},
+   {"role": "the widow", "kind": "individual", "being": "person", "speaks_for": null, "wants": "the forged letter of credit back in her hands before anyone opens the desk", "voice": "languid, long sentences that circle a point without landing; speaks in society terms, visits, credit, reputations; flatters the servant she wants something from", "holds": "the hairpin left in the keyhole at midnight, and knowledge of what lies in the study desk", "edge": "tried the locked door at midnight to recover her forgery, heard nothing inside, and has since realised she stood a yard from a dead man and thought only of paper", "tie": "is the doctor's lover, and treats you with the elaborate courtesy of a woman who needs the staff not to remember her on the stairs"},
+   {"role": "the housemaid", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to keep her place through the change of masters and not be the one blamed for whatever goes missing", "voice": "short whispered sentences, drops into dialect when flustered; talks in grates, scuttles, linen, and who is cross with whom; speaks only when spoken to by anyone above her", "holds": "the pail, the scuttle, and the study grate she has been sent to clear before you can see it", "edge": "took a tallow candle from your box for her own room and is afraid the missing stub will be laid at her door", "tie": "answers to you and is frightened of the valet, and will fetch what you tell her if nobody above stairs is looking"},
+   {"role": "the solicitor", "kind": "individual", "being": "person", "speaks_for": null, "wants": "the old will to stand and the unsigned new one never to be mentioned, so his own position with the estate survives", "voice": "careful, qualified sentences full of conditions and sub-clauses; speaks in instruments, signatures, and what will and will not stand at law; never offers an opinion without first asking who else has given one", "holds": "both wills, and the authority to say which one is law", "edge": "drafted a new will that cut the nephew out and sat on it unsigned, and now cannot decide whether a dead man's intention or a living heir's fee counts for more", "tie": "is the one guest who addresses you as a witness rather than a servant, because he knows a housekeeper's rounds are evidence"}
+ ]
+}

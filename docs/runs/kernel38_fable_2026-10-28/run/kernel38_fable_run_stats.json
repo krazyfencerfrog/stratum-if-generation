@@ -1,0 +1,4527 @@
+{
+ "schema_version": 5,
+ "story_id": "kernel38_fable",
+ "calls": [
+  {
+   "prefix": "s2",
+   "name": "shape",
+   "step": "s2",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2_shape_split.prompt",
+   "prompt_chars": 6391,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 5.04,
+   "thinking_bytes": 0,
+   "response_bytes": 772,
+   "done_reason": "stop",
+   "prompt_tokens": 3583,
+   "output_tokens": 333,
+   "format_sent": true,
+   "api_seconds": 4.0,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:46:05",
+   "started": "2026-10-28T19:46:00.136",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s2k",
+   "name": "kernel_clauses",
+   "step": "s2k",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2_clauses.prompt",
+   "prompt_chars": 2273,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 6.35,
+   "thinking_bytes": 0,
+   "response_bytes": 662,
+   "done_reason": "stop",
+   "prompt_tokens": 2008,
+   "output_tokens": 306,
+   "format_sent": true,
+   "api_seconds": 5.73,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:46:11",
+   "started": "2026-10-28T19:46:05.179",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s2",
+   "name": "genre",
+   "step": "s2",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2_genre.prompt",
+   "prompt_chars": 1937,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 4.36,
+   "thinking_bytes": 0,
+   "response_bytes": 343,
+   "done_reason": "stop",
+   "prompt_tokens": 1937,
+   "output_tokens": 192,
+   "format_sent": true,
+   "api_seconds": 3.66,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:46:15",
+   "started": "2026-10-28T19:46:11.533",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s2a",
+   "name": "catalyst_works",
+   "step": "s2a",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2a_catalyst_works.prompt",
+   "prompt_chars": 3404,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 30.33,
+   "thinking_bytes": 0,
+   "response_bytes": 5086,
+   "done_reason": "stop",
+   "prompt_tokens": 2650,
+   "output_tokens": 1927,
+   "format_sent": true,
+   "api_seconds": 29.85,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:46:46",
+   "started": "2026-10-28T19:46:15.895",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s2b",
+   "name": "catalyst_elements",
+   "step": "s2b",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2b_catalyst_elements.prompt",
+   "prompt_chars": 3176,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 45.01,
+   "thinking_bytes": 0,
+   "response_bytes": 6212,
+   "done_reason": "stop",
+   "prompt_tokens": 2511,
+   "output_tokens": 2077,
+   "format_sent": true,
+   "api_seconds": 44.46,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:31",
+   "started": "2026-10-28T19:46:46.228",
+   "check_seconds": 0.0,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s2c",
+   "name": "catalyst_sanitize",
+   "step": "s2c",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s2c_catalyst_sanitize.prompt",
+   "prompt_chars": 2884,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 8.47,
+   "thinking_bytes": 0,
+   "response_bytes": 911,
+   "done_reason": "stop",
+   "prompt_tokens": 2220,
+   "output_tokens": 348,
+   "format_sent": true,
+   "api_seconds": 7.85,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:39",
+   "started": "2026-10-28T19:47:31.239",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_0b",
+   "name": "identity_epistemic",
+   "step": "s3_0b",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_0b_identity_epistemic.prompt",
+   "prompt_chars": 29711,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 9.3,
+   "thinking_bytes": 29,
+   "response_bytes": 799,
+   "done_reason": "stop",
+   "prompt_tokens": 11421,
+   "output_tokens": 597,
+   "format_sent": true,
+   "api_seconds": 8.3,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:49",
+   "started": "2026-10-28T19:47:39.717",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3e",
+   "name": "timeline",
+   "step": "s3e",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3e_timeline.prompt",
+   "prompt_chars": 23545,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 11.24,
+   "thinking_bytes": 29,
+   "response_bytes": 834,
+   "done_reason": "stop",
+   "prompt_tokens": 8529,
+   "output_tokens": 606,
+   "format_sent": false,
+   "api_seconds": 10.2,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:50",
+   "started": "2026-10-28T19:47:39.717",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_0c",
+   "name": "consequence_failure_model",
+   "step": "s3_0c",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_0c_consequence_failure_model.prompt",
+   "prompt_chars": 31469,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 11.92,
+   "thinking_bytes": 29,
+   "response_bytes": 961,
+   "done_reason": "stop",
+   "prompt_tokens": 11427,
+   "output_tokens": 804,
+   "format_sent": false,
+   "api_seconds": 10.96,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:51",
+   "started": "2026-10-28T19:47:39.718",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3c",
+   "name": "theme",
+   "step": "s3c",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3c_theme.prompt",
+   "prompt_chars": 21983,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 16.06,
+   "thinking_bytes": 29,
+   "response_bytes": 1278,
+   "done_reason": "stop",
+   "prompt_tokens": 8109,
+   "output_tokens": 1038,
+   "format_sent": false,
+   "api_seconds": 15.22,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:55",
+   "started": "2026-10-28T19:47:39.717",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3d",
+   "name": "viewpoint",
+   "step": "s3d",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3d_viewpoint.prompt",
+   "prompt_chars": 51714,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 18.51,
+   "thinking_bytes": 29,
+   "response_bytes": 1418,
+   "done_reason": "stop",
+   "prompt_tokens": 18171,
+   "output_tokens": 998,
+   "format_sent": false,
+   "api_seconds": 17.65,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:47:58",
+   "started": "2026-10-28T19:47:39.718",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3b",
+   "name": "affect",
+   "step": "s3b",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3b_affect.prompt",
+   "prompt_chars": 28612,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 24.22,
+   "thinking_bytes": 29,
+   "response_bytes": 2009,
+   "done_reason": "stop",
+   "prompt_tokens": 10384,
+   "output_tokens": 1442,
+   "format_sent": false,
+   "api_seconds": 23.25,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:48:03",
+   "started": "2026-10-28T19:47:39.717",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_0a",
+   "name": "interactive_question",
+   "step": "s3_0a",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_0a_interactive_question.prompt",
+   "prompt_chars": 32546,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 27.67,
+   "thinking_bytes": 29,
+   "response_bytes": 1843,
+   "done_reason": "stop",
+   "prompt_tokens": 11345,
+   "output_tokens": 1555,
+   "format_sent": false,
+   "api_seconds": 26.8,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.01,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:48:07",
+   "started": "2026-10-28T19:47:39.716",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3f",
+   "name": "setting",
+   "step": "s3f",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3f_setting.prompt",
+   "prompt_chars": 22530,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 6.43,
+   "thinking_bytes": 29,
+   "response_bytes": 804,
+   "done_reason": "stop",
+   "prompt_tokens": 8239,
+   "output_tokens": 442,
+   "format_sent": false,
+   "api_seconds": 5.74,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.02,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:48:13",
+   "started": "2026-10-28T19:48:07.392",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3g",
+   "name": "complexity",
+   "step": "s3g",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3g_complexity.prompt",
+   "prompt_chars": 25819,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 17.15,
+   "thinking_bytes": 29,
+   "response_bytes": 1109,
+   "done_reason": "stop",
+   "prompt_tokens": 9104,
+   "output_tokens": 1099,
+   "format_sent": false,
+   "api_seconds": 16.57,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.02,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:48:24",
+   "started": "2026-10-28T19:48:07.391",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3h",
+   "name": "cross_check",
+   "step": "s3h",
+   "klass": "extract",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3h_cross_check.prompt",
+   "prompt_chars": 29733,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 44.96,
+   "thinking_bytes": 30,
+   "response_bytes": 5191,
+   "done_reason": "stop",
+   "prompt_tokens": 10930,
+   "output_tokens": 3506,
+   "format_sent": false,
+   "api_seconds": 44.24,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.02,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:49:09",
+   "started": "2026-10-28T19:48:24.549",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 30000,
+   "target_seconds": 1800,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_4",
+   "name": "promises",
+   "step": "s3_4",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_4_promises.prompt",
+   "prompt_chars": 12960,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 31.06,
+   "thinking_bytes": 0,
+   "response_bytes": 4187,
+   "done_reason": "stop",
+   "prompt_tokens": 6099,
+   "output_tokens": 1534,
+   "format_sent": true,
+   "api_seconds": 30.55,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.03,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:49:40",
+   "started": "2026-10-28T19:49:09.515",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5a",
+   "name": "engine",
+   "step": "s3_5a",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5a_engine.prompt",
+   "prompt_chars": 45025,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 248.71,
+   "thinking_bytes": 30,
+   "response_bytes": 11414,
+   "done_reason": "stop",
+   "prompt_tokens": 17740,
+   "output_tokens": 13618,
+   "format_sent": true,
+   "api_seconds": 248.1,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.03,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.03,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:53:49",
+   "started": "2026-10-28T19:49:40.586",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5b1",
+   "name": "spine",
+   "step": "s3_5b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5b1_spine.prompt",
+   "prompt_chars": 25531,
+   "ok": false,
+   "breaker": null,
+   "error": "these phrases are the brief's own wording copied in as if they were things in the story: \"name one of the seven\". Name each thing in the story's own words (what it is, what it does when used), everywhere it appears",
+   "seconds": 66.38,
+   "thinking_bytes": 30,
+   "response_bytes": 5574,
+   "done_reason": "stop",
+   "prompt_tokens": 10149,
+   "output_tokens": 4228,
+   "format_sent": true,
+   "api_seconds": 65.78,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.04,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:54:55",
+   "started": "2026-10-28T19:53:49.306",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5b1",
+   "name": "spine",
+   "step": "s3_5b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s3_5b1_spine.prompt",
+   "prompt_chars": 31613,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 21.36,
+   "thinking_bytes": 28,
+   "response_bytes": 5756,
+   "done_reason": "stop",
+   "prompt_tokens": 12206,
+   "output_tokens": 2041,
+   "format_sent": true,
+   "api_seconds": 20.59,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.05,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:55:17",
+   "started": "2026-10-28T19:54:55.689",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5b2",
+   "name": "ways",
+   "step": "s3_5b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5b2_ways.prompt",
+   "prompt_chars": 28054,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 122.05,
+   "thinking_bytes": 30,
+   "response_bytes": 11429,
+   "done_reason": "stop",
+   "prompt_tokens": 10820,
+   "output_tokens": 6869,
+   "format_sent": true,
+   "api_seconds": 120.42,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.05,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:57:19",
+   "started": "2026-10-28T19:55:17.057",
+   "check_seconds": 0.003,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5c",
+   "name": "cast",
+   "step": "s3_5c",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_5c_cast.prompt",
+   "prompt_chars": 24398,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 53.13,
+   "thinking_bytes": 29,
+   "response_bytes": 8126,
+   "done_reason": "stop",
+   "prompt_tokens": 9794,
+   "output_tokens": 2812,
+   "format_sent": true,
+   "api_seconds": 52.37,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:58:12",
+   "started": "2026-10-28T19:57:19.117",
+   "check_seconds": 0.01,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5j1",
+   "name": "agency",
+   "step": "s3_5j1",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_5j1_agency.prompt",
+   "prompt_chars": 9869,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 2.96,
+   "thinking_bytes": 0,
+   "response_bytes": 208,
+   "done_reason": "stop",
+   "prompt_tokens": 4659,
+   "output_tokens": 156,
+   "format_sent": true,
+   "api_seconds": 2.1,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:58:15",
+   "started": "2026-10-28T19:58:12.260",
+   "check_seconds": 0.0,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5j2",
+   "name": "dilemma",
+   "step": "s3_5j2",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_5j2_dilemma.prompt",
+   "prompt_chars": 25258,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 6.44,
+   "thinking_bytes": 29,
+   "response_bytes": 399,
+   "done_reason": "stop",
+   "prompt_tokens": 9627,
+   "output_tokens": 418,
+   "format_sent": true,
+   "api_seconds": 5.83,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:58:21",
+   "started": "2026-10-28T19:58:15.224",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5np",
+   "name": "name_pool",
+   "step": "s3_5np",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_5np_name_pool.prompt",
+   "prompt_chars": 5238,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 5.79,
+   "thinking_bytes": 0,
+   "response_bytes": 371,
+   "done_reason": "stop",
+   "prompt_tokens": 3174,
+   "output_tokens": 179,
+   "format_sent": true,
+   "api_seconds": 5.18,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:58:27",
+   "started": "2026-10-28T19:58:21.669",
+   "check_seconds": 0.0,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5k",
+   "name": "kernel_check",
+   "step": "s3_5k",
+   "klass": "audit",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5k_kernel_check.prompt",
+   "prompt_chars": 46419,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 32.04,
+   "thinking_bytes": 29,
+   "response_bytes": 4783,
+   "done_reason": "stop",
+   "prompt_tokens": 16501,
+   "output_tokens": 2269,
+   "format_sent": true,
+   "api_seconds": 31.48,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T19:58:59",
+   "started": "2026-10-28T19:58:27.468",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 12000,
+   "target_seconds": 720,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5v",
+   "name": "premise_check",
+   "step": "s3_5v",
+   "klass": "audit",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5v_premise_check.prompt",
+   "prompt_chars": 58377,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 109.06,
+   "thinking_bytes": 30,
+   "response_bytes": 10980,
+   "done_reason": "stop",
+   "prompt_tokens": 20900,
+   "output_tokens": 7739,
+   "format_sent": true,
+   "api_seconds": 108.39,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.06,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:00:16",
+   "started": "2026-10-28T19:58:27.468",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 12000,
+   "target_seconds": 720,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5r1",
+   "name": "premise_repair",
+   "step": "s3_5r",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5r_premise_repair.prompt",
+   "prompt_chars": 57248,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 92.27,
+   "thinking_bytes": 30,
+   "response_bytes": 17853,
+   "done_reason": "stop",
+   "prompt_tokens": 20248,
+   "output_tokens": 7667,
+   "format_sent": true,
+   "api_seconds": 91.47,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.07,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:01:48",
+   "started": "2026-10-28T20:00:16.570",
+   "check_seconds": 0.034,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5k_r1",
+   "name": "kernel_check",
+   "step": "s3_5k",
+   "klass": "audit",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5k_kernel_check.prompt",
+   "prompt_chars": 47205,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 39.31,
+   "thinking_bytes": 30,
+   "response_bytes": 5290,
+   "done_reason": "stop",
+   "prompt_tokens": 16731,
+   "output_tokens": 2996,
+   "format_sent": true,
+   "api_seconds": 38.72,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.07,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:02:28",
+   "started": "2026-10-28T20:01:48.881",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 12000,
+   "target_seconds": 720,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_5v_r1",
+   "name": "premise_check",
+   "step": "s3_5v",
+   "klass": "audit",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s3_5v_premise_check.prompt",
+   "prompt_chars": 59163,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 112.19,
+   "thinking_bytes": 30,
+   "response_bytes": 10313,
+   "done_reason": "stop",
+   "prompt_tokens": 21130,
+   "output_tokens": 7689,
+   "format_sent": true,
+   "api_seconds": 111.46,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.07,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:03:41",
+   "started": "2026-10-28T20:01:48.881",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 12000,
+   "target_seconds": 720,
+   "over_target": []
+  },
+  {
+   "prefix": "s3_8",
+   "name": "story_form",
+   "step": "s3_8",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s3_8_story_form.prompt",
+   "prompt_chars": 14733,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 16.86,
+   "thinking_bytes": 29,
+   "response_bytes": 1287,
+   "done_reason": "stop",
+   "prompt_tokens": 6493,
+   "output_tokens": 1015,
+   "format_sent": true,
+   "api_seconds": 16.32,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.08,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:03:57",
+   "started": "2026-10-28T20:03:41.107",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s4a_i1",
+   "name": "main_line",
+   "step": "s4a",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4a_main_line.prompt",
+   "prompt_chars": 54027,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 118.87,
+   "thinking_bytes": 30,
+   "response_bytes": 10671,
+   "done_reason": "stop",
+   "prompt_tokens": 19360,
+   "output_tokens": 7974,
+   "format_sent": true,
+   "api_seconds": 118.17,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.08,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.04,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:05:56",
+   "started": "2026-10-28T20:03:57.970",
+   "check_seconds": 0.037,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i1",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 32804,
+   "ok": false,
+   "breaker": null,
+   "error": "these summaries run past 80 words: N01 (114), N02 (119), N03 (129), N04 (131). Keep what happens and what it changes; cut the description around it Also, 2 of 4 node summaries turn on paper (documents, signatures, seals, treaties, ledgers): N02 (\"account\"); N04 (\"account\"). At most a quarter may (two more when the Kernel names a document). Keep the paper the story is about, and rewrite the rest as what people do with their hands, bodies, places and things that can break, burn, be carried off or fought over",
+   "seconds": 79.85,
+   "thinking_bytes": 30,
+   "response_bytes": 5074,
+   "done_reason": "stop",
+   "prompt_tokens": 12490,
+   "output_tokens": 6153,
+   "format_sent": true,
+   "api_seconds": 79.28,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.09,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:07:16",
+   "started": "2026-10-28T20:05:56.882",
+   "check_seconds": 0.022,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i1",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 38683,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 179.31,
+   "thinking_bytes": 31,
+   "response_bytes": 4077,
+   "done_reason": "stop",
+   "prompt_tokens": 14568,
+   "output_tokens": 16820,
+   "format_sent": true,
+   "api_seconds": 178.58,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.09,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:10:16",
+   "started": "2026-10-28T20:07:16.761",
+   "check_seconds": 0.019,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i1_p2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 35032,
+   "ok": false,
+   "breaker": null,
+   "error": "these summaries narrate a person with their cast sketch's description, which is direction for the writer, not story text: N05: Lavinia Netherby, \"laid at her door\". Show it in what they say or do",
+   "seconds": 41.1,
+   "thinking_bytes": 30,
+   "response_bytes": 3326,
+   "done_reason": "stop",
+   "prompt_tokens": 13223,
+   "output_tokens": 2757,
+   "format_sent": true,
+   "api_seconds": 40.27,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.1,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:10:57",
+   "started": "2026-10-28T20:10:16.096",
+   "check_seconds": 0.019,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i1_p2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 38847,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 17.91,
+   "thinking_bytes": 28,
+   "response_bytes": 3394,
+   "done_reason": "stop",
+   "prompt_tokens": 14562,
+   "output_tokens": 1281,
+   "format_sent": true,
+   "api_seconds": 17.32,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.1,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "soft_problems": "these summaries run past 80 words: N05 (90). Keep what happens and what it changes; cut the description around it",
+   "at": "2026-10-28T20:11:15",
+   "started": "2026-10-28T20:10:57.219",
+   "check_seconds": 0.017,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4p_i1",
+   "name": "branch_plan",
+   "step": "s4p",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4p_branch_plan.prompt",
+   "prompt_chars": 33412,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 82.06,
+   "thinking_bytes": 30,
+   "response_bytes": 5522,
+   "done_reason": "stop",
+   "prompt_tokens": 12670,
+   "output_tokens": 5145,
+   "format_sent": true,
+   "api_seconds": 81.33,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.1,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:12:37",
+   "started": "2026-10-28T20:11:15.156",
+   "check_seconds": 0.012,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4c_i2",
+   "name": "divergence",
+   "step": "s4c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4c_divergence.prompt",
+   "prompt_chars": 79437,
+   "ok": false,
+   "breaker": null,
+   "error": "the answer copies the prompt's illustration (10 of its phrases, e.g. come to want the; gives the other answer; line gives the other; seed holds as given); write this story's own content",
+   "seconds": 177.65,
+   "thinking_bytes": 30,
+   "response_bytes": 10512,
+   "done_reason": "stop",
+   "prompt_tokens": 28319,
+   "output_tokens": 10709,
+   "format_sent": true,
+   "api_seconds": 176.68,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.1,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:15:34",
+   "started": "2026-10-28T20:12:37.239",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4c_i2",
+   "name": "divergence",
+   "step": "s4c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4c_divergence.prompt",
+   "prompt_chars": 90428,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 43.74,
+   "thinking_bytes": 29,
+   "response_bytes": 10665,
+   "done_reason": "stop",
+   "prompt_tokens": 31961,
+   "output_tokens": 3914,
+   "format_sent": true,
+   "api_seconds": 43.13,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.11,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "soft_problems": "these new entries mirror existing line beats, cloning obstacle devices and scene text: beat 'third_crisis' mirrors existing N04 (21 shared phrases, e.g. 'a cart by noon; and a fresh scuttle; and tells the doctor'); beat 'climax' mirrors existing N06 (12 shared phrases, e.g. 'by twenty to eleven; carriage at the door; drawing room before the'). Divergent branches must confront different types of obstacles (social, environmental, logistical) with fresh phrasing rather than repeating parallel line scenes",
+   "at": "2026-10-28T20:16:18",
+   "started": "2026-10-28T20:15:34.908",
+   "check_seconds": 0.027,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 36195,
+   "ok": false,
+   "breaker": null,
+   "error": "2 of 4 node summaries turn on paper (documents, signatures, seals, treaties, ledgers): T2N01 (\"account\"); T2N03 (\"account\"). At most a quarter may (two more when the Kernel names a document). Keep the paper the story is about, and rewrite the rest as what people do with their hands, bodies, places and things that can break, burn, be carried off or fought over",
+   "seconds": 148.43,
+   "thinking_bytes": 31,
+   "response_bytes": 3190,
+   "done_reason": "stop",
+   "prompt_tokens": 13697,
+   "output_tokens": 11949,
+   "format_sent": true,
+   "api_seconds": 147.75,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.11,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:18:47",
+   "started": "2026-10-28T20:16:18.681",
+   "check_seconds": 0.019,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 40040,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 20.25,
+   "thinking_bytes": 29,
+   "response_bytes": 3344,
+   "done_reason": "stop",
+   "prompt_tokens": 15146,
+   "output_tokens": 1746,
+   "format_sent": true,
+   "api_seconds": 19.52,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.12,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "soft_problems": "these summaries run past 80 words: T2N01 (87), T2N03 (83). Keep what happens and what it changes; cut the description around it",
+   "at": "2026-10-28T20:19:07",
+   "started": "2026-10-28T20:18:47.138",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4c_i3",
+   "name": "divergence",
+   "step": "s4c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4c_divergence.prompt",
+   "prompt_chars": 90252,
+   "ok": false,
+   "breaker": null,
+   "error": "these new entries mirror existing line beats, cloning obstacle devices and scene text: beat 'second_crisis' mirrors existing N02 (12 shared phrases, e.g. 'dinner is laid for; dragged back half frozen; his room with fairbrother'); beat 'second_crisis' mirrors existing N03 (16 shared phrases, e.g. 'at half past ten; at the nephew's door; at twenty to eleven'); beat 'third_crisis' mirrors existing N04 (23 shared phrases, e.g. 'a cart by noon; and a fresh scuttle; and the major orders'); beat 'third_crisis' mirrors existing T2N01 (23 shared phrases, e.g. 'a cart by noon; and a fresh scuttle; and the major orders'). Divergent branches must confront different types of obstacles (social, environmental, logistical) with fresh phrasing rather than repeating parallel line scenes",
+   "seconds": 115.23,
+   "thinking_bytes": 30,
+   "response_bytes": 10679,
+   "done_reason": "stop",
+   "prompt_tokens": 31874,
+   "output_tokens": 7349,
+   "format_sent": true,
+   "api_seconds": 114.59,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.12,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:21:02",
+   "started": "2026-10-28T20:19:07.414",
+   "check_seconds": 0.03,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4c_i3",
+   "name": "divergence",
+   "step": "s4c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4c_divergence.prompt",
+   "prompt_chars": 102004,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 77.26,
+   "thinking_bytes": 30,
+   "response_bytes": 12802,
+   "done_reason": "stop",
+   "prompt_tokens": 35813,
+   "output_tokens": 5583,
+   "format_sent": true,
+   "api_seconds": 76.7,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.13,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:22:19",
+   "started": "2026-10-28T20:21:02.679",
+   "check_seconds": 0.034,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i3",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 35578,
+   "ok": false,
+   "breaker": null,
+   "error": "these phrases would appear in three or more node summaries across the outline, a verbal tic the player notices: \"carrington orders the carriage\" (N04, T2N01, T3N03). In the new nodes, show the moment in its own words, or something new happening, rather than repeating identical phrasing Also, these summaries run past 80 words: T3N01 (93), T3N02 (115), T3N03 (132). Keep what happens and what it changes; cut the description around it Also, 2 of 3 node summaries turn on paper (documents, signatures, seals, treaties, ledgers): T3N01 (\"sign\"); T3N02 (\"paper\"). At most a quarter may (two more when the Kernel names a document). Keep the paper the story is about, and rewrite the rest as what people do with their hands, bodies, places and things that can break, burn, be carried off or fought over",
+   "seconds": 89.4,
+   "thinking_bytes": 30,
+   "response_bytes": 3119,
+   "done_reason": "stop",
+   "prompt_tokens": 13374,
+   "output_tokens": 7331,
+   "format_sent": true,
+   "api_seconds": 88.68,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.13,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:23:49",
+   "started": "2026-10-28T20:22:19.978",
+   "check_seconds": 0.011,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i3",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 39788,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 158.14,
+   "thinking_bytes": 31,
+   "response_bytes": 2432,
+   "done_reason": "stop",
+   "prompt_tokens": 14896,
+   "output_tokens": 13853,
+   "format_sent": true,
+   "api_seconds": 156.54,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.14,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.05,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:26:27",
+   "started": "2026-10-28T20:23:49.386",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i3_p2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 33904,
+   "ok": false,
+   "breaker": null,
+   "error": "these summaries run past 80 words: T3N04 (83), T3N05 (86). Keep what happens and what it changes; cut the description around it",
+   "seconds": 90.33,
+   "thinking_bytes": 30,
+   "response_bytes": 1702,
+   "done_reason": "stop",
+   "prompt_tokens": 12873,
+   "output_tokens": 7939,
+   "format_sent": true,
+   "api_seconds": 89.44,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.15,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:27:57",
+   "started": "2026-10-28T20:26:27.542",
+   "check_seconds": 0.018,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4b_i3_p2",
+   "name": "line_nodes",
+   "step": "s4b",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s4b_line_nodes.prompt",
+   "prompt_chars": 36027,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 63.85,
+   "thinking_bytes": 30,
+   "response_bytes": 1550,
+   "done_reason": "stop",
+   "prompt_tokens": 13640,
+   "output_tokens": 5706,
+   "format_sent": true,
+   "api_seconds": 63.29,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.15,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:29:01",
+   "started": "2026-10-28T20:27:57.893",
+   "check_seconds": 0.018,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s4e",
+   "name": "outline_judge",
+   "step": "s4e",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s4e_outline_judge.prompt",
+   "prompt_chars": 26630,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 48.48,
+   "thinking_bytes": 30,
+   "response_bytes": 6568,
+   "done_reason": "stop",
+   "prompt_tokens": 11173,
+   "output_tokens": 3884,
+   "format_sent": true,
+   "api_seconds": 47.89,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.15,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:29:50",
+   "started": "2026-10-28T20:29:01.791",
+   "check_seconds": 0.005,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a0",
+   "name": "arc_cast",
+   "step": "s5a0",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s5a0_arc_cast.prompt",
+   "prompt_chars": 4657,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 11.75,
+   "thinking_bytes": 0,
+   "response_bytes": 1403,
+   "done_reason": "stop",
+   "prompt_tokens": 2906,
+   "output_tokens": 521,
+   "format_sent": true,
+   "api_seconds": 10.98,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.16,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:30:02",
+   "started": "2026-10-28T20:29:50.294",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a1",
+   "name": "arc_plan",
+   "step": "s5a1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s5a1_arc_plan.prompt",
+   "prompt_chars": 34295,
+   "ok": false,
+   "breaker": null,
+   "error": "line shift N03 -> T2N01: an edge already directly connects N03 to T2N01 (it is dropped otherwise)",
+   "seconds": 207.79,
+   "thinking_bytes": 30,
+   "response_bytes": 26411,
+   "done_reason": "stop",
+   "prompt_tokens": 14695,
+   "output_tokens": 14243,
+   "format_sent": true,
+   "api_seconds": 207.29,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.16,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:33:29",
+   "started": "2026-10-28T20:30:02.055",
+   "check_seconds": 0.008,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a1",
+   "name": "arc_plan",
+   "step": "s5a1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s5a1_arc_plan.prompt",
+   "prompt_chars": 58702,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 100.17,
+   "thinking_bytes": 29,
+   "response_bytes": 26181,
+   "done_reason": "stop",
+   "prompt_tokens": 23243,
+   "output_tokens": 9896,
+   "format_sent": true,
+   "api_seconds": 99.43,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.17,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:35:10",
+   "started": "2026-10-28T20:33:29.857",
+   "check_seconds": 0.007,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a2_T1",
+   "name": "line_expansion",
+   "step": "s5a2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s5a2_line_expansion.prompt",
+   "prompt_chars": 31451,
+   "ok": false,
+   "breaker": null,
+   "error": "minor node 5 (after N02): its tell at 'm5' does not land at the next major node or within 2 nodes on T1, T2 (it follows N02, which lines T1, T2 share, so its tell must land on all of them); use a major node id or m<k> for the k-th minor node of this answer",
+   "seconds": 245.47,
+   "thinking_bytes": 30,
+   "response_bytes": 22301,
+   "done_reason": "stop",
+   "prompt_tokens": 12894,
+   "output_tokens": 15751,
+   "format_sent": true,
+   "api_seconds": 244.85,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.17,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:39:15",
+   "started": "2026-10-28T20:35:10.042",
+   "check_seconds": 0.004,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a2_T1",
+   "name": "line_expansion",
+   "step": "s5a2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s5a2_line_expansion.prompt",
+   "prompt_chars": 54302,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 82.38,
+   "thinking_bytes": 29,
+   "response_bytes": 22350,
+   "done_reason": "stop",
+   "prompt_tokens": 21507,
+   "output_tokens": 8683,
+   "format_sent": true,
+   "api_seconds": 81.12,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.18,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:40:37",
+   "started": "2026-10-28T20:39:15.515",
+   "check_seconds": 0.004,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a2_T2",
+   "name": "line_expansion",
+   "step": "s5a2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s5a2_line_expansion.prompt",
+   "prompt_chars": 35231,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 181.81,
+   "thinking_bytes": 30,
+   "response_bytes": 14622,
+   "done_reason": "stop",
+   "prompt_tokens": 14326,
+   "output_tokens": 11379,
+   "format_sent": true,
+   "api_seconds": 180.85,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.18,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:43:39",
+   "started": "2026-10-28T20:40:37.911",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a2_T3",
+   "name": "line_expansion",
+   "step": "s5a2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s5a2_line_expansion.prompt",
+   "prompt_chars": 29593,
+   "ok": false,
+   "breaker": null,
+   "error": "minor node 6 (after T3N03): its tell at 'm11' does not land at the next major node or within 2 nodes on T3; use a major node id or m<k> for the k-th minor node of this answer",
+   "seconds": 159.81,
+   "thinking_bytes": 30,
+   "response_bytes": 17339,
+   "done_reason": "stop",
+   "prompt_tokens": 12214,
+   "output_tokens": 10436,
+   "format_sent": true,
+   "api_seconds": 158.99,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:46:19",
+   "started": "2026-10-28T20:43:39.734",
+   "check_seconds": 0.004,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s5a2_T3",
+   "name": "line_expansion",
+   "step": "s5a2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s5a2_line_expansion.prompt",
+   "prompt_chars": 47400,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 78.08,
+   "thinking_bytes": 29,
+   "response_bytes": 17338,
+   "done_reason": "stop",
+   "prompt_tokens": 18900,
+   "output_tokens": 7028,
+   "format_sent": true,
+   "api_seconds": 77.44,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:47:37",
+   "started": "2026-10-28T20:46:19.558",
+   "check_seconds": 0.003,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C06",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 17354,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 58.74,
+   "thinking_bytes": 30,
+   "response_bytes": 5807,
+   "done_reason": "stop",
+   "prompt_tokens": 8200,
+   "output_tokens": 3150,
+   "format_sent": true,
+   "api_seconds": 57.55,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:48:36",
+   "started": "2026-10-28T20:47:37.865",
+   "check_seconds": 0.024,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C04",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 24862,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 65.62,
+   "thinking_bytes": 30,
+   "response_bytes": 6459,
+   "done_reason": "stop",
+   "prompt_tokens": 10917,
+   "output_tokens": 3797,
+   "format_sent": true,
+   "api_seconds": 64.47,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:48:43",
+   "started": "2026-10-28T20:47:37.865",
+   "check_seconds": 0.013,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C03",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 28452,
+   "ok": false,
+   "breaker": null,
+   "error": "6 topics; give 2 to 5",
+   "seconds": 72.84,
+   "thinking_bytes": 29,
+   "response_bytes": 9157,
+   "done_reason": "stop",
+   "prompt_tokens": 12373,
+   "output_tokens": 4010,
+   "format_sent": true,
+   "api_seconds": 71.73,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:48:50",
+   "started": "2026-10-28T20:47:37.865",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_functional",
+   "name": "functional",
+   "step": "s6b1",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s6b1f_functional.prompt",
+   "prompt_chars": 3074,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 10.18,
+   "thinking_bytes": 0,
+   "response_bytes": 1002,
+   "done_reason": "stop",
+   "prompt_tokens": 2377,
+   "output_tokens": 412,
+   "format_sent": true,
+   "api_seconds": 9.55,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.21,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:48:53",
+   "started": "2026-10-28T20:48:43.502",
+   "check_seconds": 0.012,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C05",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 28803,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 79.77,
+   "thinking_bytes": 30,
+   "response_bytes": 9926,
+   "done_reason": "stop",
+   "prompt_tokens": 12467,
+   "output_tokens": 4527,
+   "format_sent": true,
+   "api_seconds": 78.66,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.2,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:48:57",
+   "started": "2026-10-28T20:47:37.865",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C02",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 37359,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 85.34,
+   "thinking_bytes": 30,
+   "response_bytes": 10573,
+   "done_reason": "stop",
+   "prompt_tokens": 15543,
+   "output_tokens": 4913,
+   "format_sent": true,
+   "api_seconds": 84.12,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:03",
+   "started": "2026-10-28T20:47:37.863",
+   "check_seconds": 0.017,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C07",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 29240,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 88.1,
+   "thinking_bytes": 30,
+   "response_bytes": 11488,
+   "done_reason": "stop",
+   "prompt_tokens": 12688,
+   "output_tokens": 5120,
+   "format_sent": true,
+   "api_seconds": 86.87,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:05",
+   "started": "2026-10-28T20:47:37.866",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C01",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 42212,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 96.6,
+   "thinking_bytes": 30,
+   "response_bytes": 10684,
+   "done_reason": "stop",
+   "prompt_tokens": 17342,
+   "output_tokens": 5620,
+   "format_sent": true,
+   "api_seconds": 95.39,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:14",
+   "started": "2026-10-28T20:47:37.862",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C03",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 37924,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 35.6,
+   "thinking_bytes": 29,
+   "response_bytes": 8451,
+   "done_reason": "stop",
+   "prompt_tokens": 15821,
+   "output_tokens": 3594,
+   "format_sent": true,
+   "api_seconds": 35.07,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.21,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:26",
+   "started": "2026-10-28T20:48:50.715",
+   "check_seconds": 0.017,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C08",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 28119,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 108.91,
+   "thinking_bytes": 30,
+   "response_bytes": 8829,
+   "done_reason": "stop",
+   "prompt_tokens": 12148,
+   "output_tokens": 6317,
+   "format_sent": true,
+   "api_seconds": 107.77,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.19,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.06,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:26",
+   "started": "2026-10-28T20:47:37.866",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C09",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 29634,
+   "ok": false,
+   "breaker": null,
+   "error": "6 topics; give 2 to 5",
+   "seconds": 58.98,
+   "thinking_bytes": 29,
+   "response_bytes": 7138,
+   "done_reason": "stop",
+   "prompt_tokens": 12757,
+   "output_tokens": 3426,
+   "format_sent": true,
+   "api_seconds": 58.37,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.21,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:49:35",
+   "started": "2026-10-28T20:48:36.634",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1_C09",
+   "name": "character",
+   "step": "s6b1",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s6b1_character.prompt",
+   "prompt_chars": 37087,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 27.01,
+   "thinking_bytes": 29,
+   "response_bytes": 7062,
+   "done_reason": "stop",
+   "prompt_tokens": 15354,
+   "output_tokens": 2718,
+   "format_sent": true,
+   "api_seconds": 26.42,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.22,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:50:02",
+   "started": "2026-10-28T20:49:35.619",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L01",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 25562,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 115.73,
+   "thinking_bytes": 30,
+   "response_bytes": 11259,
+   "done_reason": "stop",
+   "prompt_tokens": 10921,
+   "output_tokens": 6095,
+   "format_sent": true,
+   "api_seconds": 115.04,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.23,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:51:58",
+   "started": "2026-10-28T20:50:02.646",
+   "check_seconds": 0.022,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L02",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 18744,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 58.47,
+   "thinking_bytes": 29,
+   "response_bytes": 7786,
+   "done_reason": "stop",
+   "prompt_tokens": 8361,
+   "output_tokens": 3353,
+   "format_sent": true,
+   "api_seconds": 57.87,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.23,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:52:56",
+   "started": "2026-10-28T20:51:58.401",
+   "check_seconds": 0.013,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L03",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 19881,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 59.59,
+   "thinking_bytes": 29,
+   "response_bytes": 7745,
+   "done_reason": "stop",
+   "prompt_tokens": 8840,
+   "output_tokens": 3377,
+   "format_sent": true,
+   "api_seconds": 59.03,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.23,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:53:56",
+   "started": "2026-10-28T20:52:56.889",
+   "check_seconds": 0.012,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L04",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 17327,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 33.55,
+   "thinking_bytes": 29,
+   "response_bytes": 4313,
+   "done_reason": "stop",
+   "prompt_tokens": 7878,
+   "output_tokens": 1805,
+   "format_sent": true,
+   "api_seconds": 32.99,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.23,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:54:30",
+   "started": "2026-10-28T20:53:56.501",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L05",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 16713,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 45.12,
+   "thinking_bytes": 29,
+   "response_bytes": 4202,
+   "done_reason": "stop",
+   "prompt_tokens": 7659,
+   "output_tokens": 2278,
+   "format_sent": true,
+   "api_seconds": 44.55,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.23,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:55:15",
+   "started": "2026-10-28T20:54:30.069",
+   "check_seconds": 0.011,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L06",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 22038,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 68.15,
+   "thinking_bytes": 30,
+   "response_bytes": 7842,
+   "done_reason": "stop",
+   "prompt_tokens": 9675,
+   "output_tokens": 4046,
+   "format_sent": true,
+   "api_seconds": 67.52,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.24,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:56:23",
+   "started": "2026-10-28T20:55:15.203",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L07",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 18039,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 44.87,
+   "thinking_bytes": 29,
+   "response_bytes": 4176,
+   "done_reason": "stop",
+   "prompt_tokens": 8172,
+   "output_tokens": 2458,
+   "format_sent": true,
+   "api_seconds": 44.29,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.24,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:57:08",
+   "started": "2026-10-28T20:56:23.377",
+   "check_seconds": 0.009,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L08",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 16095,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 38.21,
+   "thinking_bytes": 29,
+   "response_bytes": 4584,
+   "done_reason": "stop",
+   "prompt_tokens": 7445,
+   "output_tokens": 1902,
+   "format_sent": true,
+   "api_seconds": 37.63,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.24,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:57:46",
+   "started": "2026-10-28T20:57:08.259",
+   "check_seconds": 0.011,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_L09",
+   "name": "place",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2_place.prompt",
+   "prompt_chars": 18977,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 45.86,
+   "thinking_bytes": 29,
+   "response_bytes": 4270,
+   "done_reason": "stop",
+   "prompt_tokens": 8557,
+   "output_tokens": 2263,
+   "format_sent": true,
+   "api_seconds": 45.3,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.24,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:58:32",
+   "started": "2026-10-28T20:57:46.492",
+   "check_seconds": 0.011,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b2_map",
+   "name": "map",
+   "step": "s6b2",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b2m_map.prompt",
+   "prompt_chars": 8873,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 42.09,
+   "thinking_bytes": 29,
+   "response_bytes": 5706,
+   "done_reason": "stop",
+   "prompt_tokens": 4871,
+   "output_tokens": 2590,
+   "format_sent": true,
+   "api_seconds": 41.21,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.24,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T20:59:14",
+   "started": "2026-10-28T20:58:32.372",
+   "check_seconds": 0.003,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C08",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 12597,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 113.7,
+   "thinking_bytes": 30,
+   "response_bytes": 9748,
+   "done_reason": "stop",
+   "prompt_tokens": 6052,
+   "output_tokens": 7032,
+   "format_sent": true,
+   "api_seconds": 112.41,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:08",
+   "started": "2026-10-28T20:59:14.487",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C01",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 14102,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 117.5,
+   "thinking_bytes": 30,
+   "response_bytes": 9835,
+   "done_reason": "stop",
+   "prompt_tokens": 6572,
+   "output_tokens": 6958,
+   "format_sent": true,
+   "api_seconds": 116.35,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:11",
+   "started": "2026-10-28T20:59:14.480",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C05",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 12404,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 119.23,
+   "thinking_bytes": 30,
+   "response_bytes": 11638,
+   "done_reason": "stop",
+   "prompt_tokens": 6016,
+   "output_tokens": 7386,
+   "format_sent": true,
+   "api_seconds": 118.12,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:13",
+   "started": "2026-10-28T20:59:14.487",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C03",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 9467,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 128.35,
+   "thinking_bytes": 30,
+   "response_bytes": 9870,
+   "done_reason": "stop",
+   "prompt_tokens": 4925,
+   "output_tokens": 8031,
+   "format_sent": true,
+   "api_seconds": 127.14,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:22",
+   "started": "2026-10-28T20:59:14.480",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C02",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 13396,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 134.89,
+   "thinking_bytes": 30,
+   "response_bytes": 12767,
+   "done_reason": "stop",
+   "prompt_tokens": 6297,
+   "output_tokens": 8321,
+   "format_sent": true,
+   "api_seconds": 133.48,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:29",
+   "started": "2026-10-28T20:59:14.480",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C06",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 9257,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 137.48,
+   "thinking_bytes": 30,
+   "response_bytes": 12371,
+   "done_reason": "stop",
+   "prompt_tokens": 4832,
+   "output_tokens": 8466,
+   "format_sent": true,
+   "api_seconds": 136.3,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:31",
+   "started": "2026-10-28T20:59:14.486",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C04",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 9329,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 138.53,
+   "thinking_bytes": 30,
+   "response_bytes": 11245,
+   "done_reason": "stop",
+   "prompt_tokens": 4864,
+   "output_tokens": 7387,
+   "format_sent": true,
+   "api_seconds": 137.31,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:33",
+   "started": "2026-10-28T20:59:14.480",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C07",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 12368,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 151.04,
+   "thinking_bytes": 30,
+   "response_bytes": 11757,
+   "done_reason": "stop",
+   "prompt_tokens": 6010,
+   "output_tokens": 9220,
+   "format_sent": true,
+   "api_seconds": 149.76,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:01:45",
+   "started": "2026-10-28T20:59:14.487",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C10",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 7851,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 79.98,
+   "thinking_bytes": 30,
+   "response_bytes": 6320,
+   "done_reason": "stop",
+   "prompt_tokens": 4329,
+   "output_tokens": 3928,
+   "format_sent": true,
+   "api_seconds": 79.39,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.26,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:02:31",
+   "started": "2026-10-28T21:01:11.989",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b1c_C09",
+   "name": "conversation",
+   "step": "s6b1c",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b1c_conversation.prompt",
+   "prompt_chars": 9394,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 92.52,
+   "thinking_bytes": 30,
+   "response_bytes": 11799,
+   "done_reason": "stop",
+   "prompt_tokens": 4876,
+   "output_tokens": 5181,
+   "format_sent": true,
+   "api_seconds": 91.63,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.25,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.07,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:02:40",
+   "started": "2026-10-28T21:01:08.196",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s6b3",
+   "name": "you",
+   "step": "s6b3",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s6b3_you.prompt",
+   "prompt_chars": 8382,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 77.26,
+   "thinking_bytes": 29,
+   "response_bytes": 9384,
+   "done_reason": "stop",
+   "prompt_tokens": 4499,
+   "output_tokens": 4096,
+   "format_sent": true,
+   "api_seconds": 76.69,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.27,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:03:57",
+   "started": "2026-10-28T21:02:40.723",
+   "check_seconds": 0.002,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N07",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 22039,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 82.59,
+   "thinking_bytes": 30,
+   "response_bytes": 8622,
+   "done_reason": "stop",
+   "prompt_tokens": 10829,
+   "output_tokens": 5096,
+   "format_sent": true,
+   "api_seconds": 81.23,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:20",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.011,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N04",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23560,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 87.5,
+   "thinking_bytes": 30,
+   "response_bytes": 8470,
+   "done_reason": "stop",
+   "prompt_tokens": 11423,
+   "output_tokens": 6064,
+   "format_sent": true,
+   "api_seconds": 86.19,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:25",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.01,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N06",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23514,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 89.4,
+   "thinking_bytes": 30,
+   "response_bytes": 10923,
+   "done_reason": "stop",
+   "prompt_tokens": 11446,
+   "output_tokens": 5855,
+   "format_sent": true,
+   "api_seconds": 88.13,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:27",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N02",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 24810,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 90.23,
+   "thinking_bytes": 30,
+   "response_bytes": 11647,
+   "done_reason": "stop",
+   "prompt_tokens": 11810,
+   "output_tokens": 6149,
+   "format_sent": true,
+   "api_seconds": 88.91,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:28",
+   "started": "2026-10-28T21:03:58.005",
+   "check_seconds": 0.018,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N05",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 22649,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 106.41,
+   "thinking_bytes": 30,
+   "response_bytes": 10218,
+   "done_reason": "stop",
+   "prompt_tokens": 11068,
+   "output_tokens": 7243,
+   "format_sent": true,
+   "api_seconds": 105.25,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:44",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T2N01",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 24939,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 109.07,
+   "thinking_bytes": 30,
+   "response_bytes": 10464,
+   "done_reason": "stop",
+   "prompt_tokens": 11809,
+   "output_tokens": 7604,
+   "format_sent": true,
+   "api_seconds": 107.88,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:05:47",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N01",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 24793,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 123.82,
+   "thinking_bytes": 30,
+   "response_bytes": 9552,
+   "done_reason": "stop",
+   "prompt_tokens": 11657,
+   "output_tokens": 7915,
+   "format_sent": true,
+   "api_seconds": 122.51,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:06:01",
+   "started": "2026-10-28T21:03:58.009",
+   "check_seconds": 0.013,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_N03",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 26794,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 136.35,
+   "thinking_bytes": 30,
+   "response_bytes": 11799,
+   "done_reason": "stop",
+   "prompt_tokens": 12405,
+   "output_tokens": 9649,
+   "format_sent": true,
+   "api_seconds": 135.05,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.28,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:06:14",
+   "started": "2026-10-28T21:03:58.005",
+   "check_seconds": 0.013,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T2N04",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 22828,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 84.91,
+   "thinking_bytes": 30,
+   "response_bytes": 8921,
+   "done_reason": "stop",
+   "prompt_tokens": 11182,
+   "output_tokens": 5087,
+   "format_sent": true,
+   "api_seconds": 84.41,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.3,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:06:52",
+   "started": "2026-10-28T21:05:27.430",
+   "check_seconds": 0.012,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T2N02",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23443,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 99.25,
+   "thinking_bytes": 30,
+   "response_bytes": 9173,
+   "done_reason": "stop",
+   "prompt_tokens": 11303,
+   "output_tokens": 6825,
+   "format_sent": true,
+   "api_seconds": 98.41,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.29,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:06:59",
+   "started": "2026-10-28T21:05:20.611",
+   "check_seconds": 0.01,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N02",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 22962,
+   "ok": false,
+   "breaker": null,
+   "error": "the opening puts Lucius Carrington in the library but placement puts them in the gallery; make them agree",
+   "seconds": 90.78,
+   "thinking_bytes": 30,
+   "response_bytes": 9306,
+   "done_reason": "stop",
+   "prompt_tokens": 11148,
+   "output_tokens": 6556,
+   "format_sent": true,
+   "api_seconds": 90.13,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.3,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:07:15",
+   "started": "2026-10-28T21:05:44.442",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N01",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23676,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 116.15,
+   "thinking_bytes": 30,
+   "response_bytes": 10385,
+   "done_reason": "stop",
+   "prompt_tokens": 11284,
+   "output_tokens": 7554,
+   "format_sent": true,
+   "api_seconds": 115.59,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.3,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:07:24",
+   "started": "2026-10-28T21:05:28.258",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N05",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23141,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 76.26,
+   "thinking_bytes": 30,
+   "response_bytes": 10164,
+   "done_reason": "stop",
+   "prompt_tokens": 11278,
+   "output_tokens": 4890,
+   "format_sent": true,
+   "api_seconds": 75.72,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.31,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:07:30",
+   "started": "2026-10-28T21:06:14.378",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T2N03",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 23634,
+   "ok": false,
+   "breaker": null,
+   "error": "the opening puts Lucius Carrington in the front hall but placement puts them in the drawing room; make them agree",
+   "seconds": 140.4,
+   "thinking_bytes": 30,
+   "response_bytes": 10647,
+   "done_reason": "stop",
+   "prompt_tokens": 22708,
+   "output_tokens": 9263,
+   "format_sent": true,
+   "api_seconds": 139.77,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.3,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:07:45",
+   "started": "2026-10-28T21:05:25.519",
+   "check_seconds": 0.014,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N02",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 32667,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 40.17,
+   "thinking_bytes": 29,
+   "response_bytes": 9446,
+   "done_reason": "stop",
+   "prompt_tokens": 14724,
+   "output_tokens": 3890,
+   "format_sent": true,
+   "api_seconds": 39.6,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.32,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.09,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:07:55",
+   "started": "2026-10-28T21:07:15.237",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N03",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 26755,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 144.0,
+   "thinking_bytes": 30,
+   "response_bytes": 14571,
+   "done_reason": "stop",
+   "prompt_tokens": 12593,
+   "output_tokens": 10332,
+   "format_sent": true,
+   "api_seconds": 143.4,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.3,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:08:11",
+   "started": "2026-10-28T21:05:47.100",
+   "check_seconds": 0.016,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N04",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 1,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 22854,
+   "ok": false,
+   "breaker": null,
+   "error": "moment T3N04a option 1: condition \"the master's key stands in the study lock\" is not one the engine can read (syntax error in \"the master's key stands in the study lock\": unterminated string literal (detected at line 1)); write it in the condition language (flags.done_<node> for \"after that node\"), or leave \"when\" out; moment T3N04a option 2: condition \"the master's key stands in the study lock\" is not one the engine can read (syntax error in \"the master's key stands in the study lock\": unterminated string literal (detected at line 1)); write it in the condition language (flags.done_<node> for \"after that node\"), or leave \"when\" out; moment T3N04a option 3: condition \"the master's key stands in the study lock\" is not one the engine can read (syntax error in \"the master's key stands in the study lock\": unterminated string literal (detected at line 1)); write it in the condition language (flags.done_<node> for \"after that node\"), or leave \"when\" out",
+   "seconds": 136.13,
+   "thinking_bytes": 30,
+   "response_bytes": 9712,
+   "done_reason": "stop",
+   "prompt_tokens": 11177,
+   "output_tokens": 8978,
+   "format_sent": true,
+   "api_seconds": 135.55,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.31,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.08,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:08:17",
+   "started": "2026-10-28T21:06:01.848",
+   "check_seconds": 0.017,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T2N03",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 34688,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 41.56,
+   "thinking_bytes": 29,
+   "response_bytes": 10689,
+   "done_reason": "stop",
+   "prompt_tokens": 15362,
+   "output_tokens": 4286,
+   "format_sent": true,
+   "api_seconds": 40.99,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.33,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.09,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:08:27",
+   "started": "2026-10-28T21:07:45.936",
+   "check_seconds": 0.019,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s7d_S_T3N04",
+   "name": "scene",
+   "step": "s7d",
+   "klass": "build",
+   "mode": "think",
+   "attempt": 2,
+   "prompt_file": "s7d_scene.prompt",
+   "prompt_chars": 33821,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 36.95,
+   "thinking_bytes": 28,
+   "response_bytes": 9595,
+   "done_reason": "stop",
+   "prompt_tokens": 15151,
+   "output_tokens": 3815,
+   "format_sent": true,
+   "api_seconds": 36.42,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.34,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.09,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:08:54",
+   "started": "2026-10-28T21:08:17.998",
+   "check_seconds": 0.015,
+   "target_thinking_bytes": 20000,
+   "target_seconds": 900,
+   "over_target": []
+  },
+  {
+   "prefix": "s9j",
+   "name": "rating",
+   "step": "s9j",
+   "klass": "classify",
+   "mode": "no_think",
+   "attempt": 1,
+   "prompt_file": "s9j_content_rating.prompt",
+   "prompt_chars": 13859,
+   "ok": true,
+   "breaker": null,
+   "error": null,
+   "seconds": 7.4,
+   "thinking_bytes": 0,
+   "response_bytes": 530,
+   "done_reason": "stop",
+   "prompt_tokens": 6756,
+   "output_tokens": 281,
+   "format_sent": true,
+   "api_seconds": 6.71,
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.34,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.09,
+     "resets_at": 1793271600
+    },
+    "status": "allowed"
+   },
+   "at": "2026-10-28T21:09:02",
+   "started": "2026-10-28T21:08:54.998",
+   "check_seconds": 0.001,
+   "target_thinking_bytes": 0,
+   "target_seconds": 360,
+   "over_target": []
+  }
+ ],
+ "sessions": [
+  {
+   "started": "2026-10-28T19:46:00.127",
+   "argv": [
+    "--story-id=kernel38_fable",
+    "--stage-d",
+    "--parallel",
+    "8",
+    "/Users/Shared/sv-dustin/source/stratum-if-generation/tests/kernels/kernel38.txt"
+   ],
+   "pid": 41613,
+   "first_call": 0,
+   "plan": [
+    "step 1-2: kernel, rating, shape, genre, catalysts",
+    "phase 3: extractions and cross-check",
+    "3.4: genre promises",
+    "3.5: premise build, verify, repair",
+    "3.8: story form",
+    "step 4: outline loop",
+    "4e: outline judge",
+    "stage A: arcs",
+    "stage B: world",
+    "stages C-D: scenes and package"
+   ],
+   "stages": [
+    {
+     "stage": "step 1-2: kernel, rating, shape, genre, catalysts",
+     "depth": 0,
+     "started": "2026-10-28T19:46:00.128",
+     "outcome": "ok",
+     "seconds": 99.583,
+     "model_seconds": 99.554,
+     "python_seconds": 0.029,
+     "calls": 6
+    },
+    {
+     "stage": "phase 3: extractions and cross-check",
+     "depth": 0,
+     "started": "2026-10-28T19:47:39.712",
+     "outcome": "ok",
+     "seconds": 89.799,
+     "model_seconds": 89.782,
+     "python_seconds": 0.017,
+     "calls": 10
+    },
+    {
+     "stage": "3.4: genre promises",
+     "depth": 0,
+     "started": "2026-10-28T19:49:09.513",
+     "outcome": "ok",
+     "seconds": 31.069,
+     "model_seconds": 31.063,
+     "python_seconds": 0.005,
+     "calls": 1
+    },
+    {
+     "stage": "3.5: premise build, verify, repair",
+     "depth": 0,
+     "started": "2026-10-28T19:49:40.583",
+     "outcome": "ok",
+     "seconds": 840.513,
+     "model_seconds": 840.36,
+     "python_seconds": 0.153,
+     "calls": 13
+    },
+    {
+     "stage": "3.8: story form",
+     "depth": 0,
+     "started": "2026-10-28T20:03:41.099",
+     "outcome": "ok",
+     "seconds": 16.867,
+     "model_seconds": 16.857,
+     "python_seconds": 0.011,
+     "calls": 1
+    },
+    {
+     "stage": "step 4: outline loop",
+     "depth": 0,
+     "started": "2026-10-28T20:03:57.967",
+     "outcome": "ok",
+     "seconds": 1503.809,
+     "model_seconds": 1503.396,
+     "python_seconds": 0.413,
+     "calls": 16
+    },
+    {
+     "stage": "4e: outline judge",
+     "depth": 0,
+     "started": "2026-10-28T20:29:01.778",
+     "outcome": "ok",
+     "seconds": 48.504,
+     "model_seconds": 48.484,
+     "python_seconds": 0.021,
+     "calls": 1
+    },
+    {
+     "stage": "stage A: arcs",
+     "depth": 0,
+     "started": "2026-10-28T20:29:50.285",
+     "outcome": "ok",
+     "seconds": 1067.57,
+     "model_seconds": 1067.269,
+     "python_seconds": 0.3,
+     "calls": 8
+    },
+    {
+     "stage": "stage A: checks and playtest",
+     "depth": 1,
+     "started": "2026-10-28T20:47:37.648",
+     "outcome": "ok",
+     "seconds": 0.202,
+     "model_seconds": 0.0,
+     "python_seconds": 0.202,
+     "calls": 0
+    },
+    {
+     "stage": "stage B: world",
+     "depth": 0,
+     "started": "2026-10-28T20:47:37.857",
+     "outcome": "ok",
+     "seconds": 980.137,
+     "model_seconds": 979.885,
+     "python_seconds": 0.252,
+     "calls": 33
+    },
+    {
+     "stage": "stages C-D: scenes and package",
+     "depth": 0,
+     "started": "2026-10-28T21:03:57.997",
+     "outcome": "ok",
+     "parallel_python_seconds": 2688.524,
+     "seconds": 2670.167,
+     "model_seconds": 304.346,
+     "python_seconds": 2365.821,
+     "calls": 20
+    },
+    {
+     "stage": "stage D: engine playtest",
+     "depth": 1,
+     "started": "2026-10-28T21:09:02.442",
+     "outcome": "ok",
+     "parallel_python_seconds": 2688.524,
+     "seconds": 2363.922,
+     "model_seconds": 0.0,
+     "python_seconds": 2363.922,
+     "calls": 0
+    }
+   ],
+   "running": [],
+   "outcome": "ok",
+   "usage_limits": {
+    "five_hour": {
+     "used": 0.34,
+     "resets_at": 1793248200
+    },
+    "seven_day": {
+     "used": 0.09,
+     "resets_at": 1793271600
+    },
+    "status": "allowed",
+    "at": "2026-10-28T21:09:02.402"
+   },
+   "parallel_python_seconds": 2688.524,
+   "ended": "2026-10-28T21:48:28.168",
+   "seconds": 7348.041,
+   "model_seconds": 4980.997,
+   "python_seconds": 2367.044,
+   "calls": 109
+  }
+ ],
+ "playtest": {
+  "states_explored": 289105,
+  "scenes_total": 16,
+  "scenes_reached": 16,
+  "scenes_reachability": 1.0,
+  "endings_total": 3,
+  "endings_reached": 3,
+  "endings_reachability": 1.0,
+  "stuck_states": 0,
+  "errors_count": 0,
+  "notes_count": 51,
+  "errors": [],
+  "notes": [
+   "scene S_N02 is entered in 12 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N03 is entered in 210 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N04 is entered in 464 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N05 is entered in 342 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N06 is entered in 266 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N07 is entered in 531 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T2N01 is entered in 860 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T2N02 is entered in 207 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T2N03 is entered in 238 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T2N04 is entered in 455 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T3N01 is entered in 12 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T3N02 is entered in 51 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T3N03 is entered in 182 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T3N04 is entered in 72 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_T3N05 is entered in 61 distinct states; explored from 8 of them, spread over their arc states",
+   "scene S_N02: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T3N01: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_N03: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T3N02: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_N04: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T2N01: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T3N03: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_N05: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T2N02: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T3N04: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_N06: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T2N03: exploration stopped at 20000 states; its findings cover only those",
+   "scene S_T2N04: exploration stopped at 20000 states; its findings cover only those",
+   "nudge S_N02.n2 never fires",
+   "nudge S_N03.n2 never fires",
+   "scene S_N03: the exit to S_T2N02 (pattern('carrington_regard','up',3,0.75)) is never taken",
+   "nudge S_T3N02.n2 never fires",
+   "nudge S_N04.n2 never fires",
+   "nudge S_T2N01.n2 never fires",
+   "event S_T3N03.e2 never fires",
+   "nudge S_T3N03.n2 never fires",
+   "nudge S_N05.n2 never fires",
+   "nudge S_N06.n2 never fires",
+   "nudge S_T2N03.n2 never fires",
+   "ending E_T3N05: the variant pattern('carrington_regard','up',2,0.6) of C01 is never chosen",
+   "ending E_T3N05: the variant pattern('gresham_confidence','up',2,0.6) of C05 is never chosen",
+   "ending E_T3N05: the variant pattern('ormsby_ease','up',2,0.6) of C07 is never chosen",
+   "ending E_T3N05: the variant pattern('netherby_nerve','up',2,0.6) of C08 is never chosen",
+   "ending E_N07: the variant pattern('carrington_regard','up',2,0.6) of C01 is never chosen",
+   "ending E_N07: the variant pattern('fairbrother_faith','up',2,0.6) of C02 is never chosen",
+   "ending E_T2N04: the variant pattern('carrington_regard','up',2,0.6) of C01 is never chosen",
+   "ending E_T2N04: the variant pattern('fairbrother_faith','up',2,0.6) of C02 is never chosen",
+   "ending E_T2N04: the variant pattern('netherby_nerve','up',2,0.6) of C08 is never chosen",
+   "opportunity talk:C04:mrs_ormsby is offered in only 0% of curious plays: most players never get the choice (gate the way forward behind it, move it onto the path, or mark it optional)",
+   "opportunity talk:C07:keyhole_at_midnight is offered in only 0% of curious plays: most players never get the choice (gate the way forward behind it, move it onto the path, or mark it optional)",
+   "200 of 200 random plays did not finish in the step limit (wandering is allowed; a high share may mean the way forward is hard to find)"
+  ],
+  "plays": {
+   "random": {
+    "runs": 200,
+    "unfinished": 200,
+    "mean_actions": null,
+    "endings": {}
+   },
+   "seek": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 39.5,
+    "endings": {
+     "E_N07": 46,
+     "E_T2N04": 4
+    }
+   },
+   "seek:branch": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 35.4,
+    "endings": {
+     "E_T3N05": 50
+    }
+   },
+   "up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 44.2,
+    "endings": {
+     "E_T2N04": 47,
+     "E_T3N05": 3
+    }
+   },
+   "down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 63.8,
+    "endings": {
+     "E_N07": 49,
+     "E_T3N05": 1
+    }
+   },
+   "carrington_regard:up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 49.9,
+    "endings": {
+     "E_T2N04": 47,
+     "E_T3N05": 3
+    }
+   },
+   "carrington_regard:down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 65.7,
+    "endings": {
+     "E_N07": 44,
+     "E_T3N05": 4,
+     "E_T2N04": 2
+    }
+   },
+   "fairbrother_faith:up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 72.3,
+    "endings": {
+     "E_N07": 42,
+     "E_T2N04": 4,
+     "E_T3N05": 4
+    }
+   },
+   "fairbrother_faith:down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 69.5,
+    "endings": {
+     "E_N07": 48,
+     "E_T3N05": 2
+    }
+   },
+   "gresham_confidence:up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 67.3,
+    "endings": {
+     "E_N07": 47,
+     "E_T2N04": 3
+    }
+   },
+   "gresham_confidence:down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 69.7,
+    "endings": {
+     "E_N07": 43,
+     "E_T2N04": 5,
+     "E_T3N05": 2
+    }
+   },
+   "ormsby_ease:up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 70.5,
+    "endings": {
+     "E_N07": 41,
+     "E_T3N05": 4,
+     "E_T2N04": 5
+    }
+   },
+   "ormsby_ease:down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 70.7,
+    "endings": {
+     "E_N07": 44,
+     "E_T3N05": 4,
+     "E_T2N04": 2
+    }
+   },
+   "netherby_nerve:up": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 70.1,
+    "endings": {
+     "E_N07": 46,
+     "E_T2N04": 2,
+     "E_T3N05": 2
+    }
+   },
+   "netherby_nerve:down": {
+    "runs": 50,
+    "unfinished": 0,
+    "mean_actions": 70.4,
+    "endings": {
+     "E_N07": 45,
+     "E_T3N05": 4,
+     "E_T2N04": 1
+    }
+   }
+  }
+ }
+}

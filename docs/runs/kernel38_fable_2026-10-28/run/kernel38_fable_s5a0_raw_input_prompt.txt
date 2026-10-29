@@ -1,0 +1,89 @@
+SYSTEM PROMPT
+
+You are step 5a0 of an interactive fiction generation pipeline, the arc-cast
+step. The story's outline is finished. Some characters were already given
+full arcs by code (the opposition, and anyone whose standing differs
+between endings). For each remaining character you decide one thing: is
+this person SUPPORTING or FUNCTIONAL?
+
+ - supporting: recurs, and their stance toward you shifts during the story
+   (they warm, cool, take a side) though how they end does not decide an
+   ending. They will get a light arc: where they start, one or two moments,
+   where they end on each line. Without one they read as cardboard.
+ - functional: a role the story needs in a scene or two (the clerk, the
+   driver, the voice on the radio). No arc.
+
+When unsure, prefer supporting for someone who appears in three or more
+nodes or whose tie to you is personal; prefer functional for someone who
+only delivers, blocks or announces.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary. One entry
+per candidate, the note first:
+
+{
+  "cast": [
+    {"who": "<the candidate exactly as listed>",
+     "note": "<one sentence: what they do in the story and whether their stance toward you moves>",
+     "tier": "supporting | functional"}
+  ]
+}
+
+EXAMPLE (a late-night radio phone-in story; for shape only)
+
+Candidates: the producer behind the glass (5 nodes; tie: hired you, covers
+for you with the station), the overnight security guard (1 node), the
+weather reader (2 nodes; reads the forecast on the hour).
+
+{"cast": [
+  {"who": "Dana Pryce (the producer behind the glass)", "note": "Screens every call and decides whether to cover for you with the station; her trust in you visibly moves as the nights go wrong.", "tier": "supporting"},
+  {"who": "the overnight security guard", "note": "Lets you in once; nothing about you changes how he acts.", "tier": "functional"},
+  {"who": "the weather reader", "note": "Reads the forecast on the hour; a fixed rhythm, not a relationship.", "tier": "functional"}
+]}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+ALREADY GIVEN FULL ARCS:
+ - Lucius Carrington (the Major): the nephew signed over to the magistrate at thaw so that nobody asks why he was summoned to the study at eleven
+ - Reginald Fairbrother (the master's valet of forty years): to carry out his master's last order to the letter and be let go to his grave with the house still thinking him faithful
+ - Millicent Gresham (the nephew's fiancée): her ten o'clock visit to the study and the sherry she drank there kept out of the account entirely
+ - Cordelia Ormsby (the widow): the forged letter of credit back in her hands before anyone opens the desk
+ - Lavinia Netherby (the housemaid): to keep her place through the change of masters and not be the one blamed for whatever goes missing
+
+CANDIDATES (wants, tie, how many nodes they appear in):
+[
+ {
+  "who": "Nathaniel Yardley (the master's nephew and heir)",
+  "wants": "to come into the estate without his debts or the stable loft being spoken of aloud",
+  "tie": "will be your master if the old will stands, and you saw him cross the yard when he swears he was abed",
+  "nodes": 11
+ },
+ {
+  "who": "Gideon Ashcombe (the doctor)",
+  "wants": "to sign the certificate, get the body to the ice house, and leave with the widow's name untouched by his own",
+  "tie": "is the one gentleman the Major cannot order about, and the one you can get to speak of the master's health if you ask as a servant and not an accuser",
+  "nodes": 6
+ },
+ {
+  "who": "Evangeline Davenport (the ward)",
+  "wants": "to be believed, and to be kept in the house whoever inherits it",
+  "tie": "was the master's charge from childhood, and treats you as the one person in the house she can order without being questioned",
+  "nodes": 4
+ },
+ {
+  "who": "Cornelius Ellingham (the solicitor)",
+  "wants": "the old will to stand and the unsigned new one never to be mentioned, so his own position with the estate survives",
+  "tie": "is the one guest who addresses you as a witness rather than a servant, because he knows a housekeeper's rounds are evidence",
+  "nodes": 9
+ },
+ {
+  "who": "Barnaby Quarles (the lodge-keeper)",
+  "wants": "to report the state of the road and get back to his fire before the drifts close again",
+  "tie": "",
+  "nodes": 2
+ }
+]

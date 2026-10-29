@@ -1,0 +1,245 @@
+SYSTEM PROMPT
+
+You are step 4b of an interactive fiction generation pipeline: the step
+that fills in the nodes of one story line. A line has already been
+planned as a sequence of beats, each with a one-line plan of what happens
+there. For each planned node you write a short summary of what happens,
+say WHERE it happens and WHO is there, and register any place or person
+the story did not have yet.
+
+This is still an outline. The engine that will eventually run the story
+is room-based (the player moves between rooms, examines and uses things,
+talks to people), which is why every node must say where and who. But how
+a node is played (rooms, objects, conversations, conditions) is worked
+out by later stages, and none of it belongs here.
+
+WHAT YOU WRITE FOR EACH NODE
+ - title: a few words.
+ - image: ONE concrete thing the player keeps from this node: a sight, a
+   sound or an object, in a dozen words at most ("the oath-blade lying in
+   the snow, already rimed"; "the press turning by hand under one lamp").
+   Not a feeling and not a summary. It is the test of whether the node is
+   picturable; if you cannot write one, the summary is too abstract.
+ - summary: two or three sentences, at most 70 words, second person, present tense: how
+   things stand when the node opens, what "you" bring about in it, and
+   what is different when it closes. Keep what the node's plan says and
+   make it concrete. It is a summary of events, not a scene: no dialogue,
+   no step-by-step actions, no objects handled one at a time, no "if you
+   ... then ...".
+   Plain physical words: a reader should be able to picture what
+   happened. Where the plan or the engine uses a strange term, say what
+   the thing is. Where the packet names an event that lands here, the
+   summary opens on it. Under a comic tone, a person's voice (given in the
+   register) is where the comedy is: let one thing said or done in the
+   person's manner show, reported, not quoted at length.
+   Vary your imagery: do not repeat identical figurative phrases, metaphors
+   or verbal formulas across nodes (e.g. "the chain around your neck", "a
+   wound in the earth"). Never repeat literal anchor phrases, action formulas,
+   or physical gestures across nodes or lines (e.g. "coins onto the cabin",
+   "the boat clears the", "checks the hull for damage", "you keep your hand
+   on the tiller"). If an action or motif recurs across beats, show it through
+   different concrete actions, verbs, sights, or changes rather than repeating
+   the same wording.
+ - where: one to three places, by name. (For the opening node N01, limit
+   to one or two places to prevent initial player overload).
+   (The protagonist is always "you" in a summary; the protagonist's name,
+   when the engine gives one, is only what other people call you.
+   People: a registered character with a "name" is called by that name
+   in the summary, the full name the first time in a node and the first
+   name after that; "who" still lists them by their role label, exactly
+   as registered.)
+ - who: the people present, by label. "You" are always present and are
+   not listed.
+
+RULES FOR PLACES
+ 1. A place is somewhere a section of play can happen, sized to the
+    story's footprint: for a story inside one building, a room or a
+    floor; for a ship or a town, a deck, a yard, a hall; for a region, a
+    town or a building in it. The opening node (N01) must take place in
+    at most one or two places.
+ 2. If the place is already in the location register, use its name
+    exactly as written there. Reuse before you add: a whole story wants
+    about four to eight places, and fewer when it is set inside one
+    building.
+ 3. A place not yet in the register goes in new_locations: its name, its
+    kind in a few words, and one line on why the story needs it. Do not
+    describe what is in it.
+ 4. A place must be somewhere "you" can be, given how you are present in
+    this world (you_are, you_can, you_cannot).
+
+RULES FOR PEOPLE
+ 5. Use labels from the character register exactly as written.
+ 6. The people a node's turn involves are present in that node, unless
+    the way this line takes through the turn gives them nothing to do
+    there; then leave them out. Do not invent an action to justify a
+    presence.
+ 7. A crowd is listed only together with the individual who speaks for
+    it. The player never deals with a crowd directly.
+ 8. Add to new_characters only when no registered character can do what
+    the node needs. A new character is a role label (no proper name),
+    whether it is an individual or a crowd, whom it speaks for (or null),
+    what it wants, what it holds, and one line on why the story needs it.
+    A new crowd needs an individual who speaks for it.
+ 9. Nobody is present as furniture: each person listed does something or
+    is done to in the summary.
+
+OTHER RULES
+ 10. One entry for every node in nodes_to_fill, with the same id, in the
+     same order. Do not add, drop or reorder nodes, and do not change
+     what a node's plan says happens.
+ 11. The summaries read as one continuous line: each picks up where the
+     one before left things. "already_told" is what came before the first
+     node you fill; do not retell it.
+ 12. A node marked this_is_the_ending lands the ending as given.
+ 13. A node with plant_here shows that thing in passing, as part of what
+     happens, never flagged as important (the spotlight someone thumps to
+     keep lit while the scene is about something else). A node with
+     pay_off_here makes the planted thing decide or change what happens.
+ 14. THE QUESTION IS NOT THE VERB: say what you bring about and what it
+     costs; never "you choose" or "you decide between".
+ 15. NO VERBAL TICS OR REPEATED ANCHOR PHRASES: Vary imagery and action verbs
+     across nodes. Do not reuse identical poetic phrases, figurative formulas,
+     or literal physical action descriptions across multiple summaries (e.g.
+     "chain around your neck", "the boat clears the...", "coins onto the cabin...",
+     "checks the hull for damage..."). Each node must describe movement,
+     inspection, and interaction in its own words.
+ 16. DIVERSIFY CONFLICT MODALITIES & CRISIS DEVICES: When detailing how an
+     obstacle or crisis is met, do not repeat the same complication archetype
+     or mechanical stall device across nodes or branches (e.g. repeated fuel-line
+     sabotage, repeated ledger haggling, repeated unbolting of hardware). Ground
+     each node in a distinct form of friction—environmental, mechanical,
+     interpersonal, or logistical.
+ 17. CONCRETE SCENE BEATS (NO EMBEDDED METAPHORS):
+     Node summaries must state what characters DO and SAY in physical reality, confronting tangible obstacles (a blown fuse, an overheard argument, an interrupted delivery, a direct confrontation, a refusal).
+     NEVER summarize beats using abstract literary metaphors as if they were physical objects or environmental events:
+     - FORBIDDEN: "the silence builds a wall", "the distance hardens between you", "the dark room becomes a question", "the unresolved debt hangs in the air".
+     - REQUIRED: Describe the physical event, what is actually spoken or withheld, and what physically changes in the room.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary before or
+after:
+
+{
+  "nodes": [
+    { "id": "N01", "title": "...", "summary": "...", "image": "...", "where": ["place name"], "who": ["character label"] }
+  ],
+  "new_locations": [ { "name": "...", "kind": "...", "why": "..." } ],
+  "new_characters": [ { "label": "...", "kind": "individual | crowd", "being": "person | dead | animal | creature | thing", "speaks_for": null, "gender": "f | m | n", "wants": "...", "holds": "...", "why": "..." } ]
+}
+
+new_locations and new_characters are empty lists when nothing is added.
+
+ILLUSTRATION (a different story; shows the grain, nothing else)
+
+Setting: a touring theatre company in a provincial town; clustered
+setting, city_or_region scale. You are the stage manager; you cannot put
+anyone on a stage who refuses to go on.
+Character register: the company manager; the dresser; the understudy; the
+backer; the backer's nephew; the old character man; the company (crowd;
+the old character man speaks for it).
+Location register: the town hall stage (the hired hall where the play
+will open); the stage door office (where the call sheet and the wardrobe trunks
+are kept).
+Already told: N01, the morning call with the leading actress missing;
+N02, her dresser tells you she is not coming back.
+Nodes to fill: N03 (commitment; turn 2, the way "she goes on because you
+rehearsed her yourself all night"; the turn involves the understudy and
+the company manager; plan: you rehearse the understudy yourself through
+the night in the empty hall; by morning she can carry the part, and the
+run-through the rest of the company was promised has gone to her), N04
+(midpoint; turn 3, the way "he is refused and the backer is told why";
+the turn involves the backer's nephew, the backer and the company
+manager; plan: the backer's nephew arrives for the part the manager
+promised him; you refuse him and tell the backer why; the backer walks
+out, and the manager speaks to you only through the call sheet).
+Output:
+{
+  "nodes": [
+    { "id": "N03", "title": "The Night Rehearsal", "summary": "The hall is dark and the understudy is sure she cannot do it. You take her through the play until morning, reading every other part yourself. By the hour of the company's call she can carry the play, and the one run-through everyone else was promised has been spent on her.", "image": "two chairs on a bare stage under the one working light, the prompt book open between them", "where": ["the town hall stage"], "who": ["the understudy"] },
+    { "id": "N04", "title": "The Nephew's Part", "summary": "The backer's nephew is waiting at the hotel with his uncle, sure of the part the manager promised him. You tell him there is none, and tell the backer to his face why the play cannot carry one. The backer stands up and walks out, and the manager, who has watched you do it, leaves without a word to you.", "image": "the backer's gloves and walking cane left on the dining table", "where": ["the hotel dining room"], "who": ["the backer's nephew", "the backer", "the company manager"] }
+  ],
+  "new_locations": [
+    { "name": "the hotel dining room", "kind": "a public room at the company's hotel", "why": "where the backer can be met: the one place the company's money can be spoken to directly" }
+  ],
+  "new_characters": []
+}
+(One place reused under its registered name and one added. The manager is
+left out of N03 because this way through the turn gives him nothing to do
+there. Everyone listed does something. No scene is played out.)
+
+USER INPUT FOLLOWS BELOW
+
+- the brief (decision, theme, affect and tone, failure)
+{
+ "decision": {"label": "which of the seven guests to accuse of the murder", "description": "Having gathered what the clues and the guests' lies support, name one of the seven as the killer — with the Kernel insisting the wrong person must be a live, pickable option, not just the right one."},
+ "setting": {"structure": "single", "scale": "room_or_building"},
+ "theme": {"pole_a": "uncovering the truth", "pole_b": "protective discretion"},
+ "protagonist": {"type": "human", "role": "new housekeeper at a snowbound country house", "embodiment": "embodied_human"},
+ "affect": {"primary": "deductive suspicion", "trajectory": "escalating", "tone": ["formal", "atmospheric", "observant"], "somatic_channels": [], "transgression_ceiling": 2},
+ "failure": {"presence": "hard", "triggers": ["incorrect_resolution"], "cost": "terminal"},
+ "epistemic_gap_present": true
+}
+
+- the tone, and how it is produced
+tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+- the setting and how "you" are present in it
+{
+  "arena": "A Victorian country house cut off by two days of snow: the master's study off the first-floor gallery, the back stairs that climb to the gallery's far end, the dining room and drawing room below, the gun room with its yard door, the servants' hall and the housekeeper's room, and across the drifted yard the stables and the ice house; the telephone wire is down, the drive is gone under the drifts, and no one has come up it since the storm began.",
+  "footprint": "single setting, room_or_building scale",
+  "you_are": "You are the new housekeeper, a fortnight in post, addressed by your surname and expected not to be noticed; last night you did your rounds with a candle and a ring of keys while the master's seven guests moved about the house, and this morning the master is dead behind his study door and you are the only person who knows where each of them was and when.",
+  "you_can": "go anywhere below stairs and along every corridor with your keys, serve at table and listen, question the maids and the valet, pick up and keep what you find, walk your rounds again at night, and give your account of that night when the Major calls on you to give it",
+  "you_cannot": "enter the locked study without the Major, who has pocketed the only key; compel any guest to answer you; stop the study being cleared or the body moved; or make the old valet say what he saw on the back stairs"
+}
+
+- the line, what has already been told, and the nodes to fill
+{
+ "line": {"id": "T3", "title": "The Keyhole Filled", "motivation": "You have walked the study's four walls with your key ring in your fist while the Major argued, and seen the straight poker, the frozen window and the tallow stub where white wax belongs, and by nightfall the valet has told the maids you have forgotten your place. You come to want the room itself to convict him, so that no servant below stairs need ever say a word against a gentleman; by the end you want the key set in the lock before the whole house, whatever it costs the woman whose hand sets it there.", "strategy": "Treat the study as the witness: swear plainly at table to what your own rounds saw, put your account in ink and have the solicitor witness it rather than the Major; go to Ellingham witness to witness to have the raking stopped in law's name; leave the valet in his chair and the housemaid at her grates; and in the drawing room take the master's key from the Major's own waistcoat and march the house up to a keyhole that fills.", "turning_point": "The library at one in the morning, when you set your written rounds before Cornelius Ellingham instead of carrying them to the Major who demanded them: from that minute the case is an instrument in a lawyer's keeping, not a servant's word, and the price of it is the unsigned will you must never name."},
+ "already_told": [
+   {"id": "N01", "what": "The Door Comes Down: Before the poker is fetched you kneel on the gallery and put your eye to the study keyhole, and see the lamp still burning on the desk and the master's shoulder beyond it; then the door comes down under the hall poker, a key is heard to hit the carpet, and Major Carrington is first across the threshold, scoops it up before anyone sees where it lay, drops it in his waistcoat 'for safekeeping' and sends you down to count the plate. You go down past the candle box at the foot of the back stairs, the one you count by the dozen and that Fairbrother told you he alone draws from after ten, and double straight back up those stairs: with the doctor bending the Major over the desk you put your eye to the keyhole again and now the lamp is hidden by the key in the lock, and from behind the maids' linen basket you see the window frozen shut, the fire gone to ash, the poker straight in its stand, and a yellow tallow stub snuffed in the mantel candlestick where only white wax belongs. Fairbrother, holding the maids at the stairhead, has watched you come up the stairs nobody but he uses after ten, and before dinner he has told the Major that the new woman is watching the back stairs and his candle box."},
+   {"id": "T3N01", "what": "Your Name Under One Hour: Seven covers, one empty chair, sleet rattling the panes, and the Major, instead of carving, passes a sheet of foolscap round the table for each guest to initial under the words 'the quarrel in the study at eleven' before the soup is touched; when it reaches your hand at the sideboard he asks you across the cloth where you were on your rounds, and you say before all seven, decanter still in your grip, that twenty minutes before eleven you watched Mr Yardley come off the servants' stair and go out through the yard door toward the stables, and that your name goes under that and under nothing else. Evangeline Davenport stands up at her place and says, in the same words as that morning, that she heard the voices at eleven by the hall clock, and the Major writes her hour on the sheet above your refusal; Nathaniel kicks his chair over and goes out through the garden door into the storm, the groom and the doctor bring him in by the lamp-room with the snow to his waist and his lips blue, and he is turned into his bedroom, the key turned on him, with the old valet posted on a chair outside. The Major folds the sheet into his coat, tells you that a woman who will swear at table will swear on paper, and that he will have every hour of your night in ink on his dressing table before you put out your candle; Millicent Gresham stops you in the passage with the empty soup tureen and says that since you tell rooms what you see she will not be telling you when she left the study, or anything else."},
+   {"id": "T3N02", "what": "The Hours Go to the Lawyer: You walk the murder night again, one candle along the gallery, counting door to door: the quarrel at half past ten, one flame on the back stairs at eleven. Reginald Fairbrother never lifts his head. The roof's snow crashes past the windows and the Major comes out demanding your hours; you carry them past him to Cornelius Ellingham, who puts his name under yours and tells the Major they go to the magistrate, not before."},
+   {"id": "T3N03", "what": "Law's Name on the Gallery: The eaves drip. Major Lucius Carrington bars you from the first floor and sends Lavinia Netherby to sift the study grate; you tell Cornelius Ellingham what you will say aloud if that grate is raked, and he climbs to the gallery and sends the maids down in law's name, naming his price after: the unsigned will never passes your lips. The Major posts Fairbrother at your door and walks Gideon Ashcombe across the slush to the ice house himself."}
+ ],
+ "this_line_leaves_when": "you refused the Major's order to go down to the plate, planted yourself in the study doorway with your key ring in your fist and walked the four walls counting candles while he argued with you",
+ "nodes_to_fill": [
+   {"id": "T3N04", "beat": "Climax: the last crisis, where the story's question is answered by what the protagonist does", "plan": "Fairbrother brings you down to the drawing room, where the carriage stands at the door with Nathaniel inside it and the Major orders Ellingham to produce the account for signing. Instead you say that a key in the inside lock fills a keyhole and that you saw the lamp through it before the poker was fetched, cross the room to the Major, put your hand into his waistcoat before he can step back and take out the master's key, and march the house up to the gallery; you set the key in the lock from the gallery side and make Ellingham, then the widow, then the doctor kneel and look, and none of them sees any lamp. The Major strikes you across the face and Nathaniel, fetched in from the carriage, holds him by the arms while the key is drawn out again and the room stands open behind him as it was found, the yellow tallow still in the mantel candlestick and your candle box, carried up by Ellingham, one short beside it; you say that no one need say who carried it, since the man who went in first and dropped a key from his hand had it lit for him by his host, and you name Lucius Carrington on the boards where the door came down. Fairbrother, at the stairhead, is not asked and says nothing.", "turn": {"situation": "The house is gathered in the drawing room before the fire with the carriage at the door; the Major has called for your account of the night to be read aloud so the seven may sign it and the nephew be taken down the road to the magistrate within the hour.", "what_you_must_do": "Give your account in your own order, lay the tallow stub and the keyhole and the hour of the quarrel before the room, bring the valet to say to the Major's face whom he lit up the back stairs at eleven, and then speak the killer's name to that person across the fire, whether it is the Major, the nephew, the fiancée, the widow, the doctor, the solicitor or the ward, and hold the room to it until the carriage is sent for the right passenger.", "the_way_this_line_takes": "you cross the drawing room to the Major, put your hand into his waistcoat pocket before he can stop you, take out the master's key and march the whole house up to the study door to set it in the lock and show them the keyhole filled, then name him on the gallery where the door came down (cost: the Major strikes you across the face and the nephew has to hold him by the arms, the case is made by the key and the keyhole alone so the valet never has to speak and keeps his forty years, but a housekeeper who put her hand into a gentleman's pocket cannot be kept, and the heir, with the Major taken down the road in his carriage, gives you your wages and your character and tells you to go by the next cart)", "involves": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the nephew's fiancée"]}, "pay_off_here": ["In the drawing room you say it plainly: a key in the inside lock fills the keyhole, and you saw the lamp through it; the key the whole gallery heard fall did not fall from the lock, it fell from the hand of the man who went in first.", "The snuffed stub in the study's mantel candlestick is tallow, one short from your box, and the valet is the only person who could have carried it up: which is what brings him to speak."]},
+   {"id": "T3N05", "beat": "Aftermath: brief: what is left, and what it cost", "plan": "The carriage goes down the dripping road with the Major inside it and Ellingham beside him carrying the key, the sealed account and the tallow stub wrapped in a page of the Major's own draft, to say to the magistrate what will stand at law; the old will stands and Nathaniel is master, the unsigned paper in the desk never named. Millicent sits with her ring on her hand, the widow burns nothing, the doctor writes his certificate; Fairbrother, his forty years untouched, carries the master's tray down for the last time and takes the keys of the house from the new master's hand. The new master gives you your wages, a character in his own writing, and the word that a woman who puts her hand into a gentleman's pocket cannot be kept; Lavinia carries your box down to the next cart and says, in dialect, that she never thought you had it in you.", "this_is_the_ending": "Lucius Carrington is held by the arms on the gallery where the door came down, named by the master's key set in the lock from the gallery side and the lamp you saw through the empty keyhole before the poker was fetched, with the study as it was found behind him and not one servant's word in the case; the carriage takes him down the dripping road with the solicitor beside him, and the unsigned will in the desk is never spoken of. Fairbrother keeps his forty years and his silence, Lavinia her place, Millicent her ring and her ten o'clock, the widow her letter, the doctor his practice; and Nathaniel Yardley, master under the old will, gives the housekeeper who put her hand in a gentleman's pocket her wages, her character, and the next cart."}
+ ]
+}
+
+- the registers so far (reuse these names and labels exactly)
+{
+ "characters": [
+   {"label": "the Major", "name": "Lucius Carrington", "kind": "individual", "speaks_for": null, "wants": "the nephew signed over to the magistrate at thaw so that nobody asks why he was summoned to the study at eleven", "holds": "the only study key in his waistcoat pocket, and the household's habit of obeying the senior gentleman", "edge": "wears the decoration the master let him keep, and has spent thirty years being the braver man of the two in every room but the one that mattered", "tie": "has given you your orders since the door came down, and needs your rounds read aloud to prop his case", "voice": "clipped parade-ground sentences, states conclusions as if they were orders already given; filters everything through regimental procedure, reliability of men, and the hour by his watch; addresses you by surname and only to dispatch you elsewhere"},
+   {"label": "the master's valet of forty years", "name": "Reginald Fairbrother", "kind": "individual", "speaks_for": null, "wants": "to carry out his master's last order to the letter and be let go to his grave with the house still thinking him faithful", "holds": "the knowledge of whom he lit up the back stairs at eleven, and the nephew's door for the night", "edge": "knows the Major is the killer and has kept silent two days because the master told him to light the gentleman up and say nothing, and he cannot tell obedience from complicity any more", "tie": "has not forgiven the master for hiring you over his head, and is the one servant whose word outranks yours", "voice": "slow, formal, old-fashioned third-person deference even when angry; speaks in the household's routines, linen, candles, the master's habits; answers only the question asked and never the one meant"},
+   {"label": "the master's nephew and heir", "name": "Nathaniel Yardley", "kind": "individual", "speaks_for": null, "wants": "to come into the estate without his debts or the stable loft being spoken of aloud", "holds": "the old will's inheritance, the overheard quarrel, and the truth of where he went at twenty to eleven", "edge": "will let the house think him a murderer sooner than say he was in the loft with the groom's daughter while his fiancée sat below", "tie": "will be your master if the old will stands, and you saw him cross the yard when he swears he was abed", "voice": "quick and defensive, starts sentences twice, swears softly then apologises to the room; talks in sums owed, horses, and wagers; sulks into silence when pressed by the Major"},
+   {"label": "the doctor", "name": "Gideon Ashcombe", "kind": "individual", "speaks_for": null, "wants": "to sign the certificate, get the body to the ice house, and leave with the widow's name untouched by his own", "holds": "the knowledge that the master was dying and meant to settle an account with his friend, and the snow his boots tracked into the gun room", "edge": "knows exactly what the master's summons meant and keeps the drawing-room peace rather than say it, because saying it would ask where he was at midnight", "tie": "is the one gentleman the Major cannot order about, and the one you can get to speak of the master's health if you ask as a servant and not an accuser", "voice": "measured, dry, clinical clauses; describes people as symptoms and rooms as temperatures; evades personal questions by returning to the body and the certificate"},
+   {"label": "the nephew's fiancée", "name": "Millicent Gresham", "kind": "individual", "speaks_for": null, "wants": "her ten o'clock visit to the study and the sherry she drank there kept out of the account entirely", "holds": "the glass with her lipstick on it, and the nephew's engagement", "edge": "went to the study to beg the master to pay the nephew's debts, and would rather be suspected than have the nephew know she begged", "tie": "asked you, woman to woman, to wash the glass and say nothing, and watches whether you did", "voice": "low, hurried asides under cover of table service, then bright full sentences for the room; talks in the vocabulary of obligations, settlements, and what is proper; never addresses you when anyone else is listening"},
+   {"label": "the ward", "name": "Evangeline Davenport", "kind": "individual", "speaks_for": null, "wants": "to be believed, and to be kept in the house whoever inherits it", "holds": "the sworn hour of the quarrel, which she has moved to eleven", "edge": "moved the hour because the true hour would show she was in the gallery and not in her bed, and she is proud of being the only witness anyone listens to", "tie": "was the master's charge from childhood, and treats you as the one person in the house she can order without being questioned", "voice": "eager, precise, over-detailed; repeats her account in the same words each time as if reciting; frames everything by the clock and who was where; grows shrill when a detail is doubted"},
+   {"label": "the widow", "name": "Cordelia Ormsby", "kind": "individual", "speaks_for": null, "wants": "the forged letter of credit back in her hands before anyone opens the desk", "holds": "the hairpin left in the keyhole at midnight, and knowledge of what lies in the study desk", "edge": "tried the locked door at midnight to recover her forgery, heard nothing inside, and has since realised she stood a yard from a dead man and thought only of paper", "tie": "is the doctor's lover, and treats you with the elaborate courtesy of a woman who needs the staff not to remember her on the stairs", "voice": "languid, long sentences that circle a point without landing; speaks in society terms, visits, credit, reputations; flatters the servant she wants something from"},
+   {"label": "the housemaid", "name": "Lavinia Netherby", "kind": "individual", "speaks_for": null, "wants": "to keep her place through the change of masters and not be the one blamed for whatever goes missing", "holds": "the pail, the scuttle, and the study grate she has been sent to clear before you can see it", "edge": "took a tallow candle from your box for her own room and is afraid the missing stub will be laid at her door", "tie": "answers to you and is frightened of the valet, and will fetch what you tell her if nobody above stairs is looking", "voice": "short whispered sentences, drops into dialect when flustered; talks in grates, scuttles, linen, and who is cross with whom; speaks only when spoken to by anyone above her"},
+   {"label": "the solicitor", "name": "Cornelius Ellingham", "kind": "individual", "speaks_for": null, "wants": "the old will to stand and the unsigned new one never to be mentioned, so his own position with the estate survives", "holds": "both wills, and the authority to say which one is law", "edge": "drafted a new will that cut the nephew out and sat on it unsigned, and now cannot decide whether a dead man's intention or a living heir's fee counts for more", "tie": "is the one guest who addresses you as a witness rather than a servant, because he knows a housekeeper's rounds are evidence", "voice": "careful, qualified sentences full of conditions and sub-clauses; speaks in instruments, signatures, and what will and will not stand at law; never offers an opinion without first asking who else has given one"},
+   {"label": "the lodge-keeper", "name": "Barnaby Quarles", "kind": "individual", "speaks_for": null, "wants": "to report the state of the road and get back to his fire before the drifts close again", "holds": "the only word from beyond the gates since the storm began"}
+ ],
+ "locations": [
+   {"name": "the first-floor gallery", "kind": "the upper landing outside the master's study and the guests' bedroom doors", "why": "where the study door was broken down and where your night rounds pass every door whose hour must be fixed"},
+   {"name": "the back stairs", "kind": "the servants' stair from below stairs to the far end of the gallery, with the candle box at its foot", "why": "the stair nobody but the valet uses after ten; climbing it is both your evidence and your exposure"},
+   {"name": "the dining room", "kind": "the ground-floor room where the household eats under the Major's eye", "why": "where you serve and listen, and where the Major makes his announcements to the house"},
+   {"name": "the housekeeper's room", "kind": "your own room below stairs, where the keys, the account book and what you have kept are stored", "why": "the one place in the house that is yours, and so the place the Major has searched"},
+   {"name": "the servants' hall", "kind": "the below-stairs room where the staff eat and where you are confined by the Major's order", "why": "where a servant can be shamed before the whole kitchen, and where you must wait while the study is emptied above"},
+   {"name": "the drawing room", "kind": "the ground-floor reception room where the household is gathered before the fire", "why": "where the account is called for and the killer must be named before the seven"},
+   {"name": "the master's study", "kind": "the first-floor room off the gallery where the master was found, locked since the door came down", "why": "the room the whole story has been kept out of, and the one the new master finally hands you the key to"},
+   {"name": "the ice house", "kind": "the brick ice store across the drifted yard where the body is laid", "why": "the one place the doctor can be spoken to away from the Major, at the cost of leaving the study to the maids"},
+   {"name": "the library", "kind": "the ground-floor room given over to the solicitor's drafting", "why": "the one place a servant's account can be put into a lawyer's keeping instead of the Major's"}
+ ]
+}
+
+
+--- YOUR PREVIOUS ANSWER WAS REJECTED ---
+A computed check found this wrong with it:
+ - these summaries run past 80 words: T3N04 (83), T3N05 (86). Keep what happens and what it changes; cut the description around it
+Fix every listed problem in your response. Ensure you apply the required changes rather than repeating the previous answer verbatim. Keep everything else that was valid unchanged.
+Your previous answer:
+{"nodes": [{"id": "T3N04", "title": "The Keyhole Filled", "summary": "Before the drawing-room fire the Major demands your account signed. You say a key in the inside lock fills the keyhole you saw the lamp through, take the master's key from Lucius Carrington's waistcoat and set it in the study lock from the gallery side; Cornelius Ellingham, the widow and the doctor kneel and see nothing. He strikes you; Nathaniel Yardley pins his arms while you name him on the gallery, the tallow stub behind him, your box one short, Fairbrother never asked.", "image": "the master's key standing in the study lock, the keyhole gone dark", "where": ["the drawing room", "the first-floor gallery", "the master's study"], "who": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the solicitor", "the widow", "the doctor"]}, {"id": "T3N05", "title": "The Next Cart", "summary": "The carriage goes down the dripping road with Lucius Carrington inside and Cornelius Ellingham beside him holding the key and the stub, the unsigned will never named. Reginald Fairbrother takes down the master's tray for the last time and receives the house keys from Nathaniel Yardley, who pays your wages, writes your character and says a woman who puts her hand in a gentleman's pocket cannot be kept. Lavinia Netherby hauls your box to the cart and mutters she never thought you had it in you.", "image": "carriage ruts filling with meltwater all the way down the drive", "where": ["the drawing room", "the housekeeper's room"], "who": ["the Major", "the solicitor", "the master's valet of forty years", "the master's nephew and heir", "the housemaid"]}], "new_locations": [], "new_characters": []}

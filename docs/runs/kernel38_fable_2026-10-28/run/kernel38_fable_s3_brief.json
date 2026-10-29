@@ -1,0 +1,204 @@
+{
+  "binding_legend": "constraint: may not be contradicted; default: convention supplied it, may be replaced with something more specific; free: nothing known, fill it",
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "label": "which of the seven guests to accuse of the murder",
+      "description": "Having gathered what the clues and the guests' lies support, name one of the seven as the killer — with the Kernel insisting the wrong person must be a live, pickable option, not just the right one.",
+      "binding": "constraint"
+    },
+    "3-0a.decision_mechanism": {
+      "shape": "single_fork",
+      "binding": "default"
+    },
+    "3-0a.secondary_decision_axes": {
+      "axes": [
+        {
+          "label": "which guest's lie to press or which clue to follow next",
+          "relation": "independent"
+        }
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0a.decision_landscape": {
+      "shape": "layered",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0b.protagonist_identity": {
+      "type": "human",
+      "role": "new housekeeper at a snowbound country house",
+      "embodiment": "embodied_human",
+      "binding": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "present": true,
+      "description": "who murdered the master of the house in his locked study, and how, given that all seven guests are lying about something",
+      "design_status": "designed",
+      "binding": "constraint"
+    },
+    "3-0b.gap_resolution": {
+      "expectation": "resolution_optional_or_choice_dependent",
+      "binding": "constraint"
+    },
+    "3-0c.failure_presence": {
+      "value": "hard",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_triggers": {
+      "types": [
+        "incorrect_resolution"
+      ],
+      "binding": "constraint"
+    },
+    "3-0c.failure_cost": {
+      "value": "terminal",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3-0c.failure_scope": {
+      "value": "isolated",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_affect": {
+      "label": "deductive suspicion",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.primary_trajectory": {
+      "shape": "escalating",
+      "binding": "default"
+    },
+    "3b.secondary_affects": {
+      "labels": [
+        "snowbound confinement",
+        "fear of misjudgment"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.tone": {
+      "descriptors": [
+        "formal",
+        "atmospheric",
+        "observant"
+      ],
+      "binding": "default"
+    },
+    "3b.somatic_address": {
+      "level": 1,
+      "channels": [],
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3b.transgression": {
+      "ceiling": 2,
+      "floor": 1,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3c.core_thematic_axis": {
+      "pole_a": "uncovering the truth",
+      "pole_b": "protective discretion",
+      "binding": "default"
+    },
+    "3c.secondary_thematic_axis": {
+      "approaches": [
+        "methodical deduction",
+        "quiet observation",
+        "direct confrontation"
+      ],
+      "binding": "default"
+    },
+    "3c.moral_valence": {
+      "best_case": "justice served, culprit exposed",
+      "worst_case": "innocent condemned, killer free",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3d.viewpoint_handoff": {
+      "ceiling": "single",
+      "floor": "single",
+      "count_min": 1,
+      "count_max": 1,
+      "binding": "constraint"
+    },
+    "3d.viewpoint_excursions": {
+      "ceiling": "invited",
+      "floor": "invited",
+      "types": [
+        "flashback"
+      ],
+      "interactive": "interactive",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3e.timeline_structure": {
+      "category": "linear",
+      "binding": "default"
+    },
+    "3e.timeline_duration": {
+      "ceiling": "hours_to_days",
+      "floor": "hours_to_days",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3f.setting_structure": {
+      "ceiling": "single",
+      "floor": "single",
+      "binding": "constraint"
+    },
+    "3f.setting_scale": {
+      "ceiling": "room_or_building",
+      "floor": "room_or_building",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.target_ending_count": {
+      "min": 1,
+      "max": 2,
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.branching_density": {
+      "level": "moderate",
+      "binding": "constraint",
+      "inferred": true
+    },
+    "3g.state_richness": {
+      "level": "moderate",
+      "channels": [
+        "clues discovered / red herrings taken",
+        "which guests' lies have been exposed"
+      ],
+      "binding": "constraint",
+      "inferred": true
+    }
+  },
+  "cross_check": {
+    "primary_branch_source": "interactive_question",
+    "conflicts": [
+      {
+        "id": "C3",
+        "verdict": "conflict",
+        "summary": "The decision is which of seven guests to accuse, while the thematic axis is truth versus protective discretion; naming guest A rather than guest B is not recognizably picking a pole of that axis, and accusing wrongly is a mistake, not a choice of discretion.",
+        "winner": "3-0a.primary_decision_axis",
+        "resolution": "prefer_a"
+      },
+      {
+        "id": "C9",
+        "verdict": "conflict",
+        "summary": "3d tags an invited flashback to the murder night as interactive, but no decision inside that flashback appears in 3-0a's primary or secondary axes, and 3-0b's gap does not place anything to be learned there; 3-0a's secondary axis and 3d's interactive flag are both strong_inference.",
+        "winner": "neither",
+        "resolution": "unresolved"
+      }
+    ],
+    "unresolved": [
+      "C9: whether the invited flashback to the murder night is a played interactive scene (3d) or recalled exposition with no decisions (3-0a lists none inside it); if played, its choices must be defined and constrained so what the housekeeper saw stays fixed for fair-play clueing.",
+      "C3 flag: the thematic axis (truth vs. protective discretion) is genre-supplied and does not map onto the accusation branch; the premise-expansion phase must either supply a stated value tension that the accusation can express or treat theme as coloring rather than branch structure."
+    ]
+  },
+  "enrichment_budget": "minimal"
+}

@@ -1,0 +1,24 @@
+{
+  "chosen_in_genre_work": {
+    "title": "The Mousetrap",
+    "creator": "Agatha Christie",
+    "tradition": "stage whodunit",
+    "core_dynamic": "Snow seals a guesthouse while the telephone line goes dead, so the murderer must be among the people warming themselves at the same fire."
+  },
+  "chosen_fusion_work": {
+    "title": "The Thing",
+    "creator": "John Carpenter",
+    "orthogonal_genre": "Antarctic horror",
+    "parallel_pressure": "Snowbound men test each other's blood over a flame because anyone in the room could be the killer wearing a familiar face."
+  },
+  "chosen_in_genre_element": {
+    "element": "A guest arrives on skis out of the blizzard claiming to be a police sergeant, but he carries no warrant card and his boots are dry; the household must decide whether to obey or confine him.",
+    "why_it_fits": "Injects a seventh wildcard into a sealed house and offers a tempting wrong accusation: the stranger nobody can vouch for."
+  },
+  "chosen_fusion_element": {
+    "element": "The household imposes a buddy rule: no one may go anywhere alone, and pairs must be reassigned by lot each night so that any two people are never together twice; the housekeeper draws the pairs and can rig them.",
+    "why_it_fits": "Gives the player a mechanical lever to force suspects together or test an alibi, with the dread that whoever they pair with could be the killer."
+  },
+  "catalyst_in_genre": "On the second night a stranger stamps in from the drifts on skis, announcing himself as a police sergeant come to take charge of the body, yet his boots are bone-dry under the snow crust and he cannot produce anything to prove his rank; the guests split at once between those who want to hand him the study key and those who want him locked in the gun room until the thaw, and the housekeeper's word on his boots is what tips the balance.",
+  "catalyst_fusion": "With the drifts past the windowsills and a killer loose in the house, the guests agree that no one may move anywhere alone and that each night the housekeeper draws new pairs from a bowl of folded name-slips, with the rule that no two people may ever be paired twice; whoever draws the slips can palm them to force or prevent any pairing, and a candle left burning in an empty corridor is proof that someone broke their pair."
+}

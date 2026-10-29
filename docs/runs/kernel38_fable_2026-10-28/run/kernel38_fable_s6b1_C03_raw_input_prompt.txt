@@ -1,0 +1,481 @@
+SYSTEM PROMPT
+
+You are step 6b1 of an interactive fiction generation pipeline: you build
+ONE character for the engine the story will run on. The engine is room-based
+and the player acts through a menu: they can examine this person, see them
+in a room, and talk to them about topics. You write what the player sees and
+hears; code turns it into engine data.
+
+What you write:
+ - description: how this person looks and acts when the player examines
+   them, as variants keyed to where their arc stands. This is where the arc
+   becomes visible: the tells. A variant names a state and a direction
+   (dana_trust up: she leaves the talkback key open), or a node after which
+   it holds (after N04a), or neither (the default, last).
+ - here: one sentence for how they appear when the player finds them: what
+   they are doing, holding, wearing ("Dana has her headphones round her
+   neck, one eye on the call board"), also by state if their stance shows in
+   what they are doing. Never WHERE they are: each scene places them, and
+   the same sentence is read in every room they turn up in ("Dana is in the
+   booth" is false in the corridor).
+ - topics: the CURATED things the player can talk to them about, the ones
+   the story turns on: what they want, what they hold, what they know, what
+   they are hiding, the people they are tied to. Three to eight for an arc
+   character, two to five for a supporting one. For each: a label the menu
+   shows ("the caller", "her last job"), known_after (a node id after which
+   the player can ask; null if from the start), and what they say, as
+   variants by state where their stance changes the answer. A topic may move
+   a state when asked (rarely: asking her about the caller on air moves
+   dana_trust down); most do not.
+ - history (arc characters only): two or three sentences on what they bring
+   into the story, concretely.
+ - portrait: the character's visual portrait and physical silhouette profile for multimodal rendering and spatial grounding:
+   * composition: portrait framing (bust or medium portrait, angle, posture)
+   * subjects: [name/role, age, build, facial features, distinctive marks, gaze]
+   * environment: clothing, fabric wear, accessories, silhouette
+   * palette_mood: dominant color swatches, personal lighting, expression/mood
+   * prompt_summary: dense prompt for multimodal character portrait (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
+
+Rules:
+ - Write what they SAY in their own voice (the sketch gives it, with a
+   sample line), as short speech with a little action. Under three
+   sentences each.
+ - NATURAL, GROUNDED SPEECH (NO APHORISMS OR RIDDLES):
+   Characters must speak like real people grounded in their specific occupation, background, and social setting—NOT literary poets, brooding philosophers, or cryptic oracles.
+   * NEVER write cryptic fortune-cookie epigrams or symmetrical definitions ("X is not a Y, it is a Z"):
+     BAD (technical/sci-fi): "A reactor is not an engine. It is a heart."
+     BAD (restrained/drama): "A list is not a goodbye. It is a count."
+     BAD (historical/fantasy): "A crown is not iron. It is a leash."
+   * Characters speak with practical intent: they deflect, complain, show dry humor, ask direct questions, give concrete operational details, or show nervous hesitation.
+   * Subtext lives in what is avoided or unsaid beneath normal words, NOT in theatrical riddles.
+ - NO REPETITIVE PROP MANIPULATION:
+   Do not have characters endlessly perform symbolic actions with props (fiddling with holsters, wiping counters, tapping datapad screens, adjusting collars, turning keys, holding mugs) in dialogue exchanges as a substitute for real interpersonal interaction.
+ - Stakes live in people, bodies, places and things. A ledger, a contract, a
+   signature is a weak thing; use one only where the story is about it.
+ - Only someone who knows the hidden truth (it is in the packet only if they
+   do) may state it. Others may suspect, notice, avoid.
+ - Do not invent new people. Refer to others by name or role as the packet
+   does.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two sentences: what this person's arc makes visible, and the topic the story turns on>",
+  "history": "<arc characters: two or three sentences; others: null>",
+  "description": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node id or null>", "text": "<what the player sees>"}],
+  "here": [{"state": null, "direction": null, "after": null, "text": "<one sentence>"}],
+  "topics": [{"label": "<what the menu shows>", "known_after": "<node id or null>",
+              "says": [{"state": "<state or null>", "direction": "up | down | null", "after": null, "text": "<what they say>"}],
+              "moves": [{"state": "<state>", "direction": "up | down"}]}],
+  "portrait": {"composition": "<bust or medium framing>", "subjects": ["<features, expression>"],
+               "environment": "<costume, accessories>", "palette_mood": "<colors, mood>",
+               "prompt_summary": "<dense portrait prompt>"}
+}
+
+EXAMPLE (a late-night radio phone-in story; for shape only)
+
+{
+  "notes": "Dana's trust shows in what she does: the talkback key, which way she faces, whether she cues your records. The topic the story turns on is the caller she keeps screening out.",
+  "history": "Dana produced the overnight show for nine years before you, for a host who drank. She covered for him on air until the night she could not, and she has not forgiven herself for the night she could.",
+  "portrait": {
+    "composition": "Close-up bust portrait angled three-quarters toward the studio glass",
+    "subjects": ["Dana", "Fifty years old", "Tired sharp hazel eyes with dark circles", "Pencil tucked behind left ear", "Short salt-and-pepper hair"],
+    "environment": "Heavy grey wool cardigan over faded cotton blouse, foam studio headphones clamped around neck",
+    "palette_mood": "Amber valve glow from fader console, soft sepia, slate grey; weary, sharp, guarded",
+    "prompt_summary": "16-bit retro pixel art, portrait of a tired 50-year-old female radio producer with pencil behind ear and studio headphones around neck, amber console glow"
+  },
+  "description": [
+    {"state": "dana_trust", "direction": "up", "after": null, "text": "She has pulled her chair round to face the glass instead of the board, and when she catches you looking she lifts two fingers off the fader: go on."},
+    {"state": "dana_trust", "direction": "down", "after": null, "text": "She sits side-on to the glass with her coat still on, one hand near the reject switch, the other near the phone to the station manager."},
+    {"state": null, "direction": null, "after": null, "text": "Fifty, cardigan sleeves pushed up, a pencil behind each ear because she always loses the first one."}
+  ],
+  "here": [
+    {"state": "dana_trust", "direction": "down", "after": null, "text": "Dana has her back half to you, talking low into the station phone."},
+    {"state": null, "direction": null, "after": null, "text": "Dana has her headphones round her neck and one eye on the call board."}
+  ],
+  "topics": [
+    {"label": "the caller", "known_after": "N01", "says": [
+      {"state": "dana_trust", "direction": "up", "after": null, "text": "'He rang the old host too. Every night for a month. Then the old host stopped coming in.' She looks at the board, not at you."},
+      {"state": null, "direction": null, "after": null, "text": "'He's a crank. We get one a season.' She reaches over and turns the line off at the wall."}],
+     "moves": []},
+    {"label": "the old host", "known_after": null, "says": [
+      {"state": null, "direction": null, "after": null, "text": "'Nine years. Best voice this station ever had, and he read the weather drunk twice a week.' A short laugh. 'I miss him every night at ten past two.'"}],
+     "moves": []},
+    {"label": "putting the caller on air", "known_after": "N02a", "says": [
+      {"state": null, "direction": null, "after": null, "text": "'Over my dead body. Or over yours.' She does not smile. 'Ask me again and I'll call the manager.'"}],
+     "moves": [{"state": "dana_trust", "direction": "down"}]}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS PERSON (the sketch, their arc, the states, the scenes they are in, the hidden truth if they know it):
+{
+ "who": "Nathaniel Yardley (the master's nephew and heir)",
+ "tier": "supporting",
+ "sketch": {
+  "wants": "to come into the estate without his debts or the stable loft being spoken of aloud",
+  "holds": "the old will's inheritance, the overheard quarrel, and the truth of where he went at twenty to eleven",
+  "edge": "will let the house think him a murderer sooner than say he was in the loft with the groom's daughter while his fiancée sat below",
+  "tie": "will be your master if the old will stands, and you saw him cross the yard when he swears he was abed",
+  "voice": "quick and defensive, starts sentences twice, swears softly then apologises to the room; talks in sums owed, horses, and wagers; sulks into silence when pressed by the Major"
+ },
+ "arc": {
+  "starts": "Wants the estate without his debts or the stable loft spoken of, and hates that the new housekeeper saw him cross the yard when he swears he was abed.",
+  "moments": [
+   {
+    "node": "N02",
+    "change": "Sees you whisper to Millicent and bolts for the stables, is dragged back half-frozen and locked in with the valet at his door."
+   },
+   {
+    "node": "N06",
+    "change": "Hears you say the Major's name and takes the old man's arm with the solicitor; the housekeeper who saw him in the yard has just made him master."
+   },
+   {
+    "node": "T2N04",
+    "change": "Unlocked, he passes you for the stables without a glance, a man who knows the wrong passenger went down the road and what the housekeeper's word did."
+   },
+   {
+    "node": "T3N05",
+    "change": "Pays your wages, writes your character, and says a woman who put her hand in a gentleman's pocket cannot be kept."
+   }
+  ],
+  "ends": "Master of the house under the old will, who remembers exactly what you saw and prefers you where he cannot see you."
+ },
+ "states": [
+  "carrington_regard",
+  "fairbrother_faith",
+  "gresham_confidence",
+  "netherby_nerve",
+  "ormsby_ease"
+ ],
+ "scenes": [
+  {
+   "scene": "S_N01",
+   "title": "The Door Comes Down",
+   "lines": [
+    "T1",
+    "T2",
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "N01",
+     "kind": "major",
+     "summary": "You kneel at the keyhole: lamp lit, the master's shoulder. The door falls to Nathaniel Yardley's blows, a key hits the carpet, Major Carrington pockets it and sends you below. Past the tallow box Reginald Fairbrother alone draws after ten, you climb back up his stairs; with Gideon Ashcombe bending the Major over the desk you see frozen window, dead grate, poker standing, and a yellow tallow stub among white wax. Fairbrother watched you climb."
+    },
+    {
+     "id": "N01a",
+     "kind": "opportunity",
+     "summary": "The Major straightens from the desk and finds you in the doorway he sent you from. The doctor's back is turned; Fairbrother stands on the back stair with his candle. The yellow stub lies among the white wax, an arm's length from your apron pocket."
+    },
+    {
+     "id": "N01b",
+     "kind": "demonstration",
+     "summary": "At the foot of the back stairs Fairbrother sets the tallow box square on its shelf without looking inside, as he must have done ten thousand nights. He has counted it already; you can see that in how he does not count it now."
+    }
+   ]
+  },
+  {
+   "scene": "S_N02",
+   "title": "Dinner for Seven",
+   "lines": [
+    "T1",
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "N02",
+     "kind": "major",
+     "summary": "Over the master's empty chair Major Carrington holds the table on Evangeline Davenport's recited eleven o'clock quarrel, promising the magistrate the nephew at thaw. You whisper to Millicent Gresham that her sherry glass stays unwashed until she gives the hour; between courses she does: ten past ten, fire high. Nathaniel Yardley, who saw you whisper, bolts for the stables and is dragged back half-frozen and locked in. By midnight Millicent tells the Major you pocket things."
+    },
+    {
+     "id": "N02a",
+     "kind": "opportunity",
+     "summary": "The Major lays his watch on the cloth beside the master's empty place and asks you, before the table, whether the clocks were wound that night. Evangeline's eleven o'clock hangs on your answer; the solicitor's pen waits above his paper."
+    },
+    {
+     "id": "N02b",
+     "kind": "opportunity",
+     "summary": "Millicent follows you to the pantry after the cloth is drawn. The sherry glass with its brown ring sits in your drawer. She asks whether it is washed yet. The Major's step is in the passage behind her, slow and coming nearer."
+    },
+    {
+     "id": "N02c",
+     "kind": "opportunity",
+     "summary": "Past midnight the Major has you to the library. Miss Gresham, he says, believes the housekeeper pockets things. He asks you, as a courtesy, to turn out your apron on the table. The tallow stub is in the left pocket under your keys."
+    },
+    {
+     "id": "N02d",
+     "kind": "demonstration",
+     "summary": "The Major tells the solicitor the housekeeper will keep the hours for him until the thaw, his thumb holding your rounds book open at the murder night. He does not ask you. He has already decided what you are for."
+    },
+    {
+     "id": "N02e",
+     "kind": "demonstration",
+     "summary": "The Major sets Fairbrother on a hall chair outside the nephew's locked room and says, not to you but over your head, that the housekeeper walks the rounds tonight; if she brings back the house's hour she goes in the account, and if not the solicitor has another word for her."
+    }
+   ]
+  },
+  {
+   "scene": "S_N04",
+   "title": "The Thaw",
+   "lines": [
+    "T1"
+   ],
+   "nodes": [
+    {
+     "id": "N04",
+     "kind": "major",
+     "summary": "Eaves drip; the lodge-keeper wades up: a cart by noon. Major Carrington orders the carriage, tells breakfast that Reginald Fairbrother lit the young gentleman up at eleven; Fairbrother stays silent, and Nathaniel Yardley shouts through his door that the old man has turned. The Major bars you the first floor, sends Lavinia Netherby to rake the study grate and Gideon Ashcombe with the body to the ice house, and keeps your rounds for the drawing room."
+    },
+    {
+     "id": "N04a",
+     "kind": "opportunity",
+     "summary": "Lavinia stands on the back stairs with her empty pail, sent up to rake the study grate. The first floor is barred to you by the Major's order. She looks down at you for a word; the study door above stands open on a dead man's cold."
+    },
+    {
+     "id": "N04b",
+     "kind": "opportunity",
+     "summary": "Kept to the drawing room with your rounds, you are sent for tea. Millicent, pouring, asks under the clink of cups whether the Major has seen your drawer. Nathaniel's shouting comes faint through two floors; she does not look toward it."
+    },
+    {
+     "id": "N04c",
+     "kind": "demonstration",
+     "summary": "Fairbrother sets the Major's boots outside the Major's door and the master's outside the study, blacked and paired, forty years of habit with nobody left in one room to wear them. He stands between the two doors a long moment before he goes down."
+    }
+   ]
+  },
+  {
+   "scene": "S_N06",
+   "title": "A Housekeeper's Reckoning",
+   "lines": [
+    "T1"
+   ],
+   "nodes": [
+    {
+     "id": "N06",
+     "kind": "major",
+     "summary": "Ordered to read the Major's version before the fire, you count the candle box one short instead, say a key in a lock fills a keyhole and you saw the lamp through it, and name aloud Millicent Gresham's sherry, Cordelia Ormsby's hairpin and Gideon Ashcombe's snowy boots. Reginald Fairbrother then says he lit Lucius Carrington up at eleven; the doctor confirms the summons; you say the Major's name, and Nathaniel Yardley and the solicitor take his arms."
+    },
+    {
+     "id": "N06a",
+     "kind": "opportunity",
+     "summary": "You have said the sherry aloud. Nathaniel has turned from the Major's arm to look at Millicent. The room waits for you to say what the glass was for. She does not look at you; she looks at the fire, which is high, as it was at ten."
+    },
+    {
+     "id": "N06b",
+     "kind": "opportunity",
+     "summary": "The doctor, having confirmed the summons, asks you as a servant whether anyone else was at that keyhole at midnight. Cordelia's hairpin lies on the table in a labelled paper. He does not look at her; he is asking you."
+    },
+    {
+     "id": "N06c",
+     "kind": "opportunity",
+     "summary": "The candle box is counted and the keyhole said. Fairbrother stands by the door with his hands at his sides. The Major has not looked at him. There is a silence long enough for a man to decide what forty years were for, if nobody fills it."
+    }
+   ]
+  },
+  {
+   "scene": "S_N07",
+   "title": "The First Cart",
+   "lines": [
+    "T1"
+   ],
+   "nodes": [
+    {
+     "id": "N07",
+     "kind": "major",
+     "summary": "Lucius Carrington goes down the dripping drive with your timeline, the stub and the key, Cornelius Ellingham beside him to say what will stand. Nathaniel Yardley is master, though Millicent Gresham has returned his ring. Reginald Fairbrother carries forty years down the back stairs in one box and goes without a character; Lavinia Netherby passes you on the stairs without a word. You lock the study with the key the new master has given you."
+    },
+    {
+     "id": "N07a",
+     "kind": "resolution",
+     "summary": "The first cart takes the valet and the housemaid together, his one box and hers. The back stairs you climbed twice are quiet now; whether the tallow box is squared on its shelf, and what the carter is told, is all the house will say of them."
+    },
+    {
+     "id": "N07b",
+     "kind": "resolution",
+     "summary": "The carriage is gone down the thawing drive. You stand at the study door with the new master's key and an apron with nothing in it. You collected for two days; you spoke once; the house is quieter by four people, and the master's name went with them."
+    }
+   ]
+  },
+  {
+   "scene": "S_T2N01",
+   "title": "A Cart by Noon",
+   "lines": [
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "T2N01",
+     "kind": "major",
+     "summary": "The eaves drip and Barnaby Quarles wades up: a cart by noon. Major Carrington orders the carriage, sends Lavinia Netherby up with pails and coal, then halts you on the gallery with his watch open and says, low, that the sherry glass in your drawer is evidence or blackmail: you will tell the drawing room of a lady's visit at ten and the quarrel after, or the heir hears which. Cordelia Ormsby praises your discretion aloud; Nathaniel Yardley pushes a scrap under his door; you pocket it."
+    },
+    {
+     "id": "T2N01a",
+     "kind": "revelation",
+     "summary": "In the linen press you unfold Nathaniel's scrap, pencil pressed hard enough to tear: yard, twenty to eleven; one light going up the back stair, servants' tallow by the colour; a man's cuff on it, not a sleeve. Tell them. The hand that carried the stub was never a lady's."
+    },
+    {
+     "id": "T2N01b",
+     "kind": "opportunity",
+     "summary": "Lavinia passes you on the back stairs with coal and two pails, sent to lay the study fire alone, the grate still holding its ash. Above, the Major stands at the gallery rail with his watch open. She slows at the turn and looks back to see whether you will come."
+    },
+    {
+     "id": "T2N01c",
+     "kind": "opportunity",
+     "summary": "Cordelia Ormsby, dressed now and languid against the newel, tells the Major that his housekeeper is the most discreet creature she has met in a country house. The Major's watch is still open. She says it to him and looks at you, and waits for what you will do with it."
+    }
+   ]
+  },
+  {
+   "scene": "S_T2N03",
+   "title": "The Lady's Candle",
+   "lines": [
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "T2N03",
+     "kind": "major",
+     "summary": "Reginald Fairbrother brings Nathaniel Yardley down between himself and the groom. Standing before the fire you tell the room the night as the house already believes it, every other lie held back, then set Millicent Gresham's sherry glass on the table and name her: the study at ten, the nephew in the yard by twenty to eleven, the later candle a lady carrying servants' tallow up the back stairs. Millicent goes still; Nathaniel stammers; Fairbrother keeps silent; Major Carrington sends for her cloak."
+    },
+    {
+     "id": "T2N03a",
+     "kind": "opportunity",
+     "summary": "In the passage after the room has emptied, Fairbrother stands with Nathaniel's key in his hand, waiting to be told whether to turn it. You are alone with him for the first time since the box. He has kept silent for you; he is waiting to learn what it bought."
+    },
+    {
+     "id": "T2N03b",
+     "kind": "opportunity",
+     "summary": "Millicent waits in the hall for the carriage, her cloak not yet brought, the Major's greatcoat on the stand with the wrapped glass weighting one pocket. Nathaniel is still locked above. She asks you, without turning, whether the glass goes down the road with her."
+    },
+    {
+     "id": "T2N03c",
+     "kind": "opportunity",
+     "summary": "Before the carriage, the Major dictates the household's account to Ellingham at the library table and has you read it back: the quarrel at eleven by his watch, the lady's candle, nothing of the key. The solicitor's pen is wet. He asks whether that is how the house remembers it."
+    }
+   ]
+  },
+  {
+   "scene": "S_T2N04",
+   "title": "The Key Across the Table",
+   "lines": [
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "T2N04",
+     "kind": "major",
+     "summary": "The carriage takes Millicent Gresham down the dripping road, Major Carrington on the box, the wrapped glass in his coat. Nathaniel Yardley, unlocked, passes you for the stables without a glance; Evangeline Davenport recites her eleven o'clock to Cornelius Ellingham. Reginald Fairbrother thanks you for never asking him the hour; Lavinia Netherby brings your tea. The Major, back by dinner, carves in the master's chair and hands you the study key; you lock up."
+    },
+    {
+     "id": "T2N04a",
+     "kind": "resolution",
+     "summary": "You lock the study at night with the Major's key, or watch him lock it with his own. Fairbrother carries the last candle down the back stairs, counts the box without looking, and either bids you goodnight by name or lets the dark take the question of the hour with him."
+    },
+    {
+     "id": "T2N04b",
+     "kind": "resolution",
+     "summary": "The widow's door is shut, her own maid inside dressing her hair, or open with her voice calling your name for a pin. Below, Lavinia either brings your tea unrung and whispers that the grate is relit and nobody has asked about her candle, or sets it down and goes."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N01",
+   "title": "Your Name Under One Hour",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N01",
+     "kind": "major",
+     "summary": "Major Lucius Carrington presses the quarrel at eleven round the master's empty chair and asks where your rounds took you; you tell the table you saw Nathaniel Yardley leave the back stairs at twenty to eleven and cross to the stables, and will swear to nothing else. Evangeline Davenport recites her eleven; Nathaniel kicks over his chair, bolts into the storm, is dragged back half-frozen and locked in. Millicent Gresham, tureen in hand, refuses you her hour."
+    },
+    {
+     "id": "T3N01a",
+     "kind": "opportunity",
+     "summary": "Millicent Gresham holds the tureen out to you at the sideboard an instant too long, her back to the table. Nathaniel Yardley's chair is empty; the Major is watching the door. Her lips shape ten o'clock without sound, and wait to see what yours do."
+    },
+    {
+     "id": "T3N01b",
+     "kind": "opportunity",
+     "summary": "Major Carrington lays his watch face-up on the cloth beside the master's empty place and says the quarrel was at eleven by it. He looks at you to say so too. The hall clock, by your rounds, struck half past ten through the study door."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N04",
+   "title": "The Keyhole Filled",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N04",
+     "kind": "major",
+     "summary": "The Major demands your account signed. You say a key in the inside lock fills the keyhole you saw the lamp through, pull the master's key from Lucius Carrington's waistcoat and set it in the study lock from the gallery; the solicitor, widow and doctor kneel and see nothing. He strikes you; Nathaniel Yardley pins his arms while you name him there, the tallow stub behind him, Fairbrother never asked."
+    },
+    {
+     "id": "T3N04a",
+     "kind": "opportunity",
+     "summary": "Nathaniel holds the Major's arms; the key stands in the lock from the gallery side; your cheek burns. Ellingham asks you to say, for the record, how the house knew. Fairbrother is at the foot of the stairs with his candle. His hour has not been asked."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N05",
+   "title": "The Next Cart",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N05",
+     "kind": "major",
+     "summary": "The carriage carries Lucius Carrington and Cornelius Ellingham away through the thaw, key and stub with them, the unsigned will never named. Reginald Fairbrother takes the house keys from Nathaniel Yardley, who pays your wages, writes your character and says a woman who put her hand in a gentleman's pocket cannot be kept. Lavinia Netherby hauls your box to the cart, muttering she never thought you had it in you."
+    },
+    {
+     "id": "T3N05a",
+     "kind": "resolution",
+     "summary": "The carriage turns on the dripping gravel. Through the glass, Lucius Carrington either sits with his hands folded over the place his watch hung and says nothing the whole way down, or leans to Ellingham and talks the length of the drive about a housekeeper in the heir's pay."
+    },
+    {
+     "id": "T3N05b",
+     "kind": "resolution",
+     "summary": "Fairbrother takes the house keys from Nathaniel Yardley's hand. Either he carries your box to the cart himself and tells the groom in the yard that a woman who saw a tallow stub at ten paces was wasted below stairs, or your box goes down with the maid and his head never lifts."
+    },
+    {
+     "id": "T3N05c",
+     "kind": "resolution",
+     "summary": "Millicent Gresham keeps her ring and her ten o'clock. Either the groom brings a character after you at the lodge, unsigned, in a lady's writing, or she says at tea, with Nathaniel beside her, that the housekeeper went through pockets, and does not mean the Major's."
+    },
+    {
+     "id": "T3N05d",
+     "kind": "resolution",
+     "summary": "Cordelia Ormsby stays, courteous, her letter unmentioned in the desk. Either Ashcombe brings you word at the step that she knows a house in town not particular about characters, or you learn on the road that she wrote to town that morning about a housekeeper who frightened the guests."
+    },
+    {
+     "id": "T3N05e",
+     "kind": "resolution",
+     "summary": "Lavinia hauls your box to the cart. Either she mutters she never thought you had it in you and at the step closes your fingers over a tallow stub, the one from her own candlestick, or she sets the box down because the valet told her to and is back indoors before the cart moves."
+    }
+   ]
+  }
+ ]
+}
+
+
+--- YOUR PREVIOUS ANSWER WAS REJECTED ---
+A computed check found this wrong with it:
+ - 6 topics; give 2 to 5
+Fix every listed problem in your response. Ensure you apply the required changes rather than repeating the previous answer verbatim. Keep everything else that was valid unchanged.
+Your previous answer:
+{"notes": "Nathaniel's arc is visible in his legs: he runs for the stables while he is suspected, and walks past you for them once he is master, and in both cases it is the loft he will not name. The topic the story turns on is where he went at twenty to eleven, which you saw and he swears did not happen.", "history": "Nathaniel came down for the Christmas week owing four hundred at Tattersall's and more at cards, with the old will naming him heir and the master talking of a new one. He had been three nights up the stable loft with the groom's daughter while Millicent Gresham, his fianc\u00e9e, sat below with her sherry, and on the night of the murder he crossed the yard at twenty to eleven and saw a light go up the back stair. He thinks a housekeeper who saw him in the yard is a housekeeper who can hang him or own him.", "description": [{"state": null, "direction": null, "after": "T3N05", "text": "He wears his uncle's signet now and keeps his hands behind him when you are in the room, so the ring and the yard need not be looked at together; he addresses the air a foot to the left of your cap."}, {"state": null, "direction": null, "after": "T2N04", "text": "Unlocked and fed, colour back in his face, he has the look of a man who has had his bet paid out on a horse he did not back; he does not meet your eye and he does not need to."}, {"state": null, "direction": null, "after": "N06", "text": "Master of the house since the hour you spoke, he stands where his uncle stood by the fire, and when he looks at you it is the look of a man counting what he owes and deciding it was the house's money."}, {"state": null, "direction": null, "after": "N02", "text": "Snow still melting out of his hair, blanket over his dinner coat, he sits on the edge of his bed with the valet on a chair outside the door and glares at the window as though the stables were a creditor."}, {"state": null, "direction": null, "after": null, "text": "Seven-and-twenty, too thin for his coat, a riding man's hands with a gambler's nails; he begins every answer twice and looks at the stable clock through any window he passes."}], "here": [{"state": null, "direction": null, "after": "T3N05", "text": "Nathaniel Yardley has the household ledger open under one hand and his uncle's signet on the other, and his back to you."}, {"state": null, "direction": null, "after": "N06", "text": "Nathaniel Yardley stands with his hands in his pockets and the air of a man who has lately been given a house."}, {"state": null, "direction": null, "after": "N02", "text": "Nathaniel Yardley sits wrapped in a blanket with his boots steaming by the fender and his jaw set."}, {"state": null, "direction": null, "after": null, "text": "Nathaniel Yardley is pacing with a cold pipe in his teeth, glancing at the snow on the yard window each time he turns."}], "topics": [{"label": "where he was that night", "known_after": null, "says": [{"state": null, "direction": null, "after": "N06", "text": "'I was... look here, I was where I said I was, and what you saw crossing the yard you did not see, and we shall both be more comfortable so.' He lowers his voice. 'There's a place for a woman who holds her tongue. There's a place on the road for the other sort.'"}, {"state": null, "direction": null, "after": "N02", "text": "'Abed. I was abed, damn it, I beg your... I was abed by half past ten and the valet can say so.' He pulls the blanket tighter and says nothing for a long moment. 'He can say so if he's asked.'"}, {"state": null, "direction": null, "after": null, "text": "'I went up at half past ten, I told the Major, I told the... Mrs. Whoever-you-are, I don't see that a housekeeper's rounds need to take her to the yard window.' He knocks his pipe out on the fender though there is nothing in it."}], "moves": []}, {"label": "his debts", "known_after": null, "says": [{"state": null, "direction": null, "after": "N06", "text": "'Four hundred at Tattersall's, two at the club, a hundred to a man I'd sooner not name.' He shrugs, easy now. 'The estate clears it by Lady Day. My uncle knew the figures; he simply wouldn't say them out loud at table.'"}, {"state": null, "direction": null, "after": null, "text": "'Debts. Everyone has debts, Carrington has debts, he's just better at... look, a man lays a hundred on a horse called Vespers and the brute goes lame in the paddock, that is not a crime.' He laughs once and it is not a good laugh. 'My uncle thought it was.'"}], "moves": []}, {"label": "Miss Gresham", "known_after": null, "says": [{"state": "gresham_confidence", "direction": "down", "after": null, "text": "'Millicent has given me back the ring, since you ask, and I don't... I don't suppose a housekeeper has an opinion on that.' He turns the bare finger over. 'She knows about the loft. She's known since Tuesday. I should have liked to be the one who told her.'"}, {"state": null, "direction": null, "after": "N02", "text": "'She was in the drawing room all evening, she said so, and if she... if she went up to my uncle about the settlement that's her business and his.' His voice drops. 'Her people lose money if the new will stands. That's not a thing a man says about the lady he's to marry.'"}, {"state": null, "direction": null, "after": null, "text": "'Miss Gresham is my intended, and you'll find her a very easy mistress once this is... once the roads are open.' He stops. 'She likes her sherry at ten and a quiet house. You'll manage that.'"}], "moves": []}, {"label": "the quarrel", "known_after": null, "says": [{"state": null, "direction": null, "after": "N06", "text": "'I heard it from the back stair. Half past ten, not eleven, whatever Evangeline recites. He said \"nephew\" and he said \"loft\" and I didn't wait for the rest.' He looks at the fire. 'I thought he was shouting at me. He wasn't talking to me at all.'"}, {"state": null, "direction": null, "after": null, "text": "'Quarrel. There was a... my uncle raised his voice most nights, it's a thick door, I heard nothing I could swear to and nor did Miss Davenport whatever she says at table.' He turns to the window. 'A man shouting through oak doesn't tell you who's on the other side.'"}], "moves": []}, {"label": "the Major", "known_after": "N02", "says": [{"state": "carrington_regard", "direction": "up", "after": null, "text": "'Carrington has you in his pocket already, I see. Well. He had my uncle in it twenty years.' He says it to the door, not to you. 'Ask him why he came down this week. Ask him what he's owed.'"}, {"state": null, "direction": null, "after": "T2N01", "text": "'He wants the lady for it, and he wants you to hand her to him, and he's... damn him, I beg your pardon, he's not wrong that I'd rather be in the stables than the study.' He pushes a hand through his hair. 'You read what I wrote. A man's cuff. Not mine, and not hers.'"}, {"state": null, "direction": null, "after": null, "text": "'The Major has me at the magistrate's by the thaw. Fine. He always did lay against me.' He sulks a moment, then: 'My uncle sent for him. Did you know that? Christmas week, snow coming, and he sent for Carrington particular.'"}], "moves": []}, {"label": "the light on the back stair", "known_after": "T2N01a", "says": [{"state": null, "direction": null, "after": "T2N03", "text": "'I wrote you what I saw and you put the glass on the table and said her name.' He does not shout; he is past it. 'I was in the yard with my boots full of snow and I saw a cuff on a tallow candle. A gentleman's cuff. You had that. You chose the lady.'"}, {"state": null, "direction": null, "after": null, "text": "'Twenty to eleven, I was... I was crossing from the loft stair and the back door stood open and a light went up. Yellow, the servants' stuff, not wax.' He holds his own wrist up. 'Cuff. Starched. I'll not say it to the Major, he'd ask what I was doing in the yard. You say it.'"}], "moves": []}], "portrait": {"composition": "Medium bust portrait, three-quarter angle turned slightly away as if toward a window, shoulders tense, chin lifted defensively", "subjects": ["Nathaniel Yardley, the heir", "Twenty-seven years old", "Lean and underfed for his frame, long riding man's hands with bitten nails", "Fair hair falling untidily over a high forehead, pale blue eyes that move before the face does", "Wind-chapped cheeks and a cold sore at the lip from the snow, faint shadow of stubble", "Gaze fixed just off the viewer, as if checking a clock"], "environment": "Black evening tailcoat too loose at the shoulders, white tie pulled askew, a grey wool blanket slipping off one shoulder, melting snow in the hair, a cold clay pipe held forgotten", "palette_mood": "Grey snow light from an unseen window, dull red of a low fire on one cheek, black and ivory of evening dress against wet wool; anxious, sulky, cornered", "prompt_summary": "Atmospheric Victorian concept illustration, bust portrait of a thin 27-year-old fair-haired gentleman in a rumpled evening tailcoat with a grey blanket over one shoulder, snow melting in his hair, pale blue eyes glancing off-frame, grey window light and low firelight, defensive and cornered expression, oil-painting texture"}}

@@ -1,0 +1,163 @@
+SYSTEM PROMPT
+
+You are step 4e of an interactive fiction generation pipeline: the reader
+of a finished OUTLINE. The outline is a story graph: lines (each a
+through-line with its ending), nodes (one beat of the story, summarized,
+with the one image a player would keep from it), and the people in it.
+You did not write it. You do not score it and you do not fix it: you
+REPORT what is on the page, each finding with a quote copied exactly from
+the outline, so that a program can check it and outlines built by
+different versions of the pipeline can be compared fact by fact.
+
+Report only what the outline SHOWS happening. An outline that says what
+it means ("the cost is the trust of the clerk", "the setup pays off", "the
+price is paid") has stated a thing, not shown it: report that under
+"announced", never as the thing itself. If something is not there, leave
+its entry empty; an empty answer is a correct answer, and inventing one to
+be helpful is the worst error you can make.
+
+WHAT TO REPORT
+
+ - lost: what the story takes for good, on any line: a thing that cannot
+   be undone or bought back once it happens. For each: what is lost, its
+   kind, the line and the node where it is lost, and the quote that shows
+   it lost. kind is one of:
+     person      someone dies, leaves for good, or is gone to you
+     body        an injury or capacity that will not come back
+     bond        a relationship broken past mending, shown by what someone does
+     thing       an object destroyed or gone (a boat, a house, a letter burned)
+     place       a place lost, left for good or ruined
+     way_of_life a way of living that ends (the circus folds, the farm is sold)
+     feeling     only a state of mind ("your confidence", "the old self")
+   Empty when nothing is lost for good, or only risked.
+ - plants: things shown early that come back later and decide or change
+   what happens. For each: the node where it is first shown and the quote,
+   the later node where it pays off and the quote, and what it does there.
+   Something introduced and used in the same node is not a plant; a thing
+   that merely reappears without changing anything is not a payoff.
+ - opposition_at_work: the first node where whoever or whatever opposes
+   the player is SEEN doing harm, or showing what it will do (not
+   described as dangerous): the node, the quote, what it does. null when
+   the opposition is only described, or acts only at the climax.
+ - reversal: a revelation or turn that changes what came before (a truth
+   that recasts earlier nodes, an ally who was never one): the node, the
+   quote, what it changes. null when every node only adds facts.
+ - errands: nodes whose middle is fetching, delivering, reporting or
+   signing, where nothing happens to anyone: the node and the quote.
+ - abstractions: phrases a reader cannot picture, the analyst's words
+   ("the debt of the border", "the claim", "the trust"): the node and the
+   quote. At most eight, the clearest.
+ - announced: places where the outline names its own craft or cost
+   instead of showing it ("the cost is", "it has cost", "pays off",
+   "the price"): the node and the quote.
+
+Then: "reading", two or three sentences on what this story is and how it
+reads as a whole; the single best thing in it (a node, a line, a person,
+with why); the single worst thing (what you would fix first); and whether
+you would want to play it.
+
+Quotes are copied exactly from the outline, a few words to a sentence,
+from the node you name (an ending's quote may come from its line's ending
+text: name the line's ending node).
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary before or
+after. "reading" comes first.
+
+{
+  "reading": "...",
+  "lost": [{"what": "...", "kind": "person", "line": "T1", "node": "N05", "quote": "..."}],
+  "plants": [{"plant_node": "N01", "plant_quote": "...", "payoff_node": "N05", "payoff_quote": "...", "what_it_does": "..."}],
+  "opposition_at_work": {"node": "N02", "quote": "...", "what_it_does": "..."},
+  "reversal": null,
+  "errands": [{"node": "N03", "quote": "..."}],
+  "abstractions": [{"node": "N04", "quote": "..."}],
+  "announced": [{"node": "N05", "quote": "..."}],
+  "best_thing": "...",
+  "worst_thing": "...",
+  "would_play": true
+}
+
+CALIBRATION (two entries, trimmed; the discipline is the point)
+
+A last node that reads "You lock the pawnshop for the night and the street
+goes quiet; the cost is the last of your faith in the neighbourhood":
+  "lost": [{"what": "your faith in the neighbourhood", "kind": "feeling", "line": "T1", "node": "N05", "quote": "the last of your faith in the neighbourhood"}],
+  "announced": [{"node": "N05", "quote": "the cost is the last of your faith in the neighbourhood"}]
+(Nothing is shown lost; a state of mind is named, and named as a cost.)
+
+A first node where your aunt oils the stuck weathervane "so it tells the
+truth", and a fifth where the weathervane swings north an hour before the
+frost and you get the orchard covered in time:
+  "plants": [{"plant_node": "N01", "plant_quote": "oils the stuck weathervane", "payoff_node": "N05", "payoff_quote": "the weathervane swings north an hour before the frost", "what_it_does": "it warns you of the frost in time to save the orchard"}]
+
+USER INPUT FOLLOWS BELOW
+
+- the Kernel
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+- the tone the Kernel asked for, and how the pipeline meant to produce it
+tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+- what this genre's audience expects (as the pipeline read it; "none" when it was not read)
+genre: golden-age locked-room country-house murder mystery
+player fantasy: To be the one person below stairs who saw everything, moving unregarded through a house of gentry with a candle and a ring of keys, catching each lie as it is told, and earning the right to stand before them all and name the killer.
+promise (in the Kernel): the locked study itself: the key on the inside, the window frozen shut, the fire gone to ash, the body at the desk, and one thing in the room that should not be there
+promise (in the Kernel): seven guests each caught in a lie that is true to their character but not, in six cases, to the murder: a debt, an affair, a forged letter, a quarrel overheard
+promise (in the Kernel): the housekeeper's own timeline: who was on which stair, which corridor, which lamp was lit, when the clock struck
+promise (in the Kernel): physical clues that can be held: a snuffed candle with two wicks' worth of wax, snow tracked into a room no one admits entering, a glass with a lipstick mark, a hairpin in the keyhole
+promise (in the Kernel): the storm as jailer: drifts against the doors, the telephone wire down, the drive gone, the servants whispering that no constable can come before the thaw
+promise (in the Kernel): the gathering in the drawing room where you name the killer to their face, and the room waits to see whether you are right
+set piece 1: the study door broken down with a poker, the household crowding the threshold, and the key heard to fall from the inside lock onto the carpet (at the corridor outside the master's study)
+set piece 2: seven places laid at dinner with the master's chair empty, the storm against the windows, and no one willing to be the first to eat (at the dining room)
+set piece 3: the housekeeper alone at night re-walking the first-floor corridor with a candle, counting the seconds between each door (at the first-floor gallery and back stairs)
+set piece 4: the drawing room at the moment the name is spoken, every face turning, and one of them going still (at the drawing room before the fire)
+tone engine: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+the genre expects someone like: the dead master, present only as a corpse, a will and the grudges he left in every guest
+the genre expects someone like: a loyal old servant who knows the house's hidden ways and is deciding whether to tell you
+the genre expects someone like: the guest who appoints himself detective and is loudly, confidently wrong
+must not (the Kernel rules it out): no police, inspector or outside authority arriving before the accusation: the storm has cut the house off
+must not (the Kernel rules it out): no second setting: the whole story stays within the house and its grounds under snow
+must not (the Kernel rules it out): no unfair solution: no hidden twin, supernatural agency or clue withheld from the player
+must not (the Kernel rules it out): no accusation forced correct: the wrong guest must be a genuinely pickable, condemnable choice
+
+- the outline
+QUESTION: Which of the seven do you name in the drawing room, and can you make the name hold against the house's own verdict?
+LINES
+- T1 The Housekeeper's Reckoning: You start out wanting the right name on the master's killer before the road carries a cart and the house hands the magistrate the nephew. By the end you want to know whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters, and you find it can, if the servant is willing to let it cost the house its oldest servant and the master his good name.
+  ending: Lucius Carrington is driven down the thawing road to the magistrate on the housekeeper's word, the valet's confession and the doctor's certificate; the nephew is cleared, but his marriage, the doctor's practice and the widow's name were broken in the same quarter hour, the valet leaves by the first cart with no character after forty years, and the master is remembered as a man who sold his silence for thirty years before he thought to buy it back. [answer pole_a; standing the master's nephew and heir, the doctor, the solicitor; lost the Major, the master's valet of forty years, the housemaid, the nephew's fiancée, the widow]
+- T2 The Wrong Passenger: You begin wanting the right name before the road carries a cart. At midnight the widow, caught at the keyhole, whispers that she heard Evangeline's voice through the Major's door at eleven, and after that the Major is a man with a witness and the ward's eleven o'clock quarrel is a lie about where she herself was, not about what she heard. What you want narrows to getting Nathaniel out of the carriage whatever it costs the rest of them, and with the stub on the ash heap, the valet never asked and the widow's letter and hairpin yours to keep, the only name a drawing room will accept from a servant is Millicent Gresham's.
+  leaves after N03 when you left the valet in his chair at the nephew's door, walked the rounds alone counting seconds door to door, and caught the widow on her knees at the study keyhole with her hairpin, and traded her silence for your own
+  ending: Millicent Gresham is driven down the thawing road in the Major's carriage on the housekeeper's word and the lipstick glass, with Carrington beside her to deliver the household's account; Nathaniel is unlocked and cleared and goes to the stables without looking at you. Fairbrother thanks you at the sideboard for never having asked him the hour, Lavinia brings your tea as she always has, the widow keeps her letter and the ward her lie, and the master's oldest friend sits in the master's chair at dinner. You lock the study at night with the key he hands you across the table, and the story ends there, in the one way it can be lost: an innocent at the magistrate's and the killer at the fire. [answer pole_b; standing the master's valet of forty years, the housemaid, the master's nephew and heir, the widow, the Major; lost the nephew's fiancée]
+- T3 The Keyhole Filled: You have walked the study's four walls with your key ring in your fist while the Major argued, and seen the straight poker, the frozen window and the tallow stub where white wax belongs, and by nightfall the valet has told the maids you have forgotten your place. You come to want the room itself to convict him, so that no servant below stairs need ever say a word against a gentleman; by the end you want the key set in the lock before the whole house, whatever it costs the woman whose hand sets it there.
+  leaves after N01 when you refused the Major's order to go down to the plate, planted yourself in the study doorway with your key ring in your fist and walked the four walls counting candles while he argued with you
+  ending: Lucius Carrington is held by the arms on the gallery where the door came down, named by the master's key set in the lock from the gallery side and the lamp you saw through the empty keyhole before the poker was fetched, with the study as it was found behind him and not one servant's word in the case; the carriage takes him down the dripping road with the solicitor beside him, and the unsigned will in the desk is never spoken of. Fairbrother keeps his forty years and his silence, Lavinia her place, Millicent her ring and her ten o'clock, the widow her letter, the doctor his practice; and Nathaniel Yardley, master under the old will, gives the housekeeper who put her hand in a gentleman's pocket her wages, her character, and the next cart. [answer pole_a; standing the master's valet of forty years, the housemaid, the master's nephew and heir, the nephew's fiancée, the widow, the doctor, the solicitor; lost the Major]
+NODES
+- N01 (opening_crisis, turn 1) The Door Comes Down: You kneel at the keyhole: lamp lit, the master's shoulder. The door falls to Nathaniel Yardley's blows, a key hits the carpet, Major Carrington pockets it and sends you below. Past the tallow box Reginald Fairbrother alone draws after ten, you climb back up his stairs; with Gideon Ashcombe bending the Major over the desk you see frozen window, dead grate, poker standing, and a yellow tallow stub among white wax. Fairbrother watched you climb. IMAGE: a yellow tallow stub snuffed in the study's white-wax candlestick
+- N02 (second_crisis, turn 2) Dinner for Seven: Over the master's empty chair Major Carrington holds the table on Evangeline Davenport's recited eleven o'clock quarrel, promising the magistrate the nephew at thaw. You whisper to Millicent Gresham that her sherry glass stays unwashed until she gives the hour; between courses she does: ten past ten, fire high. Nathaniel Yardley, who saw you whisper, bolts for the stables and is dragged back half-frozen and locked in. By midnight Millicent tells the Major you pocket things. IMAGE: the master's empty chair at the head of a table nobody eats from
+- N03 (second_crisis, turn 3) The Rounds Walked Twice: Past midnight you rewalk the murder night, counting doors: the quarrel at half past ten, the nephew crossing the yard at twenty to, one light on the back stairs at eleven, so Evangeline's eleven o'clock is a lie. At the nephew's door you show Reginald Fairbrother the candle box one short and threaten to set it before the heir at breakfast unless he gives the hour. He says nothing; before dawn he is at the Major's door. IMAGE: the open candle box, eleven tallow candles where twelve should lie
+- N04 (third_crisis) The Thaw: Eaves drip; the lodge-keeper wades up: a cart by noon. Major Carrington orders the carriage, tells breakfast that Reginald Fairbrother lit the young gentleman up at eleven; Fairbrother stays silent, and Nathaniel Yardley shouts through his door that the old man has turned. The Major bars you the first floor, sends Lavinia Netherby to rake the study grate and Gideon Ashcombe with the body to the ice house, and keeps your rounds for the drawing room. IMAGE: the housemaid's pail and fresh scuttle going up the stairs you are forbidden
+- N05 (third_crisis, turn 4) The Maid's Apron: Barred from the first floor, you stop Lavinia Netherby on the back stairs with her empty pail and tell her the valet will name her for the short count unless she brings you the mantel stub and the ash pan unsifted. She comes down white-faced with the stub folded in her apron, two wicks' worth of wax on it. Within the hour Major Carrington turns out your room while Cornelius Ellingham lists what is taken; Lavinia, ash on her apron, is made to confess before the kitchen and given notice. IMAGE: a yellow tallow stub, two wicks deep, passed hand to hand under a folded apron
+- N06 (climax, turn 5) A Housekeeper's Reckoning: Ordered to read the Major's version before the fire, you count the candle box one short instead, say a key in a lock fills a keyhole and you saw the lamp through it, and name aloud Millicent Gresham's sherry, Cordelia Ormsby's hairpin and Gideon Ashcombe's snowy boots. Reginald Fairbrother then says he lit Lucius Carrington up at eleven; the doctor confirms the summons; you say the Major's name, and Nathaniel Yardley and the solicitor take his arms. IMAGE: the candle box open on the drawing-room table, eleven white candles and one empty slot
+- N07 (aftermath) The First Cart: Lucius Carrington goes down the dripping drive with your timeline, the stub and the key, Cornelius Ellingham beside him to say what will stand. Nathaniel Yardley is master, though Millicent Gresham has returned his ring. Reginald Fairbrother carries forty years down the back stairs in one box and goes without a character; Lavinia Netherby passes you on the stairs without a word. You lock the study with the key the new master has given you. IMAGE: a single wooden box carried down the back stairs, the lid tied with cord
+- T2N01 (third_crisis) A Cart by Noon: The eaves drip and Barnaby Quarles wades up: a cart by noon. Major Carrington orders the carriage, sends Lavinia Netherby up with pails and coal, then halts you on the gallery with his watch open and says, low, that the sherry glass in your drawer is evidence or blackmail: you will tell the drawing room of a lady's visit at ten and the quarrel after, or the heir hears which. Cordelia Ormsby praises your discretion aloud; Nathaniel Yardley pushes a scrap under his door; you pocket it. IMAGE: a pencilled scrap under the nephew's door: twenty to eleven, the yard
+- T2N02 (third_crisis, turn 4) The Doctor's Snow: You leave the maids to the study and wade to the ice house, where Gideon Ashcombe lays out the body. You tell him whose boots tracked snow into the gun room, and from whose window; he states before Cornelius Ellingham that the master knew he was dying and had sent for his oldest friend. Indoors the grate is relit, the stub gone with the ash, and Lavinia Netherby telling the kitchen you deserted her. IMAGE: the yellow tallow stub lying on the ash heap, half sunk in grey slush
+- T2N03 (climax, turn 5) The Lady's Candle: Reginald Fairbrother brings Nathaniel Yardley down between himself and the groom. Standing before the fire you tell the room the night as the house already believes it, every other lie held back, then set Millicent Gresham's sherry glass on the table and name her: the study at ten, the nephew in the yard by twenty to eleven, the later candle a lady carrying servants' tallow up the back stairs. Millicent goes still; Nathaniel stammers; Fairbrother keeps silent; Major Carrington sends for her cloak. IMAGE: the sherry glass on the drawing-room table, lipstick dried on its rim
+- T2N04 (aftermath) The Key Across the Table: The carriage takes Millicent Gresham down the dripping road, Major Carrington on the box, the wrapped glass in his coat. Nathaniel Yardley, unlocked, passes you for the stables without a glance; Evangeline Davenport recites her eleven o'clock to Cornelius Ellingham. Reginald Fairbrother thanks you for never asking him the hour; Lavinia Netherby brings your tea. The Major, back by dinner, carves in the master's chair and hands you the study key; you lock up. IMAGE: the study key slid across the drawn cloth between the candlesticks
+- T3N01 (second_crisis, turn 2) Your Name Under One Hour: Major Lucius Carrington presses the quarrel at eleven round the master's empty chair and asks where your rounds took you; you tell the table you saw Nathaniel Yardley leave the back stairs at twenty to eleven and cross to the stables, and will swear to nothing else. Evangeline Davenport recites her eleven; Nathaniel kicks over his chair, bolts into the storm, is dragged back half-frozen and locked in. Millicent Gresham, tureen in hand, refuses you her hour. IMAGE: Nathaniel's chair on its back, sleet rattling the black panes
+- T3N02 (second_crisis, turn 3) The Hours Go to the Lawyer: You walk the murder night again, one candle along the gallery, counting door to door: the quarrel at half past ten, one flame on the back stairs at eleven. Reginald Fairbrother never lifts his head. The roof's snow crashes past the windows and the Major comes out demanding your hours; you carry them past him to Cornelius Ellingham, who puts his name under yours and tells the Major they go to the magistrate, not before. IMAGE: the roof's snow sliding past the gallery windows in one grey mass
+- T3N03 (third_crisis, turn 4) Law's Name on the Gallery: The eaves drip. Major Lucius Carrington bars you from the first floor and sends Lavinia Netherby to sift the study grate; you tell Cornelius Ellingham what you will say aloud if that grate is raked, and he climbs to the gallery and sends the maids down in law's name, naming his price after: the unsigned will never passes your lips. The Major posts Fairbrother at your door and walks Gideon Ashcombe across the slush to the ice house himself. IMAGE: wet coal dripping from the hod on the landing, the sieve beside it
+- T3N04 (climax, turn 5) The Keyhole Filled: The Major demands your account signed. You say a key in the inside lock fills the keyhole you saw the lamp through, pull the master's key from Lucius Carrington's waistcoat and set it in the study lock from the gallery; the solicitor, widow and doctor kneel and see nothing. He strikes you; Nathaniel Yardley pins his arms while you name him there, the tallow stub behind him, Fairbrother never asked. IMAGE: the master's key standing in the study lock, the keyhole gone dark
+- T3N05 (aftermath) The Next Cart: The carriage carries Lucius Carrington and Cornelius Ellingham away through the thaw, key and stub with them, the unsigned will never named. Reginald Fairbrother takes the house keys from Nathaniel Yardley, who pays your wages, writes your character and says a woman who put her hand in a gentleman's pocket cannot be kept. Lavinia Netherby hauls your box to the cart, muttering she never thought you had it in you. IMAGE: the master's last tray going down the back stairs in the valet's hands
+PEOPLE
+- Lucius Carrington (the Major), opposition: wants the nephew signed over to the magistrate at thaw so that nobody asks why he was summoned to the study at eleven; voice: clipped parade-ground sentences, states conclusions as if they were orders already given; filters everything through regimental procedure, reliability of men, and the hour by his watch; addresses you by surname and only to dispatch you elsewhere
+- Reginald Fairbrother (the master's valet of forty years): wants to carry out his master's last order to the letter and be let go to his grave with the house still thinking him faithful; voice: slow, formal, old-fashioned third-person deference even when angry; speaks in the household's routines, linen, candles, the master's habits; answers only the question asked and never the one meant
+- Nathaniel Yardley (the master's nephew and heir): wants to come into the estate without his debts or the stable loft being spoken of aloud; voice: quick and defensive, starts sentences twice, swears softly then apologises to the room; talks in sums owed, horses, and wagers; sulks into silence when pressed by the Major
+- Gideon Ashcombe (the doctor): wants to sign the certificate, get the body to the ice house, and leave with the widow's name untouched by his own; voice: measured, dry, clinical clauses; describes people as symptoms and rooms as temperatures; evades personal questions by returning to the body and the certificate
+- Millicent Gresham (the nephew's fiancée): wants her ten o'clock visit to the study and the sherry she drank there kept out of the account entirely; voice: low, hurried asides under cover of table service, then bright full sentences for the room; talks in the vocabulary of obligations, settlements, and what is proper; never addresses you when anyone else is listening
+- Evangeline Davenport (the ward): wants to be believed, and to be kept in the house whoever inherits it; voice: eager, precise, over-detailed; repeats her account in the same words each time as if reciting; frames everything by the clock and who was where; grows shrill when a detail is doubted
+- Cordelia Ormsby (the widow): wants the forged letter of credit back in her hands before anyone opens the desk; voice: languid, long sentences that circle a point without landing; speaks in society terms, visits, credit, reputations; flatters the servant she wants something from
+- Lavinia Netherby (the housemaid): wants to keep her place through the change of masters and not be the one blamed for whatever goes missing; voice: short whispered sentences, drops into dialect when flustered; talks in grates, scuttles, linen, and who is cross with whom; speaks only when spoken to by anyone above her
+- Cornelius Ellingham (the solicitor): wants the old will to stand and the unsigned new one never to be mentioned, so his own position with the estate survives; voice: careful, qualified sentences full of conditions and sub-clauses; speaks in instruments, signatures, and what will and will not stand at law; never offers an opinion without first asking who else has given one
+- Barnaby Quarles (the lodge-keeper): wants to report the state of the road and get back to his fire before the drifts close again

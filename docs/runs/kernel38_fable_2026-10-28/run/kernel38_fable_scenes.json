@@ -1,0 +1,802 @@
+{
+  "story_id": "kernel38_fable",
+  "stage": "B0",
+  "scenes": [
+    {
+      "id": "S_N01",
+      "major": "N01",
+      "nodes": [
+        "N01",
+        "N01a",
+        "N01b"
+      ],
+      "beat": "opening_crisis",
+      "title": "The Door Comes Down",
+      "lines": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "moments": {
+        "opportunity": [
+          "N01a"
+        ],
+        "demonstration": [
+          "N01b"
+        ]
+      },
+      "event": 1,
+      "ending": false,
+      "next": [
+        "S_N02",
+        "S_T3N01"
+      ]
+    },
+    {
+      "id": "S_N02",
+      "major": "N02",
+      "nodes": [
+        "N02",
+        "N02a",
+        "N02b",
+        "N02c",
+        "N02d",
+        "N02e"
+      ],
+      "beat": "second_crisis",
+      "title": "Dinner for Seven",
+      "lines": [
+        "T1",
+        "T2"
+      ],
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C05",
+        "C03",
+        "C06",
+        "C09",
+        "C02"
+      ],
+      "moments": {
+        "opportunity": [
+          "N02a",
+          "N02b",
+          "N02c"
+        ],
+        "demonstration": [
+          "N02d",
+          "N02e"
+        ]
+      },
+      "event": 2,
+      "ending": false,
+      "next": [
+        "S_N03"
+      ]
+    },
+    {
+      "id": "S_N03",
+      "major": "N03",
+      "nodes": [
+        "N03",
+        "N03a",
+        "N03b",
+        "N03c",
+        "N03d"
+      ],
+      "beat": "second_crisis",
+      "title": "The Rounds Walked Twice",
+      "lines": [
+        "T1",
+        "T2"
+      ],
+      "where": [
+        "L01",
+        "L02"
+      ],
+      "who": [
+        "C02",
+        "C07",
+        "C01"
+      ],
+      "moments": {
+        "revelation": [
+          "N03a"
+        ],
+        "opportunity": [
+          "N03b",
+          "N03c"
+        ],
+        "demonstration": [
+          "N03d"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_N04",
+        "S_T2N01"
+      ]
+    },
+    {
+      "id": "S_N04",
+      "major": "N04",
+      "nodes": [
+        "N04",
+        "N04a",
+        "N04b",
+        "N04c"
+      ],
+      "beat": "third_crisis",
+      "title": "The Thaw",
+      "lines": [
+        "T1"
+      ],
+      "where": [
+        "L03",
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C08",
+        "C10",
+        "C05"
+      ],
+      "moments": {
+        "opportunity": [
+          "N04a",
+          "N04b"
+        ],
+        "demonstration": [
+          "N04c"
+        ]
+      },
+      "event": 3,
+      "ending": false,
+      "next": [
+        "S_N05"
+      ]
+    },
+    {
+      "id": "S_N05",
+      "major": "N05",
+      "nodes": [
+        "N05",
+        "N05a",
+        "N05b"
+      ],
+      "beat": "third_crisis",
+      "title": "The Maid's Apron",
+      "lines": [
+        "T1"
+      ],
+      "where": [
+        "L02",
+        "L04",
+        "L05"
+      ],
+      "who": [
+        "C08",
+        "C01",
+        "C09",
+        "C07"
+      ],
+      "moments": {
+        "opportunity": [
+          "N05a",
+          "N05b"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_N06"
+      ]
+    },
+    {
+      "id": "S_N06",
+      "major": "N06",
+      "nodes": [
+        "N06",
+        "N06a",
+        "N06b",
+        "N06c"
+      ],
+      "beat": "climax",
+      "title": "A Housekeeper's Reckoning",
+      "lines": [
+        "T1"
+      ],
+      "where": [
+        "L06"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C05",
+        "C04",
+        "C09",
+        "C07",
+        "C06"
+      ],
+      "moments": {
+        "opportunity": [
+          "N06a",
+          "N06b",
+          "N06c"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_N07"
+      ]
+    },
+    {
+      "id": "S_N07",
+      "major": "N07",
+      "nodes": [
+        "N07",
+        "N07a",
+        "N07b"
+      ],
+      "beat": "aftermath",
+      "title": "The First Cart",
+      "lines": [
+        "T1"
+      ],
+      "where": [
+        "L02",
+        "L07",
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C09",
+        "C03",
+        "C02",
+        "C08"
+      ],
+      "moments": {
+        "resolution": [
+          "N07a",
+          "N07b"
+        ]
+      },
+      "event": null,
+      "ending": true
+    },
+    {
+      "id": "S_T2N01",
+      "major": "T2N01",
+      "nodes": [
+        "T2N01",
+        "T2N01a",
+        "T2N01b",
+        "T2N01c"
+      ],
+      "beat": "third_crisis",
+      "title": "A Cart by Noon",
+      "lines": [
+        "T2"
+      ],
+      "where": [
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C10",
+        "C08",
+        "C07",
+        "C03"
+      ],
+      "moments": {
+        "revelation": [
+          "T2N01a"
+        ],
+        "opportunity": [
+          "T2N01b",
+          "T2N01c"
+        ]
+      },
+      "event": 3,
+      "ending": false,
+      "next": [
+        "S_T2N02"
+      ]
+    },
+    {
+      "id": "S_T2N02",
+      "major": "T2N02",
+      "nodes": [
+        "T2N02",
+        "T2N02a",
+        "T2N02b",
+        "T2N02c"
+      ],
+      "beat": "third_crisis",
+      "title": "The Doctor's Snow",
+      "lines": [
+        "T2"
+      ],
+      "where": [
+        "L08",
+        "L05"
+      ],
+      "who": [
+        "C04",
+        "C09",
+        "C08",
+        "C02"
+      ],
+      "moments": {
+        "opportunity": [
+          "T2N02a",
+          "T2N02b"
+        ],
+        "demonstration": [
+          "T2N02c"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_T2N03"
+      ]
+    },
+    {
+      "id": "S_T2N03",
+      "major": "T2N03",
+      "nodes": [
+        "T2N03",
+        "T2N03a",
+        "T2N03b",
+        "T2N03c"
+      ],
+      "beat": "climax",
+      "title": "The Lady's Candle",
+      "lines": [
+        "T2"
+      ],
+      "where": [
+        "L06"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C05",
+        "C09"
+      ],
+      "moments": {
+        "opportunity": [
+          "T2N03a",
+          "T2N03b",
+          "T2N03c"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_T2N04"
+      ]
+    },
+    {
+      "id": "S_T2N04",
+      "major": "T2N04",
+      "nodes": [
+        "T2N04",
+        "T2N04a",
+        "T2N04b"
+      ],
+      "beat": "aftermath",
+      "title": "The Key Across the Table",
+      "lines": [
+        "T2"
+      ],
+      "where": [
+        "L06",
+        "L03",
+        "L07"
+      ],
+      "who": [
+        "C05",
+        "C01",
+        "C03",
+        "C06",
+        "C09",
+        "C02",
+        "C08",
+        "C07"
+      ],
+      "moments": {
+        "resolution": [
+          "T2N04a",
+          "T2N04b"
+        ]
+      },
+      "event": null,
+      "ending": true
+    },
+    {
+      "id": "S_T3N01",
+      "major": "T3N01",
+      "nodes": [
+        "T3N01",
+        "T3N01a",
+        "T3N01b"
+      ],
+      "beat": "second_crisis",
+      "title": "Your Name Under One Hour",
+      "lines": [
+        "T3"
+      ],
+      "where": [
+        "L03"
+      ],
+      "who": [
+        "C01",
+        "C06",
+        "C03",
+        "C05"
+      ],
+      "moments": {
+        "opportunity": [
+          "T3N01a",
+          "T3N01b"
+        ]
+      },
+      "event": 2,
+      "ending": false,
+      "next": [
+        "S_T3N02"
+      ]
+    },
+    {
+      "id": "S_T3N02",
+      "major": "T3N02",
+      "nodes": [
+        "T3N02",
+        "T3N02a",
+        "T3N02b",
+        "T3N02c"
+      ],
+      "beat": "second_crisis",
+      "title": "The Hours Go to the Lawyer",
+      "lines": [
+        "T3"
+      ],
+      "where": [
+        "L01",
+        "L09"
+      ],
+      "who": [
+        "C02",
+        "C01",
+        "C09",
+        "C07"
+      ],
+      "moments": {
+        "revelation": [
+          "T3N02a"
+        ],
+        "opportunity": [
+          "T3N02b",
+          "T3N02c"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_T3N03"
+      ]
+    },
+    {
+      "id": "S_T3N03",
+      "major": "T3N03",
+      "nodes": [
+        "T3N03",
+        "T3N03a",
+        "T3N03b",
+        "T3N03c",
+        "T3N03d",
+        "T3N03e",
+        "T3N03f"
+      ],
+      "beat": "third_crisis",
+      "title": "Law's Name on the Gallery",
+      "lines": [
+        "T3"
+      ],
+      "where": [
+        "L09",
+        "L01"
+      ],
+      "who": [
+        "C01",
+        "C08",
+        "C09",
+        "C02",
+        "C04",
+        "C05",
+        "C07"
+      ],
+      "moments": {
+        "opportunity": [
+          "T3N03a",
+          "T3N03c",
+          "T3N03d",
+          "T3N03e"
+        ],
+        "demonstration": [
+          "T3N03b"
+        ],
+        "revelation": [
+          "T3N03f"
+        ]
+      },
+      "event": 3,
+      "ending": false,
+      "next": [
+        "S_T3N04"
+      ]
+    },
+    {
+      "id": "S_T3N04",
+      "major": "T3N04",
+      "nodes": [
+        "T3N04",
+        "T3N04a"
+      ],
+      "beat": "climax",
+      "title": "The Keyhole Filled",
+      "lines": [
+        "T3"
+      ],
+      "where": [
+        "L06",
+        "L01",
+        "L07"
+      ],
+      "who": [
+        "C01",
+        "C02",
+        "C03",
+        "C09",
+        "C07",
+        "C04"
+      ],
+      "moments": {
+        "opportunity": [
+          "T3N04a"
+        ]
+      },
+      "event": null,
+      "ending": false,
+      "next": [
+        "S_T3N05"
+      ]
+    },
+    {
+      "id": "S_T3N05",
+      "major": "T3N05",
+      "nodes": [
+        "T3N05",
+        "T3N05a",
+        "T3N05b",
+        "T3N05c",
+        "T3N05d",
+        "T3N05e"
+      ],
+      "beat": "aftermath",
+      "title": "The Next Cart",
+      "lines": [
+        "T3"
+      ],
+      "where": [
+        "L06",
+        "L04"
+      ],
+      "who": [
+        "C01",
+        "C09",
+        "C02",
+        "C03",
+        "C08",
+        "C05",
+        "C07",
+        "C04"
+      ],
+      "moments": {
+        "resolution": [
+          "T3N05a",
+          "T3N05b",
+          "T3N05c",
+          "T3N05d",
+          "T3N05e"
+        ]
+      },
+      "event": null,
+      "ending": true
+    }
+  ],
+  "merge_candidates": [],
+  "subjects": [
+    {
+      "kind": "person",
+      "id": "C01",
+      "name": "Lucius Carrington",
+      "label": "the Major",
+      "tier": "arc",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "person",
+      "id": "C02",
+      "name": "Reginald Fairbrother",
+      "label": "the master's valet of forty years",
+      "tier": "arc",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "person",
+      "id": "C03",
+      "name": "Nathaniel Yardley",
+      "label": "the master's nephew and heir",
+      "tier": "supporting",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "person",
+      "id": "C04",
+      "name": "Gideon Ashcombe",
+      "label": "the doctor",
+      "tier": "supporting",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "person",
+      "id": "C05",
+      "name": "Millicent Gresham",
+      "label": "the nephew's fiancée",
+      "tier": "arc",
+      "first_scene": "S_N02"
+    },
+    {
+      "kind": "person",
+      "id": "C06",
+      "name": "Evangeline Davenport",
+      "label": "the ward",
+      "tier": "supporting",
+      "first_scene": "S_N02"
+    },
+    {
+      "kind": "person",
+      "id": "C07",
+      "name": "Cordelia Ormsby",
+      "label": "the widow",
+      "tier": "arc",
+      "first_scene": "S_N03"
+    },
+    {
+      "kind": "person",
+      "id": "C08",
+      "name": "Lavinia Netherby",
+      "label": "the housemaid",
+      "tier": "arc",
+      "first_scene": "S_N04"
+    },
+    {
+      "kind": "person",
+      "id": "C09",
+      "name": "Cornelius Ellingham",
+      "label": "the solicitor",
+      "tier": "supporting",
+      "first_scene": "S_N02"
+    },
+    {
+      "kind": "person",
+      "id": "C10",
+      "name": "Barnaby Quarles",
+      "label": "the lodge-keeper",
+      "tier": "functional",
+      "first_scene": "S_N04"
+    },
+    {
+      "kind": "place",
+      "id": "L01",
+      "name": "the first-floor gallery",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "place",
+      "id": "L02",
+      "name": "the back stairs",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "place",
+      "id": "L03",
+      "name": "the dining room",
+      "first_scene": "S_N02"
+    },
+    {
+      "kind": "place",
+      "id": "L04",
+      "name": "the housekeeper's room",
+      "first_scene": "S_N05"
+    },
+    {
+      "kind": "place",
+      "id": "L05",
+      "name": "the servants' hall",
+      "first_scene": "S_N05"
+    },
+    {
+      "kind": "place",
+      "id": "L06",
+      "name": "the drawing room",
+      "first_scene": "S_N06"
+    },
+    {
+      "kind": "place",
+      "id": "L07",
+      "name": "the master's study",
+      "first_scene": "S_N07"
+    },
+    {
+      "kind": "place",
+      "id": "L08",
+      "name": "the ice house",
+      "first_scene": "S_T2N02"
+    },
+    {
+      "kind": "place",
+      "id": "L09",
+      "name": "the library",
+      "first_scene": "S_T3N02"
+    },
+    {
+      "kind": "event",
+      "id": "E1",
+      "name": "The study door is broken down with the hall poker, the household crowding the gallery; a key is heard to fall onto the carpet inside, and the master is found at his desk with the window frozen shut, the fire gone to ash, and a yellow tallow stub, not one of the study's white wax candles, snuffed in the mantel candlestick.",
+      "first_scene": "S_N01"
+    },
+    {
+      "kind": "event",
+      "id": "E2",
+      "name": "At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door.",
+      "first_scene": "S_N02"
+    },
+    {
+      "kind": "event",
+      "id": "E3",
+      "name": "The eaves begin to drip at dawn and the lodge-keeper wades up to say the road will carry a cart by noon; the Major orders the carriage, sends the maids up to the study with pails and a fresh scuttle, and calls the house to the drawing room to hear the housekeeper's account of the night before they sign.",
+      "first_scene": "S_N04"
+    }
+  ],
+  "rooms": {
+    "min": 11,
+    "max": 15,
+    "scale": "room_or_building",
+    "exploring": false,
+    "locations": 9
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "ways_by_turn": [
+    {
+      "id": 1,
+      "ways_through": [
+        {
+          "way": "you refuse the Major's order to go down to the plate, plant yourself in the study doorway with your key ring in your fist and tell him the housekeeper counts every candle and cloth in a room before any gentleman shuts it up, and you walk the four walls while he argues with you",
+          "cost": "the Major marks you as insubordinate in front of the whole gallery, the nephew sees his housekeeper answer back to a guest and will later sign the order to search your room without a word, and the valet, who has waited a fortnight for this, tells the maids on the stairhead that the new woman has forgotten her place on her first dead master"
+        },
+        {
+          "way": "you go down as ordered, double straight back up the back stairs, and while the doctor has the Major bent over the desk you put your eye to the keyhole again from the gallery side to see what the lamp looks like through it now, then step in behind the maids' linen basket and look at the mantel candlestick and the poker in its stand before the door closes",
+          "cost": "the valet sees you come up the back stairs that nobody but he uses after ten and knows from that moment that you are watching the stairs and his candle box, and he goes to the Major with it before dinner, so that your every errand upstairs is now done under the Major's eye"
+        },
+        {
+          "way": "you send the housemaid ahead with the ash pan and the master's lamp for the doctor's light, follow her in with your apron and hearth brush as any housekeeper would, kneel at the grate to sweep the fallen ash and feel how cold it is, and lift the poker from its stand and set it straight to learn its weight",
+          "cost": "the doctor sees you with the poker in your hand and says so to the Major, who repeats it at breakfast that the housekeeper was handling the weapon before the body was cold, and the housemaid, who had to hold the lamp over the dead man's face while you did it, will not go up to the study again and cries when you ask her what she saw"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "ways_through": [
+        {
+          "way": "as you set the fiancée's place you tell her in a whisper that the sherry glass is in your room, unwashed, and will stay unwashed until she tells you between the fish and the roast what hour she really left the study and whether the lamp and fire were burning when she did",
+          "cost": "she gives you the hour but she now knows you are holding a glass with her mouth on it, and before midnight she has told the Major the new housekeeper is pocketing things from the study, which brings the search of your room; and the nephew, who watched the two of you whispering over his plate, thinks you and she are keeping something from him"
+        },
+        {
+          "way": "when the Major presses you across the table for your rounds, you answer him flatly before all seven that at twenty to eleven you saw the nephew come down the back stairs and cross the yard to the stables, not go to the study, and that you will swear to it",
+          "cost": "the nephew bolts from the table for the yard anyway to hide what he keeps in the stable loft and is dragged back half-frozen, the Major now demands your whole account in writing that night, and the fiancée, having seen that you tell what you see, will not give you the hour she left and tells you so in the passage"
+        },
+        {
+          "way": "you spin the dinner out and wrong-foot the Major: you bring the ward's plate to the wrong place, let the sherry decanter tip across his cuff so he must go up to change, and in the fuss draw the fiancée into the pantry passage for two minutes to get the hour and the look of the fire out of her",
+          "cost": "the valet, standing at the sideboard, has watched you serve a dinner no housekeeper of his master's would have served and tells the Major you are not fit for the post, the Major comes back in dry cuffs asking why a careful woman spilt his sherry, and the ward, whose plate you moved, sulks and will not now say anything to you about the hour of the quarrel"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "ways_through": [
+        {
+          "way": "you go to the valet in his chair at the nephew's door with your candle box open in your hands, count the tallow in front of him to show it one short, and tell him you will put the box before the heir at breakfast and say that only he draws from it after ten, unless he gives you the hour now",
+          "cost": "he says nothing to you, but he is at the Major's door before dawn, and the hour you forced out of him comes back at breakfast as the Major's announcement that the valet lit 'the young gentleman' up at eleven; the nephew hears it through his locked door and believes his uncle's own man has turned on him"
+        },
+        {
+          "way": "you offer the valet a trade: you will tell the Major in writing that the valet is the senior servant and the candle box is in his keeping, and you will leave the house at the thaw without a character asked, if he will only give you the hour he drew the candle and which stairs he lit",
+          "cost": "you have put your own leaving in writing and the Major keeps the paper, the valet takes the hour to the Major instead of giving it to you, and the widow, passing on the gallery, hears you bargaining a servant's place with a servant and tells the fiancée you are not to be trusted with what any of them says"
+        },
+        {
+          "way": "you leave the valet in his chair and walk the rounds instead, counting seconds door to door by candle, and at midnight you catch the widow on her knees at the study keyhole with her hairpin, and trade her silence for her own: she tells you what she heard through the Major's door at eleven, and you say nothing of the hairpin or her forged letter",
+          "cost": "you now owe the widow a silence that will have to be broken in the drawing room if the nephew is to be cleared, the valet's hour stays unspoken and the Major has it to use first, and the nephew, who heard your step pass his door and go on without stopping, calls through the panel that the housekeeper too has left him to it"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "ways_through": [
+        {
+          "way": "you go up with the maids in your own apron and carry the scuttle yourself, take the ash pan from the grate with your own hands and slip the tallow stub from the candlestick into your apron pocket while you rake, and then ask the Major for the key 'to show the girls how the draught is stopped' and set it in the lock so the maids see with you that a key in the lock fills the keyhole",
+          "cost": "the housemaid sees the stub go into your pocket, and when the fiancée tells the Major you have been pocketing things it is the maid who is made to say so; your room is searched, the stub and your written timeline are taken into the Major's waistcoat with the key, and the maid will not look at you afterward"
+        },
+        {
+          "way": "you stand in the study doorway with your keys and will not let the maids past with the pails, and say in the Major's hearing and the solicitor's that you will not have that grate raked or that carpet swept before a magistrate has seen the room, whatever the Major orders",
+          "cost": "the Major dismisses you on the spot on the heir's word and has you taken to your room until the carriage goes, the grate is raked within the hour with you locked away, and you reach the drawing room with no stub and no weight of the poker in your hand, only the solicitor's grudging memory that the housekeeper objected before it was done"
+        },
+        {
+          "way": "you leave the study to the maids and go across the yard to the ice house where the doctor is seeing the body laid, and tell him that you know whose boots tracked snow into the gun room and from whose window, and that you will say nothing of it if he says now, before the solicitor, that the master knew he was dying and had sent for his oldest friend",
+          "cost": "the doctor says it, but while you are in the yard the study is raked and swept and the tallow stub goes out in the ash pail; you come back with the doctor's words and the keyhole only, and the housemaid who was left to sweep the dead man's carpet under the Major's eye, with no housekeeper beside her, tells the other servants you ran off and left her to it"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "ways_through": [
+        {
+          "way": "you give your account as a housekeeper's reckoning: you set the candle box on the table and count it one short before the room, say that a key in the inside lock fills a keyhole and that you saw the lamp through it, so the key the gallery heard fall came from the Major's hand, then turn to the valet and tell him his master ordered him to light that candle and that his master's last order is to say whom he lit, and when he says the Major's name you say it after him across the fire",
+          "cost": "the valet says before the heir and the guests that he lit the killer up the back stairs and held his tongue two days while the nephew was blamed, and the heir tells him he will go by the first cart; to clear the nephew you have said aloud the fiancée's ten o'clock visit, the doctor's affair and the widow's forged letter, so the nephew's marriage, the doctor's practice and the widow's name are broken in the same quarter hour, and the master is remembered as a man who sold his silence for thirty years"
+        },
+        {
+          "way": "you cross the drawing room to the Major, put your hand into his waistcoat pocket before he can stop you, take out the master's key and march the whole house up to the study door to set it in the lock and show them the keyhole filled, then name him on the gallery where the door came down",
+          "cost": "the Major strikes you across the face and the nephew has to hold him by the arms, the case is made by the key and the keyhole alone so the valet never has to speak and keeps his forty years, but a housekeeper who put her hand into a gentleman's pocket cannot be kept, and the heir, with the Major taken down the road in his carriage, gives you your wages and your character and tells you to go by the next cart"
+        },
+        {
+          "way": "you offer the Major a bargain in front of the room: you will read your account exactly as he asked, with nothing said of keyholes or candle boxes, if he will say now that the nephew is not to go down the road and let the carriage carry only the household's account to the magistrate, and you tell him, low, that you know what hour the valet drew the candle and will keep it if the nephew is kept",
+          "cost": "the nephew is saved and the valet keeps his silence and his place, but the Major stands at the fire unnamed and drives to the magistrate as the master's grieving friend, the master's death goes down as a quarrel with no one answered for it, and you keep your post only because the Major now knows you can be bought, and the fiancée, who heard the bargain, knows you would have sold her as readily"
+        },
+        {
+          "way": "you keep back every lie that does not touch the killing, the fiancée's visit, the widow's letter, the doctor's snow, and read your account trimmed to fit the case the house already believes, then put the nephew's name across the fire with the overheard quarrel and the stable yard behind it, or the fiancée's with the lipstick glass in your hand, and hold the room to it",
+          "cost": "the room believes you, the carriage is sent for the wrong passenger and the nephew or his fiancée goes down the road to the magistrate within the hour, the valet keeps his silence and thanks you for it, the Major shakes your hand at the fire as the housekeeper who did her duty, and you have given the magistrate the killer's own case with a servant's word under it, which is the one way to lose"
+        }
+      ]
+    }
+  ]
+}

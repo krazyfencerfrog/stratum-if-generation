@@ -1,0 +1,7 @@
+{
+  "timeline_structure": {"category": "linear", "evidence_basis": "genre_association", "note": "A forward-moving snowbound investigation; the murder night is referenced through the housekeeper's knowledge and guests' testimony rather than told as interwoven or scrambled chapters, so nonlinear doesn't apply."},
+  "timeline_duration": {
+    "ceiling": {"scale": "hours_to_days", "evidence_basis": "strong_inference", "note": "The storm has already isolated the house for two days and the whodunit must resolve while the house is still cut off; nothing signals the span extending beyond a few days."},
+    "floor": {"scale": "hours_to_days", "evidence_basis": "strong_inference", "note": "Accusing the wrong person branches on which outcome occurs, not on elapsed time — every path resolves within the same snowbound window."}
+  }
+}

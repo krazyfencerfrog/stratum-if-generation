@@ -1,0 +1,217 @@
+{
+  "notes": "An aftermath with no choice left to make: the player is dismissed, the carriage is leaving, and the only thing to do is see how each person in the house turns toward or away from her before she goes out to the cart. The state tells live in where Fairbrother stands and what Lavinia presses into her hand; the front door is the way out and the end.",
+  "opening": "The thaw has come overnight and the house drips at every gutter. On the deal desk lie your wages counted out in coin and a character in Mr Yardley's hand, which says that a woman who put her hand in a gentleman's pocket cannot be kept; Lavinia Netherby is roping your box by the stove and will not look up. Through the barred window the carriage stands on the gravel with Major Carrington and Mr Ellingham already inside it, the study key and the tallow stub gone with them, the unsigned will never once named. Overhead, in the front hall, Mr Yardley is handing the house keys to Reginald Fairbrother.",
+  "start_room": "the housekeeper's room",
+  "placement": [
+    {
+      "who": "Lavinia Netherby",
+      "room": "the housekeeper's room"
+    },
+    {
+      "who": "Reginald Fairbrother",
+      "room": "the front hall"
+    },
+    {
+      "who": "Nathaniel Yardley",
+      "room": "the front hall"
+    },
+    {
+      "who": "Gideon Ashcombe",
+      "room": "the front hall"
+    },
+    {
+      "who": "Lucius Carrington",
+      "room": "the front hall"
+    },
+    {
+      "who": "Cornelius Ellingham",
+      "room": "the front hall"
+    },
+    {
+      "who": "Millicent Gresham",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Cordelia Ormsby",
+      "room": "the drawing room"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the front hall",
+      "variants": [
+        {
+          "state": "fairbrother_faith",
+          "direction": "up",
+          "after": null,
+          "text": "Fairbrother has come up to the hall table to take the house keys from Mr Yardley, his head lifted, and his eye goes past the young man to the baize door and the box behind it. The front door stands open on the dripping gravel; the carriage glass is fogged, and behind it two hands are folded over the place a watch used to hang."
+        },
+        {
+          "state": "fairbrother_faith",
+          "direction": "down",
+          "after": null,
+          "text": "Fairbrother takes the house keys at the stair foot without looking up, the ring closing in his old hand as if it had always been there. The front door stands open on the dripping gravel; behind the carriage glass the Major is leaning across to Mr Ellingham, talking, and does not stop."
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "The front door is open and the carriage waits on the gravel. The Major sits very upright behind the glass, hands folded over his empty watch pocket, saying nothing at all. Fairbrother stands with the house keys in his hand and Dr Ashcombe by the coat stand, pulling on his gloves slowly."
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "The front door is open and the carriage waits on the gravel. Behind the glass the Major is talking the length of a sentence into Mr Ellingham's ear, and the word that carries across the step is 'housekeeper'. Fairbrother holds the house keys and Dr Ashcombe stands by the coat stand, finding something to do with his gloves."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The front door stands open on grey light and the sound of water running off the porch. The carriage waits on the gravel with its two passengers; the house keys have changed hands at the stair foot; Dr Ashcombe is by the coat stand with his bag, in no hurry to go out to it."
+        }
+      ]
+    },
+    {
+      "room": "the housekeeper's room",
+      "variants": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "Your box is roped and stood on end by the stove. Lavinia has her shawl on to carry it and keeps one hand closed in her apron pocket. The key board has your ring still on its hook, the only thing in the room that is not yet packed or paid."
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "Your box is roped by the stove and Lavinia stands over it with her arms folded, waiting to be told to lift it. The character and the coin lie on the deal desk. The old housekeeper's bonnet hangs where it always hung; yours will not join it."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The stove is nearly out and no one will make it up again for you. Your box is roped, your wages are on the desk, and your ring of keys hangs on the key board under the dead woman's bonnet."
+        }
+      ]
+    },
+    {
+      "room": "the drawing room",
+      "variants": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "Miss Gresham sits at the sofa table with her ring on her finger and a sheet of paper under her hand, which she turns face down when the door opens. Mrs Ormsby on the window seat watches the carriage through the glass and does not turn round."
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "Miss Gresham is at the sofa table, saying to no one and everyone that the housekeeper went through pockets; she does not say whose. Mrs Ormsby on the window seat has her own letter already sealed and addressed to town."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The fire has been let burn low; nobody has rung for coal. Miss Gresham sits at the sofa table and Mrs Ormsby on the window seat, both of them with the composure of women who have been left in possession of a house."
+        }
+      ]
+    }
+  ],
+  "moments": [],
+  "actions": [
+    {
+      "verb": "use",
+      "object": "the key board",
+      "detail": null,
+      "label": "hang your keys on the board",
+      "room": "the housekeeper's room",
+      "text": "You take the ring from your waist and hang it on its hook under the old housekeeper's bonnet. Thirty-one keys, every one of which you could name in the dark. The study key is not among them and never will be now.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Reginald Fairbrother",
+      "detail": "the master",
+      "label": "'He is yours to keep now, Mr Fairbrother.'",
+      "room": "the front hall",
+      "text": "Fairbrother weighs the house keys in his palm. Either he says, loud enough for the groom in the yard, that a woman who saw a tallow stub at ten paces was wasted below stairs, and goes down himself for your box; or he says 'Yes, Mrs—' and cannot finish the name, and turns to the stair, and your box goes down with the maid.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Lavinia Netherby",
+      "detail": "the night the master died",
+      "label": "'You may say it now, Lavinia.'",
+      "room": null,
+      "text": "She hauls the box up against her hip. Either she mutters that she never thought you had it in you and, at the step, closes your fingers over a flattened tallow stub, the one from her own candlestick, and is gone in before you can speak; or she says the valet told her to carry it and that is all she knows, and sets it on the cart and is back indoors before the wheel turns.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Gideon Ashcombe",
+      "detail": "Mrs Ormsby",
+      "label": "'Does Mrs Ormsby send any word?'",
+      "room": "the front hall",
+      "text": "The doctor finishes with his gloves. Either he says, not looking at you, that Mrs Ormsby knows a house in town not particular about characters, and gives you a street; or he says only that Mrs Ormsby wrote to town this morning, and the way he says it tells you what she wrote, and that it has gone down the road ahead of you.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "go",
+      "object": "the front door",
+      "detail": null,
+      "label": "out the front door to the cart",
+      "room": "the front hall",
+      "text": "You go out by the front door, which is not the door you came in by. The carriage has turned on the gravel and gone down through the thaw with the key and the stub and two gentlemen who will not speak of a will. The cart waits at the side with your box in it; the groom has something in his glove that may be a letter, unsigned, in a lady's hand, or may be nothing. The house drips behind you and does not watch you go.",
+      "reveals": [],
+      "leads_to": "E_T3N05",
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "text": "The carriage wheels bite the gravel and it turns and goes down the drive through the melting snow. Behind the glass, as it passes the window, the Major's hands are either folded and still over his empty watch pocket, or moving as he talks.",
+      "after_turns": 3,
+      "after": null
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "From the yard, the groom's voice carries through the house: the road will not keep soft all day, and he means to be at the lodge before it freezes again."
+    },
+    {
+      "after": 7,
+      "text": "Somewhere above, Fairbrother tries the house keys one by one in the baize door, the way the dead woman used to, learning them."
+    }
+  ],
+  "props": [
+    {
+      "name": "the character",
+      "room": "the housekeeper's room",
+      "description": "A half sheet in Mr Yardley's hand, the ink barely dry. It says you are honest in your accounts and that a woman who put her hand in a gentleman's pocket cannot be kept. It is signed. It will get you nothing.",
+      "portable": true
+    }
+  ],
+  "frame": {
+    "composition": "Low eye-level shot from inside the housekeeper's room, looking past the roped box and the dying stove toward the barred window, through which the waiting carriage stands on wet gravel",
+    "subjects": [
+      "Lavinia Netherby in a shawl, stooped over a roped wooden box by the stove, face turned away, one hand closed in her apron pocket",
+      "A deal desk with coins counted in a row and a half sheet of paper",
+      "A key board with a single ring of keys under a black bonnet",
+      "Beyond the bars, a dark carriage with fogged glass and two seated silhouettes"
+    ],
+    "environment": "Grey morning of the thaw, water running off eaves, flat snow-light through a barred window, stove down to embers",
+    "palette_mood": "Slate grey, wet black, dull brass and tallow yellow; cold, resigned, the hush of a house that has already decided",
+    "prompt_summary": "Atmospheric Victorian graphic novel illustration, below-stairs housekeeper's room in grey thaw light, housemaid roping a wooden travelling box by a dying stove, coins and a letter on a plain desk, ring of keys hanging under an old black bonnet, barred window framing a waiting carriage on dripping gravel, muted slate and tallow palette, melancholy observant mood"
+  }
+}

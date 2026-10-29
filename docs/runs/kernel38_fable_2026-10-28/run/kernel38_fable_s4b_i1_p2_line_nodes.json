@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "N05",
+      "title": "The Maid's Apron",
+      "summary": "Barred from the first floor, you stop Lavinia Netherby on the back stairs with her empty pail and tell her the valet will name her for the short count unless she brings you the mantel stub and the ash pan unsifted. She comes down white-faced with the stub folded in her apron, two wicks' worth of wax on it. Within the hour Major Carrington turns out your room while Cornelius Ellingham lists what is taken; Lavinia, ash on her apron, is made to confess before the kitchen and given notice.",
+      "image": "a yellow tallow stub, two wicks deep, passed hand to hand under a folded apron",
+      "where": [
+        "the back stairs",
+        "the housekeeper's room",
+        "the servants' hall"
+      ],
+      "who": [
+        "the housemaid",
+        "the Major",
+        "the solicitor"
+      ]
+    },
+    {
+      "id": "N06",
+      "title": "A Housekeeper's Reckoning",
+      "summary": "Ordered to read the Major's version before the fire, you count the candle box one short instead, say a key in a lock fills a keyhole and you saw the lamp through it, and name aloud Millicent Gresham's sherry, Cordelia Ormsby's hairpin and Gideon Ashcombe's snowy boots. Reginald Fairbrother then says he lit Lucius Carrington up at eleven; the doctor confirms the summons; you say the Major's name, and Nathaniel Yardley and the solicitor take his arms.",
+      "image": "the candle box open on the drawing-room table, eleven white candles and one empty slot",
+      "where": [
+        "the drawing room"
+      ],
+      "who": [
+        "the Major",
+        "the master's valet of forty years",
+        "the master's nephew and heir",
+        "the nephew's fiancée",
+        "the doctor",
+        "the solicitor",
+        "the widow",
+        "the ward"
+      ]
+    },
+    {
+      "id": "N07",
+      "title": "The First Cart",
+      "summary": "Lucius Carrington goes down the dripping drive with your timeline, the stub and the key, Cornelius Ellingham beside him to say what will stand. Nathaniel Yardley is master, though Millicent Gresham has returned his ring. Reginald Fairbrother carries forty years down the back stairs in one box and goes without a character; Lavinia Netherby passes you on the stairs without a word. You lock the study with the key the new master has given you.",
+      "image": "a single wooden box carried down the back stairs, the lid tied with cord",
+      "where": [
+        "the back stairs",
+        "the master's study",
+        "the first-floor gallery"
+      ],
+      "who": [
+        "the Major",
+        "the solicitor",
+        "the master's nephew and heir",
+        "the master's valet of forty years",
+        "the housemaid"
+      ]
+    }
+  ],
+  "new_locations": [
+    {
+      "name": "the housekeeper's room",
+      "kind": "your own room below stairs, where the keys, the account book and what you have kept are stored",
+      "why": "the one place in the house that is yours, and so the place the Major has searched"
+    },
+    {
+      "name": "the servants' hall",
+      "kind": "the below-stairs room where the staff eat and where you are confined by the Major's order",
+      "why": "where a servant can be shamed before the whole kitchen, and where you must wait while the study is emptied above"
+    },
+    {
+      "name": "the drawing room",
+      "kind": "the ground-floor reception room where the household is gathered before the fire",
+      "why": "where the account is called for and the killer must be named before the seven"
+    },
+    {
+      "name": "the master's study",
+      "kind": "the first-floor room off the gallery where the master was found, locked since the door came down",
+      "why": "the room the whole story has been kept out of, and the one the new master finally hands you the key to"
+    }
+  ],
+  "new_characters": []
+}

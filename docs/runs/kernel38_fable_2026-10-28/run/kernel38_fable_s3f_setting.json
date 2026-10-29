@@ -1,0 +1,24 @@
+{
+  "setting_structure": {
+    "ceiling": {
+      "value": "single",
+      "evidence_basis": "explicit",
+      "note": "The snowstorm has cut the house off for two days, so the whole investigation is confined to one house-complex; the invited flashback to the night of the murder is set in the same house and adds no distinct place."
+    },
+    "floor": {
+      "value": "single",
+      "evidence_basis": "explicit"
+    }
+  },
+  "setting_scale": {
+    "ceiling": {
+      "tier": "room_or_building",
+      "evidence_basis": "strong_inference",
+      "note": "A country house is a single large structure with multiple rooms (study, guest quarters), not a city-like multi-sector complex; the snowbound isolation keeps the footprint from reaching grounds or settlements beyond it."
+    },
+    "floor": {
+      "tier": "room_or_building",
+      "evidence_basis": "strong_inference"
+    }
+  }
+}

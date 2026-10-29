@@ -1,0 +1,8 @@
+{
+  "core_thematic_axis": {"pole_a": "uncovering the truth", "pole_b": "protective discretion", "evidence_basis": "genre_association", "note": "No value tension is stated; a closed-circle whodunit conventionally pits exposing the truth against keeping the household's secrets and peace, and the new-housekeeper framing flavors but does not force this reading, so the tie resolves toward genre_association."},
+  "secondary_thematic_axis": {"approaches": ["methodical deduction", "quiet observation", "direct confrontation"], "evidence_basis": "genre_association", "note": "No manner of pursuit is stated; these are conventional detection styles available to a servant-witness under either pole."},
+  "moral_valence": {
+    "best_case_framing": {"label": "justice served, culprit exposed", "evidence_basis": "strong_inference", "note": "The Kernel's demand for a fair solution combined with the option to accuse wrongly makes the outcome choice-driven; the correct accusation path lands as clean vindication."},
+    "worst_case_framing": {"label": "innocent condemned, killer free", "evidence_basis": "strong_inference", "note": "The explicitly requested wrong-accusation path lands in the opposite register from the best case, as the same choice-driven structure implies."}
+  }
+}

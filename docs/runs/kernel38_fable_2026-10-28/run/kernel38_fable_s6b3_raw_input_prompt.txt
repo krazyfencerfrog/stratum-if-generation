@@ -1,0 +1,154 @@
+SYSTEM PROMPT
+
+You are step 6b3 of an interactive fiction generation pipeline: "you", the
+protagonist, as the engine presents them. "You" is a defined person the
+player steers: a history, ties, a need, and something left open. The player
+can examine themselves and THINK about things; you write what they find.
+
+ - description: what "you" see when you look at yourself, as variants: by
+   a state of the people around you if their arc marks you (soaked from the
+   lock, a bruise from the trench), or after a node (after N04: your hands
+   are rope-burned), and a default last. Concrete, second person, one or two
+   sentences.
+ - carrying: what you have on you at the start, one to three things that
+   matter to who you are (her ring on a cord; your father's watch), each
+   with a description when examined.
+ - think: three to six topics: your history, each tie that matters (the
+   people the story turns on, from your side), your need, the open question.
+   For each, a label for the menu ("Mira", "the move north"), known_after
+   (null from the start; a node id for a thought you can only have after
+   something happens), and what you think, as variants: by state (what you
+   think of someone changes as their arc moves) or after a node, with a
+   default last. Write thought, not summary: specific, a little unsure,
+   never an instruction to the player. Leave the open question open: say
+   what pulls each way, not which way you go.
+
+EMBODIMENT INVARIANT:
+If the protagonist is non-human, disembodied, an AI, or a distributed system, do NOT give them human anatomy, hands, feet, pockets, or physical human gestures. Describe their sensors, telemetry, core housing, data buffers, or physical substrates.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<one sentence: what the player should learn about themselves by playing>",
+  "description": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node id or null>", "text": "<what you see>"}],
+  "carrying": [{"name": "<thing>", "description": "<when examined>"}],
+  "think": [{"label": "<menu label>", "known_after": "<node id or null>",
+             "says": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node id or null>", "text": "<what you think>"}]}]
+}
+
+EXAMPLE (a late-night radio phone-in story; you are the new overnight host; for shape only)
+
+{
+  "notes": "You took this job to be a voice nobody can see; the player finds out whether you can stay that.",
+  "description": [
+    {"state": null, "direction": null, "after": "N04", "text": "Your hands smell of the fire stairs and your voice is going; you have talked for six hours straight."},
+    {"state": null, "direction": null, "after": null, "text": "Headphones, a cardigan you bought for the job, a face you have stopped checking in the studio glass."}
+  ],
+  "carrying": [{"name": "the cassette", "description": "A demo tape with your old name on the label in your mother's writing. You have never played it on air."}],
+  "think": [
+    {"label": "your old name", "known_after": null, "says": [{"state": null, "direction": null, "after": null, "text": "Nobody here knows it. That was the point of the night shift: a voice with no face and no name anyone could look up."}]},
+    {"label": "Dana", "known_after": null, "says": [
+      {"state": "dana_trust", "direction": "up", "after": null, "text": "She covered for you tonight without being asked. You do not know what you did to deserve it, and you are afraid of finding out you didn't."},
+      {"state": "dana_trust", "direction": "down", "after": null, "text": "Every time you go over her head she gets a little quieter. You tell yourself it's her job to worry. It is also her show."},
+      {"state": null, "direction": null, "after": null, "text": "She runs the board like a pilot and calls you 'kid' though you're forty."}]},
+    {"label": "the caller", "known_after": "N01a", "says": [{"state": null, "direction": null, "after": null, "text": "He knew the song. Nobody alive knows that song but you and one other person, and she is not a man."}]}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+YOU (who you are, your history, ties, need, what is open; your arc on each line; the states; the lines):
+{
+ "you": {
+  "name": "Arabella Vane",
+  "who": "You are the new housekeeper, a fortnight in post, addressed by your surname and expected not to be noticed; last night you did your rounds with a candle and a ring of keys while the master's seven guests moved about the house, and this morning the master is dead behind his study door and you are the only person who knows where each of them was and when.",
+  "history": "You came here a widow from a smaller house, hired by the master himself, who told you on your first morning that he meant to put his house in order before Christmas; you have not yet been given the study key, because he kept the only one on his own chain.",
+  "wants": "to put the right name on the master's killer before the road opens and the house hands the magistrate the wrong one",
+  "need": "to find out whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters",
+  "ties": [
+   {
+    "who": "the master's valet of forty years",
+    "what": "the senior servant who has not forgiven the master for hiring a stranger over his head, and who lit someone up the back stairs that night"
+   },
+   {
+    "who": "the Major, the master's oldest friend",
+    "what": "the gentleman who has given you your orders since the door came down, and who wants your timeline read aloud in support of his case"
+   },
+   {
+    "who": "the master's nephew and heir",
+    "what": "the young man who will be your master if the old will stands, and whom you saw come down the back stairs at twenty to eleven and cross the yard to the stables"
+   },
+   {
+    "who": "the nephew's fiancée",
+    "what": "the lady who asked you, as one woman to another, to wash a certain glass and say nothing"
+   }
+  ],
+  "open": "whether you say everything you saw, whatever it breaks, or keep back the lies that have nothing to do with the murder",
+  "gender": "f"
+ },
+ "your_arc_by_line": {
+  "T1": {
+   "arc": "From a housekeeper collecting things in her apron to a woman who stops collecting and makes the house speak, and finds that a servant's word can hang a gentleman if she will let it cost the valet his place and the master his name."
+  },
+  "T2": {
+   "arc": "From a witness who wants the right name to a servant who learns which names a drawing room will take from her, and buys the heir's freedom with a lady's, locking up at night with the killer's key in her hand."
+  },
+  "T3": {
+   "arc": "From a servant counting doors with a candle to the hand that sets the key in the lock before the whole house, so that the room convicts him and no one below stairs need say a word; and the house, made whole, sends her down the road for it."
+  }
+ },
+ "states": [
+  "carrington_regard",
+  "fairbrother_faith",
+  "gresham_confidence",
+  "netherby_nerve",
+  "ormsby_ease"
+ ],
+ "lines": [
+  {
+   "id": "T1",
+   "title": "The Housekeeper's Reckoning",
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07"
+   ]
+  },
+  {
+   "id": "T2",
+   "title": "The Wrong Passenger",
+   "path": [
+    "N01",
+    "N02",
+    "N03",
+    "T2N01",
+    "T2N02",
+    "T2N03",
+    "T2N04"
+   ]
+  },
+  {
+   "id": "T3",
+   "title": "The Keyhole Filled",
+   "path": [
+    "N01",
+    "T3N01",
+    "T3N02",
+    "T3N03",
+    "T3N04",
+    "T3N05"
+   ]
+  }
+ ]
+}

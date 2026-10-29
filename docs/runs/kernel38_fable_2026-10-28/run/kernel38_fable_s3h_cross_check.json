@@ -1,0 +1,108 @@
+{
+  "checks": [
+    {
+      "id": "C1",
+      "kind": "contract_contract",
+      "verdict": "coherent",
+      "summary": "A ceiling of 2 framed as social cost from a false accusation sits inside the worst-case framing of an innocent condemned; the difference is one of degree, not kind.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C2",
+      "kind": "contract_contract",
+      "verdict": "coherent",
+      "summary": "Escalating deductive suspicion is exactly the feeling a fair-play whodunit resolving into clean vindication or a wrong accusation would sustain.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C3",
+      "kind": "contract_interactive",
+      "verdict": "conflict",
+      "summary": "The decision is which of seven guests to accuse, while the thematic axis is truth versus protective discretion; naming guest A rather than guest B is not recognizably picking a pole of that axis, and accusing wrongly is a mistake, not a choice of discretion.",
+      "better_evidenced": "3-0a.primary_decision_axis",
+      "resolution": "prefer_a"
+    },
+    {
+      "id": "C4",
+      "kind": "interactive_interactive",
+      "verdict": "coherent",
+      "summary": "The single fork is the accusation and the moderate density is supplied by the strong_inference secondary axis of investigative beats, which 3g's own note already attributes it to.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C5",
+      "kind": "interactive_interactive",
+      "verdict": "coherent",
+      "summary": "One true solution plus wrong accusations treated as terminal failure off-ramps yields one to two endings, which is derived from outcomes rather than from the seven accusation options or investigative routes.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C6",
+      "kind": "interactive_interactive",
+      "verdict": "coherent",
+      "summary": "The incorrect_resolution trigger is tracked by the named clue and exposed-lie channels at moderate richness.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C7",
+      "kind": "contract_interactive",
+      "verdict": "coherent",
+      "summary": "The Kernel names a wrong accusation as something to be possible and avoidable, and the hard terminal failure, low transgression ceiling, and opposed moral framings all read it the same way.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C8",
+      "kind": "contract_interactive",
+      "verdict": "coherent",
+      "summary": "The designed gap is who killed the master, and the accusation decision is the direct interactive expression of closing it.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C9",
+      "kind": "contract_interactive",
+      "verdict": "conflict",
+      "summary": "3d tags an invited flashback to the murder night as interactive, but no decision inside that flashback appears in 3-0a's primary or secondary axes, and 3-0b's gap does not place anything to be learned there; 3-0a's secondary axis and 3d's interactive flag are both strong_inference.",
+      "better_evidenced": "neither",
+      "resolution": "unresolved"
+    },
+    {
+      "id": "C10",
+      "kind": "contract_contract",
+      "verdict": "coherent",
+      "summary": "A linear hours-to-days investigation confined to one snowbound house is a single place over a continuous span, with the flashback explicitly counted as adding no distinct place.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C11",
+      "kind": "contract_contract",
+      "verdict": "coherent",
+      "summary": "The only split is transgression floor 1 / ceiling 2, and the branch it claims is the Kernel's stated wrong-accusation option, independently read by 3-0c and 3g.",
+      "better_evidenced": "",
+      "resolution": ""
+    },
+    {
+      "id": "C12",
+      "kind": "contract_interactive",
+      "verdict": "coherent",
+      "summary": "A single viewpoint on a linear timeline paired with moderate state tracking clues and exposed lies is proportionate, with no interwoven periods or multiple protagonists to remember.",
+      "better_evidenced": "",
+      "resolution": ""
+    }
+  ],
+  "primary_branch_source": {
+    "source": "interactive_question",
+    "rationale": "3-0a.primary_decision_axis is tagged explicit while 3c.core_thematic_axis is genre_association, so the accusation choice is the branch and the theme is meaning assigned to its sides."
+  },
+  "unresolved_for_next_phase": [
+    "C9: whether the invited flashback to the murder night is a played interactive scene (3d) or recalled exposition with no decisions (3-0a lists none inside it); if played, its choices must be defined and constrained so what the housekeeper saw stays fixed for fair-play clueing.",
+    "C3 flag: the thematic axis (truth vs. protective discretion) is genre-supplied and does not map onto the accusation branch; the premise-expansion phase must either supply a stated value tension that the accusation can express or treat theme as coloring rather than branch structure."
+  ]
+}

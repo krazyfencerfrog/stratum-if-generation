@@ -1,0 +1,380 @@
+{
+  "notes": "Evangeline sorts everyone in the house by where they stood and at what minute, trusts the Major because he writes her down, and treats the housekeeper as the one pair of hands she may send anywhere she is not permitted to go herself.",
+  "lines": [
+    {
+      "subject": "Lucius Carrington",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'He spoke of you this morning. He said you were the kind who sees without being asked, which was a compliment to you and a warning to the rest of us. I should keep in his good books, if I were you. I have taken care to.'"
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'He does not care for you. He said so at breakfast, over the kidneys, in front of Miss Gresham. You had better give him your account plainly and in order, the way I gave mine. He likes a thing he can write down.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The Major took the head of the table on the first night as though someone had asked him to, and no one said they hadn't. He writes everything in his black book. I have told him everything, in order, and he nodded at every line.'"
+        }
+      ]
+    },
+    {
+      "subject": "Reginald Fairbrother",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Fairbrother has dressed my guardian every morning since before I was born, and he does not approve of me, which he shows by leaving a small pause before he says Miss. He has not sat down since they broke the door. Somebody ought to make him. You might.'"
+        }
+      ]
+    },
+    {
+      "subject": "Nathaniel Yardley",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Nathaniel taught me to cheat at bezique when I was nine and has not improved. He runs from things. The table, the yard, the room where his uncle sat; he ran from all three and he will tell you it was something else each time.'"
+        }
+      ]
+    },
+    {
+      "subject": "Gideon Ashcombe",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Dr. Ashcombe went in first and came out and said \"some hours\" and nothing more, which is not an answer. I asked him for the time of it and he asked me whether I had slept. I have not. That is not relevant.'"
+        }
+      ]
+    },
+    {
+      "subject": "Millicent Gresham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Gresham spent her first evening asking me how many bedrooms there were and which had the best aspect. She counts things. She was counting the silver at breakfast, with her eyes, which I suppose a fiancée is entitled to do.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cordelia Ormsby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs. Ormsby arrived already in black and so has the advantage of the rest of us now. She came down the morning after at a quarter past eight exactly, which is early for a widow, and asked for the fire built up before she asked how he was found.'"
+        }
+      ]
+    },
+    {
+      "subject": "Lavinia Netherby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Netherby cries in the linen room because she thinks no one goes there. I went in on Tuesday for a pillowslip and she told me she had been nowhere all night, before I had asked her anything at all. You should speak to her. You are permitted to; I am not.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mr. Ellingham came up with the thaw and a case that locks, and he has not yet said my name without looking into the case first. I shall give him my account exactly as I gave it to the Major. It does not alter. You may test it if you like.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Quarles keeps the lodge and the gate, and in this weather keeps neither, since nothing can get through. He came up with the dogs at noon on the first day to say the road was gone to the hedge-tops, and after that he sat in the servants' hall drinking the household's beer. He is not a guest and he is not of the house. I don't know what he is.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I can give you the order we stood in. The Major nearest the door, Fairbrother at his shoulder, Nathaniel behind, Mrs. Ormsby at the turn of the stair with Miss Gresham, Netherby on the landing with her apron up over her mouth. I was by the window seat. I counted. You may check me against any of them.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Her voice goes up a full tone. 'I do not use the back stairs. I have never used them; I am not a housemaid, whatever Miss Gresham thinks of my position here. Why do you ask me that? Who has said that I did?'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'It faces north and the fire never draws when the wind is in the east, so we were all cold at dinner and no one said so, because his chair was empty and it seemed indecent to complain of a draught.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'It was Mrs. Pell's room for twenty years and she kept lemon drops in the second drawer for me. I expect you have thrown them out. I don't come down there. I mention it only so you know that I know where it is, and that I can.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I have been in the servants' hall twice in my life, once at six to see the Christmas goose and once at twelve to hide. Netherby says the talk down there is all about who was out of bed. I should like to know what they say about me, and you are going to tell me.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The Major has made it his court. He sits with his back to the window so the snow light falls on our faces and not his. I was questioned in the chair by the fire-screen at eleven in the morning, for twenty minutes, and I did not need to stop once.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I was not allowed in the study after I was twelve, when I knocked the inkstand over a deed. He kept white wax candles in there because tallow smoked the ceiling and he said he could taste it in the room. He was particular. About everything.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'They have taken him to the ice house. I asked who carried him and the Major said Fairbrother and Quarles and the boot-boy, at four o'clock, and that I was not to go down. I have not gone down. I have stood at the garden door and looked at the path, which is trodden flat now.'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The library is where Nathaniel and Miss Gresham sat every evening with the door half open, which is how one knows an engagement is respectable. On the night the door was shut. I noted it at twenty past ten. The Major has that too.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I had my hands over my ears for the poker, and then there was a small sound after it, like a coin dropped on a rug, and the Major said \"the key.\" I did not see it fall. I heard it. Everyone heard it; ask any one of them and they will say the same.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Seven at the table and his chair empty. I had placed everyone in my head before the soup. When Nathaniel pushed back his chair it was eight minutes to nine by the dining room clock; I looked. Miss Gresham did not go after him. I noticed that as well.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The dripping woke me at ten past six. By the time I came down the Major had ordered the carriage and sent Netherby up to the study with pails. I asked why the study wanted cleaning before a magistrate had seen it and he said that was a housekeeper's question, not a lady's. So I am asking you.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The blue room, second along the gallery. His door was shut when I passed it at eleven. I know a shut door is not an alibi; I am only telling you what I saw, and I have told him the same and he wrote it in his own hand.'"
+        }
+      ]
+    },
+    {
+      "subject": "the nephew's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'They have put Fairbrother on a chair outside it with a rug over his knees, as if Nathaniel were a child with a fever. He used to climb out of that window onto the leads. I don't believe he has, in this. I went round by the garden and looked up, and the snow on the sill is unbroken.'"
+        }
+      ]
+    },
+    {
+      "subject": "the account book",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'If you mean the Major's, it is black and lives at his elbow in the drawing room, and my account is on the third page and runs to eleven lines, and I have read it over twice and it is correct. If you mean the household's, I have never seen it. I am not shown money.'"
+        }
+      ]
+    },
+    {
+      "subject": "the long table",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'It seats fourteen with the leaves in, and Fairbrother would not have the leaves taken out because it had been laid for eight, so we sat the width of a field from one another and shouted about the weather.'"
+        }
+      ]
+    },
+    {
+      "subject": "the mantel clock",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The drawing room clock runs four minutes fast and has since I was a child; he would not have it altered because he liked to be early. I allow for it. When I say eleven I mean eleven by the hall clock, which is right. I made certain of that.'"
+        }
+      ]
+    },
+    {
+      "subject": "the widow's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs. Ormsby's is the door at the end that sticks. You hear it from anywhere on the gallery; it gives a sort of groan. I did not hear it that night. I should have, from where I was.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Oak, with the big brass key he carried on his chain. He locked it from inside every evening once Fairbrother had brought up the decanter, and had done for as long as I have been in the house. I knew that at seven years old. Everyone knew it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the tallow box",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The tallow is kept in a box in the still-room passage for the servants' candles. I have never opened it. I couldn't tell you exactly where; somewhere low, in the passage. Why does everyone keep asking me about tallow?'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's chair",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'No one has sat in it. Fairbrother turned it to the wall on the first morning and nobody has turned it back. Nathaniel will have to sit in it eventually. I should like to watch and see whether he can.'"
+        }
+      ]
+    },
+    {
+      "subject": "the cloth",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'There is claret at the Major's end; he spilled when Nathaniel went out and did not notice, and Netherby could not get in to change it. It is still on the table. Nobody has had the heart to dine properly since, so nobody has asked for a clean one.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sideboard",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The decanters live on the sideboard and Fairbrother counts them with his eye every time he goes past. The brandy went up to the study at ten, as it always did; I saw Fairbrother take it through the hall. That is one more thing I have given the Major.'"
+        }
+      ]
+    },
+    {
+      "subject": "the tureen",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The soup came round in the great tureen and was cold by the time it reached the far end, as it always is. Mrs. Ormsby sent hers back. I noticed because the maid had to go the long way round, behind Nathaniel's chair, just before he rose.'"
+        }
+      ]
+    }
+  ]
+}

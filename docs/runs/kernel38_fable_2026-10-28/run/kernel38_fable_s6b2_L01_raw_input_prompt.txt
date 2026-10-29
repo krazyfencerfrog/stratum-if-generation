@@ -1,0 +1,392 @@
+SYSTEM PROMPT
+
+You are step 6b2 of an interactive fiction generation pipeline: you build
+ONE location of a story as rooms for the engine. The engine is room-based:
+the player moves between rooms, examines what is in them, takes some of it,
+uses it. A location becomes one to four rooms (rooms_wanted gives the
+number to aim for).
+
+For each room:
+ - name: what the menu calls it ("the control booth").
+ - description: its PERMANENT base text, three or four sentences: what the
+   place is, its fixtures, its smell, its light. Name only what never
+   changes: something that breaks, opens, burns or is taken during the story
+   does not go in the base text (a later step writes how the room is in each
+   scene). Make it particular to this story, not a generic room.
+ - frame: the room's permanent visual environmental plate for multimodal rendering and spatial grounding:
+   * composition: camera angle, framing, focal depth, vantage point (e.g. "Low-angle eye level looking down the narrow wooden companionway toward the aft hatch")
+   * subjects: list of prominent physical fixtures or focal structures in this room
+   * environment: lighting sources, architectural volume, materials, ambient air/weather
+   * palette_mood: dominant color swatches and atmospheric tone
+   * prompt_summary: dense prompt for multimodal image generation (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
+ - exits between this location's rooms:
+   - label: concise menu action ("through the heavy door", "into the booth").
+   - back_label: menu action in reverse ("into the studio", "out to the corridor").
+   - text / back_text: transitional prose describing the crossing.
+     * When there is a physical threshold, barrier, or distinct portal (a heavy door, a hatch, a ladder, a dark passage, elevation change): exactly ONE concise sentence (10-25 words) describing the physical act or sensation of crossing (the sound of the latch, ducking under pipes, the temperature shift, footing on the rungs).
+     * EMBODIMENT INVARIANT: If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET), crossings are sensor routing, camera switching, or telemetry shifts, NEVER human bipedal locomotion ("your feet", "step down", "walk into", "climb").
+     * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
+     * For a simple open doorway, adjoining alcove, or unobstructed space with no threshold: use null. Never invent filler ("You make your way to...").
+   - one_way: optional boolean (default false). Internal location exits are bidirectional by default; set to true ONLY for physical one-way barriers (a chute, steep drop, or locked one-way gate). Every room in the location must remain reachable from and have a path back to the starting room.
+
+Build only THIS location. other_locations are built separately and
+rooms_already_built exist: never make a room with one of those names. A
+location that is itself one room-sized space (a cabin, a wheelhouse, a
+booth) is one room, whatever rooms_wanted says.
+things_already_made exist in other rooms: never make a second one with one
+of those names (a scene here that needs it has it carried in). The
+people_here are people, never objects.
+
+Objects: four to eight examinable things per room.
+ - Every object the scenes' moments use must exist where the moments need
+   it (read the node summaries: the kettle a scene uses, the bar someone
+   counts along, the drawer something is found in). Mark these story: true.
+ - Two or three per room matter to the story; the rest say something about a
+   person or the place's history (the old host's mug nobody uses; the burn
+   on the desk), never pure inventory.
+ - portable: true only for what someone could pick up and carry off.
+ - Each has a description: what the player sees when they examine it, one
+   or two sentences, with one detail that rewards looking.
+ - Stakes live in things that can break, burn, be carried off or fought
+   over. Paper (a ledger, a form) only where the story is about it.
+ - Material culture: when material_culture is provided in the packet (containers,
+   fixtures, tools), draw from that specific palette. Avoid cliché IF staging props
+   (leather-bound journal, dusty ledger, ornate brass key, rusted iron key,
+   cracked mirror, flickering candle, half-empty bottle of whiskey).
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two sentences: how the rooms divide the location, and what the player will want to look at>",
+  "rooms": [{"name": "<room>", "description": "<permanent base text>",
+             "frame": {"composition": "<camera perspective>", "subjects": ["<focal fixture>"],
+                       "environment": "<lighting, materials>", "palette_mood": "<colors, mood>",
+                       "prompt_summary": "<dense multimodal prompt>"}}],
+  "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>",
+             "text": "<one concise sentence for physical threshold transit, or null if open doorway>",
+             "back_text": "<one concise sentence for return transit, or null if open doorway>",
+             "one_way": false}],
+  "objects": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": false, "story": false}]
+}
+
+EXAMPLE (a late-night radio phone-in story, the station building; for shape only)
+
+{
+  "notes": "The studio and the booth face each other through the glass; the corridor is where the people who are not on air wait. The call board and the old host's mug are what the player will keep coming back to.",
+  "rooms": [
+    {"name": "the studio", "description": "A box of grey foam and brown carpet with one microphone on a jointed arm and a chair that has been reupholstered twice. The clock over the glass is three minutes fast and has been for years. The air smells of hot dust from the valves in the old desk.",
+     "frame": {"composition": "Medium eye-level shot framed behind the desk microphone toward the soundproof glass",
+               "subjects": ["Ribbon microphone on articulated arm", "Reupholstered studio chair", "Fast wall clock over glass"],
+               "environment": "Dim acoustic studio, hot amber glow from tube equipment, brown sound-baffle foam",
+               "palette_mood": "Warm sepia, dark charcoal grey, valve-amber; dry, quiet, insular",
+               "prompt_summary": "16-bit retro pixel art, soundproof radio studio interior with vintage microphone, tube desk glow, brown foam walls, clock above glass"}},
+    {"name": "the control booth", "description": "Narrower than the studio, all faders and coloured lights, with a window onto the studio and another onto the car park. A call board of twelve white bulbs sits above the desk. The heater under it ticks.",
+     "frame": {"composition": "Tight interior view angled across the fader console toward the dark studio window",
+               "subjects": ["Mixing console with illuminated VU meters", "Call board with twelve bulbs", "Ticking baseboard heater"],
+               "environment": "Cold blue car park light through the small window, harsh colored LED cues on the board",
+               "palette_mood": "Deep navy, harsh bulb white, amber cue indicators; tense, technical, cramped",
+               "prompt_summary": "16-bit retro pixel art, cramped broadcast control booth with glowing fader board, illuminated telephone switchboard, rain against car park window"}},
+    {"name": "the corridor", "description": "Strip lights, framed gold records from the station's one good decade, and a vending machine that hums in E flat. The floor is worn pale outside the studio door from people waiting.",
+     "frame": {"composition": "Long symmetrical hallway view looking toward the studio's red cue light door",
+               "subjects": ["Framed gold records on wood veneer walls", "Humming vending machine", "Worn linoleum threshold"],
+               "environment": "Harsh fluorescent overhead strip lighting, greenish flicker, institutional linoleum",
+               "palette_mood": "Sickly greenish-yellow fluorescent, faded woodgrain, brass reflection; fatigued, stagnant",
+               "prompt_summary": "16-bit retro pixel art, fluorescent-lit late night radio station hallway, framed gold records on walls, humming vending machine"}}],
+  "exits": [
+    {"from": "the studio", "to": "the corridor", "label": "out through the heavy door", "back_label": "into the studio",
+     "text": "The heavy soundproof door thuds shut behind you, cutting off the hot dust of the booth.",
+     "back_text": "You pull the soundproof door open and step back into the dry warmth of the studio."},
+    {"from": "the corridor", "to": "the control booth", "label": "into the booth", "back_label": "out to the corridor",
+     "text": "You push through the low booth door, amber cue lights immediately at your elbows.",
+     "back_text": "You duck back out into the strip-lit corridor."}
+  ],
+  "objects": [
+    {"name": "the microphone", "room": "the studio", "description": "A big ribbon microphone with a sock of grey foam, worn through where twenty years of hosts leaned in.", "portable": false, "story": true},
+    {"name": "the old host's mug", "room": "the studio", "description": "A chipped mug with a cartoon of a moon on it, still on the shelf, a ring of something brown dried in the bottom. Nobody has moved it.", "portable": true, "story": false},
+    {"name": "the clock", "room": "the studio", "description": "Three minutes fast. Someone has written 'IT'S NOT' on a strip of tape under it.", "portable": false, "story": false},
+    {"name": "the cue light", "room": "the studio", "description": "A red bulb in a wire cage. When it is lit, you are on air, whatever you are saying.", "portable": false, "story": true},
+    {"name": "the call board", "room": "the control booth", "description": "Twelve white bulbs; one has been unscrewed and left on the desk beside it, the line it belongs to dark.", "portable": false, "story": true},
+    {"name": "the reject switch", "room": "the control booth", "description": "A red toggle under a flip-up cover, the cover's hinge polished from use.", "portable": false, "story": true},
+    {"name": "the station phone", "room": "the control booth", "description": "A beige handset with the manager's extension taped to it in Dana's capitals.", "portable": false, "story": false},
+    {"name": "the gold records", "room": "the corridor", "description": "Six frames from 1987 to 1991. In the last one the glass is cracked across a face somebody has scratched out.", "portable": false, "story": false}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS LOCATION (its sketch, the rooms wanted, the scenes that use it with their nodes, the people who are here):
+{
+ "location": {
+  "name": "the first-floor gallery",
+  "kind": "the upper landing outside the master's study and the guests' bedroom doors",
+  "why": "where the study door was broken down and where your night rounds pass every door whose hour must be fixed"
+ },
+ "rooms_wanted": 3,
+ "other_locations": [
+  "the back stairs",
+  "the dining room",
+  "the housekeeper's room",
+  "the servants' hall",
+  "the drawing room",
+  "the master's study",
+  "the ice house",
+  "the library"
+ ],
+ "rooms_already_built": [],
+ "things_already_made": [],
+ "scenes": [
+  {
+   "scene": "S_N01",
+   "title": "The Door Comes Down",
+   "lines": [
+    "T1",
+    "T2",
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "N01",
+     "kind": "major",
+     "summary": "You kneel at the keyhole: lamp lit, the master's shoulder. The door falls to Nathaniel Yardley's blows, a key hits the carpet, Major Carrington pockets it and sends you below. Past the tallow box Reginald Fairbrother alone draws after ten, you climb back up his stairs; with Gideon Ashcombe bending the Major over the desk you see frozen window, dead grate, poker standing, and a yellow tallow stub among white wax. Fairbrother watched you climb."
+    },
+    {
+     "id": "N01a",
+     "kind": "opportunity",
+     "summary": "The Major straightens from the desk and finds you in the doorway he sent you from. The doctor's back is turned; Fairbrother stands on the back stair with his candle. The yellow stub lies among the white wax, an arm's length from your apron pocket."
+    },
+    {
+     "id": "N01b",
+     "kind": "demonstration",
+     "summary": "At the foot of the back stairs Fairbrother sets the tallow box square on its shelf without looking inside, as he must have done ten thousand nights. He has counted it already; you can see that in how he does not count it now."
+    }
+   ]
+  },
+  {
+   "scene": "S_N03",
+   "title": "The Rounds Walked Twice",
+   "lines": [
+    "T1",
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "N03",
+     "kind": "major",
+     "summary": "Past midnight you rewalk the murder night, counting doors: the quarrel at half past ten, the nephew crossing the yard at twenty to, one light on the back stairs at eleven, so Evangeline's eleven o'clock is a lie. At the nephew's door you show Reginald Fairbrother the candle box one short and threaten to set it before the heir at breakfast unless he gives the hour. He says nothing; before dawn he is at the Major's door."
+    },
+    {
+     "id": "N03a",
+     "kind": "revelation",
+     "summary": "Cordelia Ormsby, shawled and shaking, stops you on the gallery. At eleven, passing the Major's door for the study, she heard Evangeline Davenport inside it, low and pleading, and a man's step. She took it for a scene between ward and Major, and went on to listen at the study instead."
+    },
+    {
+     "id": "N03b",
+     "kind": "opportunity",
+     "summary": "Her hairpin is in your hand, picked up from the carpet at the study keyhole on your second round. She sees it as she finishes speaking. The gallery is dark but for your candle; no one else is awake to hear what you call it."
+    },
+    {
+     "id": "N03c",
+     "kind": "opportunity",
+     "summary": "Before dawn you come upon Fairbrother at the Major's door, candle held low, waiting to be admitted. He has not knocked. He sees you and does not move. Whatever he has come to say, he has not yet said it to anyone."
+    },
+    {
+     "id": "N03d",
+     "kind": "demonstration",
+     "summary": "Grey comes into the gallery windows. Fairbrother comes out of the Major's door with his candle; the widow passes toward her own. Each of them, in a glance or its absence, has already decided what you are to them before the house is up."
+    }
+   ]
+  },
+  {
+   "scene": "S_N04",
+   "title": "The Thaw",
+   "lines": [
+    "T1"
+   ],
+   "nodes": [
+    {
+     "id": "N04",
+     "kind": "major",
+     "summary": "Eaves drip; the lodge-keeper wades up: a cart by noon. Major Carrington orders the carriage, tells breakfast that Reginald Fairbrother lit the young gentleman up at eleven; Fairbrother stays silent, and Nathaniel Yardley shouts through his door that the old man has turned. The Major bars you the first floor, sends Lavinia Netherby to rake the study grate and Gideon Ashcombe with the body to the ice house, and keeps your rounds for the drawing room."
+    },
+    {
+     "id": "N04a",
+     "kind": "opportunity",
+     "summary": "Lavinia stands on the back stairs with her empty pail, sent up to rake the study grate. The first floor is barred to you by the Major's order. She looks down at you for a word; the study door above stands open on a dead man's cold."
+    },
+    {
+     "id": "N04b",
+     "kind": "opportunity",
+     "summary": "Kept to the drawing room with your rounds, you are sent for tea. Millicent, pouring, asks under the clink of cups whether the Major has seen your drawer. Nathaniel's shouting comes faint through two floors; she does not look toward it."
+    },
+    {
+     "id": "N04c",
+     "kind": "demonstration",
+     "summary": "Fairbrother sets the Major's boots outside the Major's door and the master's outside the study, blacked and paired, forty years of habit with nobody left in one room to wear them. He stands between the two doors a long moment before he goes down."
+    }
+   ]
+  },
+  {
+   "scene": "S_N07",
+   "title": "The First Cart",
+   "lines": [
+    "T1"
+   ],
+   "nodes": [
+    {
+     "id": "N07",
+     "kind": "major",
+     "summary": "Lucius Carrington goes down the dripping drive with your timeline, the stub and the key, Cornelius Ellingham beside him to say what will stand. Nathaniel Yardley is master, though Millicent Gresham has returned his ring. Reginald Fairbrother carries forty years down the back stairs in one box and goes without a character; Lavinia Netherby passes you on the stairs without a word. You lock the study with the key the new master has given you."
+    },
+    {
+     "id": "N07a",
+     "kind": "resolution",
+     "summary": "The first cart takes the valet and the housemaid together, his one box and hers. The back stairs you climbed twice are quiet now; whether the tallow box is squared on its shelf, and what the carter is told, is all the house will say of them."
+    },
+    {
+     "id": "N07b",
+     "kind": "resolution",
+     "summary": "The carriage is gone down the thawing drive. You stand at the study door with the new master's key and an apron with nothing in it. You collected for two days; you spoke once; the house is quieter by four people, and the master's name went with them."
+    }
+   ]
+  },
+  {
+   "scene": "S_T2N01",
+   "title": "A Cart by Noon",
+   "lines": [
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "T2N01",
+     "kind": "major",
+     "summary": "The eaves drip and Barnaby Quarles wades up: a cart by noon. Major Carrington orders the carriage, sends Lavinia Netherby up with pails and coal, then halts you on the gallery with his watch open and says, low, that the sherry glass in your drawer is evidence or blackmail: you will tell the drawing room of a lady's visit at ten and the quarrel after, or the heir hears which. Cordelia Ormsby praises your discretion aloud; Nathaniel Yardley pushes a scrap under his door; you pocket it."
+    },
+    {
+     "id": "T2N01a",
+     "kind": "revelation",
+     "summary": "In the linen press you unfold Nathaniel's scrap, pencil pressed hard enough to tear: yard, twenty to eleven; one light going up the back stair, servants' tallow by the colour; a man's cuff on it, not a sleeve. Tell them. The hand that carried the stub was never a lady's."
+    },
+    {
+     "id": "T2N01b",
+     "kind": "opportunity",
+     "summary": "Lavinia passes you on the back stairs with coal and two pails, sent to lay the study fire alone, the grate still holding its ash. Above, the Major stands at the gallery rail with his watch open. She slows at the turn and looks back to see whether you will come."
+    },
+    {
+     "id": "T2N01c",
+     "kind": "opportunity",
+     "summary": "Cordelia Ormsby, dressed now and languid against the newel, tells the Major that his housekeeper is the most discreet creature she has met in a country house. The Major's watch is still open. She says it to him and looks at you, and waits for what you will do with it."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N02",
+   "title": "The Hours Go to the Lawyer",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N02",
+     "kind": "major",
+     "summary": "You walk the murder night again, one candle along the gallery, counting door to door: the quarrel at half past ten, one flame on the back stairs at eleven. Reginald Fairbrother never lifts his head. The roof's snow crashes past the windows and the Major comes out demanding your hours; you carry them past him to Cornelius Ellingham, who puts his name under yours and tells the Major they go to the magistrate, not before."
+    },
+    {
+     "id": "T3N02a",
+     "kind": "revelation",
+     "summary": "At the seventh door your candle finds a jet hairpin on the boards, an inch below the study keyhole, where a woman's knee would rest. It is Cordelia Ormsby's; you pinned her hair for dinner. It lay there before the lamp you saw, or after."
+    },
+    {
+     "id": "T3N02b",
+     "kind": "opportunity",
+     "summary": "Reginald Fairbrother stands on the back stair with his candle, the tallow box behind him on its shelf. You need the hour he drew the last candle. He has not lifted his head to you once; he will answer one question, and not the one you mean."
+    },
+    {
+     "id": "T3N02c",
+     "kind": "opportunity",
+     "summary": "Cordelia Ormsby meets you on the half-landing as the roof snow crashes past the window, her hand going to the loose side of her hair. The Major is above on the gallery; Ellingham below with your hours. The pin is in your apron pocket."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N03",
+   "title": "Law's Name on the Gallery",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N03",
+     "kind": "major",
+     "summary": "The eaves drip. Major Lucius Carrington bars you from the first floor and sends Lavinia Netherby to sift the study grate; you tell Cornelius Ellingham what you will say aloud if that grate is raked, and he climbs to the gallery and sends the maids down in law's name, naming his price after: the unsigned will never passes your lips. The Major posts Fairbrother at your door and walks Gideon Ashcombe across the slush to the ice house himself."
+    },
+    {
+     "id": "T3N03a",
+     "kind": "opportunity",
+     "summary": "Lavinia Netherby kneels at the dead study grate with the ash sieve, sent by the Major, sent down by the lawyer, and not yet moved by either. His step is on the main stair. The sieve shakes. Whatever is in that ash, the Major means her to find it alone."
+    },
+    {
+     "id": "T3N03b",
+     "kind": "demonstration",
+     "summary": "At the foot of the stairs Lavinia stands with your candle unlit, looking from the Major's door to the lawyer's to the valet's chair. She has been sent up and down by three men since breakfast. She looks last at you, and waits to be told which of them you are."
+    },
+    {
+     "id": "T3N03c",
+     "kind": "opportunity",
+     "summary": "Fairbrother sits on the hall chair outside your room with his candle, posted by the Major. The eaves drip past the window. Between you and the gallery is the servants' passage behind the linen press, which he lit the Major up two nights since, and which he has not mentioned."
+    },
+    {
+     "id": "T3N03d",
+     "kind": "opportunity",
+     "summary": "In your drawer, under the account book, lies the sherry glass from the study at ten, Millicent Gresham's colour on its rim. The Major has said he will have the housekeeper's room gone through. Water stands in the ewer; Lavinia is on the stair."
+    },
+    {
+     "id": "T3N03e",
+     "kind": "opportunity",
+     "summary": "Gideon Ashcombe comes in from the slush with the Major's mud on his boots and stops at your door past Fairbrother. He asks, as a man asks a servant, whose window the snowy boots came from the midnight the master died. He already half knows. He is asking whether you do."
+    },
+    {
+     "id": "T3N03f",
+     "kind": "revelation",
+     "summary": "Going down with the ewer you pass Lavinia's door ajar: a yellow tallow stub in her tin candlestick, burned to the socket. The maids burn tallow; the study burns wax. A stub among wax means nothing of the maids, and everything of who carried a maid's candle upstairs."
+    }
+   ]
+  },
+  {
+   "scene": "S_T3N04",
+   "title": "The Keyhole Filled",
+   "lines": [
+    "T3"
+   ],
+   "nodes": [
+    {
+     "id": "T3N04",
+     "kind": "major",
+     "summary": "The Major demands your account signed. You say a key in the inside lock fills the keyhole you saw the lamp through, pull the master's key from Lucius Carrington's waistcoat and set it in the study lock from the gallery; the solicitor, widow and doctor kneel and see nothing. He strikes you; Nathaniel Yardley pins his arms while you name him there, the tallow stub behind him, Fairbrother never asked."
+    },
+    {
+     "id": "T3N04a",
+     "kind": "opportunity",
+     "summary": "Nathaniel holds the Major's arms; the key stands in the lock from the gallery side; your cheek burns. Ellingham asks you to say, for the record, how the house knew. Fairbrother is at the foot of the stairs with his candle. His hour has not been asked."
+    }
+   ]
+  }
+ ],
+ "people_here": [
+  "Barnaby Quarles (the lodge-keeper)",
+  "Cordelia Ormsby (the widow)",
+  "Cornelius Ellingham (the solicitor)",
+  "Gideon Ashcombe (the doctor)",
+  "Lavinia Netherby (the housemaid)",
+  "Lucius Carrington (the Major)",
+  "Millicent Gresham (the nephew's fiancée)",
+  "Nathaniel Yardley (the master's nephew and heir)",
+  "Reginald Fairbrother (the master's valet of forty years)"
+ ]
+}

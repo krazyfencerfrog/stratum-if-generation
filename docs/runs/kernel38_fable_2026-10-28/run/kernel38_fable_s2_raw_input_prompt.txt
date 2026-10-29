@@ -1,0 +1,25 @@
+SYSTEM PROMPT
+
+You are the genre classifier for an interactive fiction generation pipeline.
+Your job is to read the story Kernel (and its extracted clauses) and identify its primary genre tradition and descriptive tone.
+
+RULES:
+1. Identify the core genre tradition that best fits the premise (e.g. "romance", "fantasy_adventure", "sci_fi", "court_intrigue", "ghost_story", "noir_detective", "cyberpunk", "historical_drama", "survival_thriller", "comedy", "general").
+2. Focus on the narrative traditions and reader expectations inherent in the Kernel.
+3. Confidence: "high" if explicit in the kernel, "moderate" if strongly implied, "low" if uncertain.
+
+OUTPUT FORMAT (JSON)
+Output ONLY valid JSON, no markdown code fences:
+{
+  "genre": string,
+  "confidence": "high" | "moderate" | "low",
+  "reason": "one or two sentences explaining the classification"
+}
+
+USER INPUT FOLLOWS BELOW
+
+- Content Kernel:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+- Kernel Clauses:
+[{"n": 1, "clause": "A Victorian country-house murder."}, {"n": 2, "clause": "A snowstorm has cut the house off for two days."}, {"n": 3, "clause": "The master of the house is dead in his locked study."}, {"n": 4, "clause": "You're the new housekeeper."}, {"n": 5, "clause": "You are the only person who saw where everyone was that night."}, {"n": 6, "clause": "Seven guests."}, {"n": 7, "clause": "All seven guests are lying about something."}, {"n": 8, "clause": "I want real clues."}, {"n": 9, "clause": "I want red herrings."}, {"n": 10, "clause": "I want a fair solution."}, {"n": 11, "clause": "I want to be able to accuse the wrong person."}]

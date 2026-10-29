@@ -1,0 +1,267 @@
+{
+  "notes": "The Major holds you at the rail with his watch and his price while the melt runs the hour down; Lavinia on the back stair and the widow at the newel each wait to see which way you will turn, and the nephew's scrap, read in the linen press, is the one fact nobody downstairs has asked for. Going down to give your account is the way on, and you go down with whatever you have chosen to carry.",
+  "opening": "Dawn, and the eaves have begun to drip; Barnaby Quarles has waded up from the lodge to say the road will carry a cart by noon, and the Major has ordered the carriage and sent Lavinia up the back stairs with two pails and a fresh scuttle to lay the study fire alone. He halts you at the gallery rail with his watch open and says, low, that the sherry glass in your drawer with a lady's mouth on it is evidence or it is blackmail, and the drawing room will hear from you of a visit at ten and the quarrel after, or the heir will hear which it is. Below, Mrs Ormsby, whose hairpin and whose letter you kept last night for the price of her whisper, leans dressed and languid against the newel and tells him his housekeeper is the most discreet creature she has met in a country house. Mr Fairbrother was never asked his hour and has not offered it; from behind the nephew's door a pencilled scrap slides out onto the Turkey runner, and Nathaniel's voice through the panel: so you have left me to it too.",
+  "start_room": "the stair head",
+  "placement": [
+    {
+      "who": "Lucius Carrington",
+      "room": "the gallery"
+    },
+    {
+      "who": "Nathaniel Yardley",
+      "room": "the gallery"
+    },
+    {
+      "who": "Barnaby Quarles",
+      "room": "the stair head"
+    },
+    {
+      "who": "Lavinia Netherby",
+      "room": "the stair head"
+    },
+    {
+      "who": "Cordelia Ormsby",
+      "room": "the stair head"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the stair head",
+      "variants": [
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "Melt-water ticks against the half-landing window. Mrs Ormsby's hand is closed on the newel post and she watches the gallery, not you."
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "Lavinia has set her pails down on the turn of the back stair and stands straight, the scuttle handle still swinging, waiting to see if you will come."
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "Lavinia keeps the scuttle between you and herself on the turn of the back stair and does not look up."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Melt-water ticks against the half-landing window and the barometer has climbed a hair. Barnaby Quarles stands dripping on the bottom step with his hat in his hands; Mrs Ormsby leans at the newel; Lavinia waits on the turn of the back stair with coal and two pails."
+        }
+      ]
+    },
+    {
+      "room": "the gallery",
+      "variants": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "The Major has turned his back to the rail. His watch is open in his palm and he does not look at you as you pass; behind the nephew's door a chair scrapes and goes still."
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "The Major nods you along the rail as a man nods a sergeant past, watch open, counting. Behind the nephew's door a chair scrapes and goes still."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The Major stands at the gallery rail with his watch open, the snow light grey on the case of waxwings. A folded scrap lies on the Turkey runner at the foot of the nephew's door."
+        }
+      ]
+    },
+    {
+      "room": "the study end",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": "T2N01b",
+          "text": "The study door is shut. From behind it, the scrape of a shovel on the grate and the knock of a pail set down on the hearth."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The study door stands ajar on bare boards. Inside, the grate still holds its ash from the night the master died; the scuttle has not yet come."
+        }
+      ]
+    }
+  ],
+  "moments": [
+    {
+      "node": "T2N01b",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Wait on the landing. I'll come in with you.'",
+          "label": "'Wait. I'll come in with you.'",
+          "room": null,
+          "text": "She sets the pails down on the turn and waits, hands folded on the scuttle. Above you the Major does not close his watch, and the cart's hour runs on while he keeps you at the rail.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Go on in. Lay it as you were told.'",
+          "label": "'Go on in. Lay it as you were told.'",
+          "room": null,
+          "text": "She goes up past you with the pails and the study door shuts on her and the ash. You keep your place beneath the Major's watch, and he sees that you keep it.",
+          "neutral": false
+        },
+        {
+          "verb": "rake",
+          "object": "the study grate",
+          "detail": null,
+          "label": "rake the study grate yourself",
+          "room": "the study end",
+          "text": "You go up past her and through the study door and have the ash pan in your hands when the Major's voice comes down the gallery after you. Whether it halts you at the grate or on the threshold, Lavinia has seen you come for her, and he has seen you climb.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Mind the stair-rods with those pails.'",
+          "label": "'Mind the stair-rods with those pails.'",
+          "room": null,
+          "text": "She minds them. She does not go up and she does not set the pails down, and the water in them trembles with the drip from the eaves.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    },
+    {
+      "node": "T2N01c",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Cordelia Ormsby",
+          "detail": "'The gallery carpet was swept clean this morning, madam.'",
+          "label": "'The carpet was swept clean, madam.'",
+          "room": null,
+          "text": "You curtsey and say it. She inclines her head a quarter inch; the hairpin and the keyhole are closed between you, and the Major, hearing nothing in it, snaps his watch half shut.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Cordelia Ormsby",
+          "detail": "'Did you sleep at all, madam, after so long in the cold on the gallery?'",
+          "label": "'Did you sleep at all, madam?'",
+          "room": null,
+          "text": "Her hand closes on the newel post. The Major's eyes go from her to you and stay there, and the watch in his palm is forgotten for the first time this morning.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Cordelia Ormsby",
+          "detail": "'The carriage is ordered for noon, madam.'",
+          "label": "'The carriage is ordered, madam.'",
+          "room": null,
+          "text": "'So I hear,' she says, and goes on looking at you with her palm open on the newel, waiting still for what you will do with her praise.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    }
+  ],
+  "actions": [
+    {
+      "verb": "take",
+      "object": "Nathaniel's scrap",
+      "detail": null,
+      "label": "the scrap under the nephew's door",
+      "room": "the gallery",
+      "text": "You stoop as if to straighten the runner and the scrap goes into your apron. Behind the panel, the nephew's breath lets out.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "unfold",
+      "object": "Nathaniel's scrap",
+      "detail": null,
+      "label": "unfold the scrap in the linen press",
+      "room": "the study end",
+      "text": "Behind the linen press door, out of the gallery's sight, you unfold it: pencil pressed hard enough to tear. Yard, twenty to eleven; one light going up the back stair, servants' tallow by the colour; a man's cuff on it, not a sleeve. Tell them. The hand that carried the stub was never a lady's.",
+      "reveals": [
+        "T2N01a"
+      ],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Lucius Carrington",
+      "detail": "'I'll come down and give my account, sir.'",
+      "label": "'I'll come down and give my account.'",
+      "room": null,
+      "text": "The Major closes his watch. 'Then we'll have it before the papers,' he says, and stands aside from the rail to let you go down first, so that the drawing room sees you come in ahead of him.",
+      "reveals": [],
+      "leads_to": "S_T2N02",
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "text": "Through the end window, the carriage horses are being put to in the yard; the ring of a hoof on cleared stone carries up the well, and below, the drawing room door opens on a murmur that stops when it hears the stair.",
+      "after_turns": 3,
+      "after": null
+    },
+    {
+      "text": "Barnaby Quarles, from the bottom step, to no one: the lane is running clear to the turnpike, and he will not answer for the bridge past one.",
+      "after_turns": 5,
+      "after": null
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "Somewhere above you a watch-case clicks shut and open again. The house has a clock this morning that is not its own."
+    },
+    {
+      "after": 7,
+      "text": "Lavinia's voice, carried along a passage: the pails are getting cold, and Mr Carrington says the papers are laid out and waiting on the housekeeper."
+    }
+  ],
+  "props": [
+    {
+      "name": "Nathaniel's scrap",
+      "room": "the gallery",
+      "description": "A corner torn from a letter, folded twice, the pencil pressed through the paper so the words can be read from the back.",
+      "portable": true
+    },
+    {
+      "name": "the study grate",
+      "room": "the study end",
+      "description": "Through the ajar door: the grate still holds its ash from the night the master died, grey and unraked, waiting for the pails.",
+      "portable": false
+    }
+  ],
+  "frame": {
+    "composition": "Low wide shot from the stair head looking up the well toward the gallery rail, the back stair turning away to the left",
+    "subjects": [
+      "Major Carrington at the gallery rail above, open pocket watch in his palm, looking down",
+      "Cordelia Ormsby leaning languid against the newel post, one hand lying open on it, eyes on the housekeeper",
+      "Lavinia Netherby on the turn of the back stair with a coal scuttle and two pails, looking back",
+      "Barnaby Quarles on the bottom step, snow-wet to the thigh, hat in hands",
+      "a folded scrap of paper on the Turkey runner at the foot of a closed door"
+    ],
+    "environment": "Dawn after the snow, grey melt-light through the half-landing window, melt-water ticking on the glass, a bracket lamp still burning low",
+    "palette_mood": "Grey-white snow light, dark oak and faded red Turkey runner, brass of a watch-case catching the lamp; hushed, watched, every figure waiting on the housekeeper",
+    "prompt_summary": "Atmospheric Victorian country-house illustration, graphic novel woodcut style: looking up a staircase well at dawn, a military man at a gallery rail with an open pocket watch, a widow in black leaning on a newel post, a housemaid on a turning back stair with coal pails, a wet lodge-keeper on the bottom step, grey snow-melt light through a tall window, folded paper on a runner at a closed door"
+  }
+}

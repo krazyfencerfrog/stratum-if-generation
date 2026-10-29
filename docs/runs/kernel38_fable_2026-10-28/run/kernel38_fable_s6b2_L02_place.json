@@ -1,0 +1,137 @@
+{
+  "notes": "The location divides into the foot of the stair behind the baize door, where the tallow box sits on its shelf and the valet's habits are written in forty years of grease, and the enclosed flight itself, turning twice in the dark up to the jib door at the far end of the gallery. The player will want to count the tallow box, read the smoke mark on the plaster at the valet's candle height, and notice which treads sound and which do not.",
+  "rooms": [
+    {
+      "name": "the stair foot",
+      "description": "A whitewashed well behind the green baize door, no wider than a man's shoulders, where the servants' passage gives onto the back stairs. A deal shelf at elbow height holds the candle box, and the plaster above it is grey with forty years of tallow smoke from one man's candle. It smells of mutton fat and cold stone, and the only light is what leaks under the baize from the passage. The bell wires run up the corner in their tin casing and tick when anyone upstairs so much as touches a pull.",
+      "frame": {
+        "composition": "Tight low-angle shot from the servants' passage threshold looking up into the narrow whitewashed stairwell, the deal shelf at frame left",
+        "subjects": [
+          "Deal shelf with candle box",
+          "Soot-greyed plaster above the shelf",
+          "Green baize door on its spring",
+          "Bell wires in tin casing climbing the corner",
+          "First worn stone treads"
+        ],
+        "environment": "Near-dark stone well, thin yellow light under the baize door, whitewash gone grey, cold still air smelling of tallow",
+        "palette_mood": "Dirty whitewash, tallow yellow, dark baize green, soot grey; furtive, cramped, watchful",
+        " prompt_summary": "Atmospheric concept illustration, Victorian servants' back stair foot, narrow whitewashed stairwell, wooden shelf with candle box, soot stain on plaster, green baize door, bell wires, cold dim light",
+        "prompt_summary": "Atmospheric concept illustration, Victorian servants' back stair foot, narrow whitewashed stairwell, wooden shelf with candle box, soot stain on plaster, green baize door, bell wires, single leaking light, cold dim grey-yellow palette"
+      }
+    },
+    {
+      "name": "the back stair",
+      "description": "Two straight flights of bare deal and a dog-leg turn between them, boxed in by plaster walls close enough to touch with both elbows. A rope rail runs up the inner wall on iron eyes, black and glassy where one hand has gripped it for forty years. There is no window on the flights; the only light is whatever is carried, and the stair gives back every footfall to the gallery above and the passage below. At the top a plain jib door, papered on its far side to match the gallery, lets out at the far end of the first floor.",
+      "frame": {
+        "composition": "Steep upward view from the dog-leg turn along the upper flight toward the dark seam of the jib door, walls pressing in either side",
+        "subjects": [
+          "Bare deal treads rising steeply",
+          "Rope handrail on iron eyes",
+          "Dog-leg turn with worn corner",
+          "Jib door outlined in the plaster above",
+          "Candle-height smoke streak along the wall"
+        ],
+        "environment": "Windowless enclosed stair, light only from a carried candle below frame, raw deal and cold plaster, dead still air",
+        "palette_mood": "Candle amber fading to black, raw pine, grey plaster; vertiginous, hushed, exposed",
+        "prompt_summary": "Atmospheric concept illustration, steep enclosed Victorian servants' staircase, bare wooden treads, rope handrail on iron rings, single candle glow from below, plain hidden door at top, deep shadow, amber and grey"
+      }
+    }
+  ],
+  "exits": [
+    {
+      "from": "the stair foot",
+      "to": "the back stair",
+      "label": "up the back stairs",
+      "back_label": "down to the stair foot",
+      "text": "The first tread sounds under your foot, and you take the rope rail in the dark, climbing by touch.",
+      "back_text": "You come down backwards into the smell of tallow, the rope sliding through your hand on every eye.",
+      "one_way": false
+    }
+  ],
+  "objects": [
+    {
+      "name": "the tallow box",
+      "room": "the stair foot",
+      "description": "A deal box with a sliding lid, greasy at the thumb-place, holding the yellow tallow dips the servants draw by. The dips lie in rows of six; the box is squared to the shelf edge so exactly that the dust line shows if it has been moved a quarter-inch.",
+      "portable": true,
+      "story": true
+    },
+    {
+      "name": "the shelf",
+      "room": "the stair foot",
+      "description": "A plank of deal on two brackets, set at the height of a tall man's elbow, not a housekeeper's. A pale rectangle in the grease marks where the box sits, and a smaller ring beside it where a candlestick is set down each night.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the baize door",
+      "room": "the stair foot",
+      "description": "Green baize over deal on a spring, to swallow the sound of the servants' side. The spring is strong enough to shut it on a skirt, and the baize is worn to the cloth at the one place a shoulder goes through with hands full.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the smoke mark",
+      "room": "the stair foot",
+      "description": "A tongue of grey soot on the whitewash above the shelf, laid down over forty years by a candle lifted and set in the same place. It is the height of Fairbrother's hand at rest, and no one else's.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the bell wires",
+      "room": "the stair foot",
+      "description": "Four wires in a tin casing up the corner, each one lettered in old ink: Study, Master's Room, Blue Room, Gallery. The Study wire is bright where the others are dull, as if it has been pulled more than any of them, or lately.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the pail hook",
+      "room": "the stair foot",
+      "description": "An iron hook in the wall at the foot of the first tread where the housemaid hangs her ash pail between rounds. The whitewash below it is streaked grey from a pail set down wet and emptied in haste.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the lower flight",
+      "room": "the back stair",
+      "description": "Nine treads of bare deal, the fourth and seventh scooped hollow in the middle and silent, the rest giving a dry crack underfoot. Someone who climbs here nightly would know which to step on.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the rope rail",
+      "room": "the back stair",
+      "description": "Tarred rope on iron eyes, black and smooth as horn along the inner wall. There is a bright ravelled place near the turn where a ring or a button has caught the fibres, recently enough that the loose ends are still pale.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the dog-leg turn",
+      "room": "the back stair",
+      "description": "A square of boards where the flights meet, the corner of the plaster rubbed through to the brown beneath by shoulders turning in the dark. A spot of yellow grease has dried on the top board here, where a dip was set down and taken up again.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the candle streak",
+      "room": "the back stair",
+      "description": "A long smear of soot along the upper flight's wall at a steady height, where a candle has been carried close to the plaster on every climb. It breaks off two treads from the top, where the carrier has learned to lift it clear of the jib door.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the jib door",
+      "room": "the back stair",
+      "description": "A plain deal door on the stair side, papered and skirted on the gallery side so that from the first floor it is only a seam in the wall. The thumb-latch is worn silver, and the door shuts with a sound no louder than a book closing.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the loose tread",
+      "room": "the back stair",
+      "description": "The second tread from the top rocks on its riser and knocks once when weight comes off it. A wedge of folded paper has been pushed under one end to quiet it, yellowed, and pushed in from the stair side.",
+      "portable": false,
+      "story": false
+    }
+  ]
+}

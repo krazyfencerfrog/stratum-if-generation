@@ -1,0 +1,226 @@
+SYSTEM PROMPT
+
+You are step 9j of an interactive fiction generation pipeline: the CONTENT RATING & ADVISORY JUDGE.
+Your task is to evaluate the complete assembled narrative of a story package (including introduction, scene descriptions, dialogues, and endings) to derive an accurate, unencumbered maturity rating, descriptor tags, and a reader advisory according to the Stratum Content Advisory classification scheme.
+
+You did not write the story. You evaluate its content objectively and dispassionately based on observable narrative elements.
+
+RATING TIERS
+
+1. ALL-AGES:
+   - Suitable for general audiences.
+   - Lighthearted, exploratory, pastoral, educational, or low-stakes narrative.
+   - Contains no graphic violence, no profanity, no explicit sexuality, and no visceral horror or disturbing psychological trauma.
+
+2. TEEN (13+):
+   - Suitable for teenagers and general adult readers.
+   - May contain sci-fi/fantasy action, non-graphic combat/peril, mild-to-moderate physical conflict, or systemic social dilemmas.
+   - May contain infrequent mild language (e.g. damn, hell, bastard, crap).
+   - May contain non-graphic romantic tension or mild suggestive themes.
+   - No graphic gore, no severe profanity (e.g. fuck), no sexual violence.
+
+3. MATURE (17+):
+   - Suitable for mature readers.
+   - May contain intense violence, realistic blood/injuries, intense combat, or bleak existential peril.
+   - May contain coarse or strong language (e.g. shit, fuck, ass).
+   - May contain heavy psychological distress, themes of suicide/sacrifice, body horror, or totalitarian oppression.
+
+4. ADULT (18+):
+   - Reserved for explicit graphic content.
+   - Pervasive, sadistically detailed torture or dismemberment.
+   - Explicit sexual acts or pervasive unsimulated erotic content.
+
+CATEGORY DESCRIPTORS
+
+Use standard concise tags:
+- "V": Violence (combat, physical peril, injury, death)
+- "L": Language (profanity, coarse or strong words)
+- "T": Mature Themes (psychological distress, systemic sacrifice, grief, oppression)
+- "H": Horror (body horror, visceral dread, gore)
+- "S": Sexuality (suggestive content or sexual references)
+
+If the rating is ALL-AGES, rating_descriptors MUST be empty [].
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary before or after.
+"reading" comes first, giving a concise 1-2 sentence assessment of the story's tone and maturity level.
+
+{
+  "reading": "The story depicts peaceful pastoral exploration with no conflict or coarse language.",
+  "rating": "ALL-AGES",
+  "rating_descriptors": [],
+  "rating_advisory": "Suitable for all audiences."
+}
+
+For stories with conflict, language, or peril:
+{
+  "reading": "The story features sci-fi combat, hull breach peril, and mild coarse language.",
+  "rating": "TEEN",
+  "rating_descriptors": ["V", "L"],
+  "rating_advisory": "Recommended for teen readers (13+). Contains sci-fi combat, life-or-death peril, and infrequent mild language."
+}
+
+For stories with intense violence, coarse language, or dark psychological themes:
+{
+  "reading": "The narrative depicts torture in cellar dungeons and coarse profanity.",
+  "rating": "MATURE",
+  "rating_descriptors": ["V", "L", "T"],
+  "rating_advisory": "Recommended for mature readers (17+). Contains graphic depictions of violence, torture, and strong language."
+}
+
+CALIBRATION EXAMPLES
+
+Example 1 (Pastoral):
+"The morning sun rose over the quiet library garden. She turned the parchment pages of the herbarium."
+-> ALL-AGES, descriptors: [], advisory: "Suitable for all audiences."
+
+Example 2 (Mild Peril / Mild Language):
+"Damn it, the klaxon sounds across the deck as the pressure gauge drops into the red."
+-> TEEN, descriptors: ["V", "L"], advisory: "Recommended for teen readers (13+). Contains emergency peril and infrequent mild language."
+
+Example 3 (Intense Violence / Torture):
+"The assassin was tortured and his body dismembered in the cellar beneath the fortress."
+-> MATURE (or ADULT if sadistically detailed), descriptors: ["V", "T"], advisory: "Recommended for mature readers (17+). Contains graphic violence and torture."
+
+USER INPUT FOLLOWS BELOW
+
+- Story Narrative Texts
+=== ENDINGS & RESOLUTIONS ===
+Ending The Carriage Takes the Major:
+Lucius Carrington is driven down the thawing road to the magistrate on the housekeeper's word, the valet's confession and the doctor's certificate; the nephew is cleared, but his marriage, the doctor's practice and the widow's name were broken in the same quarter hour, the valet leaves by the first cart with no character after forty years, and the master is remembered as a man who sold his silence for thirty years before he thought to buy it back.
+
+Ending The Wrong Passenger:
+Millicent Gresham is driven down the thawing road in the Major's carriage on the housekeeper's word and the lipstick glass, with Carrington beside her to deliver the household's account; Nathaniel is unlocked and cleared and goes to the stables without looking at you. Fairbrother thanks you at the sideboard for never having asked him the hour, Lavinia brings your tea as she always has, the widow keeps her letter and the ward her lie, and the master's oldest friend sits in the master's chair at dinner. You lock the study at night with the key he hands you across the table, and the story ends there, in the one way it can be lost: an innocent at the magistrate's and the killer at the fire.
+
+Ending The Keyhole Filled:
+Lucius Carrington is held by the arms on the gallery where the door came down, named by the master's key set in the lock from the gallery side and the lamp you saw through the empty keyhole before the poker was fetched, with the study as it was found behind him and not one servant's word in the case; the carriage takes him down the dripping road with the solicitor beside him, and the unsigned will in the desk is never spoken of. Fairbrother keeps his forty years and his silence, Lavinia her place, Millicent her ring and her ten o'clock, the widow her letter, the doctor his practice; and Nathaniel Yardley, master under the old will, gives the housekeeper who put her hand in a gentleman's pocket her wages, her character, and the next cart.
+
+=== SCENE ACTIONS & INTERACTIONS ===
+Scene S_N01:
+The Major straightens, finds you in the doorway, and takes the excuse as he would from a footman: a nod toward the back stair, and his attention gone back to the desk before you have turned. He does not watch you go. Fairbrother does.
+i_came_up_about_the_fire_sir_for
+'About the fire, sir. For the doctor.'
+carrington_regard
+Doctor Ashcombe's hands stop on the master's collar. The Major's hand goes to his coat pocket and stays there, closed over it. 'The housekeeper is new, Ashcombe,' he says to the doctor, not to you. 'She will learn what is asked of her.' The doctor does not turn round, but he has heard.
+sir_the_key_that_fell_where_is_i
+
+Scene S_N02:
+The Major closes the watch with his thumb and tells Mr Ellingham that the house keeps good time and the housekeeper keeps it. Miss Davenport's eleven o'clock goes into the paper unchallenged, and she lets out a breath she thinks nobody sees.
+wound_by_my_hand_sir_your_watch_
+'Wound by my hand, sir.'
+carrington_regard
+Miss Davenport's colour goes out of her face in one piece. The Major does not close the watch. 'Note,' he says to Mr Ellingham, 'that the housekeeper disputes the house's clocks,' and the pen notes it while the table looks anywhere but at you.
+hall_clock_ran_a_quarter_fast_th
+
+Scene S_N03:
+You put the pin into her hand and say it must have fallen at dinner. She closes her fingers on it and says the house is lucky in its housekeeper, and you do not correct her.
+You hold it up to the candle and tell her where it lay. She draws her hand back as if the pin were hot, and asks, very low, what else you keep. You put it back in your pocket.
+You ask her plainly whose window Dr Ashcombe's snowy boots came from. She says she does not understand you, and her voice says she does; she looks past you at the Major's door and then stops looking.
+whose_window_had_the_doctor_s_bo
+'Whose window had the doctor's boots?'
+You tell her she will take cold. She goes in. The pin stays in your pocket, unnamed, and her light stays burning under the door.
+
+Scene S_N04:
+She goes down white and grateful, the pail knocking her knee. The grate above is not raked, and the lie is yours to keep if the Major asks who did it.
+go_down_i_ll_say_it_was_raked
+'Go down. I'll say it was raked.'
+You take the pail from her and climb the stairs you are forbidden. The study is cold and the grate is full of something that was burned in a hurry; you are on your knees in it when a tread on the bare boards tells you Fairbrother is in the doorway, and he goes down to the Major without a word.
+up_past_the_bar_to_the_study
+carry the pail up past the bar
+
+Scene S_N05:
+You say it to the room, not to him: you sent her for the stub and the ash pan, and it was yours to ask for. The Major turns a page and writes your name below hers, in the same hand. The cook lets go of Lavinia's wrist as if it had gone hot.
+i_sent_her_up_the_stub_was_mine
+'I sent her up. The stub was mine.'
+carrington_regard
+You take Lavinia by the elbow, walk her past the Major and across the passage, and shut the kitchen door on the cook's open mouth. In your room she gets a chair and a clean apron from your box. The kitchen talks of you instead, for the rest of the day.
+take her into your room, shut the door
+
+Scene S_N06:
+You say that Miss Gresham went to the study at ten to ask the master, plainly and as one asks a thing of a relation, to settle her father's debts, and that the sherry was his and not hers. Nathaniel's face closes like a book, but it does not break. Millicent keeps her chin level and looks at the fire.
+her_father_s_debts_asked_for_pla
+'Her father's debts, asked plainly'
+gresham_confidence
+You say she begged. You say it in the voice one uses for the inventory. Millicent stands as if she had been struck, and the glass of the thing is in the air between her and Nathaniel, and he does not go to her.
+she_begged_him_over_a_glass
+
+Scene S_N07:
+He does not look up from the Major's pocket. 'Your rounds book stands. The stub stands with it. The key stands if the Major says where it was found and you say when.' He closes the Major's coat over it himself. 'The rest is a house talking, and houses are not sworn.'
+what_will_stand_sir
+'What will stand, sir?'
+He takes up his box as if it weighed nothing, which after forty years it does. Lavinia comes down the last flight behind him without a word and the two boxes are roped on the cart's tail together. What he says to the carter, you do not hear; the baize door swings shut on it. The back stairs are quiet.
+carter_is_waiting_mr_fairbrother
+'The carter is waiting, Mr Fairbrother.'
+
+Scene S_T2N01:
+S_T2N01.T2N01b.1
+S_T2N01.T2N01b.2
+S_T2N01.T2N01b.3
+S_T2N01.T2N01b.n
+S_T2N01.T2N01b.n
+S_T2N01.T2N01c.1
+
+Scene S_T2N02:
+S_T2N02.T2N02a.1
+S_T2N02.T2N02a.2
+S_T2N02.T2N02a.3
+S_T2N02.T2N02a.n
+S_T2N02.T2N02a.n
+S_T2N02.T2N02b.1
+
+Scene S_T2N03:
+S_T2N03.T2N03a.1
+S_T2N03.T2N03a.2
+S_T2N03.T2N03a.3
+S_T2N03.T2N03a.n
+S_T2N03.T2N03a.n
+S_T2N03.T2N03b.1
+
+Scene S_T2N04:
+She inclines her head the exact degree a lady gives a housekeeper, and gets up into the carriage. The Major shakes out the reins. The wheels take the meltwater with a sound like torn cloth, and the road has her.
+safe_road_miss_gresham
+'A safe road, Miss Gresham.'
+You drink it standing, in the cold, with the sink dripping. It is the first thing anyone in this house has brought you without a bell.
+You go up with the last candle and lock the study door, with the Major's key or at his elbow while he turns his own. Behind you Fairbrother comes down the back stairs with the tallow box, counts it without looking, and either bids you goodnight by your name or lets the dark carry the hour away with him. The key turns in a lock nobody broke.
+lock_up_for_the_night
+
+Scene S_T3N01:
+S_T3N01.T3N01a.1
+S_T3N01.T3N01a.2
+S_T3N01.T3N01a.n
+S_T3N01.T3N01a.n
+S_T3N01.T3N01b.1
+S_T3N01.T3N01b.2
+
+Scene S_T3N02:
+S_T3N02.T3N02b.1
+S_T3N02.T3N02b.2
+S_T3N02.T3N02b.3
+S_T3N02.T3N02b.n
+S_T3N02.T3N02b.n
+S_T3N02.T3N02c.1
+
+Scene S_T3N03:
+S_T3N03.T3N03a.1
+S_T3N03.T3N03a.2
+S_T3N03.T3N03a.3
+S_T3N03.T3N03a.n
+S_T3N03.T3N03a.n
+S_T3N03.T3N03c.1
+
+Scene S_T3N04:
+S_T3N04.T3N04a.1
+S_T3N04.T3N04a.2
+S_T3N04.T3N04a.3
+S_T3N04.T3N04a.n
+S_T3N04.T3N04a.n
+You give it as you would give the week's accounts. A key in the inside lock fills the keyhole; at midnight you saw lamplight through it, so no key stood there. The tallow stub lies on the bare boards where no wax belongs, because a man waited in the dark outside this door. Ellingham writes it. No servant's hour goes down on his page, and at the stair head Fairbrother's head comes up for the first time in two days.
+
+Scene S_T3N05:
+You take the ring from your waist and hang it on its hook under the old housekeeper's bonnet. Thirty-one keys, every one of which you could name in the dark. The study key is not among them and never will be now.
+housekeeper_s_room
+Fairbrother weighs the house keys in his palm. Either he says, loud enough for the groom in the yard, that a woman who saw a tallow stub at ten paces was wasted below stairs, and goes down himself for your box; or he says 'Yes, Mrs—' and cannot finish the name, and turns to the stair, and your box goes down with the maid.
+'He is yours to keep now, Mr Fairbrother.'
+You go out by the front door, which is not the door you came in by. The carriage has turned on the gravel and gone down through the thaw with the key and the stub and two gentlemen who will not speak of a will. The cart waits at the side with your box in it; the groom has something in his glove that may be a letter, unsigned, in a lady's hand, or may be nothing. The house drips behind you and does not watch you go.
+go_S_T3N05__E_T3N05

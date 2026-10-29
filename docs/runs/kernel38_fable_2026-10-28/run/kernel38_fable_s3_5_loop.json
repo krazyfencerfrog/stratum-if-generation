@@ -1,0 +1,39 @@
+{
+  "accepted_source": "s3_5r1_premise_repair.json#revised",
+  "accepted_copy": "s3_5_premise_accepted.json",
+  "repair_rounds_used": 1,
+  "max_repairs": 2,
+  "still_failing": false,
+  "accepted_with": [],
+  "rounds": [
+    {
+      "round": 0,
+      "source": "s3_5_premise.json",
+      "findings": [
+        {
+          "source": "engine check",
+          "where": "no two turns pose the same choice: their ways are not the same outcomes with different nouns, and turns before the last have local goals of their own rather than the decision axis in another form (unless the Kernel itself makes the decision recur). If they do, quote the turn that should change: the later one, or the earlier one when the later is the last turn.",
+          "problem": "Turn 4 repeats turn 1's choice of how to get at the study against the Major's order, with the same defy-him-in-the-doorway and do-it-under-cover-of-housekeeping ways only escalated, so the later turn should change.",
+          "quote": "you stand in the study doorway with your keys and will not let the maids past with the pails",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "source": "s3_5r1_premise_repair.json#revised",
+      "changed": [
+        "turns"
+      ],
+      "repair_log": [
+        {
+          "finding": "F1: Turn 4 repeats turn 1's choice of how to get at the study against the Major's order",
+          "change": "Turn 4 is rewritten with a local goal of its own: the study is being emptied around you and you are kept out of it, so the question is whom in the house you make your accomplice before noon. The defy-him-in-the-doorway and under-cover-of-housekeeping ways are replaced: one way turns the frightened housemaid, who carries the stub out for you (what you hold changes, and she pays for it); one turns the solicitor, who stops the clearing in law's name (who stands with you changes, and a silence is owed); the ice-house bargain with the doctor is kept, since it did not repeat turn 1. No new person is introduced; turns 1, 2, 3 and 5 are copied unchanged.",
+          "disagreement": "",
+          "declined": false
+        }
+      ],
+      "findings": []
+    }
+  ]
+}

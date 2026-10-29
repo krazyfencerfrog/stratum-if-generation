@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "T2N01",
+      "title": "A Cart by Noon",
+      "summary": "The eaves drip and Barnaby Quarles wades up: a cart by noon. Major Carrington orders the carriage, sends Lavinia Netherby up with pails and coal, then halts you on the gallery with his watch open and says, low, that the sherry glass in your drawer is evidence or blackmail: you will tell the drawing room of a lady's visit at ten and the quarrel after, or the heir hears which. Cordelia Ormsby praises your discretion aloud; Nathaniel Yardley pushes a scrap under his door; you pocket it.",
+      "image": "a pencilled scrap under the nephew's door: twenty to eleven, the yard",
+      "where": [
+        "the first-floor gallery"
+      ],
+      "who": [
+        "the Major",
+        "the lodge-keeper",
+        "the housemaid",
+        "the widow",
+        "the master's nephew and heir"
+      ]
+    },
+    {
+      "id": "T2N02",
+      "title": "The Doctor's Snow",
+      "summary": "You leave the maids to the study and wade to the ice house, where Gideon Ashcombe lays out the body. You tell him whose boots tracked snow into the gun room, and from whose window; he states before Cornelius Ellingham that the master knew he was dying and had sent for his oldest friend. Indoors the grate is relit, the stub gone with the ash, and Lavinia Netherby telling the kitchen you deserted her.",
+      "image": "the yellow tallow stub lying on the ash heap, half sunk in grey slush",
+      "where": [
+        "the ice house",
+        "the servants' hall"
+      ],
+      "who": [
+        "the doctor",
+        "the solicitor",
+        "the housemaid"
+      ]
+    },
+    {
+      "id": "T2N03",
+      "title": "The Lady's Candle",
+      "summary": "Reginald Fairbrother brings Nathaniel Yardley down between himself and the groom. Standing before the fire you tell the room the night as the house already believes it, every other lie held back, then set Millicent Gresham's sherry glass on the table and name her: the study at ten, the nephew in the yard by twenty to eleven, the later candle a lady carrying servants' tallow up the back stairs. Millicent goes still; Nathaniel stammers; Fairbrother keeps silent; Major Carrington sends for her cloak.",
+      "image": "the sherry glass on the drawing-room table, lipstick dried on its rim",
+      "where": [
+        "the drawing room"
+      ],
+      "who": [
+        "the Major",
+        "the master's valet of forty years",
+        "the master's nephew and heir",
+        "the nephew's fiancée"
+      ]
+    },
+    {
+      "id": "T2N04",
+      "title": "The Key Across the Table",
+      "summary": "The carriage takes Millicent Gresham down the dripping road, Major Carrington on the box, the wrapped glass in his coat. Nathaniel Yardley, unlocked, passes you for the stables without a glance; Evangeline Davenport recites her eleven o'clock to Cornelius Ellingham. Reginald Fairbrother thanks you for never asking him the hour; Lavinia Netherby brings your tea. The Major, back by dinner, carves in the master's chair and hands you the study key; you lock up.",
+      "image": "the study key slid across the drawn cloth between the candlesticks",
+      "where": [
+        "the drawing room",
+        "the dining room",
+        "the master's study"
+      ],
+      "who": [
+        "the nephew's fiancée",
+        "the Major",
+        "the master's nephew and heir",
+        "the ward",
+        "the solicitor",
+        "the master's valet of forty years",
+        "the housemaid"
+      ]
+    }
+  ],
+  "new_locations": [
+    {
+      "name": "the ice house",
+      "kind": "the brick ice store across the drifted yard where the body is laid",
+      "why": "the one place the doctor can be spoken to away from the Major, at the cost of leaving the study to the maids"
+    }
+  ],
+  "new_characters": []
+}

@@ -1,0 +1,24 @@
+{
+  "failure_presence": {
+    "value": "hard",
+    "evidence_basis": "strong_inference",
+    "note": "The Kernel pairs a stated \"fair solution\" with the explicit wish \"to be able to accuse the wrong person\" — a wrong accusation is framed as a mistake against a true answer, not an equally valid branch."
+  },
+  "failure_triggers": {
+    "types": [
+      "incorrect_resolution"
+    ],
+    "evidence_basis": "explicit",
+    "note": "The accusation is a single on-page decisive beat the Kernel names directly; the snowstorm isolation is setting, not a deadline mechanic."
+  },
+  "failure_cost": {
+    "value": "terminal",
+    "evidence_basis": "strong_inference",
+    "note": "A wrong accusation in a fair-play mystery with one true solution reads as the losing end of the run; nothing in the Kernel suggests play continues past it."
+  },
+  "failure_scope": {
+    "value": "isolated",
+    "evidence_basis": "strong_inference",
+    "note": "Risk crystallizes at the accusation beat rather than running through the investigation."
+  }
+}

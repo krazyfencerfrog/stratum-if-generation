@@ -1,0 +1,13 @@
+{
+  "viewpoint_handoff": {
+    "ceiling": {"value": "single", "evidence_basis": "explicit", "note": "The housekeeper is named as the sole investigating protagonist; the seven guests are suspects to be questioned and accused, not perspectives the player takes on."},
+    "floor": {"value": "single", "evidence_basis": "explicit"},
+    "count": {"min": 1, "max": 1, "evidence_basis": "explicit"}
+  },
+  "viewpoint_excursions": {
+    "ceiling": {"value": "invited", "evidence_basis": "strong_inference", "note": "\"The only person who saw where everyone was that night\" places the housekeeper's key knowledge in a prior evening, which plausibly opens the door to a played flashback of that night; but the story could equally render her observations as recalled exposition and present-tense interrogation, so this is not required."},
+    "floor": {"value": "invited", "evidence_basis": "strong_inference", "note": "The detail applies to the whole premise rather than one branch, so the affordance is uniform."},
+    "types": {"values": ["flashback"], "evidence_basis": "strong_inference"},
+    "interactive": {"value": "interactive", "evidence_basis": "strong_inference", "note": "A flashback to the night would be the housekeeper's own memory lived through, so the silent-Kernel default for flashback applies; later phases may constrain choices inside it since what she saw must stay fixed for fair-play clueing."}
+  }
+}

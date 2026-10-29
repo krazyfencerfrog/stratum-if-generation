@@ -1,0 +1,358 @@
+{
+  "notes": "Nathaniel sorts everyone in the house into creditor, witness, or judge, and cannot settle which the new housekeeper is.",
+  "lines": [
+    {
+      "subject": "Reginald Fairbrother",
+      "says": [
+        {
+          "state": "fairbrother_faith",
+          "direction": "up",
+          "after": null,
+          "text": "'He's been talking to you. He doesn't talk, Fairbrother, forty years and I've had twenty words out of him and ten of those were \"Your uncle will see you now.\"'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Fairbrother was— Fairbrother was brushing my uncle's coats before I was breeched. He sat at my door all night like a— damn it, like a dog at a grave. Beg pardon.'"
+        }
+      ]
+    },
+    {
+      "subject": "Gideon Ashcombe",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I owe Ashcombe a guinea from Doncaster and he'll mention it, he always does. He said heart, then he said the fire, then he stopped saying anything and wrote in that little book. A man who shifts his bet three times has seen something.'"
+        }
+      ]
+    },
+    {
+      "subject": "Evangeline Davenport",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Evie— Miss Davenport was his favourite, if he had one. New will stands, she gets the Home Farm and I get the roof and the debts under it. She cried at dinner. I didn't. You'll have noticed; everyone has.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cordelia Ormsby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs Ormsby plays whist for sixpences and wins like it's the house she's after. She sat with my uncle every evening this week, door shut, and came out looking— paid. That's ungenerous. Beg pardon. Ask her where she was; she'll tell it prettier than I would.'"
+        }
+      ]
+    },
+    {
+      "subject": "Lavinia Netherby",
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "'Whatever she's told you, she's seventeen and she'll say anything to keep her place, and— damn. Beg pardon. The loft was nothing. Horses. I was looking at the bay's near fore.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The maid? Netherby. I— I wouldn't know one housemaid from another, would I. She does the fires.' He looks at the door. 'Does she say otherwise?'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Ellingham carried the new will down in his bag and has sat on the bag ever since like a hen. If he'd stayed in Lincoln's Inn the old one stands and I'm— well. He knows the arithmetic as well as I do, and he hasn't let me see it. Not once.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Quarles carries my bets to the village when the road's open and takes a shilling on each for his trouble. Doesn't mean he'll speak for me. He'd sell his mother for a dry pair of boots, and I say that fondly.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'You can hear every door on that gallery from every other door, that's the trouble with it. Mrs Ormsby's latch, the Major's boots, my uncle's lock. I lay there counting them like— like a man counting the field at the off.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Staff stairs. I don't— I've never used them.' Too quick, and he hears it. 'Well. As a boy. For the kitchen.'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'He carved. The Major carved the beef in my uncle's house, with my uncle's chair empty beside him, and looked down the table at me while he did it. I'll not sit in there again under that.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Your room. I came in there at ten years old to steal sugar and the last woman boxed my ears for it. The keys still hang on the same hook. I expect you keep a count of who asks for them.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I'm not— I'm not supposed to know the way down there, and I know it better than the drawing room. Cook used to feed me when my uncle had me sent up without dinner. That's— no. That's all.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'That's where they'll sign it. Ellingham, the Major, two witnesses, a pen, and Mrs Ormsby pouring. I'll be stood by the window like a horse brought out for inspection.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I was in there Tuesday twenty minutes and came out owing more than I went in with, if you follow me. He kept it locked when he was in it and locked when he wasn't. Nobody went in without him. That's— that's rather the point, isn't it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The ice house? Lord. The path's a sheet in this, nobody goes near it. Quarles cuts the ice in January and that's the last anyone— why? What's in the ice house?'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Racing calendars back to 'forty-one, that's the only shelf I ever opened. The Major sits in there now with the newspaper as if he's paid for the chair. He hasn't. Nobody has, yet.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I held the poker. The Major told me to and I hit the lock and it went, and I heard the key drop, everyone did. I'd not— God. Beg pardon. I'd not seen a dead man before, only horses, and it isn't the same.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I ran. There's no— there's no gloss to put on it, I heard \"magistrate\" and my legs went for the stables before my head did. Fairbrother and Quarles brought me back across the ice by the collar, and then they locked me in. In my uncle's house.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The dripping started before I was awake and he had the carriage ordered before I was dressed. He's very quick, for an old man. Who goes down that road and who stays is being decided by whoever he listens to, and I know whose account he's asked for.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Faces mine across the gallery. He leaves it open an inch, always has, every visit since I was a boy; says he likes to hear the house. He heard me, that's certain, and I didn't hear him, which is— that's the difference between us.'"
+        }
+      ]
+    },
+    {
+      "subject": "the nephew's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'My door. Locked from the outside, with Fairbrother on a chair in front of it, in a house that's— that's mine, or will be. The key's on the Major's ring now. You'll have seen it there.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Oak, two inches, key on the inside. I know, I broke it. I keep— I keep going back to that key falling. My uncle never left a key in a lock in his life. He said it was asking.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's chair",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The Major took it the first night, before the body was cold, and nobody said a word, least of all me. I'll have it carried out when— if. If.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sherry glass",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'One glass of sherry at nine, every night, and Fairbrother poured it. One. I asked him for a second once and he said a man who wants two glasses wants ten. The one on the desk was his, that's all I can tell you.'"
+        }
+      ]
+    },
+    {
+      "subject": "the long table",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Seven at it and a chair empty and the Major carving. I counted the places the way you count a book at Epsom, and the sum came out wrong, and it's still wrong.'"
+        }
+      ]
+    },
+    {
+      "subject": "the gallery rail",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I leaned on it the night of— that night. You can see the study door from there, and the back stair door too if you hang over far enough. That's— that's just how it's built.'"
+        }
+      ]
+    },
+    {
+      "subject": "the widow's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Next to my uncle's. The latch sticks and she has to lift it, so you hear it twice. I heard it twice that night, and I'll say so if it comes to it, and she'll say she heard mine. That's how a house like this goes.'"
+        }
+      ]
+    },
+    {
+      "subject": "the linen press",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The press on the back landing? I hid in it from the Major when I was eight. He found me inside four minutes. He doesn't— he doesn't miss much, is what I'm telling you.'"
+        }
+      ]
+    },
+    {
+      "subject": "the tallow box",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Kitchen candles. My uncle wouldn't have tallow above stairs, he said it stank the paintings. If there's one gone from that box, someone carried it up who'd no business with the wax.'"
+        }
+      ]
+    },
+    {
+      "subject": "the shelf",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'What shelf? I don't— I don't go in the pantries.' A beat. 'Ask Netherby.'"
+        }
+      ]
+    },
+    {
+      "subject": "the cloth",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A cloth. Look, I— I know nothing about any cloth. If there's something on it, I didn't put it there. Damn. Beg pardon.'"
+        }
+      ]
+    }
+  ]
+}

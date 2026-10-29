@@ -1,0 +1,92 @@
+{
+  "clauses": [
+    {
+      "n": 1,
+      "requires": "The story is a murder set in a Victorian country house.",
+      "premise_says": "A Victorian country house cut off by two days of snow: the master's study off the first-floor gallery ... The Major struck the master down with the study's own poker",
+      "note": "The arena is a Victorian country house and the master is murdered in it; period, place and crime all match.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 2,
+      "requires": "A snowstorm has isolated the house, and the isolation has lasted two days by the time the story is under way.",
+      "premise_says": "A Victorian country house cut off by two days of snow ... the telephone wire is down, the drive is gone under the drifts, and no one has come up it since the storm began",
+      "note": "The house is cut off by two days of snow and nobody has reached it; the coming thaw is the story moving the situation on, not denying it.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 3,
+      "requires": "The master of the house is dead, and his body is inside his study, which is locked.",
+      "premise_says": "The study door is broken down with the hall poker ... and the master is found at his desk with the window frozen shut ... locked the door from the gallery side with the master's key from the dead man's chain",
+      "note": "The master is dead at his desk behind a locked study door that has to be broken down; the premise explains how it was locked but keeps it locked.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 4,
+      "requires": "The protagonist is the housekeeper, and newly in the post.",
+      "premise_says": "You are the new housekeeper, a fortnight in post",
+      "note": "A fortnight in post is a new housekeeper; the widowhood and the surname are added detail.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 5,
+      "requires": "The protagonist saw where everyone was on the murder night, and nobody else has that complete knowledge.",
+      "premise_says": "last night you did your rounds with a candle and a ring of keys while the master's seven guests moved about the house, and this morning ... you are the only person who knows where each of them was and when",
+      "note": "The premise states the clause almost verbatim; that the valet alone knows whom he lit up at eleven is a partial knowledge another holds, and the premise never says you failed to see where everyone was, so the specific the clause states still stands.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 6,
+      "requires": "There are exactly seven guests in the house.",
+      "premise_says": "the master's seven guests moved about the house ... Dinner is laid for seven with the master's chair empty",
+      "note": "The cast lists seven guests (Major, nephew, doctor, fiancée, ward, widow, solicitor); the valet and housemaid are servants, not guests.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 7,
+      "requires": "Each of the seven guests is lying about something.",
+      "premise_says": "The other six are lying about a debt, a ten o'clock visit with a glass of sherry, an affair, a forged letter of credit, an unsigned new will, and the hour of the overheard quarrel; none of it touches the killing",
+      "note": "The Major lies about the murder and each of the other six has a named lie, so all seven are lying.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 8,
+      "requires": "The story contains genuine clues that point to the true solution.",
+      "premise_says": "the key heard to fall is no longer proof of a locked room but proof of who dropped it; the tallow stub becomes a candle carried up the back stairs after ten, which only the valet draws",
+      "note": "The tallow stub, the keyhole with the lamp visible through it, and the key falling from the Major's hand are real clues leading to the killer.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 9,
+      "requires": "The story contains misleading clues that point away from the true solution.",
+      "premise_says": "the fiancée's lipstick glass, the widow's hairpin in the keyhole, the doctor's snow in the gun room, the solicitor's unsigned will or the ward's testimony",
+      "note": "The lipstick glass, hairpin, snow in the gun room, unsigned will and the ward's false hour are all red herrings that implicate the innocent.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 10,
+      "requires": "The solution can be reached by the player from clues available in the story.",
+      "premise_says": "On the gallery, before the poker is fetched, you kneel at the study door and put your eye to the keyhole, and see the lamp still burning ... On your first morning in the house you took over the candle box ... and the valet told you ... that he alone draws from it after ten",
+      "note": "The keyhole observation and candle-box setup are planted before the solution and pay off in the drawing room, so the solution is fairly derivable.",
+      "contradiction": false,
+      "quote": ""
+    },
+    {
+      "n": 11,
+      "requires": "The player must be able to accuse someone other than the real killer.",
+      "premise_says": "name one of the other six ... the name is wrong, the room believes you, and the story ends with an innocent sent to the magistrate at thaw and the killer standing at the fire: the one way you can lose",
+      "note": "Pole B and the final turn's last way explicitly let you name the nephew, the fiancée or another guest and lose by it.",
+      "contradiction": false,
+      "quote": ""
+    }
+  ]
+}

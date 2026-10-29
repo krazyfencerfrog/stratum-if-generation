@@ -1,0 +1,422 @@
+{
+  "notes": "Cordelia sees every person in the house as a question of credit, what they are worth, what they know, and what it would cost her, and is warmest to whichever servant she most needs to forget her.",
+  "lines": [
+    {
+      "subject": "Lucius Carrington",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Carrington is received everywhere and lent to nowhere, which in a man of his years tells one something, though I could never say precisely what. He has a gift for finding the chair that faces the door.'"
+        }
+      ]
+    },
+    {
+      "subject": "Reginald Fairbrother",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Forty years with one gentleman. Imagine it. He has brushed every coat your master ever quarrelled in and he will know which pockets were heaviest, and I would be careful what I asked him, because he answers.'"
+        }
+      ]
+    },
+    {
+      "subject": "Nathaniel Yardley",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The nephew has the look of a young man who has had his expectations explained to him in low voices by a great many tradesmen. One is sorry for him, naturally. One also notices he was the first to run.'"
+        }
+      ]
+    },
+    {
+      "subject": "Gideon Ashcombe",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "'You have been so very kind about the doctor, and I shall not forget it, and nor will he, which in the long run is worth rather more than my memory.'"
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "'Dr Ashcombe attends me for my head. I imagine that is written down somewhere now, with everything else.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A very sound man, one hears his name in the best houses, generally in connection with somebody's nerves.' She says it as if reading it off a card."
+        }
+      ]
+    },
+    {
+      "subject": "Millicent Gresham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Gresham is engaged to the heir and has had two days to watch her inheritance walk about the house looking frightened. She counts the silver with her eyes. I rather admire it.'"
+        }
+      ]
+    },
+    {
+      "subject": "Evangeline Davenport",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The ward. One was never quite told whose. She weeps very prettily and in the right rooms, and she has been most attentive to the Major since the dinner, which is either grief or arithmetic.'"
+        }
+      ]
+    },
+    {
+      "subject": "Lavinia Netherby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The little housemaid with the quick eyes. She did my fire the first morning and looked at my dressing table as if she were learning it. I am sure you have her well in hand; I should want her well in hand, if she were mine.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The solicitor has been waiting two days for the road with a key in his pocket, and he looks at the study door the way other men look at a dinner going cold. I do hope he is made to wait a little longer. These things are better done with the family rested.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The lodge-keeper. I have met him twice, both times through a window, in snow. He is the one man in the county who can say when the road is open, and that is a great deal of power in a person I have not tipped.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'It is the only warm walk in the house, and so everybody takes it, which is the difficulty. One cannot cross from one's own door to the stairs without three people knowing one's slippers.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "'You have never once told me where they come out, and I have begun to think it the kindest thing anyone has done for me in this house.'"
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "'Yes, I know where they come out. So, it seems, does everyone now.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I'm sure I don't know them. Guests are not shown the back stairs, and I have always thought that rather the point of being a guest.'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Seven at a table laid for eight, and nobody with the sense to have the chair taken away. I ate nothing and watched the Major carve, which he did very well for a man who was speaking the whole time.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Your little room with the fire. I came down once to ask about a hot brick and found the door shut, and was oddly glad. It is the only door in this house I have not heard open in the night.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I have no notion what is said down there and I would give a good deal to know, which is, I believe, the whole condition of being a lady.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Where we are all to be gathered to hear you, like a sermon. I shall take the chair by the window; the light is kinder there, and one can see who looks at whom.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "'You are very good not to look at me when the study is mentioned. I have noticed. One notices kindnesses in a cold house.'"
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "'I have said I was never in it. I notice you have said nothing at all, which is a different thing, and I am not certain I like the difference.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I was never asked into it. Gentlemen's rooms smell of tobacco and arithmetic, and one is grateful not to be asked.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'They have put him out there until the road, I understand. It seems a dreadful thing to do to one's host, and perfectly sensible, which is this house all over.'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Cold, and full of sermons, and the one room where a woman may sit an hour and be assumed to be improving herself rather than waiting for someone.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I was on the gallery in my wrapper with everyone else, and I heard something small fall inside, a key or a coin, before the poker went through. I thought, how odd, and then I saw that yellow candle, and then I saw him, and I stopped thinking of anything much.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The Major stood up with his glass and made witnesses of us all, which was clever, and then that boy went white and ran, which was stupid, and between the clever man and the stupid one I knew which a magistrate would prefer. I kept my eyes on my plate. I recommend it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The dripping woke me before the maids did. One lies there counting what must be done before noon and finds the list longer than the morning.' A smile. 'Packing, I mean, of course.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'His is the one with the handle that wants oiling; one hears it from the far end of the gallery. I shan't say I heard it that night. I shall say that if I had, I should have put it down to a soldier's habits and gone back to sleep.'"
+        }
+      ]
+    },
+    {
+      "subject": "the widow's door",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "'You have been most discreet about my door, and I am a woman who notices when a door is not mentioned.'"
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "'Everyone seems to know when my door opened and when it shut. I begin to feel I should have charged admission.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mine does not lock, which I mention only so that you will understand I did not lock it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Good oak and a stiff lock that nobody could turn from the gallery side. It has been said so often in this house these two days that I have begun to wonder why everyone needs me to believe it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the service door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The baize one. It sighs. One cannot go through it without the whole gallery knowing a servant has gone somewhere, which I always supposed was the intention. It sighed more than once that night, and I did not count.'"
+        }
+      ]
+    },
+    {
+      "subject": "the deal desk",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I don't know it. Deal is what one has in the attics.' A pause, not quite long enough. 'Whose is it?'"
+        }
+      ]
+    },
+    {
+      "subject": "the writing table",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The one in the drawing room by the window. The ink is dreadful and the paper better than the house deserves. I wrote nothing at it that anyone need read, if that is the question, and in this house it generally is.'"
+        }
+      ]
+    },
+    {
+      "subject": "the gallery rail",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'One leans on it to look down into the hall and finds everyone else leaning too. The night it happened there were nine of us at that rail in our nightclothes, and for the first minute not one of us looked at the door. We looked at one another.'"
+        }
+      ]
+    },
+    {
+      "subject": "the half-landing window",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'It makes whoever passes it look drowned. I avoid it in daylight. At night, of course, it is simply a window one passes on the way to wherever one is going.'"
+        }
+      ]
+    },
+    {
+      "subject": "the nephew's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'With the old valet asleep in a chair outside it like a dog. They have made a prisoner of the boy, and the boy was the only one of us who ran out of the house instead of into a room, which I should have thought argued the other way.'"
+        }
+      ]
+    },
+    {
+      "subject": "the gallery windows",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Grey all day and grey all night, with the snow heaped against them so one cannot tell whether one is watched from the yard. It is somebody's wet boots under those windows that everyone keeps speaking of, and I have very small feet, and I say so now so that you may look.'"
+        }
+      ]
+    },
+    {
+      "subject": "the linen press",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "'On the landing by the back stairs, and warm, and the one place a person might stand a quarter of an hour and be taken for a maid counting sheets. I say might. You have never asked me, and I am grateful.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I'm sure I don't know what a linen press looks like from the outside. One only ever sees the sheets.'"
+        }
+      ]
+    },
+    {
+      "subject": "the tallow box",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I have never in my life had cause to know where the tallow is kept, and I should think the person who does would be worth asking. It was a yellow candle in his stick. Somebody carried that up from below.'"
+        }
+      ]
+    }
+  ]
+}

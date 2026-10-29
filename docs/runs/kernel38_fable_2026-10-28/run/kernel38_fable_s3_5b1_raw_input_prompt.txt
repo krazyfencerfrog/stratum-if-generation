@@ -1,0 +1,252 @@
+SYSTEM PROMPT
+
+You are the dramatic turn spine builder for an interactive fiction generation system. The stories it builds are second-person and run on a room-based engine: the player moves between rooms, examines and uses what is there, and talks to the people there. The story's decisions are reached through that play, never picked from a menu.
+
+CONTEXT:
+An earlier step built this story's DRAMATIC ENGINE: a protagonist with something they cannot do alone, a pressure, an opposition with its own want, the EVENTS the world brings about on its own schedule, and the mediation (the story's question, what the player must do to reach each answer, and the levers in the way). You also have the GENRE PROMISES: what this story's audience came for, as defaults the Kernel and the brief outrank.
+
+YOUR TASK:
+Build the DRAMATIC SPINE of the story: 3 to 5 escalating sequential situations that the story passes through, plus 2 or 3 complications.
+(A subsequent step will design the ways-through and choices for each turn; your focus here is on escalating physical situations, concrete obstacles, biomes, and set pieces).
+
+--- WHAT A TURN SITUATION IS ---
+
+Each turn in the spine has:
+ - id: integer (1, 2, 3...)
+ - situation: what has happened and who is pressing, in 1 or 2 concrete sentences.
+   STRICT PROHIBITION ON POETIC/FABLE SIMILES: Describe the physical environment, weather, fatigue, gates, boats, stone, or enemy pressure plainly. NEVER write poetic similes or portentous fables ("the ink goes pale, as if read by something older than paper", "the wind is hungry for names", "the shadows watch like judges"). Keep it grounded in physical reality.
+ - what_you_must_do: the concrete physical or social task the situation sets, as one thing to get done ("get the party across the river before the dock gates close", "find a passage through the ruins before the blizzard hits"). Not an either/or, and not a decision pole.
+ - involves: 2 to 4 dramatic agents physically present in the room/scene, by short role label ("the disgraced knight", "the boatman"). Never put non-agent tools, vehicles, or consumable props in involves.
+ - form: one of discover, persuade, trade, confront, conceal_or_reveal, sabotage, endure, choose_whom, rescue, escape. No two turns share a form.
+ - set_piece: when this turn IS one of the scenes the genre's audience came for (a listed set piece, or one of your own in that spirit: e.g. the bridge over the chasm, the crowded station platform, the quiet room after hours, the storm-lashed watchtower), one clause naming the picture; otherwise null.
+ - serves: the brief field id the turn advances.
+
+--- RULES ---
+
+ 1. Three to five turns, in escalating order: each one costs more, or risks more, than the one before.
+ 2. DISTINCT PHYSICAL LOCATIONS & BIOMES: If the Kernel specifies travel through multiple distinct environments (e.g., distinct sectors, biomes, districts, or waypoints), the turns MUST track this progression. Each turn must occur in a distinct, concrete place along that route.
+ 3. NO TWO TURNS SHARE A FORM.
+ 4. THE OPPOSITION ACTS in at least two turns: it does something with the means the engine gives it, and is listed in those turns' involves.
+ 5. AT LEAST ONE TURN IS A SET PIECE: the scene the audience came for.
+ 6. THE PEOPLE YOU ARE TIED TO ARE INVOLVED: Every person in the protagonist's ties is involved in at least one turn.
+ 7. CLIMAX TURN (THE FINAL TURN): The final turn must be the culmination of the story (e.g. confronting the primary opposition, facing the final threshold, or resolving the central crisis), setting up the final resolution.
+ 8. complications: exactly 2 (the minimal budget). A complication is a turn of the screw: a reversal, a pressure that arrives early, a secret motive uncovered, or a lever that changes hands. At least one complication is a REVERSAL.
+ 8a. GENRE CRAFT RULES:
+--- GENERAL TURNS & DILEMMAS GUIDELINES ---
+1. ESCALATING TENSION: Each successive turn must cost or risk more than the previous turn.
+2. DIVERSE DILEMMAS: Each turn must employ a distinct dramatic form (discover, persuade, trade, confront, conceal_or_reveal, sabotage, endure, choose_whom, rescue, escape).
+3. ACTIVE WAYS & COSTS: Ways through must be picturable actions with tangible costs that leave the world, resources, or alliances permanently changed.
+4. MANDATED RESOLUTION: If the premise requires a specific positive resolution or fruition, at least one path through the final turn must deliver that payoff without nullifying penalties.
+
+OUTPUT FORMAT (JSON)
+Output ONLY valid JSON, no markdown code fences:
+
+{
+  "turns": [
+    {
+      "id": 1,
+      "situation": string,
+      "what_you_must_do": string,
+      "involves": [string],
+      "form": string,
+      "set_piece": string | null,
+      "serves": string
+    }
+  ],
+  "complications": [
+    {
+      "description": string,
+      "serves": string
+    }
+  ]
+}
+
+USER INPUT FOLLOWS BELOW:
+
+- the brief
+3-0a.primary_decision_axis [constraint]: label which of the seven guests to accuse of the murder; description Having gathered what the clues and the guests' lies support, name one of the seven as the killer — with the Kernel insisting the wrong person must be a live, pickable option, not just the right one.
+3-0a.decision_mechanism [default]: shape single_fork
+3-0a.secondary_decision_axes [constraint, inferred]: axes label which guest's lie to press or which clue to follow next; relation independent
+3-0a.decision_landscape [constraint, inferred]: shape layered
+3-0b.protagonist_identity [constraint]: type human; role new housekeeper at a snowbound country house; embodiment embodied_human
+3-0b.epistemic_gap [constraint]: present true; description who murdered the master of the house in his locked study, and how, given that all seven guests are lying about something; design_status designed
+3-0b.gap_resolution [constraint]: expectation resolution_optional_or_choice_dependent
+3-0c.failure_presence [constraint, inferred]: value hard
+3-0c.failure_triggers [constraint]: types incorrect_resolution
+3-0c.failure_cost [constraint, inferred]: value terminal
+3-0c.failure_scope [constraint, inferred]: value isolated
+3b.primary_affect [constraint, inferred]: label deductive suspicion
+3b.primary_trajectory [default]: shape escalating
+3b.secondary_affects [constraint, inferred]: labels snowbound confinement, fear of misjudgment
+3b.tone [default]: descriptors formal, atmospheric, observant
+3b.somatic_address [constraint, inferred]: level 1; channels (none)
+3b.transgression [constraint, inferred]: ceiling 2; floor 1
+3c.core_thematic_axis [default]: between uncovering the truth and protective discretion (in either order)
+3c.secondary_thematic_axis [default]: approaches methodical deduction, quiet observation, direct confrontation
+3c.moral_valence [constraint, inferred]: best_case justice served, culprit exposed; worst_case innocent condemned, killer free
+3d.viewpoint_handoff [constraint]: ceiling single; floor single; count_min 1; count_max 1
+3d.viewpoint_excursions [constraint, inferred]: ceiling invited; floor invited; types flashback; interactive interactive
+3e.timeline_structure [default]: category linear
+3e.timeline_duration [constraint, inferred]: ceiling hours_to_days; floor hours_to_days
+3f.setting_structure [constraint]: ceiling single; floor single
+3f.setting_scale [constraint, inferred]: ceiling room_or_building; floor room_or_building
+3g.state_richness [constraint, inferred]: level moderate; channels clues discovered / red herrings taken, which guests' lies have been exposed
+cross-check C3: The decision is which of seven guests to accuse, while the thematic axis is truth versus protective discretion; naming guest A rather than guest B is not recognizably picking a pole of that axis, and accusing wrongly is a mistake, not a choice of discretion. -> the better-evidenced field is 3-0a.primary_decision_axis; prefer_a
+cross-check C9: 3d tags an invited flashback to the murder night as interactive, but no decision inside that flashback appears in 3-0a's primary or secondary axes, and 3-0b's gap does not place anything to be learned there; 3-0a's secondary axis and 3d's interactive flag are both strong_inference. -> the better-evidenced field is neither; unresolved
+cross-check unresolved: C9: whether the invited flashback to the murder night is a played interactive scene (3d) or recalled exposition with no decisions (3-0a lists none inside it); if played, its choices must be defined and constrained so what the housekeeper saw stays fixed for fair-play clueing.
+cross-check unresolved: C3 flag: the thematic axis (truth vs. protective discretion) is genre-supplied and does not map onto the accusation branch; the premise-expansion phase must either supply a stated value tension that the accusation can express or treat theme as coloring rather than branch structure.
+enrichment_budget: minimal
+
+- the promises
+genre: golden-age locked-room country-house murder mystery
+player fantasy: To be the one person below stairs who saw everything, moving unregarded through a house of gentry with a candle and a ring of keys, catching each lie as it is told, and earning the right to stand before them all and name the killer.
+promise (in the Kernel): the locked study itself: the key on the inside, the window frozen shut, the fire gone to ash, the body at the desk, and one thing in the room that should not be there
+promise (in the Kernel): seven guests each caught in a lie that is true to their character but not, in six cases, to the murder: a debt, an affair, a forged letter, a quarrel overheard
+promise (in the Kernel): the housekeeper's own timeline: who was on which stair, which corridor, which lamp was lit, when the clock struck
+promise (in the Kernel): physical clues that can be held: a snuffed candle with two wicks' worth of wax, snow tracked into a room no one admits entering, a glass with a lipstick mark, a hairpin in the keyhole
+promise (in the Kernel): the storm as jailer: drifts against the doors, the telephone wire down, the drive gone, the servants whispering that no constable can come before the thaw
+promise (in the Kernel): the gathering in the drawing room where you name the killer to their face, and the room waits to see whether you are right
+set piece 1: the study door broken down with a poker, the household crowding the threshold, and the key heard to fall from the inside lock onto the carpet (at the corridor outside the master's study)
+set piece 2: seven places laid at dinner with the master's chair empty, the storm against the windows, and no one willing to be the first to eat (at the dining room)
+set piece 3: the housekeeper alone at night re-walking the first-floor corridor with a candle, counting the seconds between each door (at the first-floor gallery and back stairs)
+set piece 4: the drawing room at the moment the name is spoken, every face turning, and one of them going still (at the drawing room before the fire)
+tone engine: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+the genre expects someone like: the dead master, present only as a corpse, a will and the grudges he left in every guest
+the genre expects someone like: a loyal old servant who knows the house's hidden ways and is deciding whether to tell you
+the genre expects someone like: the guest who appoints himself detective and is loudly, confidently wrong
+must not (the Kernel rules it out): no police, inspector or outside authority arriving before the accusation: the storm has cut the house off
+must not (the Kernel rules it out): no second setting: the whole story stays within the house and its grounds under snow
+must not (the Kernel rules it out): no unfair solution: no hidden twin, supernatural agency or clue withheld from the player
+must not (the Kernel rules it out): no accusation forced correct: the wrong guest must be a genuinely pickable, condemnable choice
+
+- the engine
+{
+  "protagonist": {
+    "who": "You are the new housekeeper, a fortnight in post, addressed by your surname and expected not to be noticed; last night you did your rounds with a candle and a ring of keys while the master's seven guests moved about the house, and this morning the master is dead behind his study door and you are the only person who knows where each of them was and when.",
+    "history": "You came here a widow from a smaller house, hired by the master himself, who told you on your first morning that he meant to put his house in order before Christmas; you have not yet been given the study key, because he kept the only one on his own chain.",
+    "wants": "to put the right name on the master's killer before the road opens and the house hands the magistrate the wrong one",
+    "need": "to find out whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters",
+    "can_do": "go anywhere below stairs and along every corridor with your keys, serve at table and listen, question the maids and the valet, pick up and keep what you find, walk your rounds again at night, and give your account of that night when the Major calls on you to give it",
+    "cannot_do": "enter the locked study without the Major, who has pocketed the only key; compel any guest to answer you; stop the study being cleared or the body moved; or make the old valet say what he saw on the back stairs",
+    "ties": [
+      {
+        "who": "the master's valet of forty years",
+        "what": "the senior servant who has not forgiven the master for hiring a stranger over his head, and who lit someone up the back stairs that night"
+      },
+      {
+        "who": "the Major, the master's oldest friend",
+        "what": "the gentleman who has given you your orders since the door came down, and who wants your timeline read aloud in support of his case"
+      },
+      {
+        "who": "the master's nephew and heir",
+        "what": "the young man who will be your master if the old will stands, and whom you saw come down the back stairs at twenty to eleven and cross the yard to the stables"
+      },
+      {
+        "who": "the nephew's fiancée",
+        "what": "the lady who asked you, as one woman to another, to wash a certain glass and say nothing"
+      }
+    ],
+    "open": "whether you say everything you saw, whatever it breaks, or keep back the lies that have nothing to do with the murder",
+    "gender": "f",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "arena": {
+    "description": "A Victorian country house cut off by two days of snow: the master's study off the first-floor gallery, the back stairs that climb to the gallery's far end, the dining room and drawing room below, the gun room with its yard door, the servants' hall and the housekeeper's room, and across the drifted yard the stables and the ice house; the telephone wire is down, the drive is gone under the drifts, and no one has come up it since the storm began.",
+    "serves": "3f.setting_structure"
+  },
+  "pressure": {
+    "description": "The thaw is coming: the eaves have begun to drip, the lodge-keeper says the road will carry a cart within a day, and the Major has announced that when it does he will drive to the magistrate with the nephew and the household's sworn account; meanwhile the doctor wants the body moved to the ice house and the Major has ordered the study cleared and its fire relit, so that every hour the room that holds the truth is closer to being swept.",
+    "clock_or_stock": "none tracked: the thaw and the clearing of the study are told through events (the drip, the lodge-keeper, the maids sent up with pails); the only way to lose is the one 3-0c names, accusing the wrong guest",
+    "serves": "3-0c.failure_triggers"
+  },
+  "opposition": {
+    "who_or_what": "the Major, the master's oldest friend and the senior gentleman in the house, who has appointed himself detective",
+    "wants": "the nephew sent to the magistrate for the murder with the whole household's word behind him, so that the matter is closed before anyone asks why the master summoned the Major to the study at eleven",
+    "means": "he holds the only study key in his waistcoat pocket and decides who enters; he gives orders the nephew, the valet and the maids obey; he can have the nephew confined, the study cleared, and the new housekeeper sent to her room or dismissed on the heir's word; and he leads every conversation at table back to the quarrel everyone overheard",
+    "shown_by": "when the study door comes down under the hall poker he is first across the threshold, picks the master's key up off the carpet before anyone else can see where it lay, drops it in his pocket 'for safekeeping,' and sends you down to count the plate",
+    "serves": "3c.core_thematic_axis"
+  },
+  "events": [
+    {
+      "what": "The study door is broken down with the hall poker, the household crowding the gallery; a key is heard to fall onto the carpet inside, and the master is found at his desk with the window frozen shut, the fire gone to ash, and a yellow tallow stub, not one of the study's white wax candles, snuffed in the mantel candlestick.",
+      "when": "early",
+      "serves": "3-0b.epistemic_gap"
+    },
+    {
+      "what": "At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door.",
+      "when": "middle",
+      "serves": "3b.primary_affect"
+    },
+    {
+      "what": "The eaves begin to drip at dawn and the lodge-keeper wades up to say the road will carry a cart by noon; the Major orders the carriage, sends the maids up to the study with pails and a fresh scuttle, and calls the house to the drawing room to hear the housekeeper's account of the night before they sign.",
+      "when": "late",
+      "serves": "3-0c.failure_triggers"
+    }
+  ],
+  "hidden_truth": {
+    "truth": "The Major killed the master. Thirty years ago the master covered for the Major's retreat under fire and let him take a decoration for it; the master, who knew from the doctor that he was dying, summoned the Major to the study at eleven to tell him he would write to the regiment before Christmas. The valet lit the Major up the back stairs with a tallow candle from the housekeeper's box, as the master had ordered, and left it with him. The Major struck the master down with the study's own poker, which he put back in its stand, locked the door from the gallery side with the master's key from the dead man's chain, and kept it. In the morning he broke the door down himself, went in first, and let the key fall from his hand beside the door so the whole gallery heard it land and took it for the key from the inside lock. The other six are lying about a debt, a ten o'clock visit with a glass of sherry, an affair, a forged letter of credit, an unsigned new will, and the hour of the overheard quarrel; none of it touches the killing.",
+    "who_knows": "the Major; the valet, who knows he lit the Major up at eleven and has said nothing for two days; the doctor, who knows the master was dying and had told him he meant to settle an old account with his friend",
+    "what_it_changes": "the key heard to fall is no longer proof of a locked room but proof of who dropped it; the tallow stub becomes a candle carried up the back stairs after ten, which only the valet draws; the Major's eagerness to hang the nephew becomes the act of a man covering a second disgrace with a murder; and the valet's silence is no longer spite toward a new housekeeper but a servant obeying his dead master's last order",
+    "serves": "3-0b.epistemic_gap"
+  },
+  "mediation": {
+    "question": "Which of the seven do you name in the drawing room, and can you make the name hold against the house's own verdict?",
+    "to_reach_pole_a": {
+      "pole": "name the Major, and make it stick",
+      "what_you_must_do": "get back into the study before it is swept, with the Major or without him, and come out with the tallow stub and the shape of the keyhole; fix the hour of the quarrel by your own rounds against the ward's lie; get the doctor to say aloud that the master was dying and had summoned his friend; and bring the valet to say in the drawing room, before the Major's face, whom he lit up the back stairs at eleven",
+      "cost": "to clear the nephew you must speak the fiancée's ten o'clock visit, the doctor's affair and the widow's forged letter in front of the whole house, and the valet's confession that he let the killer up and kept silent two days ends his forty years in the master's service"
+    },
+    "to_reach_pole_b": {
+      "pole": "name one of the other six",
+      "what_you_must_do": "stand with the Major's case, or build your own against the nephew's debt and quarrel, the fiancée's lipstick glass, the widow's hairpin in the keyhole, the doctor's snow in the gun room, the solicitor's unsigned will or the ward's testimony, and say that name to their face",
+      "cost": "the name is wrong, the room believes you, and the story ends with an innocent sent to the magistrate at thaw and the killer standing at the fire: the one way you can lose"
+    },
+    "levers": [
+      "the Major, and the master's key in his waistcoat pocket",
+      "the study itself: the keyhole, the mantel candlestick with its tallow stub, the poker in its stand, the frozen window",
+      "the valet of forty years, who lit someone up the back stairs and will not say whom",
+      "the doctor, who knows the master was dying and whose boots tracked snow into the gun room",
+      "the nephew locked in his room, and the stable loft where he really went at twenty to eleven",
+      "the fiancée and the sherry glass with her lipstick on it",
+      "the widow and her hairpin left in the study keyhole at midnight",
+      "the ward, who swears the quarrel was at eleven",
+      "the solicitor, who says the old will stands",
+      "your own rounds of that night, which you can walk again by candle, and which fix what you saw and when"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  },
+  "price": {
+    "what": "the valet's forty years in the house, and the master's name as an honest man",
+    "who_pays": "the old valet, and the dead master",
+    "why_final": "on the way the right name is made to hold, the valet must say before the heir and the guests that he lit the killer up the back stairs and held his tongue while the nephew was blamed; the heir will not keep him and he will not stay, and he leaves by the first cart that gets through, with no character to carry to another house; and the master is remembered as a man who sold his silence for thirty years before he thought to buy it back",
+    "serves": "3c.core_thematic_axis"
+  },
+  "setups": [
+    {
+      "plant": "On the gallery, before the poker is fetched, you kneel at the study door and put your eye to the keyhole, and see the lamp still burning on the desk and the master's shoulder beyond it.",
+      "payoff": "In the drawing room you say it plainly: a key in the inside lock fills the keyhole, and you saw the lamp through it; the key the whole gallery heard fall did not fall from the lock, it fell from the hand of the man who went in first."
+    },
+    {
+      "plant": "On your first morning in the house you took over the candle box at the foot of the back stairs and counted its yellow tallow by the dozen, and the valet told you, not kindly, that he alone draws from it after ten.",
+      "payoff": "The snuffed stub in the study's mantel candlestick is tallow, one short from your box, and the valet is the only person who could have carried it up: which is what brings him to speak."
+    }
+  ],
+  "rules": []
+}
+
+- the Kernel
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+
+DRAMATIC CATALYSTS (narrative seeds to enrich character motives, obstacles, and stakes):
+- In-Genre Dramatic Catalyst: On the second night a stranger stamps in from the drifts on skis, announcing himself as a police sergeant come to take charge of the body, yet his boots are bone-dry under the snow crust and he cannot produce anything to prove his rank; the guests split at once between those who want to hand him the study key and those who want him locked in the gun room until the thaw, and the housekeeper's word on his boots is what tips the balance.
+- Cross-Genre Fusion Catalyst: With the drifts past the windowsills and a killer loose in the house, the guests agree that no one may move anywhere alone and that each night the housekeeper draws new pairs from a bowl of folded name-slips, with the rule that no two people may ever be paired twice; whoever draws the slips can palm them to force or prevent any pairing, and a candle left burning in an empty corridor is proof that someone broke their pair.
+
+
+
+--- YOUR PREVIOUS ANSWER WAS REJECTED ---
+A computed check found this wrong with it:
+ - these phrases are the brief's own wording copied in as if they were things in the story: "name one of the seven". Name each thing in the story's own words (what it is, what it does when used), everywhere it appears
+Fix every listed problem in your response. Ensure you apply the required changes rather than repeating the previous answer verbatim. Keep everything else that was valid unchanged.
+Your previous answer:
+{"turns": [{"id": 1, "situation": "The study door has just come down under the hall poker, the household is crowding the first-floor gallery, and a key has been heard to hit the carpet inside; the Major is first over the threshold, pockets the key 'for safekeeping,' and orders you down to count the plate while the doctor is called to the desk and the valet holds the maids back at the stairhead.", "what_you_must_do": "Get a clear look at the study before the Major shuts the door on it: the keyhole you put your eye to a minute ago with the lamp visible through it, the frozen window, the ash in the grate, the poker in its stand, and the yellow tallow stub snuffed in the mantel candlestick where only white wax belongs.", "involves": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the doctor"], "form": "discover", "set_piece": "the study door broken down with a poker, the household crowding the threshold, and the key heard to fall onto the carpet", "serves": "3-0b.epistemic_gap"}, {"id": 2, "situation": "Dinner is laid for seven with the master's chair empty and the storm against the dining-room windows; the Major holds the table on the overheard quarrel and announces he will carry the household's sworn account to the magistrate at the thaw, while the fianc\u00e9e, as you set her place, asks you under her breath whether the sherry glass has been washed yet.", "what_you_must_do": "Serve the whole dinner without the Major getting the lipstick-marked glass or the fianc\u00e9e's ten o'clock visit out of you, and get from her, between courses, what hour she really left the study and what the master's lamp and fire looked like when she did, before the nephew bolts from the table for the yard.", "involves": ["the Major", "the nephew's fianc\u00e9e", "the master's nephew and heir", "the ward"], "form": "conceal_or_reveal", "set_piece": "seven places laid at dinner with the master's chair empty, the storm at the windows, and no one willing to be the first to eat", "serves": "3b.primary_affect"}, {"id": 3, "situation": "It is past midnight; the nephew has been dragged back half-frozen from the stables and locked in his room with the valet set in a chair at his door, the Major has sent you to bed, and the first-floor gallery is dark except for the one candle you carry.", "what_you_must_do": "Walk your rounds of the murder night again with the candle, counting the seconds between each door to fix the true hour of the quarrel against the ward's eleven o'clock, and get the valet, who will not leave the nephew's door, to give you at least the hour at which he drew a tallow candle from your box and lit someone up the back stairs.", "involves": ["the master's valet of forty years", "the widow", "the master's nephew and heir"], "form": "persuade", "set_piece": "the housekeeper alone at night re-walking the first-floor corridor with a candle, counting the seconds between each door", "serves": "3g.state_richness"}, {"id": 4, "situation": "The eaves are dripping at dawn, the lodge-keeper has waded up to say the road will carry a cart by noon, and the Major has ordered the carriage and sent two maids up to the study with pails and a fresh scuttle to clear the grate and relight the fire, with the doctor waiting to have the body carried out to the ice house.", "what_you_must_do": "Get into the study with the maids under the Major's eye and come out with the tallow stub, the shape of the keyhole and the poker's weight in your hand before the grate is raked and the carpet swept, and make the doctor say, within your hearing, that the master knew he was dying and had sent for his oldest friend.", "involves": ["the Major", "the doctor", "the housemaid", "the solicitor"], "form": "sabotage", "set_piece": null, "serves": "3-0c.failure_triggers"}, {"id": 5, "situation": "The house is gathered in the drawing room before the fire with the carriage at the door; the Major has called for your account of the night to be read aloud so the seven may sign it and the nephew be taken down the road to the magistrate within the hour.", "what_you_must_do": "Give your account in your own order, lay the tallow stub and the keyhole and the hour of the quarrel before the room, bring the valet to say to the Major's face whom he lit up the back stairs at eleven, and name one of the seven as the killer and make the name hold.", "involves": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the nephew's fianc\u00e9e"], "form": "confront", "set_piece": "the drawing room at the moment the name is spoken, every face turning, and one of them going still", "serves": "3-0a.primary_decision_axis"}], "complications": [{"description": "REVERSAL: after you corner the valet on the back stairs, he goes not to you but to the Major, and at breakfast the Major announces to the house that the valet has confirmed lighting 'the young gentleman' up to the study at eleven; the valet, asked to deny it, says nothing, and the hour you dragged out of him now stands as the strongest plank in the case against the nephew.", "serves": "3c.core_thematic_axis"}, {"description": "The fianc\u00e9e, frightened that the glass has not been washed, tells the Major that the new housekeeper has been pocketing things from the study; on the heir's word your room is searched, the tallow stub and your written timeline are taken into the Major's keeping, and you are told you will give your account from memory alone unless you can get them back before the drawing room.", "serves": "3g.state_richness"}]}

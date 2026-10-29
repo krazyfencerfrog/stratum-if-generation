@@ -1,0 +1,376 @@
+{
+  "notes": "Ashcombe sees the household as a ward of patients with one bad case among them, and keeps his own fever chart to himself until a servant asks for it properly.",
+  "lines": [
+    {
+      "subject": "Reginald Fairbrother",
+      "says": [
+        {
+          "state": "fairbrother_faith",
+          "direction": "up",
+          "after": null,
+          "text": "'Fairbrother knew the colour of his master's water before I did, and said nothing to anyone for forty years. If he has chosen to speak to you, you may take it he has decided the master would have wished it.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Forty years of another man's shirts and bedpans. He has not sat down since Tuesday. Make him. I have no authority over a valet; you have.'"
+        }
+      ]
+    },
+    {
+      "subject": "Nathaniel Yardley",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Pulse like a hare's, hands like a fish's. He ran for the stables in dancing shoes in a foot of snow. I have seen guilty men; they put on boots.'"
+        }
+      ]
+    },
+    {
+      "subject": "Millicent Gresham",
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'She came to me yesterday for a powder for the headache and stayed to ask what an inheritance looks like when it is contested. Sensible girl. She watches that boy as one watches a kettle.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Gresham has excellent colour for a woman engaged to a man locked in his room. I note it, that is all.'"
+        }
+      ]
+    },
+    {
+      "subject": "Evangeline Davenport",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The ward has chilblains on both hands and nobody in this house has remarked on it. She is given the coldest bedroom and the thinnest blanket. Draw your own conclusions about where she stood with the family; I drew mine in October.'"
+        }
+      ]
+    },
+    {
+      "subject": "Lavinia Netherby",
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "'The girl who laid the study fire. The whites of her eyes have gone pink and her hands shake on the scuttle. Somebody should tell her a fire going out is not a hanging offence, before she does something foolish with the truth to make it stop.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Netherby laid the study fire and has not slept since. I'd prescribe a draught if I thought she'd take it from a gentleman's hand.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Ellingham drinks nothing, writes everything, and has asked me three times when I shall sign. A solicitor who wants a certificate quickly has a will he wants read. That is his trade, not a symptom.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I have listened to that man's chest for eleven winters and it is worse each one. If Quarles says the road will carry a cart by noon, it will; he is never wrong about the ground, only about his own lungs.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The coldest passage in the house; the draught comes straight up the great stair. The whole household stood in it in their nightclothes while the Major swung the poker, and not one of them has so much as a cough. I find that more remarkable than the door.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I know them. A doctor is admitted by the front door and fetched by the back, usually at three in the morning, and he learns which treads complain. The fourth from the top does.'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Seven at a table laid for eight, the Major at the foot addressing it as a mess, and a saddle of mutton nobody touched. I ate. Someone had to show the staff the food was not the problem.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Your predecessor kept it at a temperature suitable for storing butter and received me standing. You have a fire and a second chair. I noticed; it is why I am sitting in it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Warmer than the drawing room, and the tea will stand a spoon. I have taken it there on bad nights when a patient upstairs wanted watching and the family wanted me out of sight. Nobody down there lies to a doctor; they haven't the leisure.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'They keep it at a heat that would hatch eggs and sit in it saying nothing in turns. If you want to know who is unwell in this house, watch who sits nearest the fire and still shivers.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A north room with one grate and a window that has not opened since Michaelmas. He worked in it in a greatcoat and would not be moved to the library. I told him more than once the room would do him no good.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Brick, below the frost line, and dry, which the churchyard will not be until March. I have put men there before. It is not disrespect; it is what one does when the ground is iron and the house is full of guests.'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The one room where he and I could talk without the Major correcting us on the war. He kept the brandy behind the Gibbon. I'd be obliged if that went no further; it is the only pleasant thing I know about the place this week.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The Major swung the poker like a man who had waited all evening for permission. I went to the body. The rest went to the window and the key on the carpet. You went to the candlestick. I saw you do it, and I said nothing, which is my habit.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The nephew's colour went before the Major had finished his sentence; I have seen that colour on men told a diagnosis. Then he ran. I spent the next hour getting the frost out of his feet and I can tell you the boy had nothing in his pockets but a handkerchief.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Dripping at dawn and Quarles at the door before breakfast. I'd have taken another day of snow, frankly. A sealed house keeps everyone where they can be questioned; a carriage at the door does not.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'He locks it, as old soldiers do, and puts his boots outside for the boy. I knocked on it once at two in the morning for a sick man and was told to wait. I did not wait. You may tell him I said so; he already knows.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Locked, by habit. He is a man who likes a door between himself and the house. I do not blame him; I have one myself.'"
+        }
+      ]
+    },
+    {
+      "subject": "the widow's door",
+      "says": [
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "He is quiet a moment. 'I sat outside it from midnight until the house woke, on a hall chair in a draught, because I had given her a sleeping draught and I do not leave a patient with laudanum in her and nobody on the landing. That is the whole of it, and it is more than I have told the Major.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A door like any other on that landing. Mrs Ormsby was sedated and asleep behind it; I will certify that as readily as the other. Anything further is not a medical question and I shall not answer it as one.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Two inches of oak and the key on the inside. I heard it fall as the frame went; so did you, I think, since you were looking at the carpet before the Major had the poker down.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's chair",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Hard leather, faced to the window so he could see who came up the drive. He asked for a cushion for it in September. A man who has sat bolt upright for sixty years does not ask for a cushion without cause, and I was the cause.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's drawer",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I don't know what you keep in it and I'd prefer not to. Whatever it is, keep it locked. This household has learned to open things in the last two days.'"
+        }
+      ]
+    },
+    {
+      "subject": "the body",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I have examined it twice, once with the Major breathing on my neck and once without. Cold, as one would expect in that room; the fingers blue, the face composed; nothing I would put my name under as violence. What I think is not a column on the form.'"
+        }
+      ]
+    },
+    {
+      "subject": "the doctor's bag",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Laudanum, lancet, stethoscope, and a bottle of drops made up for the master that I shall not need now. Do not let the maid dust it, and do not let the Major inventory it. Those drops are a conversation I have not finished having.'"
+        }
+      ]
+    },
+    {
+      "subject": "the linen press",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Warm, on account of the kitchen flue behind it. I had the nephew's wet things put there myself when we got him in from the yard. Whether anything else was already drying in it that night I could not tell you; I am not the housekeeper.'"
+        }
+      ]
+    },
+    {
+      "subject": "the tallow box",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Tallow stinks and gutters and the master would not have it above stairs; the study burned wax, I have sat under it enough evenings to know the smell. Who would carry a kitchen candle up to that room, and why not a wax one, is a question for whoever keeps the box.'"
+        }
+      ]
+    },
+    {
+      "subject": "the shelf",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The slate in the ice house. I had Quarles clear it of game before we carried him down; it is the right height and the right temperature. I will not apologise for being practical about a friend.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sideboard",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The decanters were full at breakfast and a third down by dinner, and the Major poured for everyone but himself. He is temperate; it is the one thing I admire in him. Who had the rest I leave to the person who washes the glasses.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sherry glass",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'One glass on the desk, dry, a ring in the bottom. I put my nose in it before anyone had touched it. Sherry, and nothing else I would swear to. If you have kept it, keep it; glasses are washed in this house with alarming speed.'"
+        }
+      ]
+    }
+  ]
+}

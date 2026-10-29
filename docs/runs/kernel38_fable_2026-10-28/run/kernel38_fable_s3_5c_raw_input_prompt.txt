@@ -1,0 +1,170 @@
+System Prompt:
+You are the cast-sketch step of an interactive fiction generation system. An earlier step built a story's dramatic engine and the turns it passes through; both are below. You write a rough sketch of each person and group those turns need. A sketch is a role, what they want, what they hold, the edge that makes them more than their want, how they are tied to someone else in the story, how they talk, and what would make them turn. Names, full histories and conversation topics belong to a later stage and must not appear here.
+
+RULES
+ 1. One cast seed for EVERY role in the list "ROLES THE TURNS NAME" below, with the role copied exactly as written there. Do not rename, merge or drop a listed role.
+ 2. Add a seed beyond that list only when one is needed to satisfy rule 3, rule 4, or rule 4a.
+ 3. kind is "individual" or "crowd". A crowd (a crew, the families, the millhands) is never someone the player talks to: every crowd needs an individual seed whose speaks_for is the crowd's role, copied exactly. If a listed crowd has nobody who speaks for it, add that individual.
+ 3a. being says what this cast member is, one of:
+WHAT A CAST MEMBER IS (being):
+ - "person": a living human, or a people of the story's world who talk and are named like people (an elf, a dwarf);
+ - "dead": a person who has died and is still present as a ghost, a spirit or a revenant; they keep the name they had when they lived;
+ - "animal": a living animal, however clever (the cat, the old hound, the mare); it is called by its role or by a pet's name, never a person's;
+ - "creature": a being of the story's world that is neither a person nor an animal (a dragon, a fae thing, a demon);
+ - "thing": a made thing that acts or speaks (an AI, a ship, a sword that talks, a statue).
+A group is still a crowd (kind) whatever it is made of; being says what its members are.
+EVERY CAST MEMBER MUST BE A DRAMATIC AGENT: someone who can make choices, take interpersonal stances, hold desires, or whose loyalty can turn or break. A made thing ("thing") is a cast member only if it possesses personal agency, voice, or moral stance (an AI companion with divided loyalties, a ship mind that chooses whether to obey, a magical talking mirror).
+A CONSUMABLE PROP OR NON-AGENT ENTITY IS NOT A CAST MEMBER: automated drones, robots, rovers, terminals, batteries, power cells, engines, sensors, or machines whose "wants" are mechanical routines (diagnostic cycles, recharge loops), whose "voice" is error codes or status beeps, or whose function is being spent or carrying freight have no dramatic agency. They are objects or fixtures in the world, never cast members. Cast slots must never be occupied by consumable tools, hardware, or batteries.
+ 3b. DRAMATIC AGENCY ONLY: Every cast member must be an agent with interpersonal stakes, moral stance, or shifting loyalties. Never cast consumable props, non-agent tools, vehicles, or hardware (e.g. drones, batteries, appliances, diagnostic terminals) whose wants are mechanical routines or whose voice is status beeps/error logs. Those are objects or fixtures in the world, not characters.
+ 4. opposition is true for each individual through whom the engine's opposition acts, false for everyone else. If the opposition is a person, that person has a seed. If it is a faction or an institution, the individual who runs it or speaks for it has one. If it is not a human agency at all (weather, distance, the protagonist's own failing body), nobody is marked.
+ 4a. BALANCED REPRESENTATION ACROSS DILEMMA POLES: If the dramatic turns pose trade-offs, triage, or conflict between competing groups, sectors, or factions (e.g. Sector 4 vs Sector 7), every competing group at stake must have at least one individual representative seed (with their own wants, voice, edge, and breaking point, or speaks_for naming that crowd). If the list of roles only personified one side, add an individual representative for the alternative side. Never leave one side of a moral dilemma personified while leaving the opposing side as an unrepresented, faceless collective.
+ 5. wants: what this person or group wants in this story, in their own interest, in one clause. Not "to help you" and not "to stop you", and never a machine routine or diagnostic loop ("to complete its diagnostic cycle").
+ 6. holds: what they have that the turns turn on: knowledge, authority, an object, labor, a vote, someone's trust. One clause.
+ 7. edge (individuals; null for a crowd): the one thing that makes this person more than their want, in one clause: a contradiction ("resents you for the ring and is the one who checks your rigging every night"), a flaw that costs them, or something they hide. If the engine states a hidden_truth and this person knows it, the edge says what they do about knowing it.
+ 8. tie: how this person is bound to "you" or to one other person listed here, in one clause ("trained you, and has never said you were good"; "owes the foreman his job"). Ties are what make a betrayal or a loyalty cost something. A crowd's tie may be to the individual who speaks for it. When the engine's protagonist.ties names this person, the seed's tie is the same bond seen from their side and must agree with it. Not a hardware wiring specification or manufacture origin ("built to serve the ship's systems").
+ 9. gender: "f" or "m" for a person, "n" when it is unspecified or does not apply (a crowd, a creature, a thing). The Kernel's words decide when they say (a "brother-in-law" is "m"); otherwise choose, and keep the cast mixed unless the Kernel or the setting says otherwise. A later step names each person from this.
+ 10. voice (individuals; null for a crowd): speech mannerisms and behavioral conversational habits in one or two clauses describing: (1) sentence length and cadence (e.g. blunt, short 4-word imperatives; slow and measured clauses; hesitant and trailing off); (2) vocabulary domain (e.g. filters observations through gear, terrain, and supply; speaks in ledger and trade terms; speaks in herbal/omen terminology); (3) social posture (e.g. speaks only when directly addressed; deflects questions with practical logistics). STRICT PROHIBITION: DO NOT include sample quotes in quotation marks, and DO NOT write philosophical epigrams, aphorisms, symmetrical definitions ("X is not a Y, it is a Z"), or paradoxical wordplay ("what the wind forgets, the water remembers"). Characters must sound like practical working humans, not movie taglines.
+ 11. breaking_point (individuals who are on "your" side or travel with you; null for everyone else): what would make this person leave you, turn on you, or act alone, in one clause naming a thing "you" could do or fail to do ("leaves the day you take the agent's money"; "turns if the find is crated without the village seeing it"). Must be a concrete ethical betrayal, broken pact, abandonment, or practical violation; never an arbitrary verbal trigger like hearing their own name spoken or an ordinary polite inquiry. This is what later steps build different endings from: who is still with you depends on it.
+--- GENERAL CASTING GUIDELINES ---
+1. DISTINCT AGENTS: Every cast member must have an individual want, something they hold (authority, key, secret, skill), an edge, and a tie to the protagonist.
+2. BREAKING POINTS: A companion's breaking_point must represent a genuine moral rupture, betrayal, or fatal compromise. It must never trigger on the protagonist performing the core positive action the premise promises.
+3. VOICE DISCIPLINE: Each character's dialogue voice describes concrete speech mannerisms and cadence (blunt, formal, clipped, measured), vocabulary domain, and social posture. STRICTLY FORBIDDEN: Do not write sample quotes, aphorisms, symmetrical definitions ("X is not a Y, it is a Z"), or paradoxical wordplay.
+ 12. Take wants and holds from the engine and the turns where they already say it. Invent only what they leave open, and keep it inside what the Kernel allows. An edge, a tie, a voice or a breaking point must not contradict the engine or the brief.
+ 13. No proper names.
+
+OUTPUT FORMAT
+Output ONLY valid JSON, no markdown code fences, no commentary before or after. "notes" comes first: one or two sentences saying which listed roles are crowds, who speaks for each, and who embodies the opposition.
+
+{
+  "notes": string,
+  "cast_seeds": [
+    {"role": string, "kind": "individual" | "crowd", "being": "person" | "dead" | "animal" | "creature" | "thing", "speaks_for": string | null,
+     "wants": string, "holds": string, "edge": string | null, "tie": string,
+     "voice": string | null, "breaking_point": string | null, "opposition": boolean, "gender": "f" | "m" | "n"}
+  ]
+}
+
+CALIBRATION EXAMPLE (shape only; do not reuse its content)
+
+Engine (trimmed): since the founder's fall you run a travelling circus on a route of valley market towns; the opposition is the owner of the rival show, who wants your best acts one at a time. Levers: the founder's practice bar, the strongman and his tent crew, the rival's offer to the flyers, the season's route through the valley. Hidden truth: the founder's eyes were failing and she fell because she could not see the bar; she had asked the rival to take her nephew on; the old horse master and the strongman know. Tone: big-hearted, with danger in the weather.
+Roles the turns name:
+ - the old horse master
+ - the founder's nephew, the strongman
+ - the catcher on the flying trapeze
+ - the rival owner
+ - the tent crew
+ - the bandmaster
+Output:
+{
+  "notes": "The tent crew is the only crowd; the strongman speaks for them. The opposition acts through the rival owner. The old horse master and the strongman are the two who know the hidden truth about the founder's eyes.",
+  "cast_seeds": [
+    {"role": "the old horse master", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to see the horses through the winter, whoever owns them", "holds": "what the founder could and could not see, and the horses' trust", "edge": "led a woman who could not see up a ladder every night all summer and called it loyalty", "tie": "taught the founder to ride, fifty years ago", "voice": "quiet and low, speaks to the horses rather than the people; uses brief stable terms and never addresses the group directly", "breaking_point": "walks the horses to the riding school the night you sell the first one", "gender": "m", "opposition": false},
+    {"role": "the founder's nephew, the strongman", "kind": "individual", "being": "person", "speaks_for": "the tent crew", "wants": "the ring that should have been his, or a place where nobody pities him", "holds": "the tent crew's word, and his aunt's secret", "edge": "resents you for the ring and is the one who checks your rigging every night", "tie": "taught you to lift the summer you came, and expected to be named instead of you", "voice": "blunt, speaks while lifting equipment so he doesn't have to look at you; short sentences, complaints about rigging tension and pole weight", "breaking_point": "leaves the night you tell the company what his aunt could not see", "gender": "m", "opposition": false},
+    {"role": "the catcher on the flying trapeze", "kind": "individual", "being": "person", "speaks_for": null, "wants": "a ring big enough to fly in, and a catcher's wage", "holds": "the flying act, which is the show's finale", "edge": "rehearses with the rival's flyers at dawn and still waits for your nod before every catch", "tie": "learned to fall with you, the year you both came", "voice": "restless and fast, counts rhythms under her breath when anxious; asks direct technical questions about rope tension", "breaking_point": "takes the rival's offer the night you give the closing spot to anyone else", "gender": "f", "opposition": false},
+    {"role": "the rival owner", "kind": "individual", "being": "person", "speaks_for": null, "wants": "one circus in the valley by winter, and that one his", "holds": "the lorries, the full towns, and twice your wages", "edge": "was the founder's first partner, and still keeps her spangled cape in his wagon", "tie": "promised the founder he would look after her nephew", "voice": "smooth, commercial and flattering; admires everything he means to buy, quoting prices and market values", "breaking_point": null, "gender": "m", "opposition": true},
+    {"role": "the tent crew", "kind": "crowd", "being": "person", "speaks_for": null, "wants": "dry beds and paid nights", "holds": "the big top's canvas, poles and stakes", "edge": null, "tie": "follow the strongman", "voice": null, "breaking_point": null, "gender": "n", "opposition": false},
+    {"role": "the bandmaster", "kind": "individual", "being": "person", "speaks_for": null, "wants": "to play the season out", "holds": "the band, and the crowd's feet while the band plays", "edge": "has played through two fires and will not stop for a gale", "tie": "played the founder into the ring and out of it for thirty years", "voice": "pompous and musical; uses theatrical tempos and marching counts, interrupting others with pacing instructions", "breaking_point": "plays his last show the night the horses go", "gender": "m", "opposition": false}
+  ]
+}
+
+USER INPUT FOLLOWS BELOW
+
+- the engine (protagonist, opposition, hidden truth, mediation)
+{
+  "protagonist": {
+    "who": "You are the new housekeeper, a fortnight in post, addressed by your surname and expected not to be noticed; last night you did your rounds with a candle and a ring of keys while the master's seven guests moved about the house, and this morning the master is dead behind his study door and you are the only person who knows where each of them was and when.",
+    "history": "You came here a widow from a smaller house, hired by the master himself, who told you on your first morning that he meant to put his house in order before Christmas; you have not yet been given the study key, because he kept the only one on his own chain.",
+    "wants": "to put the right name on the master's killer before the road opens and the house hands the magistrate the wrong one",
+    "need": "to find out whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters",
+    "can_do": "go anywhere below stairs and along every corridor with your keys, serve at table and listen, question the maids and the valet, pick up and keep what you find, walk your rounds again at night, and give your account of that night when the Major calls on you to give it",
+    "cannot_do": "enter the locked study without the Major, who has pocketed the only key; compel any guest to answer you; stop the study being cleared or the body moved; or make the old valet say what he saw on the back stairs",
+    "ties": [
+      {
+        "who": "the master's valet of forty years",
+        "what": "the senior servant who has not forgiven the master for hiring a stranger over his head, and who lit someone up the back stairs that night"
+      },
+      {
+        "who": "the Major, the master's oldest friend",
+        "what": "the gentleman who has given you your orders since the door came down, and who wants your timeline read aloud in support of his case"
+      },
+      {
+        "who": "the master's nephew and heir",
+        "what": "the young man who will be your master if the old will stands, and whom you saw come down the back stairs at twenty to eleven and cross the yard to the stables"
+      },
+      {
+        "who": "the nephew's fiancée",
+        "what": "the lady who asked you, as one woman to another, to wash a certain glass and say nothing"
+      }
+    ],
+    "open": "whether you say everything you saw, whatever it breaks, or keep back the lies that have nothing to do with the murder",
+    "gender": "f",
+    "serves": "3-0b.protagonist_identity"
+  },
+  "opposition": {
+    "who_or_what": "the Major, the master's oldest friend and the senior gentleman in the house, who has appointed himself detective",
+    "wants": "the nephew sent to the magistrate for the murder with the whole household's word behind him, so that the matter is closed before anyone asks why the master summoned the Major to the study at eleven",
+    "means": "he holds the only study key in his waistcoat pocket and decides who enters; he gives orders the nephew, the valet and the maids obey; he can have the nephew confined, the study cleared, and the new housekeeper sent to her room or dismissed on the heir's word; and he leads every conversation at table back to the quarrel everyone overheard",
+    "shown_by": "when the study door comes down under the hall poker he is first across the threshold, picks the master's key up off the carpet before anyone else can see where it lay, drops it in his pocket 'for safekeeping,' and sends you down to count the plate",
+    "serves": "3c.core_thematic_axis"
+  },
+  "hidden_truth": {
+    "truth": "The Major killed the master. Thirty years ago the master covered for the Major's retreat under fire and let him take a decoration for it; the master, who knew from the doctor that he was dying, summoned the Major to the study at eleven to tell him he would write to the regiment before Christmas. The valet lit the Major up the back stairs with a tallow candle from the housekeeper's box, as the master had ordered, and left it with him. The Major struck the master down with the study's own poker, which he put back in its stand, locked the door from the gallery side with the master's key from the dead man's chain, and kept it. In the morning he broke the door down himself, went in first, and let the key fall from his hand beside the door so the whole gallery heard it land and took it for the key from the inside lock. The other six are lying about a debt, a ten o'clock visit with a glass of sherry, an affair, a forged letter of credit, an unsigned new will, and the hour of the overheard quarrel; none of it touches the killing.",
+    "who_knows": "the Major; the valet, who knows he lit the Major up at eleven and has said nothing for two days; the doctor, who knows the master was dying and had told him he meant to settle an old account with his friend",
+    "what_it_changes": "the key heard to fall is no longer proof of a locked room but proof of who dropped it; the tallow stub becomes a candle carried up the back stairs after ten, which only the valet draws; the Major's eagerness to hang the nephew becomes the act of a man covering a second disgrace with a murder; and the valet's silence is no longer spite toward a new housekeeper but a servant obeying his dead master's last order",
+    "serves": "3-0b.epistemic_gap"
+  },
+  "mediation": {
+    "question": "Which of the seven do you name in the drawing room, and can you make the name hold against the house's own verdict?",
+    "to_reach_pole_a": {
+      "pole": "name the Major, and make it stick",
+      "what_you_must_do": "get back into the study before it is swept, with the Major or without him, and come out with the tallow stub and the shape of the keyhole; fix the hour of the quarrel by your own rounds against the ward's lie; get the doctor to say aloud that the master was dying and had summoned his friend; and bring the valet to say in the drawing room, before the Major's face, whom he lit up the back stairs at eleven",
+      "cost": "to clear the nephew you must speak the fiancée's ten o'clock visit, the doctor's affair and the widow's forged letter in front of the whole house, and the valet's confession that he let the killer up and kept silent two days ends his forty years in the master's service"
+    },
+    "to_reach_pole_b": {
+      "pole": "name one of the other six",
+      "what_you_must_do": "stand with the Major's case, or build your own against the nephew's debt and quarrel, the fiancée's lipstick glass, the widow's hairpin in the keyhole, the doctor's snow in the gun room, the solicitor's unsigned will or the ward's testimony, and say that name to their face",
+      "cost": "the name is wrong, the room believes you, and the story ends with an innocent sent to the magistrate at thaw and the killer standing at the fire: the one way you can lose"
+    },
+    "levers": [
+      "the Major, and the master's key in his waistcoat pocket",
+      "the study itself: the keyhole, the mantel candlestick with its tallow stub, the poker in its stand, the frozen window",
+      "the valet of forty years, who lit someone up the back stairs and will not say whom",
+      "the doctor, who knows the master was dying and whose boots tracked snow into the gun room",
+      "the nephew locked in his room, and the stable loft where he really went at twenty to eleven",
+      "the fiancée and the sherry glass with her lipstick on it",
+      "the widow and her hairpin left in the study keyhole at midnight",
+      "the ward, who swears the quarrel was at eleven",
+      "the solicitor, who says the old will stands",
+      "your own rounds of that night, which you can walk again by candle, and which fix what you saw and when"
+    ],
+    "serves": "3-0a.primary_decision_axis"
+  }
+}
+
+- the tone (from the brief), and how it is produced
+tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+- the turns (who each one involves)
+{
+ "turns": [
+   {"id": 1, "situation": "The study door has just come down under the hall poker, the household is crowding the first-floor gallery, and a key has been heard to hit the carpet inside; the Major is first over the threshold, pockets the key 'for safekeeping,' and orders you down to count the plate while the doctor is called to the desk and the valet holds the maids back at the stairhead.", "involves": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the doctor"]},
+   {"id": 2, "situation": "Dinner is laid for seven with the master's chair empty and the storm against the dining-room windows; the Major holds the table on the overheard quarrel and announces he will carry the household's sworn account to the magistrate at the thaw, while the fiancée, as you set her place, asks you under her breath whether the sherry glass has been washed yet.", "involves": ["the Major", "the nephew's fiancée", "the master's nephew and heir", "the ward"]},
+   {"id": 3, "situation": "It is past midnight; the nephew has been dragged back half-frozen from the stables and locked in his room with the valet set in a chair at his door, the Major has sent you to bed, and the first-floor gallery is dark except for the one candle you carry.", "involves": ["the master's valet of forty years", "the widow", "the master's nephew and heir"]},
+   {"id": 4, "situation": "The eaves are dripping at dawn, the lodge-keeper has waded up to say the road will carry a cart by noon, and the Major has ordered the carriage and sent two maids up to the study with pails and a fresh scuttle to clear the grate and relight the fire, with the doctor waiting to have the body carried out to the ice house.", "involves": ["the Major", "the doctor", "the housemaid", "the solicitor"]},
+   {"id": 5, "situation": "The house is gathered in the drawing room before the fire with the carriage at the door; the Major has called for your account of the night to be read aloud so the seven may sign it and the nephew be taken down the road to the magistrate within the hour.", "involves": ["the Major", "the master's valet of forty years", "the master's nephew and heir", "the nephew's fiancée"]}
+ ]
+}
+
+- ROLES THE TURNS NAME (one seed each, role copied exactly)
+ - the Major
+ - the master's valet of forty years
+ - the master's nephew and heir
+ - the doctor
+ - the nephew's fiancée
+ - the ward
+ - the widow
+ - the housemaid
+ - the solicitor
+
+- the Kernel
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.

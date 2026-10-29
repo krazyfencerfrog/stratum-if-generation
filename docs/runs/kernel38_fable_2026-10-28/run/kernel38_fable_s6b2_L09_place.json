@@ -1,0 +1,80 @@
+{
+  "notes": "The library is a single long room, so it is built as one; the solicitor has taken the big table at the window end and the rest of the room has gone on being the dead master's. The player will want the table where a signature can be put under their own, the deed box that locks, and the windows the roof snow falls past.",
+  "rooms": [
+    {
+      "name": "the library",
+      "description": "A long room of oak shelving and dark green paper, the books behind brass-latticed doors nobody has unlocked in years, the carpet worn to its threads in a lane from door to window. The solicitor has taken the great table under the two north windows for his drafting, and the grey snow light lies flat across it all day. The fire here is kept small, as the master liked it, and the room smells of leather bindings, coal smoke and cold ink. The snow stands against the lower panes and everything is heard twice: the clock, the fire, the drip beyond the glass.",
+      "frame": {
+        "composition": "Wide eye-level view down the long room from the door toward the two tall north windows and the solicitor's table beneath them",
+        "subjects": [
+          "Great mahogany library table under the north windows",
+          "Brass-latticed bookcases in dark oak",
+          "Small coal fire in a steel-barred grate",
+          "Snow banked against the lower window panes"
+        ],
+        "environment": "Flat grey snow light from two tall sash windows, dim red glow from a low coal fire, oak shelving and dark green flock wallpaper, cold still air",
+        "palette_mood": "Bottle green, dark oak brown, grey-white snow light, dull brass and a single coal-red ember; hushed, watchful, formal",
+        "prompt_summary": "Atmospheric concept illustration, Victorian country-house library in snow light, long room of brass-latticed oak bookcases, great mahogany table strewn with legal papers beneath tall windows banked with snow, small coal fire, dark green walls, grey winter light, hushed and cold"
+      }
+    }
+  ],
+  "exits": [],
+  "objects": [
+    {
+      "name": "the library table",
+      "room": "the library",
+      "description": "A great mahogany table with a green leather top, the leather worn pale at the one place a man sits to write. The solicitor's blotting pad lies squared to the edge; held to the window, its reverse shows every signature he has taken in the house, backwards.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the inkstand",
+      "room": "the library",
+      "description": "A heavy cut-glass inkstand with two wells and a pen tray, the black well full, the red well dried to a crust. Whatever is written here is written in the master's ink.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the deed box",
+      "room": "the library",
+      "description": "A japanned tin box lettered CARRINGTON in faded gilt, with a lock the solicitor keeps the key to on his watch chain. Papers put into it leave the house's keeping and enter the law's.",
+      "portable": true,
+      "story": true
+    },
+    {
+      "name": "the north windows",
+      "room": "the library",
+      "description": "Two tall sashes, the snow risen to the second pane outside. Above them the roof's weight hangs in a grey lip; when it goes it goes past the glass all at once, and the room shakes.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the wax jack",
+      "room": "the library",
+      "description": "A brass wax jack with a coil of red sealing wax and a spirit flame. The seal beside it is the master's; the solicitor has turned it face down on the leather.",
+      "portable": true,
+      "story": false
+    },
+    {
+      "name": "the library steps",
+      "room": "the library",
+      "description": "A set of folding mahogany steps left at the far bookcase, their top tread dusty but for two clean marks the width of a pair of shoes.",
+      "portable": true,
+      "story": false
+    },
+    {
+      "name": "the master's reading chair",
+      "room": "the library",
+      "description": "A winged chair by the fire, the horsehair gone flat on the left arm where he rested a glass. Nobody has sat in it since Tuesday; the guests take the sofa and leave it empty, as if he might come in.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the scorched shelf",
+      "room": "the library",
+      "description": "A run of shelf beside the fire where the oak is blackened in a crescent and the books behind the lattice have cockled spines. A lamp went over there once; the old housekeeper's rule about open flames in this room dates from it.",
+      "portable": false,
+      "story": false
+    }
+  ]
+}

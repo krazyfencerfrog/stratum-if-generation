@@ -1,0 +1,371 @@
+{
+  "notes": "Lavinia sees the house from the grate upward: everyone above stairs is a bell, a temper, and a fire to be kept in, and she sorts them by who shouts and who says thank you.",
+  "lines": [
+    {
+      "subject": "Nathaniel Yardley",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mr Yardley sits up. His grate's always dead by morning and his boots is by the door where he's thrown 'em. He were cross all week, ma'am. Afore it, I mean.'"
+        }
+      ]
+    },
+    {
+      "subject": "Gideon Ashcombe",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Doctor wants his water at seven and sends it back if it in't scalding. He were the only one didn't shout when the door went. Just stood on the gallery with his hands behind him. I didn't like that better.'"
+        }
+      ]
+    },
+    {
+      "subject": "Millicent Gresham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Gresham leaves her gloves about and asks me to find 'em like I'd hid 'em. She were crying in the linen closet Tuesday. I went back down with the sheets and come up again later.'"
+        }
+      ]
+    },
+    {
+      "subject": "Evangeline Davenport",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Davenport's the only one says thank you. She's in the cold end over the yard and never rings for more coal, so I take it up anyhow. Nobody's told me not to.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cordelia Ormsby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs Ormsby's bell goes more'n all the rest put together. Hot bottle, fresh water, the fire's smoking. It never is smoking.' A glance at the door. 'I think she just wants somebody stood in the room.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The solicitor gentleman come with the first snow and never got out again. He don't look at me, which suits. Only he counts things with his eyes. Spoons. Chairs. Cook seen him at it too.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Quarles is my mam's cousin's man. Brings the eggs when the road's open and tells the whole village what he's told at the back door. So I don't tell him nothing, ma'am. Nothing.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Boards go all along there. Third one past the Major's door is worst. You can't cross it quiet with a full scuttle, I've tried every way.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Them's mine. Nobody above stairs uses 'em, 'cept Mr Fairbrother when he don't want seeing. Dark past the half-landing when the lamp's not filled, and it in't been filled since the snow.'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Lays for eleven and we had seven. All that silver out and his chair stood empty at the top like it were watching 'em eat. I don't go in till the gentlemen's gone through.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Yours, ma'am. I only come in when I'm rung for. The last one kept the key on her belt and never took it off, Cook says, not even to sleep. Cook says a lot.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Warmest room in the house and nobody'll own it. Everyone's cross with everyone down there just now. I eat quick and go.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Wants making up twice of an evening with all seven sat round it. I go in and out with the scuttle and they talk right over me like I'm the fender.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "'I'll go if you say, ma'am. I'd sooner you come as far as the door.' She lowers her voice. 'I did his grate five year and never seen him at the desk afore eight. He'd not have had the window open. Not in snow.'"
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "She does not look up. 'You sent me. I went. It smells of chimney and of him, and I've to go in again tomorrow, haven't I.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I did his grate five year, ma'am, and never once seen him at his desk afore eight. He'd not have the window open, neither. Not in snow. He were mortal about draughts.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Down past the kitchen garden, under the bank. Cook sends me when there's a jelly and I hate it. Steps is green and the door sticks, and once it's shut you can't hear the house at all.'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Cold as the church. Nobody rings for it, so the fire's laid and never lit. The solicitor sits in there of an afternoon in his coat, turning pages he in't reading.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I were on the back stairs with the hot water. Heard the poker go in, and then the key drop. Little sound, like a spoon on the carpet. Then all of 'em shouting at once. I kept hold of the can, I don't know how.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I were only in for the plates. Then Mr Yardley's chair went over backwards and he were out the door and me stood there with the gravy. They brought him back through my kitchen, blue to the lips, and Cook put brandy in him afore anyone said she could.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "'Dripping off the eaves afore it were light. I thought, that's the cart, then. And pails for the study.' She looks at you. 'You'll be upstairs when I go up, ma'am? Only say you will.'"
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "'Dripping. Means the road. Means the cart.' She picks up the pails. 'Means I go up on my own, same as before.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Eaves started afore it were light. Cook says the road'll take a cart by noon, and the Major's had everyone running since. Pails, coal, carriage. He don't want nobody stood still long enough to think.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Shuts like a gun. You hear it from the kitchen. He has it locked of a night and wants his coal left outside, so I leave it outside and I'm glad to.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Heavy old thing. Always locked from inside when he were at his papers, and you knocked and waited and sometimes he never come. Now it hangs off and I've to squeeze round it with the scuttle.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's chair",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Nobody's sat in it since. Mr Fairbrother turned it to the wall.' She shakes her head. 'I don't dust it. I'll do the desk, but I don't touch the chair.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's drawer",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'In't my business what's in your drawer, ma'am.' A pause. 'The last one kept the candle count in hers. In a little book. I only know 'cause she'd read it out at me.'"
+        }
+      ]
+    },
+    {
+      "subject": "your box",
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "'I'll carry it down meself when it's time. Don't let him send me, ma'am, let it be you as says.'"
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "'Mr Fairbrother says it's to go on the cart. I'll fetch it when he says.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The one in your room? I've not touched it, ma'am. I don't go in your room without I'm rung.'"
+        }
+      ]
+    },
+    {
+      "subject": "the gallery rail",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I do it Fridays with the beeswax. Somebody's been leaning on it with wet hands down the study end, there's marks I couldn't lift. Snow off a sleeve, like.'"
+        }
+      ]
+    },
+    {
+      "subject": "the half-landing window",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Rattles. Snow comes in under the sash and I've a rag laid along the sill. You can see the lodge from it when you can see anything, which in't been for two days.'"
+        }
+      ]
+    },
+    {
+      "subject": "the widow's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs Ormsby keeps it on the jar. Says she can't breathe shut in. So you hear her all night from the landing, up and down, up and down.'"
+        }
+      ]
+    },
+    {
+      "subject": "the linen press",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mine and Cook's. Warmest spot in the house, the hot pipe runs behind it. I keep—' She stops. 'I keep the sheets in there. Where else would I.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sideboard",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Decanters go on it after and the gentlemen help theirselves. I count the glasses back in to the pantry, every one. It's the only counting in this house I'm trusted with.'"
+        }
+      ]
+    },
+    {
+      "subject": "the sherry glass",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs Ormsby takes one up of a night, always, and I fetch it down with the slops. There weren't one on her tray that morning.' She frowns at the floor. 'Might be she carried it down herself. She never has before.'"
+        }
+      ]
+    }
+  ]
+}

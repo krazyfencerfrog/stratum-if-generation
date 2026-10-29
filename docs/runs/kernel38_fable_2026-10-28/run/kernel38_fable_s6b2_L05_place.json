@@ -1,0 +1,80 @@
+{
+  "notes": "The servants' hall is a single room-sized space below stairs, so it is one room whatever the count asked for; it serves as the \"kitchen\" the scenes mean when staff are shamed before it. The player will want to look at the long table where Lavinia is held by the wrist, the rules board under which notice is given, and the bell board that summons them back up to whoever now gives orders.",
+  "rooms": [
+    {
+      "name": "the servants' hall",
+      "description": "A long low room under the front of the house, whitewashed to shoulder height and stone-flagged, with a deal table down its length and benches either side. One high area window lets in a slab of grey snow-light that reaches the table and no farther; the rest is the red of the hearth and tallow. It smells of boiled linen, coal smoke, and the dripping kept in the dresser crock. The house's voices come down to it through the floor as footfalls, never as words.",
+      "frame": {
+        "composition": "Low eye-level shot from the hearth end looking down the length of the scrubbed deal table toward the high area window",
+        "subjects": [
+          "Long scrubbed deal table with benches",
+          "Bell board of numbered brass bells on the wall",
+          "Painted rules board above the dresser",
+          "Open hearth with iron fender"
+        ],
+        "environment": "Grey snow-light through one high window set into the area wall, red coal glow from the hearth, whitewashed stone walls dark with damp above a flagged floor, low beamed ceiling",
+        "palette_mood": "Cold slate grey, whitewash yellowed by smoke, hearth-red, dark deal brown; watchful, hushed, closed-in",
+        "prompt_summary": "Atmospheric concept illustration, Victorian country-house servants' hall below stairs, long scrubbed deal table with benches, high barred area window with grey snow-light, row of brass bells on a numbered board, low coal hearth, whitewashed stone walls, flagged floor, hushed and watchful"
+      }
+    }
+  ],
+  "exits": [],
+  "objects": [
+    {
+      "name": "the long table",
+      "room": "the servants' hall",
+      "description": "Twelve feet of deal scrubbed pale, with a dark ring at the cook's end where the teapot has stood for thirty years. The near corner is worn to a shine by wrists held against it.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the rules board",
+      "room": "the servants' hall",
+      "description": "A black-painted board lettered in white: no followers, no singing, no servant to be above stairs after the family is up without a bell. Beneath the last rule someone has pencilled a small, neat date and rubbed most of it out.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the bell board",
+      "room": "the servants' hall",
+      "description": "Fourteen brass bells on coiled springs, each with a painted room name beneath. The study bell's spring is stretched longer than the rest, and its clapper hangs still.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the hearth",
+      "room": "the servants' hall",
+      "description": "An open coal fire behind an iron fender, the hob kept for the staff kettle. The ash in the pan here is grey and fine; study ash, with its paper, would be flecked black.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the dresser",
+      "room": "the servants' hall",
+      "description": "A plain pine dresser of blue-rimmed plates and a brown dripping crock. The second hook from the end holds a servant's cup with a chipped foot, turned to the wall as cups are when their owner has left under a cloud.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the cook's chair",
+      "room": "the servants' hall",
+      "description": "The only chair with arms, at the head of the table, its cushion flattened to the shape of one woman. Nobody sits in it, even when she is upstairs.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the area window",
+      "room": "the servants' hall",
+      "description": "A high sash set into the area wall, iron-barred on the outside, snow banked against the lower panes. From the bench you can see only boots pass, never faces.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the wages book",
+      "room": "the servants' hall",
+      "description": "A thin ruled book kept on the dresser shelf, names down the side and quarter-days across. Lavinia Netherby's line shows two quarters paid and a third left blank.",
+      "portable": true,
+      "story": true
+    }
+  ]
+}

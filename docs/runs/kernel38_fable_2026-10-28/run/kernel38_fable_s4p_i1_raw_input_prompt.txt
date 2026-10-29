@@ -1,0 +1,248 @@
+SYSTEM PROMPT
+
+You are step 4p of an interactive fiction generation pipeline: the BRANCH
+PLAN. A story's main line has just been built: a through-line laid over
+the beats of a framework, ending in one answer to the story's question.
+You design every further line at once: where each one leaves the story,
+on what the player did, and the WORLD its ending leaves. A later step grows
+each seed into a line, one at a time, in the order you give them.
+
+You plan them together because two things cannot be judged one line at a
+time: whether the lines part early enough to have middles of their own,
+and whether their endings are really different endings.
+
+WHAT A SEED IS
+ - motivation: what "you" come to want on this line, and what makes you
+   want it (something learned, offered or suffered at the divergence).
+ - strategy: how you go about it from the divergence on.
+ - diverges_at: the last node this line shares with the existing story.
+   One of valid_divergence_nodes.
+ - trigger: what the player DID or brought about in that node that sends
+   the story this way: plain words, second person, past tense ("you let
+   the agent swing his crane over the trench"). Never "you chose".
+ - trigger_kind: "act" when it is something done in that node;
+   "accumulated" when it is the pattern of what the player did across the
+   earlier nodes ("you had taken the agent's money three times by the time
+   the crate came"). A companion's loyalty is spent over the whole road:
+   when the line turns on a companion staying or leaving, prefer
+   "accumulated" and name the node where the pattern comes due.
+ - way: when the node plays a premise turn and the trigger is one of that
+   turn's numbered ways that no line has taken (see unused_ways), its
+   number; otherwise null.
+ - ending: the title and two sentences of the ending this line earns, and
+   the world it leaves in comparable form:
+     answer:   pole_a | pole_b | mixed | neither  (which answer to the
+               story's question this ending gives)
+     standing: who is still with "you" at the end, by role label (names
+               are fine), empty when nobody is
+     lost:     who is gone: left, turned against you, dead or taken, by
+               role label
+     changed:  one clause: what stands or is destroyed in the world that
+               was not so on the main line
+     pays_price: true when this ending is where the engine's price is
+               paid. If the main line's ending does not pay it, one
+               seed's ending must.
+ - why_different: one sentence per existing line and per earlier seed:
+   how this ending differs in KIND from it.
+
+WHAT MAKES A SET OF LINES WORTH BUILDING
+ 1. Each ending leaves a DIFFERENT WORLD: a different answer, or the same
+    answer with different people standing or lost, or something else
+    destroyed. The same answer, the same people standing, with the price
+    moved onto a different payer, is the same ending written twice: do not
+    plan it. The main line's ending world is given; plan against it.
+ 1a. BALANCED PERSONIFICATION ACROSS DILEMMAS: Never plan an ending that
+    shifts sacrifice, loss, or survival to a faceless collective noun or
+    nameless statistic ("the other sector", "the rest of the crew"). If an
+    alternative ending shifts who is lost or standing, name the character
+    representing that faction or group in standing/lost.
+ 2. At least one line leaves in the FIRST HALF of the main line (the nodes
+    listed as first_half), so that it has its own middle: its own turns
+    taken its own way, its own event landing differently. A story whose
+    lines all part at the climax is one road with a choice of endings.
+    Take a later starting point for the other lines only when an earlier
+    one cannot carry them.
+ 3. Companions with a breaking point are the cheapest different worlds:
+    one line where the person who stands on the main line is lost, one
+    where the person lost is kept, each because of what the player did.
+    Use them, and use the events: an event that the main line survives
+    can go the other way on another line.
+ 4. unused_ways are the cheapest places to start: the fork is already in
+    the premise with its cost. A line may also start from something new
+    arriving in a node (an offer, a discovery, a refusal); then the trigger
+    says what.
+ 5. A line is NOT worth building when it is the same strategy pointed at
+    a different person or place; an ending that differs only in degree;
+    one way through a turn swapped with everything after it unchanged; or
+    a line that needs the protagonist to become someone else for no reason
+    the story supplies.
+ 6. seeds_wanted is what the Kernel's stated shape points to; it is
+    advisory. Plan fewer when fewer are worth building, never more than
+    seeds_at_most. Order the seeds so that the one that most changes what
+    the story is about comes first.
+
+BRANCHING SHAPE. A new line may leave the story after any node listed as a valid divergence node. Its trigger is normally something the player did in that node.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary before or
+after. "assessment" comes first: two or three sentences on which answer
+the main line gives, which worlds are missing, and where the story can
+part early.
+
+{
+  "assessment": "...",
+  "seeds": [
+    {
+      "motivation": "...", "strategy": "...",
+      "diverges_at": "node id", "trigger": "...", "trigger_kind": "act | accumulated", "way": null,
+      "ending": { "title": "...", "summary": "...", "answer": "pole_a | pole_b | mixed | neither",
+                  "standing": ["role label"], "lost": ["role label"], "changed": "...", "pays_price": false },
+      "why_different": "..."
+    }
+  ]
+}
+
+seeds is an empty list when no further line is worth building.
+
+ILLUSTRATION (a different story; shows the grain, nothing else)
+
+Question: does the find leave the hill, or stay with the people it was
+buried for? pole_a: it leaves with the sponsor; pole_b: it stays with the
+village. You direct a dig above a village in the last days before the
+rains; the team is the foreman (breaking point: turns the day the find is
+crated without the village seeing it), the student (breaking point: leaves
+the day you publish the report without crediting her excavation) and the sponsor's agent, the
+opposition. Events: 1 (middle) the rain comes a week early; 2 (late) the
+sponsor's crate arrives at the station before the find is out of the
+ground. Framework: Fichtean curve.
+Main line T1 "The Hill's Own": N01 opening_crisis (turn 1, way 1: the
+foreman's mother tells you his grandfather dug here for the last sponsor);
+N02 second_crisis (event 1; turn 2, way 1: the men dig the nephew out by
+hand, the student's arm is broken); N03 third_crisis (turn 3, way 1: you walk the council up the hill to see the find in the ground; the agent stops the men's pay and the student goes to the station with him anyway); N04 climax (event 2; turn 4,
+way 1: the men lift the crate off the platform); N05 aftermath, the
+ending: the find in the village church, the sponsor gone for good, the
+student gone with him, the foreman beside you. World: answer pole_b;
+standing: the foreman; lost: the student. first_half: N01, N02.
+unused_ways: N02 turn 2 way 2 (the agent's crane, which cracks the lid);
+N03 turn 3 way 2 (the student leads the agent's crew down the trench and they lift it, the foreman's men walk off), way 3 (you show them both the day book; it comes
+up whole and the agent wires the sponsor that you are the thief); N04 turn
+4 way 2 (it goes on the train and the student rides with it).
+seeds_wanted: 3.
+Output:
+{
+  "assessment": "T1 answers the question for the village and pays with the student, who goes to the sponsor. Missing: the find leaving the hill at all (pole_a), and any ending where the student stays or the foreman is the one lost. The crane at N02 is the early fork: from the moment the agent's machine is over the trench the dig is his, and the whole second half plays under his orders instead of yours.",
+  "seeds": [
+    {
+      "motivation": "The crane gets the nephew out in a minute and the agent has his photograph of the cracked lid. You come to want the dig finished at any price, because the find is already half his and the rain is not waiting.",
+      "strategy": "Take the agent's money and his crew, keep the foreman's men on by paying them out of it, and get the find to the station before the council can organize.",
+      "diverges_at": "N02", "trigger": "you let the agent swing his crane over the trench to get the nephew out", "trigger_kind": "act", "way": 2,
+      "ending": { "title": "The Cracked Lid", "summary": "The find leaves on the train in the sponsor's crate with its lid cracked, and the student rides with it, to see her name on its case in the sponsor's museum. The foreman stays on the hill with his men paid and his nephew alive, and does not come to the station.", "answer": "pole_a", "standing": ["the foreman"], "lost": ["the student"], "changed": "the find is the sponsor's, damaged; the village has seen nothing", "pays_price": false },
+      "why_different": "T1 keeps the find and loses the student; this line loses the find and the student both and keeps the foreman only by his nephew's debt: the other answer, with the dig run by the agent from the second crisis on."
+    },
+    {
+      "motivation": "You come to want the student's name on the record more than the village's claim, because she broke her arm in the trench for a find the foreman had been hiding from everyone, you included.",
+      "strategy": "Let her lead the agent's crew down the trench to lift it, and answer the council at the station with the day book that shows what the foreman knew.",
+      "diverges_at": "N03", "trigger": "you let the student lead the agent's crew down the trench to lift it", "trigger_kind": "act", "way": 2,
+      "ending": { "title": "Her Name on the Case", "summary": "The find goes on the train with the student beside it in the goods van, her name to go on its case. The foreman and his men have walked off the hill, the council turns its back on you at the station, and the second burial is left open to the rain.", "answer": "pole_a", "standing": ["the student"], "lost": ["the foreman", "the foreman's mother"], "changed": "the upper burial is destroyed by the rain; the village will not have you back", "pays_price": false },
+      "why_different": "Seed 1 loses the student and keeps the foreman; this line is the reverse, and the village is lost with him. T1 keeps the find; this does not."
+    },
+    {
+      "motivation": "Once the foreman and the student have both read the day book, you come to want the find raised by the people it was hidden from and the people who found it together, whatever the sponsor does afterwards.",
+      "strategy": "Show them both the day book, raise the find by lamplight with every hand on the hill, and meet the council at the station with the student at your side.",
+      "diverges_at": "N03", "trigger": "you showed the foreman and the student the last dig's day book together before the lift", "trigger_kind": "act", "way": 3,
+      "ending": { "title": "Every Hand on the Hill", "summary": "The find stands whole in the village church with the student's drawings pinned beside it and the foreman's mother keeping the key. The sponsor has pulled next season and the agent's wire has named you a thief, and both of them stayed.", "answer": "pole_b", "standing": ["the foreman", "the student", "the foreman's mother"], "lost": ["the sponsor's agent"], "changed": "the dig has no sponsor; the find is whole and shown", "pays_price": false },
+      "why_different": "The same answer as T1 but a different world: the student stays, the find is whole, and the price is next season instead of a companion."
+    }
+  ]
+}
+(Three seeds, three worlds, none the same as the main line's. Seed 1 leaves at N02, in the first half, by an unused way. Seeds 2 and 3 share a node and differ in way. Each ending names who stands and who is lost by role.)
+
+USER INPUT FOLLOWS BELOW
+
+- the Kernel
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+- the story's question
+{
+  "question": "Which of the seven do you name in the drawing room, and can you make the name hold against the house's own verdict?",
+  "pole_a": "name the Major, and make it stick",
+  "pole_b": "name one of the other six",
+  "protagonist_wants": "to put the right name on the master's killer before the road opens and the house hands the magistrate the wrong one",
+  "opposition_wants": "the nephew sent to the magistrate for the murder with the whole household's word behind him, so that the matter is closed before anyone asks why the master summoned the Major to the study at eleven"
+}
+
+- companions and their breaking points
+{
+ "companions": [
+   {"role": "the master's valet of forty years", "name": "Reginald Fairbrother", "breaking_point": "turns against you for good if you name the master's dying to the guests before he has been given the chance to say it himself"},
+   {"role": "the housemaid", "name": "Lavinia Netherby", "breaking_point": "stops bringing you anything the moment you let the Major believe she took what went missing from the study"}
+ ]
+}
+
+- the engine's events (numbered)
+{
+ "events": ["1. (early) The study door is broken down with the hall poker, the household crowding the gallery; a key is heard to fall onto the carpet inside, and the master is found at his desk with the window frozen shut, the fire gone to ash, and a yellow tallow stub, not one of the study's white wax candles, snuffed in the mantel candlestick.", "2. (middle) At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door.", "3. (late) The eaves begin to drip at dawn and the lodge-keeper wades up to say the road will carry a cart by noon; the Major orders the carriage, sends the maids up to the study with pails and a fresh scuttle, and calls the house to the drawing room to hear the housekeeper's account of the night before they sign."]
+}
+
+- the story so far (one entry per node; the main line's ending world is in its line entry)
+{
+ "lines": [
+   {"id": "T1", "title": "The Housekeeper's Reckoning", "motivation": "You start out wanting the right name on the master's killer before the road carries a cart and the house hands the magistrate the nephew. By the end you want to know whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters, and you find it can, if the servant is willing to let it cost the house its oldest servant and the master his good name.", "strategy": "Do the housekeeper's work as cover: count the candles, sweep the grate, serve the dinner, walk the rounds, and keep in your apron what the house throws out, so that the case is built from the things a gentleman never thinks to hide from staff.", "ending": "Lucius Carrington is driven down the thawing road to the magistrate on the housekeeper's word, the valet's confession and the doctor's certificate; the nephew is cleared, but his marriage, the doctor's practice and the widow's name were broken in the same quarter hour, the valet leaves by the first cart with no character after forty years, and the master is remembered as a man who sold his silence for thirty years before he thought to buy it back.", "ending_world": {"answer": "pole_a", "standing": ["the master's nephew and heir", "the doctor", "the solicitor"], "lost": ["the Major", "the master's valet of forty years", "the housemaid", "the nephew's fiancée", "the widow"]}, "path": ["N01", "N02", "N03", "N04", "N05", "N06", "N07"]}
+ ],
+ "nodes": [
+   {"id": "N01", "beat": "opening_crisis", "turn": 1, "way": 2, "event": 1, "what": "The Door Comes Down: Before the poker is fetched you kneel on the gallery and put your eye to the study keyhole, and see the lamp still burning on the desk and the master's shoulder beyond it; then the door comes down under the hall poker, a key is heard to hit the carpet, and Major Carrington is first across the threshold, scoops it up before anyone sees where it lay, drops it in his waistcoat 'for safekeeping' and sends you down to count the plate. You go down past the candle box at the foot of the back stairs, the one you count by the dozen and that Fairbrother told you he alone draws from after ten, and double straight back up those stairs: with the doctor bending the Major over the desk you put your eye to the keyhole again and now the lamp is hidden by the key in the lock, and from behind the maids' linen basket you see the window frozen shut, the fire gone to ash, the poker straight in its stand, and a yellow tallow stub snuffed in the mantel candlestick where only white wax belongs. Fairbrother, holding the maids at the stairhead, has watched you come up the stairs nobody but he uses after ten, and before dinner he has told the Major that the new woman is watching the back stairs and his candle box."},
+   {"id": "N02", "beat": "second_crisis", "turn": 2, "way": 1, "event": 2, "what": "Dinner for Seven: Dinner is laid for seven with the master's chair empty and the storm at the windows, and no one will take the first mouthful until the Major does; he holds the table on the quarrel everyone overheard and announces he will carry the household's sworn account to the magistrate at the thaw, and every errand you run to the sideboard is done under his eye. As you set Millicent Gresham's place you tell her under your breath that the sherry glass with her mouth on it is in your room, unwashed, and stays so until she gives you the hour; between the fish and the roast she whispers that she left the study at ten past ten with the lamp lit and the fire built high, and the master alive and laughing at her settlement. Then Nathaniel Yardley, who has watched the two of you whisper over his plate, bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with Fairbrother set in a chair at the door; and Millicent, frightened of the glass, goes to the Major before midnight to say the new housekeeper is pocketing things from the study."},
+   {"id": "N03", "beat": "second_crisis", "turn": 3, "way": 1, "what": "The Rounds Walked Twice: Past midnight, sent to bed by the Major, you walk the murder night again along the dark gallery with one candle, counting the seconds door to door: at half past ten you passed the study and heard the nephew's voice raised over a sum owed; at twenty to eleven he came down the back stairs and crossed the yard to the stables; by eleven the gallery was dark and the only light in the house was one moving up the back stairs that you took for the valet's, so Evangeline Davenport's eleven o'clock quarrel is a lie, and the tallow stub starts to look like a candle carried up after the nephew had gone. You go to Fairbrother in his chair at the nephew's door with the candle box open in your hands, count it one short in front of him and tell him you will set the box before the heir at breakfast and say that only he draws from it after ten unless he gives you the hour now; he says nothing to you, but he is at the Major's door before dawn with it."},
+   {"id": "N04", "beat": "third_crisis", "event": 3, "what": "The Thaw: At dawn the eaves begin to drip, the lodge-keeper wades up to say the road will carry a cart by noon, and the Major orders the carriage; at breakfast he announces to the house that Fairbrother has confirmed lighting 'the young gentleman' up the back stairs to the study at eleven, and the valet, asked to deny it, stands at the sideboard and says nothing, so the hour you dragged out of him is now the strongest plank in the case against the nephew, who hears it through his locked door and shouts that his uncle's own man has turned on him. The Major forbids you the first floor, sends two maids up to the study with pails and a fresh scuttle to rake the grate and relight the fire, and tells the doctor to have the body carried to the ice house; and on the gallery, watch in hand, he tells you that your account will be read in the drawing room before the house signs and that you will be sent to your room if you are seen above stairs before then."},
+   {"id": "N05", "beat": "third_crisis", "turn": 4, "way": 1, "what": "The Maid's Apron: You catch Lavinia Netherby on the back stairs with her empty pail and tell her quietly that you know she took a tallow from your box for her own room, that when the Major has the box counted short it is her the valet will name, and that the one thing that clears her is to bring you the yellow stub out of the mantel candlestick in her apron and the ash pan down unsifted while you keep to the servants' hall as ordered; she does it, and the stub is in your hand with two wicks' worth of wax on it. Within the hour the Major, on the fiancée's word and the nephew's signature passed under his door, has your room searched: the stub, the lipstick glass and your written timeline go into his waistcoat with the key, Lavinia is found with ash on her apron, made to say in front of the whole kitchen where she took it and told she will go at the thaw, and she will not bring you so much as a scuttle again; you are told you will give your account in the drawing room from memory alone."},
+   {"id": "N06", "beat": "climax", "turn": 5, "way": 1, "what": "A Housekeeper's Reckoning: In the drawing room before the fire, with the carriage at the door and the Major ordering you to read the account as he has it written, you give it instead as a housekeeper's reckoning: you set the candle box on the table and count it one short before the room, say that the yellow stub the Major took from your room and carries in his waistcoat with the key is tallow from that box, which only the valet draws after ten; that by your rounds the quarrel was at half past ten and the nephew was in the stable yard by twenty to eleven, whatever the ward swears; and that a key in the inside lock fills a keyhole, and you saw the lamp through it before the door came down, so the key the gallery heard fall came not from the lock but from the hand of the man who went in first. To clear the nephew you say aloud the fiancée's ten o'clock visit and the glass, the widow's hairpin in the keyhole at midnight and her forged letter of credit, and the doctor's boots tracking snow from the widow's window into the gun room; then you turn to Fairbrother and tell him his master ordered him to light that candle and that his master's last order is to say whom he lit, and the old man says before the heir and the guests that he lit Major Carrington up the back stairs at eleven with a tallow from the housekeeper's box, by the master's order, and left it with him, and held his tongue two days while the young gentleman was blamed; the doctor says that the master knew he was dying and had sent for his oldest friend to settle an old account; and you say the Major's name after them across the fire, and he goes still, and the nephew and the solicitor hold him by the arms while the carriage is sent for a different passenger."},
+   {"id": "N07", "beat": "aftermath", "ending": true, "what": "The First Cart: The Major is driven down the dripping road to the magistrate with your timeline, the stub and the key, and the solicitor beside him to say what will stand at law; the old will stands and Nathaniel is master of the house, but Millicent has given him back his ring, the doctor's practice is finished when the widow's name is, and the master is remembered as a man who covered a coward's retreat for thirty years. Fairbrother packs his forty years into one box and goes by the first cart that gets through, without a character, because the heir will not keep him and he will not ask; the housemaid passes you on the stairs without a word; and you lock the study with the master's key, which the new master has given you at last."}
+ ]
+}
+
+- ways through a turn that no line has taken
+{
+ "unused_ways": [
+   {"node": "N01", "turn": 1, "way": 1, "what": "you refuse the Major's order to go down to the plate, plant yourself in the study doorway with your key ring in your fist and tell him the housekeeper counts every candle and cloth in a room before any gentleman shuts it up, and you walk the four walls while he argues with you", "cost": "the Major marks you as insubordinate in front of the whole gallery, the nephew sees his housekeeper answer back to a guest and will later sign the order to search your room without a word, and the valet, who has waited a fortnight for this, tells the maids on the stairhead that the new woman has forgotten her place on her first dead master"},
+   {"node": "N01", "turn": 1, "way": 3, "what": "you send the housemaid ahead with the ash pan and the master's lamp for the doctor's light, follow her in with your apron and hearth brush as any housekeeper would, kneel at the grate to sweep the fallen ash and feel how cold it is, and lift the poker from its stand and set it straight to learn its weight", "cost": "the doctor sees you with the poker in your hand and says so to the Major, who repeats it at breakfast that the housekeeper was handling the weapon before the body was cold, and the housemaid, who had to hold the lamp over the dead man's face while you did it, will not go up to the study again and cries when you ask her what she saw"},
+   {"node": "N02", "turn": 2, "way": 2, "what": "when the Major presses you across the table for your rounds, you answer him flatly before all seven that at twenty to eleven you saw the nephew come down the back stairs and cross the yard to the stables, not go to the study, and that you will swear to it", "cost": "the nephew bolts from the table for the yard anyway to hide what he keeps in the stable loft and is dragged back half-frozen, the Major now demands your whole account in writing that night, and the fiancée, having seen that you tell what you see, will not give you the hour she left and tells you so in the passage"},
+   {"node": "N02", "turn": 2, "way": 3, "what": "you spin the dinner out and wrong-foot the Major: you bring the ward's plate to the wrong place, let the sherry decanter tip across his cuff so he must go up to change, and in the fuss draw the fiancée into the pantry passage for two minutes to get the hour and the look of the fire out of her", "cost": "the valet, standing at the sideboard, has watched you serve a dinner no housekeeper of his master's would have served and tells the Major you are not fit for the post, the Major comes back in dry cuffs asking why a careful woman spilt his sherry, and the ward, whose plate you moved, sulks and will not now say anything to you about the hour of the quarrel"},
+   {"node": "N03", "turn": 3, "way": 2, "what": "you offer the valet a trade: you will tell the Major in writing that the valet is the senior servant and the candle box is in his keeping, and you will leave the house at the thaw without a character asked, if he will only give you the hour he drew the candle and which stairs he lit", "cost": "you have put your own leaving in writing and the Major keeps the paper, the valet takes the hour to the Major instead of giving it to you, and the widow, passing on the gallery, hears you bargaining a servant's place with a servant and tells the fiancée you are not to be trusted with what any of them says"},
+   {"node": "N03", "turn": 3, "way": 3, "what": "you leave the valet in his chair and walk the rounds instead, counting seconds door to door by candle, and at midnight you catch the widow on her knees at the study keyhole with her hairpin, and trade her silence for her own: she tells you what she heard through the Major's door at eleven, and you say nothing of the hairpin or her forged letter", "cost": "you now owe the widow a silence that will have to be broken in the drawing room if the nephew is to be cleared, the valet's hour stays unspoken and the Major has it to use first, and the nephew, who heard your step pass his door and go on without stopping, calls through the panel that the housekeeper too has left him to it"},
+   {"node": "N05", "turn": 4, "way": 2, "what": "you go to the solicitor in the library where he is drafting the household's account, speak to him as he speaks to you, witness to witness, and tell him the magistrate will want the room as it was found and the desk unopened, and that if the grate is raked before noon you will have to say in the drawing room who ordered it and what unsigned paper lies in that desk; so it is the solicitor, not you, who goes up to the gallery and tells the Major in law's name to call the maids off", "cost": "the clearing is stopped and the study stays as it was, but the solicitor names his price on the stairs: the unsigned will is never to be mentioned by you, in the drawing room or after; and the Major, finding the one guest he cannot order has been turned by the housekeeper, has the nephew taken out to the waiting carriage early and sets the valet to watch your door, while the doctor goes across to the ice house with the body unasked and you reach the drawing room with a silence owed and no word from him"},
+   {"node": "N05", "turn": 4, "way": 3, "what": "you leave the study to the maids and go across the yard to the ice house where the doctor is seeing the body laid, and tell him that you know whose boots tracked snow into the gun room and from whose window, and that you will say nothing of it if he says now, before the solicitor, that the master knew he was dying and had sent for his oldest friend", "cost": "the doctor says it, but while you are in the yard the study is raked and swept and the tallow stub goes out in the ash pail; you come back with the doctor's words and the keyhole only, and the housemaid who was left to sweep the dead man's carpet under the Major's eye, with no housekeeper beside her, tells the other servants you ran off and left her to it"},
+   {"node": "N06", "turn": 5, "way": 2, "what": "you cross the drawing room to the Major, put your hand into his waistcoat pocket before he can stop you, take out the master's key and march the whole house up to the study door to set it in the lock and show them the keyhole filled, then name him on the gallery where the door came down", "cost": "the Major strikes you across the face and the nephew has to hold him by the arms, the case is made by the key and the keyhole alone so the valet never has to speak and keeps his forty years, but a housekeeper who put her hand into a gentleman's pocket cannot be kept, and the heir, with the Major taken down the road in his carriage, gives you your wages and your character and tells you to go by the next cart"},
+   {"node": "N06", "turn": 5, "way": 3, "what": "you offer the Major a bargain in front of the room: you will read your account exactly as he asked, with nothing said of keyholes or candle boxes, if he will say now that the nephew is not to go down the road and let the carriage carry only the household's account to the magistrate, and you tell him, low, that you know what hour the valet drew the candle and will keep it if the nephew is kept", "cost": "the nephew is saved and the valet keeps his silence and his place, but the Major stands at the fire unnamed and drives to the magistrate as the master's grieving friend, the master's death goes down as a quarrel with no one answered for it, and you keep your post only because the Major now knows you can be bought, and the fiancée, who heard the bargain, knows you would have sold her as readily"},
+   {"node": "N06", "turn": 5, "way": 4, "what": "you keep back every lie that does not touch the killing, the fiancée's visit, the widow's letter, the doctor's snow, and read your account trimmed to fit the case the house already believes, then put the nephew's name across the fire with the overheard quarrel and the stable yard behind it, or the fiancée's with the lipstick glass in your hand, and hold the room to it", "cost": "the room believes you, the carriage is sent for the wrong passenger and the nephew or his fiancée goes down the road to the magistrate within the hour, the valet keeps his silence and thanks you for it, the Major shakes your hand at the fire as the housekeeper who did her duty, and you have given the magistrate the killer's own case with a servant's word under it, which is the one way to lose"}
+ ]
+}
+
+- counts and where a line may leave
+{
+  "lines_the_kernel_suggests": 3,
+  "seeds_wanted": 2,
+  "seeds_at_most": 2,
+  "main_line_nodes": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07"
+  ],
+  "first_half": [
+    "N01",
+    "N02",
+    "N03"
+  ],
+  "valid_divergence_nodes": [
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06"
+  ]
+}

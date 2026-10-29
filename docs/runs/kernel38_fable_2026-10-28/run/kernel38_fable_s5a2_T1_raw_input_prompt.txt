@@ -1,0 +1,626 @@
+SYSTEM PROMPT
+
+You are step 5a2 of an interactive fiction generation pipeline, the node
+expansion for ONE line of a story. The line is a path of major nodes (the
+outline's beats). You add MINOR NODES between them: small scenes that let
+the player move, understand and complete the arcs of the people on this
+line. Each minor node goes after one major node on the path; several may
+follow the same one, in the order you list them.
+
+Four kinds:
+ - opportunity: a small situation where the player does or says one of two
+   or three things. Each option is an act ("hand her the headphones",
+   "tell the caller the station is closed"), never a moral label ("be
+   kind"). In each opportunity, at least one option (and usually each option)
+   MUST move a named state (the states listed) using:
+   "moves": [{"state": "<state name>", "direction": "up | down"}]
+   What each option means must be readable from the situation, so the player
+   knows roughly what they are choosing. Never leave all options in an
+   opportunity with empty "moves": []. About one opportunity in three on a line
+   also offers an ACTIVE attempt: a physical try at changing the situation
+   (fix it, take it, go there, stop it) that can succeed, fail or be
+   stopped. Mark it "active": true. A failed attempt has its own effect;
+   it is never a dead end.
+ - revelation: something learned that explains a person or the hidden
+   truth (a letter, an overheard call, an object, a confession).
+ - demonstration: a person acting from where their arc stands now, so the
+   change is seen, not told. A demonstration that shows someone nearing a
+   pattern shift is a WARNING: set "warns" to that state.
+ - resolution: where an arc lands, after the line's ending node only.
+
+Every opportunity has a TELL: how and where the player sees its effect,
+within the next one or two nodes on this line ("at": a major node id from
+the path, or "m<k>" for the k-th minor node in your answer). Write the tell
+in the story's visibility mode: signposted (someone says it), observed
+(shown in what someone does, where they stand, what they call you), hidden
+(something visibly happens; what it means comes out later). The player can
+rewind, so a surprise must show early.
+
+Rules:
+ - A small choice moves a state; it never changes the line by itself.
+ - Every opportunity must move an arc: in each opportunity node, at least
+   one option (and typically each option) must have a non-empty "moves" list
+   with a declared state and direction ("up" or "down"). An opportunity
+   where no option moves a state will fail validation.
+ - Do not make every choice a trade between two people. Most options move
+   ONE person's state, and their cost is in the world (time lost, a thing
+   given up, a risk taken, someone else watching), not automatically the
+   other person's state. At most a third of a line's opportunities may set
+   one person against another, and somewhere on the line there is a way to
+   do right by both, or wrong by both. A player must be able to win
+   everyone, or lose everyone, by how they play.
+ - An option is something done or said for a reason the player can feel
+   (to comfort, to defy, to protect, to mock, to help), not the order of
+   two errands, and not a document signed or priced unless the story is
+   about that document.
+ - Every arc on this line gets opportunities on this line. Where how
+   someone ends depends on their state, at least two opportunities on the
+   line move it.
+ - A pattern shift listed below needs at least three opportunities moving
+   its state before its node, and a warning demonstration before it.
+ - Honor every major node's must_contain: put it in a minor node after that
+   node if the major node's summary does not already hold it.
+ - A major node marked already_expanded was expanded with an earlier line;
+   add after it only what THIS line's arcs need.
+ - Each major node lists the lines that pass through it. A minor node after
+   a node several lines share is on all of those lines, so its tell must
+   land on all of them: at a later minor node after the same major node, or
+   at a major node every one of those lines reaches next. A choice that
+   belongs to this line alone goes after a node only this line has.
+ - Keep each summary to 30-50 words, second person, present tense. One
+   image per node: a concrete thing the player keeps.
+ - People: name only characters already in the story, by name. A new
+   person may appear only as a passing role (a waiter, a guard).
+ - INTRODUCTORY SCOPING: The opening major node (the first node on the path)
+   should be followed by at most one or two minor nodes (one opportunity
+   and/or demonstration). Distribute subsequent opportunities and turns across
+   later nodes on the path to avoid front-loading the opening scene with excessive choices.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two or three sentences: how this line paces its arcs>",
+  "minor_nodes": [
+    {"after": "<major node id>",
+     "kind": "opportunity | revelation | demonstration | resolution",
+     "serves": ["<name of each person whose arc this serves>"],
+     "title": "<three to six words>",
+     "summary": "<30-50 words>",
+     "image": "<one concrete thing>",
+     "who": ["<names>"],
+     "options": [{"do": "<an act>", "effect": "<what follows, in plain words>", "moves": [{"state": "<state name>", "direction": "up | down"}], "active": false}],
+     "tell": {"at": "<node id or m<k>>", "how": "<what the player sees>"},
+     "warns": "<state name, for a warning demonstration; else omit>"}
+  ]
+}
+Options and tell are for opportunities only. Every opportunity MUST have at least one option with a non-empty "moves" list.
+
+EXAMPLE (one line of a late-night radio phone-in story; for shape only)
+
+{
+  "notes": "Dana's trust gets three chances before the crisis at N04, one of them an active attempt; the caller's revelation sits right before the turn so the turn lands.",
+  "minor_nodes": [
+    {"after": "N01", "kind": "opportunity", "serves": ["Dana Pryce"], "title": "The Call She Screened Out",
+     "summary": "The line lights up with the number Dana told you never to take. She is already reaching for the reject switch, watching you through the glass, waiting to see whether you let her.",
+     "image": "Dana's finger resting on the red reject switch", "who": ["Dana Pryce"],
+     "options": [{"do": "Nod, and let her drop the call", "effect": "she relaxes and cues the next record", "moves": [{"state": "dana_trust", "direction": "up"}], "active": false},
+                 {"do": "Wave her off and take the call on air", "effect": "she pulls her headphones down and folds her arms", "moves": [{"state": "dana_trust", "direction": "down"}], "active": false}],
+     "tell": {"at": "N02", "how": "when the manager asks who put the caller through, Dana answers before you can, or looks at you and says nothing"}},
+    {"after": "N02", "kind": "revelation", "serves": ["Dana Pryce"], "title": "The Notebook",
+     "summary": "In the dead air after the news you find the caller's number written in your own hand on the inside cover of your notebook, dated a year before you took this job.",
+     "image": "a phone number in your handwriting, dated last spring", "who": []},
+    {"after": "N03", "kind": "opportunity", "serves": ["Dana Pryce"], "title": "The Dead Microphone",
+     "summary": "Your microphone cuts out mid-sentence. Dana is on the phone to the engineer; the clock says forty seconds of silence before the station's emergency tape starts.",
+     "image": "the second hand sweeping toward the emergency tape", "who": ["Dana Pryce"],
+     "options": [{"do": "Wait for Dana to fix it", "effect": "she brings you back with three seconds to spare and does not mention it", "moves": [{"state": "dana_trust", "direction": "up"}], "active": false},
+                 {"do": "Crawl under the desk and swap the cable yourself", "effect": "you either get it working and she laughs for the first time tonight, or short the board and she has to run the tape", "moves": [{"state": "dana_trust", "direction": "up"}], "active": true}],
+     "tell": {"at": "m4", "how": "she leaves the talkback key open, so you hear her say your name to the engineer"}},
+    {"after": "N03", "kind": "demonstration", "serves": ["Dana Pryce"], "title": "Talkback Left Open",
+     "summary": "Through the open talkback you hear Dana tell the engineer the host is fine, the host is handling it. Her voice is steady; her hand on the fader is not.",
+     "image": "Dana's hand trembling on the fader", "who": ["Dana Pryce"], "warns": "dana_trust"}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS LINE (its arc for you, the states, the arcs and light arcs on it, the path of major nodes, any pattern shifts):
+{
+ "line": {
+  "id": "T1",
+  "title": "The Housekeeper's Reckoning",
+  "motivation": "You start out wanting the right name on the master's killer before the road carries a cart and the house hands the magistrate the nephew. By the end you want to know whether a servant's word, said plainly with the thing in her hand, can be made to count against seven of her betters, and you find it can, if the servant is willing to let it cost the house its oldest servant and the master his good name.",
+  "protagonist_arc": {
+   "arc": "From a housekeeper collecting things in her apron to a woman who stops collecting and makes the house speak, and finds that a servant's word can hang a gentleman if she will let it cost the valet his place and the master his name."
+  },
+  "ending": "Lucius Carrington is driven down the thawing road to the magistrate on the housekeeper's word, the valet's confession and the doctor's certificate; the nephew is cleared, but his marriage, the doctor's practice and the widow's name were broken in the same quarter hour, the valet leaves by the first cart with no character after forty years, and the master is remembered as a man who sold his silence for thirty years before he thought to buy it back."
+ },
+ "state_visibility": "observed",
+ "states": [
+  {
+   "name": "carrington_regard",
+   "who": "Lucius Carrington (the Major)",
+   "up_when": "you go below when sent, carry his orders to the maids without question, keep your rounds for him and read the account he dictates, or let his hour by his watch stand unchallenged at table",
+   "down_when": "you climb the back stairs after he has sent you down, question the hour or the key before guests, carry your hours to the solicitor instead of to him, or are seen with things from the study in your apron"
+  },
+  {
+   "name": "fairbrother_faith",
+   "who": "Reginald Fairbrother (the master's valet of forty years)",
+   "up_when": "you ask him only the question and not the one meant, defer to his forty years before the maids, leave the master's dying for him to speak first, or set his candle box straight without counting it aloud",
+   "down_when": "you threaten him with the heir or the kitchen, name the master's dying to the guests before he has spoken, count his box one short where the maids can hear, or make him answer before the Major's face"
+  },
+  {
+   "name": "gresham_confidence",
+   "who": "Millicent Gresham (the nephew's fiancée)",
+   "up_when": "you wash the glass or leave it in your drawer unspoken, take her hour under cover of table service and tell no one, or speak of the study at ten as a settlement and never as begging",
+   "down_when": "you hold the glass over her as a lever, whisper to her where Nathaniel can see, name the sherry before the room, or let the Major learn what is in your drawer"
+  },
+  {
+   "name": "ormsby_ease",
+   "who": "Cordelia Ormsby (the widow)",
+   "up_when": "you return the hairpin privately, accept her praise of your discretion without correcting it, say nothing of the midnight keyhole or of whose window the snowy boots came from, or let her letter lie in the desk unmentioned",
+   "down_when": "you name the hairpin before the room, tell the doctor what you saw, speak of the keyhole at midnight, or let the desk be opened in her hearing"
+  },
+  {
+   "name": "netherby_nerve",
+   "who": "Lavinia Netherby (the housemaid)",
+   "up_when": "you cover her short count, take the blame for the candle box yourself, send her down before the Major comes up, or stand between her and the valet",
+   "down_when": "you let the Major believe she took what went missing from the study, send her into the study alone, threaten her with the valet's word, or leave her to the kitchen's tongue"
+  }
+ ],
+ "arcs": [
+  {
+   "who": "Lucius Carrington (the Major)",
+   "state": {
+    "name": "carrington_regard",
+    "meaning": "How far the Major reckons you a reliable instrument of the household rather than a hazard to be managed.",
+    "up_when": "you go below when sent, carry his orders to the maids without question, keep your rounds for him and read the account he dictates, or let his hour by his watch stand unchallenged at table",
+    "down_when": "you climb the back stairs after he has sent you down, question the hour or the key before guests, carry your hours to the solicitor instead of to him, or are seen with things from the study in your apron"
+   },
+   "moments": [
+    {
+     "node": "N01",
+     "kind": "demonstration",
+     "change": "He pockets the fallen key before anyone has looked at it and sends you below; whether you go, or come back up the valet's stairs, is the first thing he learns about you."
+    },
+    {
+     "node": "N02",
+     "kind": "test",
+     "change": "He holds the table on Evangeline's eleven o'clock and watches whether the housekeeper's whisper to Miss Gresham is service or inquiry; by midnight Millicent has told him you pocket things."
+    },
+    {
+     "node": "N04",
+     "kind": "turn",
+     "change": "He takes the hour you forced from the valet and turns it against the nephew at breakfast, then bars you the first floor: you have become a hazard to be kept out of the study, not a servant to be used in it."
+    },
+    {
+     "node": "N06",
+     "kind": "reveal",
+     "change": "The candle box counted one short, the keyhole you saw a lamp through, and the valet's eleven o'clock put the summons on him; when you say his name his face shows the room what thirty years of being the braver man has covered."
+    },
+    {
+     "node": "N07",
+     "kind": "demonstration",
+     "change": "He goes down the drive with your timeline and the key, and how he leaves you depends on whether he ever thought you worth his notice."
+    }
+   ],
+   "resolutions": [
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "up",
+     "stands_with_you": false,
+     "becomes": "Goes down the drive with his coat buttoned over the decoration and does not once look at the servant who put him there; he had never thought her worth watching, and still does not."
+    },
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "down",
+     "stands_with_you": false,
+     "becomes": "Says your name to the magistrate before his own, a housekeeper who kept a dead man's candle-end in her apron, and the solicitor spends the whole road unsaying it."
+    }
+   ]
+  },
+  {
+   "who": "Reginald Fairbrother (the master's valet of forty years)",
+   "state": {
+    "name": "fairbrother_faith",
+    "meaning": "How far the valet believes you serve the master's house and the master's last orders rather than your own standing in it.",
+    "up_when": "you ask him only the question and not the one meant, defer to his forty years before the maids, leave the master's dying for him to speak first, or set his candle box straight without counting it aloud",
+    "down_when": "you threaten him with the heir or the kitchen, name the master's dying to the guests before he has spoken, count his box one short where the maids can hear, or make him answer before the Major's face"
+   },
+   "moments": [
+    {
+     "node": "N01",
+     "kind": "demonstration",
+     "change": "He watches you climb the back stairs he lit the Major up the night before, and says nothing; whether you say anything to him of the tallow box sets the first mark."
+    },
+    {
+     "node": "N03",
+     "kind": "test",
+     "change": "You show him the box one short at the nephew's door and threaten to set it before the heir at breakfast; he gives you nothing and goes to the Major before dawn, either to confess or to warn."
+    },
+    {
+     "node": "N04",
+     "kind": "turn",
+     "change": "The hour he never gave you comes out of the Major's mouth as proof against the young gentleman; he stays silent, and his silence has become complicity, and he knows it."
+    },
+    {
+     "node": "N06",
+     "kind": "reveal",
+     "change": "Whether he says aloud that he lit Lucius Carrington up at eleven, and whether he says it to the room or only after you have forced it, decides what forty years of service were for."
+    },
+    {
+     "node": "N07",
+     "kind": "demonstration",
+     "change": "He carries forty years down the back stairs in one box and goes without a character; how he leaves your candle box is all the leave he takes."
+    }
+   ],
+   "resolutions": [
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "up",
+     "stands_with_you": false,
+     "becomes": "Carries forty years down the back stairs in one box; at the foot he sets your candle box square on its shelf before he goes, and that is all the leave he takes of you."
+    },
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "down",
+     "stands_with_you": false,
+     "becomes": "Goes without a character and without a word. The kitchen has it from him that the new housekeeper counted candles over a dying man's order."
+    }
+   ]
+  },
+  {
+   "who": "Millicent Gresham (the nephew's fiancée)",
+   "state": {
+    "name": "gresham_confidence",
+    "meaning": "Whether Millicent believes her ten o'clock visit and the sherry she begged over will be kept from Nathaniel.",
+    "up_when": "you wash the glass or leave it in your drawer unspoken, take her hour under cover of table service and tell no one, or speak of the study at ten as a settlement and never as begging",
+    "down_when": "you hold the glass over her as a lever, whisper to her where Nathaniel can see, name the sherry before the room, or let the Major learn what is in your drawer"
+   },
+   "moments": [
+    {
+     "node": "N02",
+     "kind": "test",
+     "change": "You whisper that the glass stays unwashed until she gives the hour; she gives it between courses, and Nathaniel sees the whisper, which is the worst of it for her; by midnight she has told the Major you pocket things."
+    },
+    {
+     "node": "N06",
+     "kind": "reveal",
+     "change": "You name her sherry aloud before the fire, with the ten o'clock hour and the fire high; whether you call it begging or leave it a visit decides what Nathaniel hears."
+    },
+    {
+     "node": "N07",
+     "kind": "demonstration",
+     "change": "She has returned the ring; what she says of you on the stairs, or does not, is the last mark."
+    }
+   ],
+   "resolutions": [
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "up",
+     "stands_with_you": false,
+     "becomes": "Returns the ring and leaves with her chin up, the sherry understood by the room as begging and not as murder; she will not look at the woman who said it aloud, though she knows it was the kinder word."
+    },
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "down",
+     "stands_with_you": false,
+     "becomes": "Returns the ring without a word to Nathaniel of why she went to the study, and lets the house think what it likes of a glass that was held over her for two days."
+    }
+   ]
+  },
+  {
+   "who": "Cordelia Ormsby (the widow)",
+   "state": {
+    "name": "ormsby_ease",
+    "meaning": "How far the widow believes the staff do not remember her on the stairs, at the keyhole, or at the doctor's door.",
+    "up_when": "you return the hairpin privately, accept her praise of your discretion without correcting it, say nothing of the midnight keyhole or of whose window the snowy boots came from, or let her letter lie in the desk unmentioned",
+    "down_when": "you name the hairpin before the room, tell the doctor what you saw, speak of the keyhole at midnight, or let the desk be opened in her hearing"
+   },
+   "moments": [
+    {
+     "node": "N06",
+     "kind": "reveal",
+     "change": "Her hairpin is named aloud with the sherry and the snowy boots; whether you name the keyhole with it decides whether the doctor's door is spoken of."
+    },
+    {
+     "node": "N07",
+     "kind": "demonstration",
+     "change": "She leaves on the doctor's arm with the hairpin gone down the road in a labelled paper; what she tells the magistrate's man about the housekeeper is her parting courtesy."
+    }
+   ],
+   "resolutions": [
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "up",
+     "stands_with_you": false,
+     "becomes": "Leaves on the doctor's arm with the hairpin gone down the road in a labelled paper; her thanks for your discretion about the midnight stairs is a silence, and she keeps it."
+    },
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "down",
+     "stands_with_you": false,
+     "becomes": "Mentions to the magistrate's man, in passing, that the housekeeper kept ladies' hairpins in her apron, and lets him draw his own conclusions."
+    }
+   ]
+  },
+  {
+   "who": "Lavinia Netherby (the housemaid)",
+   "state": {
+    "name": "netherby_nerve",
+    "meaning": "Whether Lavinia will still fetch for you when nobody above stairs is looking.",
+    "up_when": "you cover her short count, take the blame for the candle box yourself, send her down before the Major comes up, or stand between her and the valet",
+    "down_when": "you let the Major believe she took what went missing from the study, send her into the study alone, threaten her with the valet's word, or leave her to the kitchen's tongue"
+   },
+   "moments": [
+    {
+     "node": "N04",
+     "kind": "test",
+     "change": "The Major sends her up to rake the study grate; she looks to you on the stairs for a word that would stop her, and whether you have one is the first test of her nerve."
+    },
+    {
+     "node": "N05",
+     "kind": "turn",
+     "change": "You tell her the valet will name her for the short count unless she brings you the stub; she brings it folded in her apron, and within the hour is made to confess before the kitchen with ash on her apron and given notice. Whether you spoke for her is what she remembers."
+    },
+    {
+     "node": "N07",
+     "kind": "demonstration",
+     "change": "She passes you on the stairs with her box; whether she says a word, and what word, is her verdict."
+    }
+   ],
+   "resolutions": [
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "up",
+     "stands_with_you": false,
+     "becomes": "Given notice, she passes you on the stairs without a word, her apron clean; but she will not say to the kitchen that it was you who sent her up."
+    },
+    {
+     "lines": [
+      "T1"
+     ],
+     "direction": "down",
+     "stands_with_you": false,
+     "becomes": "Given notice before the kitchen, ash still on her apron. She tells the carter the housekeeper made her do it, and the carter tells the village."
+    }
+   ]
+  }
+ ],
+ "light_arcs": [
+  {
+   "who": "Nathaniel Yardley (the master's nephew and heir)",
+   "moments": [
+    {
+     "node": "N02",
+     "change": "Sees you whisper to Millicent and bolts for the stables, is dragged back half-frozen and locked in with the valet at his door."
+    },
+    {
+     "node": "N06",
+     "change": "Hears you say the Major's name and takes the old man's arm with the solicitor; the housekeeper who saw him in the yard has just made him master."
+    }
+   ],
+   "ends": "Master of the house under the old will, who remembers exactly what you saw and prefers you where he cannot see you."
+  },
+  {
+   "who": "Gideon Ashcombe (the doctor)",
+   "moments": [
+    {
+     "node": "N01",
+     "change": "Bends the Major over the desk to look at the body and sees you note the frozen window and the tallow stub; he says nothing, which is his habit."
+    },
+    {
+     "node": "N06",
+     "change": "Confirms the summons when the valet has spoken; the one gentleman the Major cannot order about says the sentence that closes the case."
+    }
+   ],
+   "ends": "Signs what he must and leaves with the widow, having said what he knew only when a servant asked it as a servant."
+  },
+  {
+   "who": "Evangeline Davenport (the ward)",
+   "moments": [
+    {
+     "node": "N02",
+     "change": "Recites her eleven o'clock quarrel for the Major's table and is believed by everyone but the woman counting doors."
+    },
+    {
+     "node": "N03",
+     "change": "Your rounds put the quarrel at half past ten and one flame on the back stairs at eleven; her hour is a lie about where she was, not what she heard."
+    }
+   ],
+   "ends": "Kept in the house under whichever master, her eleven o'clock standing in the record because no one found it worth breaking."
+  },
+  {
+   "who": "Cornelius Ellingham (the solicitor)",
+   "moments": [
+    {
+     "node": "N05",
+     "change": "Lists what the Major takes from your room in his own hand, so that the inventory is law's and not the Major's."
+    }
+   ],
+   "ends": "Rides down the road beside whoever the carriage carries, to say what will stand, with the old will intact and the new one never spoken of."
+  }
+ ],
+ "path": [
+  {
+   "id": "N01",
+   "title": "The Door Comes Down",
+   "lines": [
+    "T1",
+    "T2",
+    "T3"
+   ],
+   "summary": "You kneel at the keyhole: lamp lit, the master's shoulder. The door falls to Nathaniel Yardley's blows, a key hits the carpet, Major Carrington pockets it and sends you below. Past the tallow box Reginald Fairbrother alone draws after ten, you climb back up his stairs; with Gideon Ashcombe bending the Major over the desk you see frozen window, dead grate, poker standing, and a yellow tallow stub among white wax. Fairbrother watched you climb.",
+   "who": [
+    "C01",
+    "C02",
+    "C03",
+    "C04"
+   ],
+   "where": [
+    "L01",
+    "L02"
+   ]
+  },
+  {
+   "id": "N02",
+   "title": "Dinner for Seven",
+   "lines": [
+    "T1",
+    "T2"
+   ],
+   "summary": "Over the master's empty chair Major Carrington holds the table on Evangeline Davenport's recited eleven o'clock quarrel, promising the magistrate the nephew at thaw. You whisper to Millicent Gresham that her sherry glass stays unwashed until she gives the hour; between courses she does: ten past ten, fire high. Nathaniel Yardley, who saw you whisper, bolts for the stables and is dragged back half-frozen and locked in. By midnight Millicent tells the Major you pocket things.",
+   "who": [
+    "C01",
+    "C05",
+    "C03",
+    "C06"
+   ],
+   "where": [
+    "L03"
+   ]
+  },
+  {
+   "id": "N03",
+   "title": "The Rounds Walked Twice",
+   "lines": [
+    "T1",
+    "T2"
+   ],
+   "summary": "Past midnight you rewalk the murder night, counting doors: the quarrel at half past ten, the nephew crossing the yard at twenty to, one light on the back stairs at eleven, so Evangeline's eleven o'clock is a lie. At the nephew's door you show Reginald Fairbrother the candle box one short and threaten to set it before the heir at breakfast unless he gives the hour. He says nothing; before dawn he is at the Major's door.",
+   "who": [
+    "C02"
+   ],
+   "where": [
+    "L01",
+    "L02"
+   ],
+   "must_contain": [
+    {
+     "line": "T2",
+     "text": "What the widow tells you through chattering teeth on the gallery must be this: at eleven, passing the Major's door on her way to the study, she heard Evangeline Davenport's voice inside it, low and pleading, and a man's step; she took it for a scene between the ward and the Major and went on to the study door to listen there instead."
+    }
+   ]
+  },
+  {
+   "id": "N04",
+   "title": "The Thaw",
+   "lines": [
+    "T1"
+   ],
+   "summary": "Eaves drip; the lodge-keeper wades up: a cart by noon. Major Carrington orders the carriage, tells breakfast that Reginald Fairbrother lit the young gentleman up at eleven; Fairbrother stays silent, and Nathaniel Yardley shouts through his door that the old man has turned. The Major bars you the first floor, sends Lavinia Netherby to rake the study grate and Gideon Ashcombe with the body to the ice house, and keeps your rounds for the drawing room.",
+   "who": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C08",
+    "C10"
+   ],
+   "where": [
+    "L03",
+    "L01"
+   ]
+  },
+  {
+   "id": "N05",
+   "title": "The Maid's Apron",
+   "lines": [
+    "T1"
+   ],
+   "summary": "Barred from the first floor, you stop Lavinia Netherby on the back stairs with her empty pail and tell her the valet will name her for the short count unless she brings you the mantel stub and the ash pan unsifted. She comes down white-faced with the stub folded in her apron, two wicks' worth of wax on it. Within the hour Major Carrington turns out your room while Cornelius Ellingham lists what is taken; Lavinia, ash on her apron, is made to confess before the kitchen and given notice.",
+   "who": [
+    "C08",
+    "C01",
+    "C09"
+   ],
+   "where": [
+    "L02",
+    "L04",
+    "L05"
+   ]
+  },
+  {
+   "id": "N06",
+   "title": "A Housekeeper's Reckoning",
+   "lines": [
+    "T1"
+   ],
+   "summary": "Ordered to read the Major's version before the fire, you count the candle box one short instead, say a key in a lock fills a keyhole and you saw the lamp through it, and name aloud Millicent Gresham's sherry, Cordelia Ormsby's hairpin and Gideon Ashcombe's snowy boots. Reginald Fairbrother then says he lit Lucius Carrington up at eleven; the doctor confirms the summons; you say the Major's name, and Nathaniel Yardley and the solicitor take his arms.",
+   "who": [
+    "C01",
+    "C02",
+    "C03",
+    "C05",
+    "C04",
+    "C09",
+    "C07",
+    "C06"
+   ],
+   "where": [
+    "L06"
+   ]
+  },
+  {
+   "id": "N07",
+   "title": "The First Cart",
+   "lines": [
+    "T1"
+   ],
+   "summary": "Lucius Carrington goes down the dripping drive with your timeline, the stub and the key, Cornelius Ellingham beside him to say what will stand. Nathaniel Yardley is master, though Millicent Gresham has returned his ring. Reginald Fairbrother carries forty years down the back stairs in one box and goes without a character; Lavinia Netherby passes you on the stairs without a word. You lock the study with the key the new master has given you.",
+   "who": [
+    "C01",
+    "C09",
+    "C03",
+    "C02",
+    "C08"
+   ],
+   "where": [
+    "L02",
+    "L07",
+    "L01"
+   ],
+   "ending": true
+  }
+ ],
+ "pattern_shifts": [
+  {
+   "state": "carrington_regard",
+   "direction": "up",
+   "at": "N03",
+   "does": "line"
+  }
+ ]
+}
+
+
+--- YOUR PREVIOUS ANSWER WAS REJECTED ---
+A computed check found this wrong with it:
+ - minor node 5 (after N02): its tell at 'm5' does not land at the next major node or within 2 nodes on T1, T2 (it follows N02, which lines T1, T2 share, so its tell must land on all of them); use a major node id or m<k> for the k-th minor node of this answer
+Fix every listed problem in your response. Ensure you apply the required changes rather than repeating the previous answer verbatim. Keep everything else that was valid unchanged.
+Your previous answer:
+{"notes": "The Major's regard gets three clear chances before N03 (the study door, the hour by his watch, the midnight apron) and a warning demonstration of him taking the housekeeper for his instrument, so the pattern shift lands. The valet and Netherby are paced across N03 to N05 where the house turns against you; Gresham and Ormsby each get a private chance early and a public one before the fire at N06, where the kinder word is also the crueller. Three of thirteen opportunities set one person against another; the kitchen at N05 and the stairs at N04 let you do right by Lavinia at no one's cost.", "minor_nodes": [{"after": "N01", "kind": "opportunity", "serves": ["Lucius Carrington (the Major)", "Reginald Fairbrother (the master's valet of forty years)"], "title": "Found at the Study Door", "summary": "The Major straightens from the desk and finds you in the doorway he sent you from. The doctor's back is turned; Fairbrother stands on the back stair with his candle. The yellow stub lies among the white wax, an arm's length from your apron pocket.", "image": "the yellow tallow stub among white wax", "who": ["Lucius Carrington (the Major)", "Reginald Fairbrother (the master's valet of forty years)", "Gideon Ashcombe (the doctor)"], "options": [{"do": "Say you came up about the fire for the doctor, and go down when he points", "effect": "he nods you out as he would a footman, and does not watch you go", "moves": [{"state": "carrington_regard", "direction": "up"}], "active": false}, {"do": "Ask him, in the doctor's hearing, where the key went that fell", "effect": "his hand goes to his pocket and stays there; he tells the doctor the housekeeper is new", "moves": [{"state": "carrington_regard", "direction": "down"}], "active": false}, {"do": "Take the stub into your apron while his back is to you", "effect": "either it is in your pocket before he turns, or Fairbrother's eyes go to your hand and the Major follows them", "moves": [{"state": "fairbrother_faith", "direction": "down"}], "active": true}], "tell": {"at": "m2", "how": "Fairbrother either lights you down the back stairs with his own candle or lets you find the dark; the Major's voice above says 'the housekeeper' or 'that woman'"}}, {"after": "N01", "kind": "demonstration", "serves": ["Reginald Fairbrother (the master's valet of forty years)"], "title": "The Tallow Box Set Straight", "summary": "At the foot of the back stairs Fairbrother sets the tallow box square on its shelf without looking inside, as he must have done ten thousand nights. He has counted it already; you can see that in how he does not count it now.", "image": "the tallow box squared to the edge of its shelf", "who": ["Reginald Fairbrother (the master's valet of forty years)"]}, {"after": "N02", "kind": "opportunity", "serves": ["Lucius Carrington (the Major)"], "title": "The Hour by His Watch", "summary": "The Major lays his watch on the cloth beside the master's empty place and asks you, before the table, whether the clocks were wound that night. Evangeline's eleven o'clock hangs on your answer; the solicitor's pen waits above his paper.", "image": "the Major's watch open on the white cloth", "who": ["Lucius Carrington (the Major)", "Evangeline Davenport (the ward)", "Cornelius Ellingham (the solicitor)"], "options": [{"do": "Say the clocks were wound by your hand and keep to his watch", "effect": "he closes the watch and tells Ellingham the house keeps good time", "moves": [{"state": "carrington_regard", "direction": "up"}], "active": false}, {"do": "Say the hall clock ran a quarter fast that night, before the guests", "effect": "Evangeline's colour goes; the Major asks the solicitor to note that the housekeeper disputes the house's clocks", "moves": [{"state": "carrington_regard", "direction": "down"}], "active": false}], "tell": {"at": "m5", "how": "the Major either hands you the morning's orders for the maids himself or sends them down by the valet with your name left off"}}, {"after": "N02", "kind": "opportunity", "serves": ["Millicent Gresham (the nephew's fianc\u00e9e)", "Lucius Carrington (the Major)"], "title": "The Glass in the Drawer", "summary": "Millicent follows you to the pantry after the cloth is drawn. The sherry glass with its brown ring sits in your drawer. She asks whether it is washed yet. The Major's step is in the passage behind her, slow and coming nearer.", "image": "a brown sherry ring in an unwashed glass", "who": ["Millicent Gresham (the nephew's fianc\u00e9e)", "Lucius Carrington (the Major)"], "options": [{"do": "Wash the glass before her and call ten o'clock a settlement of her father's debts", "effect": "she watches the water take the ring and says nothing, which is thanks", "moves": [{"state": "gresham_confidence", "direction": "up"}], "active": false}, {"do": "Tell her it stays in the drawer while her hour stands", "effect": "she looks at the drawer as if it were a door she cannot lock, and goes", "moves": [{"state": "gresham_confidence", "direction": "down"}], "active": false}, {"do": "Slide the drawer shut as the Major opens the pantry door", "effect": "either it closes before he looks, or it sticks and he sees the glass and Millicent's face together", "moves": [{"state": "gresham_confidence", "direction": "up"}, {"state": "carrington_regard", "direction": "down"}], "active": true}], "tell": {"at": "N03", "how": "on your rounds Millicent's door is bolted against your knock, or stands a hand's breadth open with her candle still lit"}}, {"after": "N02", "kind": "opportunity", "serves": ["Lucius Carrington (the Major)"], "title": "Turn Out Your Apron", "summary": "Past midnight the Major has you to the library. Miss Gresham, he says, believes the housekeeper pockets things. He asks you, as a courtesy, to turn out your apron on the table. The tallow stub is in the left pocket under your keys.", "image": "your keys laid on the library table", "who": ["Lucius Carrington (the Major)"], "options": [{"do": "Empty the apron on the table, stub and all", "effect": "he picks up the stub, looks at it, and puts it in his own pocket with the key", "moves": [{"state": "carrington_regard", "direction": "down"}], "active": false}, {"do": "Say it holds keys and a thimble, and offer the household book instead", "effect": "he takes your word as a servant's word and waves the book away unopened", "moves": [{"state": "carrington_regard", "direction": "up"}], "active": false}, {"do": "Stop at the tallow box on the way and put the stub back before you go in", "effect": "either the apron is empty when he asks, or Fairbrother finds you at his box at midnight and holds his candle to your face", "moves": [{"state": "carrington_regard", "direction": "up"}, {"state": "fairbrother_faith", "direction": "down"}], "active": true}], "tell": {"at": "m5", "how": "the Major either sets your rounds book under his hand on the table or has it fetched from your room by Fairbrother"}}, {"after": "N02", "kind": "demonstration", "serves": ["Lucius Carrington (the Major)"], "title": "My Housekeeper Will Keep the Hours", "summary": "The Major tells the solicitor the housekeeper will keep the hours for him until the thaw, his thumb holding your rounds book open at the murder night. He does not ask you. He has already decided what you are for.", "image": "the Major's thumb holding your rounds book open", "who": ["Lucius Carrington (the Major)", "Cornelius Ellingham (the solicitor)"], "warns": "carrington_regard"}, {"after": "N03", "kind": "revelation", "serves": ["Cordelia Ormsby (the widow)", "Evangeline Davenport (the ward)"], "title": "The Widow on the Gallery", "summary": "Cordelia Ormsby, shawled and shaking, stops you on the gallery. At eleven, passing the Major's door for the study, she heard Evangeline Davenport inside it, low and pleading, and a man's step. She took it for a scene between ward and Major, and went on to listen at the study instead.", "image": "the widow's shawl pulled across her chattering teeth", "who": ["Cordelia Ormsby (the widow)"]}, {"after": "N03", "kind": "opportunity", "serves": ["Cordelia Ormsby (the widow)"], "title": "A Hairpin on the Carpet", "summary": "Her hairpin is in your hand, picked up from the carpet at the study keyhole on your second round. She sees it as she finishes speaking. The gallery is dark but for your candle; no one else is awake to hear what you call it.", "image": "a jet hairpin in your palm by candlelight", "who": ["Cordelia Ormsby (the widow)"], "options": [{"do": "Hand it to her and say it must have fallen at dinner", "effect": "she takes it and says the house is lucky in its housekeeper, and you do not correct her", "moves": [{"state": "ormsby_ease", "direction": "up"}], "active": false}, {"do": "Say you found it at the study keyhole, and keep it", "effect": "she draws her hand back as if the pin were hot, and asks what else you keep", "moves": [{"state": "ormsby_ease", "direction": "down"}], "active": false}, {"do": "Ask her plainly whose window the doctor's snowy boots came from", "effect": "she says she does not understand you, and her voice says she does", "moves": [{"state": "ormsby_ease", "direction": "down"}], "active": false}], "tell": {"at": "m10", "how": "passing you on the gallery before dawn, she either inclines her head to you as to a servant she trusts or draws her shawl across and looks at the wall"}}, {"after": "N03", "kind": "opportunity", "serves": ["Reginald Fairbrother (the master's valet of forty years)"], "title": "Before the Major's Door", "summary": "Before dawn you come upon Fairbrother at the Major's door, candle held low, waiting to be admitted. He has not knocked. He sees you and does not move. Whatever he has come to say, he has not yet said it to anyone.", "image": "Fairbrother's candle guttering outside the Major's door", "who": ["Reginald Fairbrother (the master's valet of forty years)", "Lucius Carrington (the Major)"], "options": [{"do": "Ask him only whether the master rang after eleven, and nothing of whom he lit", "effect": "he says the master did not ring; it is the first answer he has given you", "moves": [{"state": "fairbrother_faith", "direction": "up"}], "active": false}, {"do": "Tell him the heir will hear of the box at breakfast if he goes in", "effect": "he knocks at once, and the door opens on your words", "moves": [{"state": "fairbrother_faith", "direction": "down"}], "active": false}, {"do": "Step past him and knock on the Major's door yourself", "effect": "either the Major opens and Fairbrother must speak before his face, or the door stays shut and the valet walks away from you down the gallery", "moves": [{"state": "fairbrother_faith", "direction": "down"}], "active": true}], "tell": {"at": "m10", "how": "coming out of the Major's door he either holds his candle up to light your way back or snuffs it and leaves you the dark"}}, {"after": "N03", "kind": "demonstration", "serves": ["Reginald Fairbrother (the master's valet of forty years)", "Cordelia Ormsby (the widow)"], "title": "Two Candles Before Dawn", "summary": "Grey comes into the gallery windows. Fairbrother comes out of the Major's door with his candle; the widow passes toward her own. Each of them, in a glance or its absence, has already decided what you are to them before the house is up.", "image": "grey snow light on the gallery carpet", "who": ["Reginald Fairbrother (the master's valet of forty years)", "Cordelia Ormsby (the widow)"]}, {"after": "N04", "kind": "opportunity", "serves": ["Lavinia Netherby (the housemaid)", "Lucius Carrington (the Major)"], "title": "A Word on the Stairs", "summary": "Lavinia stands on the back stairs with her empty pail, sent up to rake the study grate. The first floor is barred to you by the Major's order. She looks down at you for a word; the study door above stands open on a dead man's cold.", "image": "Lavinia's empty pail on the stair", "who": ["Lavinia Netherby (the housemaid)", "Lucius Carrington (the Major)"], "options": [{"do": "Send her down and say you will tell the Major the grate was raked already", "effect": "she goes down white and grateful; the lie is yours to keep if he asks", "moves": [{"state": "netherby_nerve", "direction": "up"}], "active": false}, {"do": "Take the pail and go up past the bar yourself", "effect": "either the grate is raked before anyone comes, or Fairbrother finds you kneeling in the study and the Major is told within the minute", "moves": [{"state": "netherby_nerve", "direction": "up"}, {"state": "carrington_regard", "direction": "down"}], "active": true}, {"do": "Say nothing and let her go up alone", "effect": "she climbs with the pail held against her like a shield and does not look back", "moves": [{"state": "netherby_nerve", "direction": "down"}], "active": false}], "tell": {"at": "N05", "how": "when you stop her on the back stairs she either sets the pail down to listen or keeps hold of it and her eyes on the door below"}}, {"after": "N04", "kind": "opportunity", "serves": ["Millicent Gresham (the nephew's fianc\u00e9e)"], "title": "Tea for the Drawing Room", "summary": "Kept to the drawing room with your rounds, you are sent for tea. Millicent, pouring, asks under the clink of cups whether the Major has seen your drawer. Nathaniel's shouting comes faint through two floors; she does not look toward it.", "image": "a teacup trembling on its saucer", "who": ["Millicent Gresham (the nephew's fianc\u00e9e)"], "options": [{"do": "Say the glass went down the sink last night, whatever else the drawer holds", "effect": "she sets the pot down steady and asks after your sister's health, which she has invented", "moves": [{"state": "gresham_confidence", "direction": "up"}], "active": false}, {"do": "Say the drawer is the Major's to open now, and her hour with it", "effect": "she spills the milk and rings for a cloth you must fetch", "moves": [{"state": "gresham_confidence", "direction": "down"}], "active": false}], "tell": {"at": "N05", "how": "when the Major turns out your room, Millicent is either on the landing pointing him to the drawer or in her own room with the door shut"}}, {"after": "N04", "kind": "demonstration", "serves": ["Reginald Fairbrother (the master's valet of forty years)"], "title": "Two Pairs of Boots", "summary": "Fairbrother sets the Major's boots outside the Major's door and the master's outside the study, blacked and paired, forty years of habit with nobody left in one room to wear them. He stands between the two doors a long moment before he goes down.", "image": "the dead master's blacked boots outside the study", "who": ["Reginald Fairbrother (the master's valet of forty years)"]}, {"after": "N05", "kind": "opportunity", "serves": ["Lavinia Netherby (the housemaid)", "Lucius Carrington (the Major)"], "title": "Confession Before the Kitchen", "summary": "The cook has Lavinia by the wrist at the kitchen table, ash on her apron, the stub gone from your room into the Major's pocket. The Major stands in the door. Lavinia says it was her that took it, and looks at you.", "image": "ash on Lavinia's apron under the cook's hand", "who": ["Lavinia Netherby (the housemaid)", "Lucius Carrington (the Major)"], "options": [{"do": "Say before the kitchen that you sent her up and the stub was yours to ask for", "effect": "the Major writes your name in his book below hers; the cook lets go her wrist", "moves": [{"state": "netherby_nerve", "direction": "up"}, {"state": "carrington_regard", "direction": "down"}], "active": false}, {"do": "Take her into your room and shut the kitchen door on the cook", "effect": "the kitchen talks of you instead for the rest of the day, and she has a chair and a clean apron", "moves": [{"state": "netherby_nerve", "direction": "up"}], "active": false}, {"do": "Say nothing and let the cook finish", "effect": "she is given notice at the table with her apron still on", "moves": [{"state": "netherby_nerve", "direction": "down"}], "active": false}], "tell": {"at": "N06", "how": "as you are taken to the fire, Lavinia at the foot of the back stairs either holds the baize door for you or lets it swing in your face"}}, {"after": "N05", "kind": "opportunity", "serves": ["Cordelia Ormsby (the widow)", "Lucius Carrington (the Major)"], "title": "The Hairpin in the Inventory", "summary": "Ellingham lifts the jet hairpin from your apron pocket and asks, pen raised, whose it is. The Major waits at your door; behind him on the landing Cordelia Ormsby has stopped with her hand on the rail.", "image": "the solicitor's pen stopped above the inventory", "who": ["Cornelius Ellingham (the solicitor)", "Lucius Carrington (the Major)", "Cordelia Ormsby (the widow)"], "options": [{"do": "Say it is a lady's and you could not say whose", "effect": "Ellingham writes 'one hairpin' and the widow's hand leaves the rail", "moves": [{"state": "ormsby_ease", "direction": "up"}], "active": false}, {"do": "Name it Mrs Ormsby's, found at the study keyhole at midnight", "effect": "Ellingham writes it all; the widow goes to the doctor's door and does not come out", "moves": [{"state": "ormsby_ease", "direction": "down"}], "active": false}, {"do": "Say nothing of the pin and hand the Major your rounds book before he finds it", "effect": "he takes the book as if it had always been his and tells Ellingham to list it last", "moves": [{"state": "carrington_regard", "direction": "up"}], "active": false}], "tell": {"at": "N06", "how": "before the fire Cordelia sits beside the doctor or across the room from him, and the Major either hands you the paper to read or has Ellingham read it over your head"}}, {"after": "N06", "kind": "opportunity", "serves": ["Millicent Gresham (the nephew's fianc\u00e9e)"], "title": "Begging or Settlement", "summary": "You have said the sherry aloud. Nathaniel has turned from the Major's arm to look at Millicent. The room waits for you to say what the glass was for. She does not look at you; she looks at the fire, which is high, as it was at ten.", "image": "the fire built high as it was at ten", "who": ["Millicent Gresham (the nephew's fianc\u00e9e)", "Nathaniel Yardley (the master's nephew and heir)"], "options": [{"do": "Call it a settlement of her father's debts, asked for plainly", "effect": "Nathaniel's face closes but does not break; she keeps her chin level", "moves": [{"state": "gresham_confidence", "direction": "up"}], "active": false}, {"do": "Call it begging over a glass", "effect": "she stands as if struck and Nathaniel does not go to her", "moves": [{"state": "gresham_confidence", "direction": "down"}], "active": false}], "tell": {"at": "N07", "how": "on the stairs with the ring returned she either passes you with her chin up and says nothing to Nathaniel of why, or stops to tell the solicitor what the housekeeper kept in her drawer"}}, {"after": "N06", "kind": "opportunity", "serves": ["Cordelia Ormsby (the widow)"], "title": "Who Else Knelt There", "summary": "The doctor, having confirmed the summons, asks you as a servant whether anyone else was at that keyhole at midnight. Cordelia's hairpin lies on the table in a labelled paper. He does not look at her; he is asking you.", "image": "the hairpin in a paper labelled in the solicitor's hand", "who": ["Gideon Ashcombe (the doctor)", "Cordelia Ormsby (the widow)"], "options": [{"do": "Say the gallery was empty at midnight as far as you saw", "effect": "the doctor nods and signs; the widow's breath goes out slowly", "moves": [{"state": "ormsby_ease", "direction": "up"}], "active": false}, {"do": "Say Mrs Ormsby knelt there at midnight and went to the doctor's door after", "effect": "the doctor signs anyway, and does not offer her his arm until the carriage", "moves": [{"state": "ormsby_ease", "direction": "down"}], "active": false}], "tell": {"at": "N07", "how": "leaving on the doctor's arm she either passes the magistrate's man in silence or stops to mention, in passing, the housekeeper's apron"}}, {"after": "N06", "kind": "opportunity", "serves": ["Reginald Fairbrother (the master's valet of forty years)"], "title": "Leaving Him the Word", "summary": "The candle box is counted and the keyhole said. Fairbrother stands by the door with his hands at his sides. The Major has not looked at him. There is a silence long enough for a man to decide what forty years were for, if nobody fills it.", "image": "Fairbrother's hands held still at his sides", "who": ["Reginald Fairbrother (the master's valet of forty years)", "Lucius Carrington (the Major)"], "options": [{"do": "Say nothing, and let the silence stand until he fills it", "effect": "he says it to the room in his own words, that he lit the Major up at eleven", "moves": [{"state": "fairbrother_faith", "direction": "up"}], "active": false}, {"do": "Say that Fairbrother lit the Major up at eleven, and tell him to confirm it", "effect": "he says 'yes' to the carpet, and the room hears your word, not his", "moves": [{"state": "fairbrother_faith", "direction": "down"}], "active": false}], "tell": {"at": "N07", "how": "at the foot of the back stairs he either sets your candle box square on its shelf before he goes or leaves it as he finds it"}}, {"after": "N07", "kind": "resolution", "serves": ["Reginald Fairbrother (the master's valet of forty years)", "Lavinia Netherby (the housemaid)"], "title": "The Back Stairs Emptied", "summary": "The first cart takes the valet and the housemaid together, his one box and hers. The back stairs you climbed twice are quiet now; whether the tallow box is squared on its shelf, and what the carter is told, is all the house will say of them.", "image": "two boxes roped on the cart's tail", "who": ["Reginald Fairbrother (the master's valet of forty years)", "Lavinia Netherby (the housemaid)"]}, {"after": "N07", "kind": "resolution", "serves": ["Lucius Carrington (the Major)", "Millicent Gresham (the nephew's fianc\u00e9e)", "Cordelia Ormsby (the widow)"], "title": "The Key in Your Hand", "summary": "The carriage is gone down the thawing drive. You stand at the study door with the new master's key and an apron with nothing in it. You collected for two days; you spoke once; the house is quieter by four people, and the master's name went with them.", "image": "the study key warm from the new master's hand", "who": ["Nathaniel Yardley (the master's nephew and heir)"]}]}

@@ -1,0 +1,126 @@
+{
+  "in_genre_works": [
+    {
+      "title": "The Mousetrap",
+      "creator": "Agatha Christie",
+      "tradition": "stage whodunit",
+      "core_dynamic": "Snow seals a guesthouse while the telephone line goes dead, so the murderer must be among the people warming themselves at the same fire."
+    },
+    {
+      "title": "The Hollow",
+      "creator": "Agatha Christie",
+      "tradition": "country-house mystery novel",
+      "core_dynamic": "The wife is found standing over her dying husband holding a revolver, but the gun in her hand is not the gun that shot him."
+    },
+    {
+      "title": "The Mystery of the Yellow Room",
+      "creator": "Gaston Leroux",
+      "tradition": "locked-room novel",
+      "core_dynamic": "A victim screams inside a bolted room with barred windows, and the solution hinges on when the wounds were actually inflicted versus when the cries were heard."
+    },
+    {
+      "title": "The Hollow Man (The Three Coffins)",
+      "creator": "John Dickson Carr",
+      "tradition": "locked-room novel",
+      "core_dynamic": "Fresh snow outside shows no footprints leaving the house, forcing every witness's account of the clock to be re-timed against the moment the snowfall stopped."
+    },
+    {
+      "title": "Gosford Park",
+      "creator": "Robert Altman",
+      "tradition": "country-house film",
+      "core_dynamic": "Servants below stairs see every guest's movement through doors, trays, and bells, while the victim is both poisoned and stabbed by two different hands."
+    },
+    {
+      "title": "The Moonstone",
+      "creator": "Wilkie Collins",
+      "tradition": "Victorian sensation novel",
+      "core_dynamic": "A smear of wet paint on a nightgown fixes exactly who passed through a doorway during the night, and the house steward narrates what he physically witnessed."
+    },
+    {
+      "title": "The Nine Tailors",
+      "creator": "Dorothy L. Sayers",
+      "tradition": "golden-age mystery novel",
+      "core_dynamic": "A corpse with no apparent wound is explained by the physical force of church bells rung through a long winter night."
+    },
+    {
+      "title": "Busman's Honeymoon",
+      "creator": "Dorothy L. Sayers",
+      "tradition": "country-house mystery",
+      "core_dynamic": "A hanging cactus pot and a wireless aerial form a mechanical trap in the house itself, so the killer never needed to be present."
+    },
+    {
+      "title": "Dead Man's Folly",
+      "creator": "Agatha Christie",
+      "tradition": "estate mystery",
+      "core_dynamic": "A servant's lie about a trivial domestic chore is the single sincere clue amid a house full of guests performing roles they are not entitled to."
+    },
+    {
+      "title": "The Lady Vanishes",
+      "creator": "Alfred Hitchcock",
+      "tradition": "enclosed-space suspense",
+      "core_dynamic": "Every passenger denies ever seeing a woman the heroine spoke with, until a name written in breath-fog on a window proves her memory right."
+    }
+  ],
+  "fusion_works": [
+    {
+      "title": "The Thing",
+      "creator": "John Carpenter",
+      "orthogonal_genre": "Antarctic horror",
+      "parallel_pressure": "Snowbound men test each other's blood over a flame because anyone in the room could be the killer wearing a familiar face."
+    },
+    {
+      "title": "Twelve Angry Men",
+      "creator": "Reginald Rose",
+      "orthogonal_genre": "jury chamber drama",
+      "parallel_pressure": "Locked in a hot room, people reconstruct a crime by physically re-enacting how long it takes to walk across a floor and open a door."
+    },
+    {
+      "title": "Rashomon",
+      "creator": "Akira Kurosawa",
+      "orthogonal_genre": "period drama",
+      "parallel_pressure": "Four eyewitnesses to one death give contradictory accounts, each shaped by what they are ashamed of rather than what they saw."
+    },
+    {
+      "title": "The Hateful Eight",
+      "creator": "Quentin Tarantino",
+      "orthogonal_genre": "Western",
+      "parallel_pressure": "A blizzard traps strangers in a single haberdashery with a poisoned coffee pot, and the door must be nailed shut each time it is opened."
+    },
+    {
+      "title": "The Remains of the Day",
+      "creator": "Kazuo Ishiguro",
+      "orthogonal_genre": "literary servant memoir",
+      "parallel_pressure": "A head servant notices everything in the house yet is bound by station to speak none of it aloud."
+    },
+    {
+      "title": "Alive",
+      "creator": "Piers Paul Read",
+      "orthogonal_genre": "survival account",
+      "parallel_pressure": "Snow-isolated survivors must decide within days whom to trust with scarce resources while rescue is impossible."
+    },
+    {
+      "title": "Dead Calm",
+      "creator": "Charles Williams",
+      "orthogonal_genre": "maritime thriller",
+      "parallel_pressure": "A couple on a becalmed boat realize their rescued guest's story cannot be true, and there is nowhere to go to escape him."
+    },
+    {
+      "title": "The Dumb Waiter",
+      "creator": "Harold Pinter",
+      "orthogonal_genre": "absurdist theatre",
+      "parallel_pressure": "Two men in a basement receive orders down a food lift and must deduce from objects what is happening upstairs."
+    },
+    {
+      "title": "Cube",
+      "creator": "Vincenzo Natali",
+      "orthogonal_genre": "science-fiction thriller",
+      "parallel_pressure": "Strangers in a sealed structure discover each possesses one skill needed to escape, while one of them is sabotaging the group."
+    },
+    {
+      "title": "Festen (The Celebration)",
+      "creator": "Thomas Vinterberg",
+      "orthogonal_genre": "family drama",
+      "parallel_pressure": "At a father's birthday dinner a son stands up and speaks an unspoken truth, and the guests must choose whether to stay seated."
+    }
+  ]
+}

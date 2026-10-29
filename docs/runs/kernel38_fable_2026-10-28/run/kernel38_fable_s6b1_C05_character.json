@@ -1,0 +1,229 @@
+{
+  "notes": "Millicent's confidence shows in where her eyes go: your hands and apron pockets when she doubts you, the room when she does not, and the ring on her finger, which she turns when she is counting what it cost. The topic the story turns on is the sherry glass and what she was doing in the study at ten past ten, which she would rather have called murder than begging.",
+  "history": "Millicent Gresham came to the house engaged to the nephew with a settlement her family thinks handsome and Nathaniel's creditors think thin. At ten past ten on the night the master died she went to his study alone, drank a glass of his sherry to steady herself, and asked him to pay Nathaniel's debts; he refused, and she left the glass on his desk with her colour on the rim. The next morning she found the new housekeeper and asked her, as one woman to another, to wash it and say nothing.",
+  "description": [
+    {
+      "state": "gresham_confidence",
+      "direction": "up",
+      "after": null,
+      "text": "She has stopped watching your hands. When you come in with the tray she goes on talking to whoever is nearest and takes her cup without looking at it, and the ring sits on her finger the right way round."
+    },
+    {
+      "state": "gresham_confidence",
+      "direction": "down",
+      "after": null,
+      "text": "She sits where she can see the pantry door and the pockets of your apron, and whenever you cross the room she finds something to say to the Major. The ring has been turned stone-inward, as it is when she is counting."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": "T2N03",
+      "text": "She stands very straight with her hands empty, the colour gone from her mouth and nothing left of the bright voice she used for the table. Her eyes pass over you the way they pass over the hall stand."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": null,
+      "text": "Three-and-twenty, dark hair dressed plainly for a country house, a small sapphire on her left hand that she touches more than she knows. Her mouth is coloured a shade darker than is quite proper, and she speaks to the room in bright full sentences and to you not at all."
+    }
+  ],
+  "here": [
+    {
+      "state": "gresham_confidence",
+      "direction": "down",
+      "after": null,
+      "text": "Millicent Gresham is at the Major's elbow, bright and talking, with one eye on your apron."
+    },
+    {
+      "state": "gresham_confidence",
+      "direction": "up",
+      "after": null,
+      "text": "Millicent Gresham has her hands folded in her lap and her face turned to the company, and does not look round when you come in."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": null,
+      "text": "Millicent Gresham sits with her ring turned inward and watches whatever is in your hands."
+    }
+  ],
+  "topics": [
+    {
+      "label": "the sherry glass",
+      "known_after": null,
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'I shan't ask you again. I know what I asked and I know what it was to ask it.' Low, with a glance at the door. 'Only tell me it is not still sitting where anyone might open a drawer.'"
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "'A glass is a glass, Mrs. Hale, and a housekeeper who keeps one in her drawer rather than her cupboard will be asked why.' Her voice is bright enough to carry. 'I have said as much to the Major.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Is it washed?' Under her breath, while she holds out her cup for more. 'I asked you as a woman, not as the mistress of a house I am not yet mistress of. I should like to know what that bought.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the study at ten",
+      "known_after": null,
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'Ten past, by the clock on his mantel. The fire was high; he had just had it made up.' She looks at the fire. 'I was there a quarter of an hour and he was alive and perfectly disagreeable when I left him.'"
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "'I was in my room at ten with a headache. I have said so to the Major and I shall say so to the magistrate.' She lifts her chin. 'Whatever you think you saw on the back stairs was a maid.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'If I was in the study at ten it was on a matter of settlement, which is a private thing between a family and the man at its head.' Quick and low. 'It has nothing to do with eleven o'clock and I will thank you to keep the two apart.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "Mr. Yardley",
+      "known_after": null,
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'He thinks I came down here to be looked over, like a horse. He has no idea.' A short breath that is not a laugh. 'I should like it kept that way, even now.'"
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "'Mr. Yardley is engaged to me and locked in his room, and both of those are the house's business and neither is yours.' Bright, for the room. 'You might see that his fire is kept in.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'He saw you whisper to me at dinner. He will think it was about him; he thinks most things are.' She turns the ring. 'He ran for the stables because of it, you know. He does not run from the things he ought to.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "Mr. Yardley's debts",
+      "known_after": "N02",
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'Four thousand, and his uncle knew it to the shilling. I went in to ask whether a man could let his heir go to the moneylenders in the month of his marriage.' Her mouth tightens. 'He could, it seems. He said so with the decanter in his hand.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I do not discuss Mr. Yardley's affairs with the servants, and I did not go to the study to beg.' Her colour rises. 'Say settlement if you must say anything. I would rather they thought me capable of the other thing than of that.'"
+        }
+      ],
+      "moves": [
+        {
+          "state": "gresham_confidence",
+          "direction": "down"
+        }
+      ]
+    },
+    {
+      "label": "Major Carrington",
+      "known_after": null,
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'He has been very proper. He speaks to me as if I had already lost something, which I suppose I have.' A glance toward the library. 'I do not like how quickly he has decided whose hour it was.'"
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "'The Major is the only gentleman in this house with his wits about him, and he listens when a lady tells him a servant is not what she seems.' She does not lower her voice. 'I have found him most attentive.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'He asks a great many questions about where everyone was and answers none about himself, which is a gentleman's privilege, I am told.' She says it lightly. 'He has his watch out at every meal. I had not thought him so fond of it.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "what she told the Major",
+      "known_after": "N02c",
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'I told him you pocket things. I did it because you whispered to me where Nathaniel could see, and I had to put something between you and me before he looked harder.' She does not apologise. 'I am telling you now so that you know it was not malice. It was arithmetic.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I told him what any lady would tell him of a housekeeper who keeps a guest's glass in her drawer instead of the scullery.' She looks straight past you. 'If your apron had nothing in it, no harm was done.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the master",
+      "known_after": null,
+      "says": [
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "'He poured me the sherry himself and watched me drink it as if that were the whole of what he owed me.' Her voice goes flat. 'I did not like him. I did not want him dead; I wanted him to open his cheque-book, which is a different thing.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A hard man with his money and a careless one with his nephew. I had not met him above three times before this week.' Bright, for the room. 'I understand the house was always kept very well under him.'"
+        }
+      ],
+      "moves": []
+    }
+  ],
+  "portrait": {
+    "composition": "Medium bust portrait, three-quarter angle, seated upright with hands folded over her left hand so the ring is half hidden, face turned slightly toward an unseen company and eyes cut sideways toward the viewer",
+    "subjects": [
+      "Millicent Gresham, the nephew's fiancée",
+      "Twenty-three years old",
+      "Slight, straight-backed build with a long neck",
+      "Dark hair dressed smooth and low with a centre parting",
+      "Pale, composed face with a mouth coloured a shade too dark for a country dinner, lips pressed",
+      "Small sapphire engagement ring turned stone-inward on the left hand",
+      "Sideways, watchful gaze, assessing rather than frightened"
+    ],
+    "environment": "Dove-grey silk evening dress with a high lace collar and jet buttons, a black velvet ribbon at the throat, a fine cashmere shawl slipping from one shoulder, no other jewellery; narrow upright silhouette against a tall grey window",
+    "palette_mood": "Dove grey, jet black, cold white snow-light from the left, one warm amber edge from a low fire on the right side of her face, a single dark wine-red accent at the mouth; composed, guarded, calculating",
+    "prompt_summary": "Atmospheric Victorian concept illustration, medium bust portrait of a slight 23-year-old dark-haired woman in dove-grey silk with high lace collar and black velvet throat ribbon, hands folded over a small sapphire ring, mouth coloured a shade too dark, sideways watchful gaze, cold grey snow-light from a tall window on one side and low amber firelight on the other, country-house drawing room, muted grey and jet palette with a single wine-red accent, guarded composed expression"
+  }
+}

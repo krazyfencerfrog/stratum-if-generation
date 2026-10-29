@@ -1,0 +1,280 @@
+SYSTEM PROMPT
+
+You are step 6b2 of an interactive fiction generation pipeline: you build
+ONE location of a story as rooms for the engine. The engine is room-based:
+the player moves between rooms, examines what is in them, takes some of it,
+uses it. A location becomes one to four rooms (rooms_wanted gives the
+number to aim for).
+
+For each room:
+ - name: what the menu calls it ("the control booth").
+ - description: its PERMANENT base text, three or four sentences: what the
+   place is, its fixtures, its smell, its light. Name only what never
+   changes: something that breaks, opens, burns or is taken during the story
+   does not go in the base text (a later step writes how the room is in each
+   scene). Make it particular to this story, not a generic room.
+ - frame: the room's permanent visual environmental plate for multimodal rendering and spatial grounding:
+   * composition: camera angle, framing, focal depth, vantage point (e.g. "Low-angle eye level looking down the narrow wooden companionway toward the aft hatch")
+   * subjects: list of prominent physical fixtures or focal structures in this room
+   * environment: lighting sources, architectural volume, materials, ambient air/weather
+   * palette_mood: dominant color swatches and atmospheric tone
+   * prompt_summary: dense prompt for multimodal image generation (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
+ - exits between this location's rooms:
+   - label: concise menu action ("through the heavy door", "into the booth").
+   - back_label: menu action in reverse ("into the studio", "out to the corridor").
+   - text / back_text: transitional prose describing the crossing.
+     * When there is a physical threshold, barrier, or distinct portal (a heavy door, a hatch, a ladder, a dark passage, elevation change): exactly ONE concise sentence (10-25 words) describing the physical act or sensation of crossing (the sound of the latch, ducking under pipes, the temperature shift, footing on the rungs).
+     * EMBODIMENT INVARIANT: If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET), crossings are sensor routing, camera switching, or telemetry shifts, NEVER human bipedal locomotion ("your feet", "step down", "walk into", "climb").
+     * NEVER describe what is inside the destination room and NEVER repeat the destination room's name (the room description immediately follows).
+     * For a simple open doorway, adjoining alcove, or unobstructed space with no threshold: use null. Never invent filler ("You make your way to...").
+   - one_way: optional boolean (default false). Internal location exits are bidirectional by default; set to true ONLY for physical one-way barriers (a chute, steep drop, or locked one-way gate). Every room in the location must remain reachable from and have a path back to the starting room.
+
+Build only THIS location. other_locations are built separately and
+rooms_already_built exist: never make a room with one of those names. A
+location that is itself one room-sized space (a cabin, a wheelhouse, a
+booth) is one room, whatever rooms_wanted says.
+things_already_made exist in other rooms: never make a second one with one
+of those names (a scene here that needs it has it carried in). The
+people_here are people, never objects.
+
+Objects: four to eight examinable things per room.
+ - Every object the scenes' moments use must exist where the moments need
+   it (read the node summaries: the kettle a scene uses, the bar someone
+   counts along, the drawer something is found in). Mark these story: true.
+ - Two or three per room matter to the story; the rest say something about a
+   person or the place's history (the old host's mug nobody uses; the burn
+   on the desk), never pure inventory.
+ - portable: true only for what someone could pick up and carry off.
+ - Each has a description: what the player sees when they examine it, one
+   or two sentences, with one detail that rewards looking.
+ - Stakes live in things that can break, burn, be carried off or fought
+   over. Paper (a ledger, a form) only where the story is about it.
+ - Material culture: when material_culture is provided in the packet (containers,
+   fixtures, tools), draw from that specific palette. Avoid cliché IF staging props
+   (leather-bound journal, dusty ledger, ornate brass key, rusted iron key,
+   cracked mirror, flickering candle, half-empty bottle of whiskey).
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two sentences: how the rooms divide the location, and what the player will want to look at>",
+  "rooms": [{"name": "<room>", "description": "<permanent base text>",
+             "frame": {"composition": "<camera perspective>", "subjects": ["<focal fixture>"],
+                       "environment": "<lighting, materials>", "palette_mood": "<colors, mood>",
+                       "prompt_summary": "<dense multimodal prompt>"}}],
+  "exits": [{"from": "<room>", "to": "<room>", "label": "<from -> to>", "back_label": "<to -> from>",
+             "text": "<one concise sentence for physical threshold transit, or null if open doorway>",
+             "back_text": "<one concise sentence for return transit, or null if open doorway>",
+             "one_way": false}],
+  "objects": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": false, "story": false}]
+}
+
+EXAMPLE (a late-night radio phone-in story, the station building; for shape only)
+
+{
+  "notes": "The studio and the booth face each other through the glass; the corridor is where the people who are not on air wait. The call board and the old host's mug are what the player will keep coming back to.",
+  "rooms": [
+    {"name": "the studio", "description": "A box of grey foam and brown carpet with one microphone on a jointed arm and a chair that has been reupholstered twice. The clock over the glass is three minutes fast and has been for years. The air smells of hot dust from the valves in the old desk.",
+     "frame": {"composition": "Medium eye-level shot framed behind the desk microphone toward the soundproof glass",
+               "subjects": ["Ribbon microphone on articulated arm", "Reupholstered studio chair", "Fast wall clock over glass"],
+               "environment": "Dim acoustic studio, hot amber glow from tube equipment, brown sound-baffle foam",
+               "palette_mood": "Warm sepia, dark charcoal grey, valve-amber; dry, quiet, insular",
+               "prompt_summary": "16-bit retro pixel art, soundproof radio studio interior with vintage microphone, tube desk glow, brown foam walls, clock above glass"}},
+    {"name": "the control booth", "description": "Narrower than the studio, all faders and coloured lights, with a window onto the studio and another onto the car park. A call board of twelve white bulbs sits above the desk. The heater under it ticks.",
+     "frame": {"composition": "Tight interior view angled across the fader console toward the dark studio window",
+               "subjects": ["Mixing console with illuminated VU meters", "Call board with twelve bulbs", "Ticking baseboard heater"],
+               "environment": "Cold blue car park light through the small window, harsh colored LED cues on the board",
+               "palette_mood": "Deep navy, harsh bulb white, amber cue indicators; tense, technical, cramped",
+               "prompt_summary": "16-bit retro pixel art, cramped broadcast control booth with glowing fader board, illuminated telephone switchboard, rain against car park window"}},
+    {"name": "the corridor", "description": "Strip lights, framed gold records from the station's one good decade, and a vending machine that hums in E flat. The floor is worn pale outside the studio door from people waiting.",
+     "frame": {"composition": "Long symmetrical hallway view looking toward the studio's red cue light door",
+               "subjects": ["Framed gold records on wood veneer walls", "Humming vending machine", "Worn linoleum threshold"],
+               "environment": "Harsh fluorescent overhead strip lighting, greenish flicker, institutional linoleum",
+               "palette_mood": "Sickly greenish-yellow fluorescent, faded woodgrain, brass reflection; fatigued, stagnant",
+               "prompt_summary": "16-bit retro pixel art, fluorescent-lit late night radio station hallway, framed gold records on walls, humming vending machine"}}],
+  "exits": [
+    {"from": "the studio", "to": "the corridor", "label": "out through the heavy door", "back_label": "into the studio",
+     "text": "The heavy soundproof door thuds shut behind you, cutting off the hot dust of the booth.",
+     "back_text": "You pull the soundproof door open and step back into the dry warmth of the studio."},
+    {"from": "the corridor", "to": "the control booth", "label": "into the booth", "back_label": "out to the corridor",
+     "text": "You push through the low booth door, amber cue lights immediately at your elbows.",
+     "back_text": "You duck back out into the strip-lit corridor."}
+  ],
+  "objects": [
+    {"name": "the microphone", "room": "the studio", "description": "A big ribbon microphone with a sock of grey foam, worn through where twenty years of hosts leaned in.", "portable": false, "story": true},
+    {"name": "the old host's mug", "room": "the studio", "description": "A chipped mug with a cartoon of a moon on it, still on the shelf, a ring of something brown dried in the bottom. Nobody has moved it.", "portable": true, "story": false},
+    {"name": "the clock", "room": "the studio", "description": "Three minutes fast. Someone has written 'IT'S NOT' on a strip of tape under it.", "portable": false, "story": false},
+    {"name": "the cue light", "room": "the studio", "description": "A red bulb in a wire cage. When it is lit, you are on air, whatever you are saying.", "portable": false, "story": true},
+    {"name": "the call board", "room": "the control booth", "description": "Twelve white bulbs; one has been unscrewed and left on the desk beside it, the line it belongs to dark.", "portable": false, "story": true},
+    {"name": "the reject switch", "room": "the control booth", "description": "A red toggle under a flip-up cover, the cover's hinge polished from use.", "portable": false, "story": true},
+    {"name": "the station phone", "room": "the control booth", "description": "A beige handset with the manager's extension taped to it in Dana's capitals.", "portable": false, "story": false},
+    {"name": "the gold records", "room": "the corridor", "description": "Six frames from 1987 to 1991. In the last one the glass is cracked across a face somebody has scratched out.", "portable": false, "story": false}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS LOCATION (its sketch, the rooms wanted, the scenes that use it with their nodes, the people who are here):
+{
+ "location": {
+  "name": "the ice house",
+  "kind": "the brick ice store across the drifted yard where the body is laid",
+  "why": "the one place the doctor can be spoken to away from the Major, at the cost of leaving the study to the maids"
+ },
+ "rooms_wanted": 1,
+ "other_locations": [
+  "the first-floor gallery",
+  "the back stairs",
+  "the dining room",
+  "the housekeeper's room",
+  "the servants' hall",
+  "the drawing room",
+  "the master's study",
+  "the library"
+ ],
+ "rooms_already_built": [
+  "the stair head",
+  "the gallery",
+  "the study end",
+  "the stair foot",
+  "the back stair",
+  "the dining room",
+  "the serving pantry",
+  "the housekeeper's room",
+  "the servants' hall",
+  "the drawing room",
+  "the front hall",
+  "the study"
+ ],
+ "things_already_made": [
+  "the Major's door",
+  "the Turkey runner",
+  "the account book",
+  "the area window",
+  "the baize door",
+  "the bare boards",
+  "the barometer",
+  "the barred window",
+  "the bell board",
+  "the bell rope",
+  "the bell wires",
+  "the bracket lamp",
+  "the candle streak",
+  "the card salver",
+  "the carving set",
+  "the case of waxwings",
+  "the chimneypiece",
+  "the cloth",
+  "the coal scuttle",
+  "the coat stand",
+  "the cook's chair",
+  "the deal desk",
+  "the dinner gong",
+  "the dog-leg turn",
+  "the double doors",
+  "the dresser",
+  "the end window",
+  "the estate map",
+  "the fender",
+  "the fire bucket",
+  "the front door",
+  "the front step",
+  "the gallery rail",
+  "the gallery windows",
+  "the glass cloths",
+  "the grate",
+  "the half-landing window",
+  "the hall chair",
+  "the hanging lantern",
+  "the hearth",
+  "the housekeeper's drawer",
+  "the inside lock",
+  "the iron bed",
+  "the jib door",
+  "the key board",
+  "the lead sink",
+  "the linen press",
+  "the long table",
+  "the loose tread",
+  "the lower flight",
+  "the mantel clock",
+  "the master's bell",
+  "the master's chair",
+  "the moderator lamp",
+  "the nephew's door",
+  "the newel post",
+  "the north windows",
+  "the old housekeeper's bonnet",
+  "the pail hook",
+  "the plate-warmer",
+  "the portrait",
+  "the reading lamp",
+  "the rope rail",
+  "the rules board",
+  "the sconces",
+  "the service door",
+  "the shelf",
+  "the sherry glass",
+  "the sideboard",
+  "the smoke mark",
+  "the sofa table",
+  "the stair-rods",
+  "the stove",
+  "the study door",
+  "the tallow box",
+  "the tallow drip",
+  "the tantalus",
+  "the tray",
+  "the tureen",
+  "the wages book",
+  "the widow's door",
+  "the window seat",
+  "the work basket",
+  "the writing table",
+  "your box"
+ ],
+ "scenes": [
+  {
+   "scene": "S_T2N02",
+   "title": "The Doctor's Snow",
+   "lines": [
+    "T2"
+   ],
+   "nodes": [
+    {
+     "id": "T2N02",
+     "kind": "major",
+     "summary": "You leave the maids to the study and wade to the ice house, where Gideon Ashcombe lays out the body. You tell him whose boots tracked snow into the gun room, and from whose window; he states before Cornelius Ellingham that the master knew he was dying and had sent for his oldest friend. Indoors the grate is relit, the stub gone with the ash, and Lavinia Netherby telling the kitchen you deserted her."
+    },
+    {
+     "id": "T2N02a",
+     "kind": "opportunity",
+     "summary": "The doctor straightens from the body and asks, in the same flat voice he uses for weather, whether the lady whose window it was knew whose boots went out of it. Ellingham's pen waits. The Major's boots stand in the gun room still, the snow line dried white on the leather."
+    },
+    {
+     "id": "T2N02b",
+     "kind": "opportunity",
+     "summary": "You come in from the snow to find Lavinia at the kitchen table telling the cook you left her to the study alone, and that the Major has been asking what went out of the grate. Her hands are grey with ash to the wrist. The kitchen goes quiet when it sees you."
+    },
+    {
+     "id": "T2N02c",
+     "kind": "demonstration",
+     "summary": "Fairbrother has laid the drawing room for the hearing without being told: the master's chair drawn to the fire for the Major, the sherry decanter gone from the sideboard, Lavinia sent in with the lamps. Forty years of service, turned in an afternoon toward whoever sits at the head."
+    }
+   ]
+  }
+ ],
+ "people_here": [
+  "Cornelius Ellingham (the solicitor)",
+  "Gideon Ashcombe (the doctor)",
+  "Lavinia Netherby (the housemaid)",
+  "Reginald Fairbrother (the master's valet of forty years)"
+ ]
+}

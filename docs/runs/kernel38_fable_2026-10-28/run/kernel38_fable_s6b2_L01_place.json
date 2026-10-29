@@ -1,0 +1,210 @@
+{
+  "notes": "The gallery divides into the head of the main stair where the house comes up and watches, the long run of guests' doors where every hour must be fixed, and the narrow study end past the arch where the door came down and the linen press hides the servants' way to the back stairs. The player will keep returning to the keyhole, the bare boards beneath it, the sconces that tell wax from tallow, and the three doors whose owners lie about when they closed.",
+  "rooms": [
+    {
+      "name": "the stair head",
+      "description": "The main stair arrives here under a tall window of leaded glass, its half-landing a dozen steps below where the turn makes a place to stop and be seen stopping. A carved newel post stands at the top like a sentry, and the balustrade runs on into the gallery, its rail polished by a century of hands and by yours with a cloth each morning. A brass oil lamp burns on a bracket by day as by night, since the snow light comes grey and gives nothing. The air smells of lamp oil, cold plaster and the wet wool of people who have been outside.",
+      "frame": {
+        "composition": "Eye-level shot from the top step looking across the newel post and down toward the half-landing window",
+        "subjects": [
+          "Carved oak newel post",
+          "Polished balustrade rail curving into the gallery",
+          "Tall leaded half-landing window with snow against the panes",
+          "Brass oil lamp on a wall bracket"
+        ],
+        "environment": "Flat grey snow light through leaded glass, a single warm oil lamp, dark oak stair, Turkey carpet held by brass rods",
+        "palette_mood": "Grey-white window glare, oak brown, dull brass, one spot of lamp amber; hushed, watchful, cold",
+        "prompt_summary": "Atmospheric concept illustration, Victorian country house staircase head, carved oak newel post and balustrade, tall leaded window filled with snow light, brass oil lamp on bracket, Turkey stair carpet with brass rods, cold grey morning"
+      }
+    },
+    {
+      "name": "the gallery",
+      "description": "A long landing panelled in dark oak, a Turkey runner down its centre and seven bedroom doors along the inner wall, each with a brass number plate and a china finger-plate. Three windows on the outer wall look over the stable yard and the drive, and at night the gallery is lit only by wax candles in brass sconces between the doors. A glass case of stuffed waxwings stands between the second and third windows. It smells of beeswax polish, candle smoke and the damp that comes in at the window frames.",
+      "frame": {
+        "composition": "Long low-angle view down the gallery's length, the runner leading the eye past the row of doors to the arch at the far end",
+        "subjects": [
+          "Row of seven panelled bedroom doors with brass plates",
+          "Turkey runner down dark oak boards",
+          "Three tall sash windows with snow light",
+          "Brass candle sconces between the doors",
+          "Glass case of stuffed waxwings"
+        ],
+        "environment": "Grey diffused daylight from the outer wall, dark oak panelling absorbing it, candle sconces unlit by day, cold draughts at the sashes",
+        "palette_mood": "Oak black-brown, red and ochre runner, grey-white window light, tarnished brass; formal, hushed, suspicious",
+        "prompt_summary": "Atmospheric concept illustration, long Victorian first-floor gallery, dark oak panelling, seven closed bedroom doors in a row, red Turkey runner, tall sash windows showing snowbound yard, brass candle sconces, glass case of stuffed birds, grey winter light"
+      }
+    },
+    {
+      "name": "the study end",
+      "description": "Past a plaster arch the gallery narrows to a short passage ending at the study door, where the runner stops a yard short and leaves bare boards. A tall mahogany linen press stands against the inner wall, and the gap behind it is the servants' way to the back stairs, a baize-covered door that nobody above stairs is supposed to know about. A leather fire bucket hangs on a hook by the arch. The end window is small and the eaves run close above it, so the sound here is always the roof: snow settling, or water.",
+      "frame": {
+        "composition": "Tight eye-level view through the plaster arch toward the study door at the passage's end, linen press looming on the left",
+        "subjects": [
+          "Oak study door with brass escutcheon and keyhole",
+          "Bare floorboards where the runner ends",
+          "Tall mahogany linen press",
+          "Leather fire bucket on a hook",
+          "Small end window under the eaves"
+        ],
+        "environment": "Dim, narrow volume, thin grey light from the small end window, mahogany and oak surfaces, cold draught from behind the press",
+        "palette_mood": "Near-black mahogany, pale board, grey window square, worn brass; close, airless, expectant",
+        "prompt_summary": "Atmospheric concept illustration, narrow end of a Victorian gallery passage, heavy oak study door with brass keyhole at the end, bare floorboards before it, tall mahogany linen press, leather fire bucket on hook, small window under dripping eaves, dim grey light"
+      }
+    }
+  ],
+  "exits": [
+    {
+      "from": "the stair head",
+      "to": "the gallery",
+      "label": "along the gallery",
+      "back_label": "back to the stair head",
+      "text": null,
+      "back_text": null,
+      "one_way": false
+    },
+    {
+      "from": "the gallery",
+      "to": "the study end",
+      "label": "through the arch to the study door",
+      "back_label": "back through the arch",
+      "text": "The runner gives way to bare boards under the arch and the sound of the roof closes in overhead.",
+      "back_text": "You come back under the arch onto the runner, and the gallery opens out grey and long before you.",
+      "one_way": false
+    }
+  ],
+  "objects": [
+    {
+      "name": "the newel post",
+      "room": "the stair head",
+      "description": "Carved oak, an acorn finial worn smooth on the stair side where people rest a hand before going down. Someone has leaned here long enough lately to leave a smear of face powder on the acorn.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the gallery rail",
+      "room": "the stair head",
+      "description": "The balustrade runs from the newel along the whole gallery, and from this corner a man standing at it can see the hall below and every door behind him. You polish it each morning; this morning there is a watch-chain scratch in the wax.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the half-landing window",
+      "room": "the stair head",
+      "description": "Tall leaded glass a dozen steps down, the only window on the stair, with the roof's edge just above it. Snow sits against the outer panes in a wedge that has grown for two days.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the stair-rods",
+      "room": "the stair head",
+      "description": "Brass rods holding the Turkey carpet to each tread. The third from the top is loose in its eye and rings when trodden; the household knows to step over it, and guests do not.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the barometer",
+      "room": "the stair head",
+      "description": "A banjo barometer in walnut, the needle stuck at Change. The glass over the dial is dulled in one spot where the master tapped it every morning on his way down.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the bracket lamp",
+      "room": "the stair head",
+      "description": "A brass oil lamp with a white glass shade, kept burning because the stair would be black without it. You filled it yourself at six; the level is lower than one day's burning should leave it.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the Major's door",
+      "room": "the gallery",
+      "description": "Number four, the best guest room, nearest the stair. The china finger-plate is clean except for a thumb's smear of blacking low on the panel, at the height of a boot held in one hand.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the nephew's door",
+      "room": "the gallery",
+      "description": "Number six, Mr Yardley's since he was a boy at school. The key is on the inside; the keyhole shows a sliver of light when his lamp is lit, and the bottom rail is scuffed from being kicked shut.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the widow's door",
+      "room": "the gallery",
+      "description": "Number two, Mrs Ormsby's, across from the second window. The door does not sit true and must be pulled hard to latch, so it cannot be closed quietly by anyone who does not know it.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the gallery windows",
+      "room": "the gallery",
+      "description": "Three sashes over the stable yard and the sweep of the drive, grey with snow light by day. From the middle one you can see the yard door and the path to the ice house, and whoever crosses them.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the sconces",
+      "room": "the gallery",
+      "description": "Brass wall sconces between the doors, each with a white wax candle. Above stairs burns wax; below stairs burns tallow, and the two leave different stubs and different smells. The sconce by number four has a drip of something yellower on its tray.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the Turkey runner",
+      "room": "the gallery",
+      "description": "Red and ochre, worn to the weave outside the Major's and the nephew's doors and hardly at all outside the others. Damp footmarks dry out of it slowly in this cold, and you have learned to read them.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the case of waxwings",
+      "room": "the gallery",
+      "description": "A glass case of stuffed waxwings on a branch, dusty inside, a card in the master's father's hand: Shot in the great snow, 1838. One bird has lost its glass eye and looks at the gallery with a hole.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the study door",
+      "room": "the study end",
+      "description": "Heavy oak, panelled, with a brass escutcheon over the mortice lock. The keyhole is wide enough to take a lamp's light through, and the escutcheon is rubbed bright at the bottom edge where a cheek has pressed against it more than once.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the bare boards",
+      "room": "the study end",
+      "description": "A yard of unpolished board between the end of the runner and the study door, dark with age. Low down, where a kneeling person's knee and skirt would rest, the dust is disturbed in two places, not one.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the linen press",
+      "room": "the study end",
+      "description": "A tall mahogany press of sheets and pillow-slips, lavender between the folds. Behind it, a baize-covered door lets onto the servants' passage to the back stairs; the press stands an inch off the wall, enough for a candle's glow to show along its edge.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the fire bucket",
+      "room": "the study end",
+      "description": "A leather bucket on a hook, filled with sand and painted with the house's crest in flaking red. It has hung here since the kitchen chimney went up in the master's father's time, and nobody has lifted it since.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the end window",
+      "room": "the study end",
+      "description": "A small square sash under the eaves, the sill wet from the frame leaking. From it you hear the roof before you see anything: snow settling with a sigh, or the drip when it begins to go.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the master's bell",
+      "room": "the study end",
+      "description": "A small brass bell on a sprung wire beside the study door, rung from the desk inside for the valet alone. The wire has been oiled so often that it does not creak; Fairbrother came whenever it moved, and now it does not move.",
+      "portable": false,
+      "story": false
+    }
+  ]
+}

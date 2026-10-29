@@ -1,0 +1,293 @@
+{
+  "notes": "The player rewalks the murder night with one candle: the box at the stair foot comes up one short, the widow stops them on the gallery with what she heard at eleven, and the hairpin in their pocket must be named or not. The scene leaves either by setting the box before Fairbrother and demanding his hour, or by seeing the widow to her door in a traded silence and passing the valet's chair unasked.",
+  "opening": "Past midnight, and the house has gone to its beds with its lies still on. You stand at the stair head with one candle, meaning to walk the rounds as you walked them that night, counting the doors against the clock; in your apron pocket is a jet hairpin lifted from the carpet at the study keyhole on your second pass. Along the gallery Reginald Fairbrother keeps his chair outside the nephew's locked door as he has since the key was turned, and he has still given you no hour for the last candle he drew; through the panel Nathaniel Netherby asks whether anyone is out there. Under the widow's door a light is burning, and Mrs Ormsby does not sleep with a light.",
+  "start_room": "the stair head",
+  "placement": [
+    {
+      "who": "Reginald Fairbrother",
+      "room": "the gallery"
+    },
+    {
+      "who": "Cordelia Ormsby",
+      "room": "the gallery"
+    },
+    {
+      "who": "Lucius Carrington",
+      "room": "the gallery"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the gallery",
+      "variants": [
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "Beyond the case of waxwings Miss Gresham's door is bolted; your knock gets the bolt's answer and no voice. Fairbrother's chair stands at the nephew's door, the widow's light burns under hers."
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "Beyond the case of waxwings Miss Gresham's door stands a hand's breadth open, her candle still lit inside, as if she meant you to see she had not slept either. Fairbrother's chair stands at the nephew's door, the widow's light burns under hers."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": "N03b",
+          "text": "Mrs Ormsby passes you on the Turkey runner and inclines her head to you, as to a servant she trusts, before her door closes on her."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": "N03b",
+          "text": "Mrs Ormsby passes you on the Turkey runner with her shawl drawn across her mouth and her eyes on the wall, and her door closes on her without a sound."
+        },
+        {
+          "state": "fairbrother_faith",
+          "direction": "up",
+          "after": "N03c",
+          "text": "Fairbrother comes out of the Major's door and holds his candle up, high, to light your way back along the gallery."
+        },
+        {
+          "state": "fairbrother_faith",
+          "direction": "down",
+          "after": "N03c",
+          "text": "Fairbrother comes out of the Major's door, looks at you once, and snuffs his candle between finger and thumb, leaving you the dark."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The sconces are out; the Turkey runner swallows your step. Fairbrother sits in his chair at the nephew's door with his candle low, and does not look up. A line of light lies under the widow's door. The Major's door is shut, and behind it a floorboard answers its own weight."
+        }
+      ]
+    },
+    {
+      "room": "the stair head",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Snow still comes past the half-landing window, grey on black. The barometer has fallen since you last tapped it. The bracket lamp is out, as it was that night, and the stair-rods gleam only where your candle finds them."
+        }
+      ]
+    },
+    {
+      "room": "the study end",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Bare boards here, and cold. The study door is locked and sealed as the Major left it. At the keyhole, in the dust of the board, is the small dent where a hairpin lay until your second round; the master's bell above the linen press has not rung in two days."
+        }
+      ]
+    },
+    {
+      "room": "the stair foot",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The baize door is shut on the servants' side. On the shelf sits the tallow box where Fairbrother keeps the night candles, and above it the smoke mark of a candle set down burning. The bell wires run dead along the ceiling to the study."
+        }
+      ]
+    },
+    {
+      "room": "the back stair",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The rope rail is damp to the hand. At the dog-leg turn the candle streak runs up the plaster, fresh grease on old, where someone climbed with a light held too near the wall at eleven. The loose tread speaks when you reach it, as it would have spoken then."
+        }
+      ]
+    }
+  ],
+  "moments": [
+    {
+      "node": "N03b",
+      "options": [
+        {
+          "verb": "give",
+          "object": "Cordelia Ormsby",
+          "detail": "the jet hairpin",
+          "label": "'This fell at dinner, madam.'",
+          "room": "the gallery",
+          "text": "You put the pin into her hand and say it must have fallen at dinner. She closes her fingers on it and says the house is lucky in its housekeeper, and you do not correct her.",
+          "neutral": false
+        },
+        {
+          "verb": "show",
+          "object": "Cordelia Ormsby",
+          "detail": "the jet hairpin",
+          "label": "'I found this at the study keyhole.'",
+          "room": "the gallery",
+          "text": "You hold it up to the candle and tell her where it lay. She draws her hand back as if the pin were hot, and asks, very low, what else you keep. You put it back in your pocket.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Cordelia Ormsby",
+          "detail": "'Whose window had the doctor's boots?'",
+          "label": "'Whose window had the doctor's boots?'",
+          "room": "the gallery",
+          "text": "You ask her plainly whose window Dr Ashcombe's snowy boots came from. She says she does not understand you, and her voice says she does; she looks past you at the Major's door and then stops looking.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Cordelia Ormsby",
+          "detail": "'You'll take cold, madam. Go in.'",
+          "label": "'You'll take cold, madam. Go in.'",
+          "room": "the gallery",
+          "text": "You tell her she will take cold. She goes in. The pin stays in your pocket, unnamed, and her light stays burning under the door.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": "She pulls the shawl across her teeth and goes back to her door without another word, and the pin is still in your pocket."
+      }
+    },
+    {
+      "node": "N03c",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Reginald Fairbrother",
+          "detail": "'Did the master ring after eleven?'",
+          "label": "'Did the master ring after eleven?'",
+          "room": "the gallery",
+          "text": "You ask him only whether the master rang after eleven, and nothing of whom he lit. He says the master did not ring. It is the first answer he has given you in two days.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Reginald Fairbrother",
+          "detail": "'Go in and the heir hears of the box.'",
+          "label": "'Go in and the heir hears of the box.'",
+          "room": "the gallery",
+          "text": "You tell him the heir will hear of the box at breakfast if he goes through that door. He knocks at once, twice, and the Major's door opens on your words.",
+          "neutral": false
+        },
+        {
+          "verb": "knock",
+          "object": "the Major's door",
+          "detail": null,
+          "label": "knock on the Major's door yourself",
+          "room": "the gallery",
+          "text": "You step past him and knock. If the Major opens, Fairbrother must say what he came to say before his face and yours; if the door stays shut, the valet turns and walks away from you down the gallery, his candle going with him.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Reginald Fairbrother",
+          "detail": "'Your candle wants trimming.'",
+          "label": "'Your candle wants trimming.'",
+          "room": "the gallery",
+          "text": "You pinch the wick for him. Neither of you speaks of the door, and he does not knock while you stand there.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": "The Major's door opens from within before either of you has spoken, and Fairbrother goes in; it shuts behind him."
+      }
+    }
+  ],
+  "actions": [
+    {
+      "verb": "take",
+      "object": "the tallow box",
+      "detail": null,
+      "label": "take the tallow box from the shelf",
+      "room": "the stair foot",
+      "text": "You lift the lid by your candle. Eleven tallow candles lie where twelve should; the twelfth, drawn after eleven, is the one nobody has owned to. You carry the box with you.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Cordelia Ormsby",
+      "detail": "what she heard at eleven",
+      "label": "'What did you hear at eleven, madam?'",
+      "room": "the gallery",
+      "text": "She stops you by the waxwings, shawl across her chattering teeth. At eleven, passing the Major's door on her way to the study, she heard Miss Davenport inside it, low and pleading, and a man's step. She took it for a scene between ward and Major, and went on to listen at the study instead.",
+      "reveals": [
+        "N03a"
+      ],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "show",
+      "object": "Reginald Fairbrother",
+      "detail": "the tallow box",
+      "label": "set the box before him; ask the hour",
+      "room": "the gallery",
+      "text": "You open the box under his candle and count them aloud, eleven, in front of him, and say the heir will see this box at breakfast unless he gives you the hour he drew the twelfth. He says nothing. His hands are quite still on his knees.",
+      "reveals": [],
+      "leads_to": "S_N04",
+      "once": true
+    },
+    {
+      "verb": "go",
+      "object": "the widow's door",
+      "detail": "see her in; leave the valet unasked",
+      "label": "see the widow in; leave him unasked",
+      "room": "the gallery",
+      "text": "You give Mrs Ormsby your arm to her door and say nothing of the pin or the letter, and she says nothing of your rounds; her key turns behind her. You pass Fairbrother's chair without stopping, and through the panel Nathaniel's voice follows you: 'You too, then.'",
+      "reveals": [],
+      "leads_to": "S_T2N01",
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "text": "Fairbrother rises from his chair, takes up his candle, and goes to stand before the Major's door. He does not knock. He waits with the candle held low, as a man waits to be admitted.",
+      "after_turns": 3,
+      "after": null
+    },
+    {
+      "text": "Grey comes into the gallery windows and lies along the Turkey runner. Fairbrother comes out of the Major's door with his candle; the widow passes toward her own. Each of them, in a glance or its absence, has already decided what you are to them before the house is up.",
+      "after_turns": null,
+      "after": "N03c"
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "Somewhere below, the kitchen clock strikes the quarter. Lavinia will rake the range at six, and after that nothing in this house is private."
+    },
+    {
+      "after": 7,
+      "text": "Through a panel, muffled, Nathaniel Netherby: 'Is anyone still out there? Fairbrother? Anyone?'"
+    }
+  ],
+  "props": [
+    {
+      "name": "the jet hairpin",
+      "room": "the gallery",
+      "description": "A jet hairpin, one of a pair, with a bent tine. It lay in the dust at the study keyhole until your second round; now it is in your apron pocket.",
+      "portable": true
+    }
+  ],
+  "frame": {
+    "composition": "Eye-level shot from the stair head looking down the long dark gallery, a single candle flame in the foreground, the perspective drawn along the Turkey runner to a line of closed doors",
+    "subjects": [
+      "Reginald Fairbrother seated upright in a hard chair outside a locked door, candle held low in his lap, face turned away",
+      "a thin line of light under the widow's door halfway down the gallery",
+      "the Major's door shut, nearest the viewer"
+    ],
+    "environment": "Past midnight in a snowbound Victorian country house; sconces out, one candle, grey snow light faint through the gallery windows, snow still falling beyond the glass",
+    "palette_mood": "Near-black mahogany and oxblood carpet, one warm tallow glow against cold blue-grey window light; hushed, watchful, suspicious",
+    "prompt_summary": "Atmospheric graphic-novel illustration, Victorian country-house gallery at midnight, housekeeper's candle in foreground, long corridor of closed doors, old valet seated in a chair outside a locked door with a low candle, line of light under a far door, snow falling grey beyond tall windows, deep shadows, deductive tension"
+  }
+}

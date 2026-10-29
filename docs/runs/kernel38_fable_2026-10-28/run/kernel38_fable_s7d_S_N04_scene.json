@@ -1,0 +1,243 @@
+{
+  "notes": "The thaw has opened the road and the Major is closing the house: the player is barred from the first floor, kept to the dining room, and must choose whether to let Lavinia carry the pail up alone, cover for her, or break the bar herself; Millicent's tea is the second trap. The Major's demand for the housekeeper's account is the way on.",
+  "opening": "The eaves have begun to drip, and Barnaby Quarles stands dripping in the serving pantry to say the road will carry a cart by noon. At breakfast Major Carrington orders the carriage and tells the table, over the tureen, that Reginald Fairbrother lit the young gentleman up at eleven; Fairbrother says nothing at the sideboard, and through two floors Nathaniel Yardley shouts against his door that the old man has turned on him. The Major bars you the first floor, sends Lavinia Netherby up the back stairs with a pail for the study grate and Dr Ashcombe with the body to the ice house, and keeps you to your rounds down here until the house is gathered to hear your account of that night, before they sign.",
+  "start_room": "the dining room",
+  "placement": [
+    {
+      "who": "Lucius Carrington",
+      "room": "the dining room"
+    },
+    {
+      "who": "Millicent Gresham",
+      "room": "the dining room"
+    },
+    {
+      "who": "Reginald Fairbrother",
+      "room": "the dining room"
+    },
+    {
+      "who": "Gideon Ashcombe",
+      "room": "the dining room"
+    },
+    {
+      "who": "Barnaby Quarles",
+      "room": "the serving pantry"
+    },
+    {
+      "who": "Lavinia Netherby",
+      "room": "the stair head"
+    },
+    {
+      "who": "Nathaniel Yardley",
+      "room": "the gallery"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the dining room",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Grey thaw-light through the north windows; the master's chair stands pushed in and nobody will sit beside it. The Major has taken the head of the cloth and the carving set has been moved to his hand."
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "The Major does not look up when you come in. He speaks to Dr Ashcombe across you, as if you were the sideboard."
+        }
+      ]
+    },
+    {
+      "room": "the stair head",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Lavinia waits on the back stairs with her empty pail and the fresh scuttle, one step above the line the Major drew for you. The barometer has begun to climb; water ticks from the half-landing window."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": "N04a",
+          "text": "The pail is gone from the stair. The wet print of its rim is drying on the tread."
+        }
+      ]
+    },
+    {
+      "room": "the gallery",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The nephew's door is locked from the outside and Nathaniel Yardley's voice comes through it, hoarse now, telling the old man he has been turned. The waxwings in their case watch the Turkey runner."
+        }
+      ]
+    },
+    {
+      "room": "the study end",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The study door stands open on a dead man's cold. The fire bucket is where it was; the master's bell has not been rung in two days and the bare boards hold the chill."
+        }
+      ]
+    }
+  ],
+  "moments": [
+    {
+      "node": "N04a",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Go down. I'll say it was raked.'",
+          "label": "'Go down. I'll say it was raked.'",
+          "room": "the stair head",
+          "text": "She goes down white and grateful, the pail knocking her knee. The grate above is not raked, and the lie is yours to keep if the Major asks who did it.",
+          "neutral": false
+        },
+        {
+          "verb": "carry",
+          "object": "the pail",
+          "detail": "up past the bar to the study",
+          "label": "carry the pail up past the bar",
+          "room": "the stair head",
+          "text": "You take the pail from her and climb the stairs you are forbidden. The study is cold and the grate is full of something that was burned in a hurry; you are on your knees in it when a tread on the bare boards tells you Fairbrother is in the doorway, and he goes down to the Major without a word.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Go on, then. He's waiting.'",
+          "label": "'Go on, then. He's waiting.'",
+          "room": "the stair head",
+          "text": "She climbs with the pail held against her like a shield and does not look back. You listen until her steps cross the bare boards and stop.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Lavinia Netherby",
+          "detail": "'Set it down a moment. Breathe.'",
+          "label": "'Set it down a moment. Breathe.'",
+          "room": "the stair head",
+          "text": "She sets the pail on the step and stands with her hands in her apron. Neither of you goes up or down.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    },
+    {
+      "node": "N04b",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'The glass went down the sink last night.'",
+          "label": "'The glass went down the sink.'",
+          "room": "the dining room",
+          "text": "She sets the pot down steady and asks, for the table, after your sister's health. You have no sister. You say she is mending.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'The drawer is the Major's to open now.'",
+          "label": "'The drawer is the Major's now.'",
+          "room": "the dining room",
+          "text": "The milk goes over the cloth. She rings for a cloth you must fetch yourself, and does not look at you when you bring it.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'Milk first, miss. The Major takes it so.'",
+          "label": "'Milk first, miss.'",
+          "room": "the dining room",
+          "text": "She pours as you say. The cup trembles on its saucer and the question hangs over it, unanswered.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    }
+  ],
+  "actions": [
+    {
+      "verb": "open",
+      "object": "the housekeeper's drawer",
+      "detail": null,
+      "label": "open the housekeeper's drawer",
+      "room": "the serving pantry",
+      "text": "The sherry glass is still there, wrapped in a glass cloth, a dried bloom on its rim. The drawer sits a finger's width proud of its runners: someone has tried it since you shut it.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Lucius Carrington",
+      "detail": "'I am ready to give my account, sir.'",
+      "label": "'I am ready to give my account.'",
+      "room": "the dining room",
+      "text": "The Major folds his napkin and rings for the house. One by one they come down to the dining room, and the carriage waits in the thaw.",
+      "reveals": [],
+      "leads_to": "S_N05",
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "text": "Reginald Fairbrother comes up with two pairs of boots, blacked and paired, and sets the Major's outside the Major's door and the master's outside the study. He stands between the two doors a long moment, forty years of habit with nobody left in one room to wear them, before he goes down.",
+      "after_turns": 3,
+      "after": null
+    },
+    {
+      "text": "Dr Ashcombe and two men from the stable bring the master down the back stairs under a sheet. The service door stands open to the dripping yard, and the cold comes through the house with him.",
+      "after_turns": 6,
+      "after": null
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "The Major's voice carries through the house: 'Housekeeper. The dining room. We are waiting on your account before anyone signs.'"
+    },
+    {
+      "after": 7,
+      "text": "Somewhere above, Nathaniel Yardley stops shouting. The silence is worse."
+    }
+  ],
+  "props": [
+    {
+      "name": "the pail",
+      "room": "the stair head",
+      "description": "Lavinia's housemaid's pail, empty, the rim still wet. Beside it the fresh scuttle for a dead man's fire.",
+      "portable": true
+    }
+  ],
+  "frame": {
+    "composition": "Wide eye-level shot from the serving pantry doorway across the long dining table toward the north windows",
+    "subjects": [
+      "Major Carrington standing at the head of the cloth, one hand on the carving set, addressing the table",
+      "Millicent Gresham seated with the teapot lifted, cup trembling on its saucer",
+      "Reginald Fairbrother rigid at the sideboard, eyes down",
+      "Dr Ashcombe by the grate, coat already on",
+      "the master's chair empty and pushed in"
+    ],
+    "environment": "Early morning, grey thaw-light through tall north windows, eaves dripping outside, fire burned low, cold breath in the air",
+    "palette_mood": "Slate grey, bone white cloth, dark mahogany, a thin thread of ember orange; brittle, formal, watchful",
+    "prompt_summary": "Atmospheric concept illustration, Victorian country-house dining room at dawn after a snowstorm, grey light through tall windows, military gentleman standing at head of table with carving knife, young woman pouring tea, old valet rigid at sideboard, doctor in coat by dying fire, empty master's chair, dripping thaw outside"
+  }
+}

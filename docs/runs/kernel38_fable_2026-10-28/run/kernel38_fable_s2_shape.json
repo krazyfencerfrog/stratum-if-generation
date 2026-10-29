@@ -1,0 +1,14 @@
+{
+  "reading": "No shape clauses. 'I want to be able to accuse the wrong person' says what the decisions are about and that the outcome depends on the accusation; it does not state a number of endings, a path count, or a length.",
+  "content_kernel": "A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.",
+  "shape": {
+    "endings": {
+      "tier": "unstated",
+      "stated": ""
+    },
+    "linearity": "unstated",
+    "choice_density": "unstated",
+    "length": "unstated",
+    "removed_clauses": []
+  }
+}

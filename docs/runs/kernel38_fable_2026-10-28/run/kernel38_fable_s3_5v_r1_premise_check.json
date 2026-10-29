@@ -1,0 +1,282 @@
+{
+  "constraints": [
+    {
+      "n": 1,
+      "note": "Turn 5 lets you put any of the seven names across the fire, with the nephew or fiancée as a fully built wrong way through, so the axis is the accusation and the wrong person is pickable.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 2,
+      "note": "Turns 2 through 4 each choose which guest's lie to press (the fiancée's glass, the valet's candle, the widow's hairpin, the doctor's snow, the solicitor's will), independent of the final naming.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 3,
+      "note": "Clue-gathering turns sit beneath the final accusation and feed it without being it, which is a layered landscape.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 4,
+      "note": "The protagonist is a human widow a fortnight in post as housekeeper, embodied and walking the house with keys and candle.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 5,
+      "note": "The hidden truth answers who killed the master and how the locked room was faked, with all seven guests (the Major included) lying about something, and it is designed in full.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 6,
+      "note": "The final turn allows the truth to go unspoken (the bargain) or be got wrong, so resolution is choice-dependent.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 7,
+      "note": "The premise names exactly one way the game ends in the player's defeat, the wrong accusation, so hard failure is present.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 8,
+      "note": "The only way to lose is accusing the wrong guest, which is incorrect_resolution and nothing else.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 9,
+      "note": "The wrong name ends the story with an innocent sent down the road, which is terminal.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 10,
+      "note": "The loss is confined to the final drawing-room accusation and no earlier turn ends the game.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 11,
+      "note": "Every turn is built on reading clues against lies and weighing who dropped the key, which is deductive suspicion.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 12,
+      "note": "The snowed-in drive and downed wire hold the house shut, and the price of a wrong name is foregrounded in turn 5, matching confinement and fear of misjudgment.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 13,
+      "note": "The premise does not elaborate bodily sensation as a channel; the slap in turn 5 and the cold ash are single events, not somatic address.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 14,
+      "note": "The violence is an off-stage blow with a poker before the story opens and one slap across the face, within a low ceiling.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 15,
+      "note": "Turn 5's first way exposes the culprit and its fourth sends an innocent to the magistrate with the killer at the fire, matching both poles of the valence.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 16,
+      "note": "The viewpoint stays with the housekeeper throughout with no handoff.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 17,
+      "note": "Re-walking the rounds of the murder night by candle is compatible with an invited interactive flashback; nothing contradicts the field.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 18,
+      "note": "The story runs from the door coming down one morning to the carriage at the door the next noon, about a day and a half.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 19,
+      "note": "The whole story happens in the one snowbound house and its yard.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 20,
+      "note": "The arena is a single country house with its own yard, stables and ice house, which is building scale.",
+      "violated": false,
+      "quote": ""
+    },
+    {
+      "n": 21,
+      "note": "Turns track which clues are in your hands (stub, glass, hour) and which lies are exposed, which is the moderate richness the field names.",
+      "violated": false,
+      "quote": ""
+    }
+  ],
+  "engine": [
+    {
+      "id": "E1",
+      "note": "cannot_do names the locked study held by the Major's key, guests who need not answer, and the valet who will not speak, all of which need the world's cooperation.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E2",
+      "note": "The Major wants the nephew sent down so his own summons at eleven is never asked about, and his key, his orders and his power to dismiss act directly on you.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E3",
+      "note": "Pole A requires getting back into the study for the stub, fixing the hour by your rounds, getting the doctor to speak and bringing the valet to name the Major, at the cost of the valet's place and three guests' secrets.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E4",
+      "note": "Pole B requires building a case from the red herrings (the glass, the hairpin, the snow, the will) and saying the name to a face, with the loss as its cost, so it is action rather than the pole bare.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E5",
+      "note": "Levers, pressure and ways are keys, candle stubs, keyholes, pails, sherry glasses, hairpins, a dripping eave and a lodge-keeper, all picturable.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E6",
+      "note": "Turn 1 looks at the room, turn 2 guards the glass at dinner, turn 3 works the valet or the widow by night, turn 4 picks an accomplice against the sweeping, and only turn 5 is the naming; no two share outcomes.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E7",
+      "note": "The valet's forty years ended without a character and the master's name as an honest man are lost for good, and why_final explains that the heir will not keep him and the house will remember the master's sold silence.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E8",
+      "note": "The keyhole glimpse before the poker and the counted tallow box with the valet's after-ten rule are seen or heard early in passing, and both decide the drawing-room case rather than the scene they appear in.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E10",
+      "note": "shown_by is the Major crossing the threshold first, picking up the key before anyone sees where it lay, pocketing it and dispatching you to the plate, all done.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E12",
+      "note": "Pocketing the key, locking the nephew up, ordering your room searched and forbidding you the first floor are leverage and disruption, not routine.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E13",
+      "note": "The drama runs on the key, the stub, the keyhole and face-to-face bargains with the valet, fiancée, housemaid, solicitor and doctor; the forged letter and unsigned will are red herrings, not the primary driver.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E14",
+      "note": "The Kernel mandates no fruition beyond a fair solution and a pickable wrong name; turn 5 delivers the right name cleanly in two ways and the valet's breaking point triggers only on your naming the master's dying before he can, which the right ways avoid by having the doctor say it.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "E11",
+      "note": "The truth is a thirty-year-old covered retreat and a stolen decoration, a dying man's summons, and a valet obeying a last order, a concrete historical obligation rather than a bare 'he is guilty' or a fetch-quest.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "T1",
+      "note": "Each way is a distinct act in the gallery (refuse the order and walk the walls, double back up the back stairs, sweep the grate and lift the poker) with its own cost in standing or witnesses.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "T2",
+      "note": "Each way is something done at table (hold the glass over the fiancée, swear to the nephew's stable crossing, spill the sherry to get her alone) with its own cost.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "T3",
+      "note": "Each way is an act by night (threaten the valet with the box, offer him your leaving in writing, walk the rounds and catch the widow) with a cost in silence owed or the hour going to the Major.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "T4",
+      "note": "Each way makes a different accomplice (housemaid, solicitor, doctor) through a different lever, with the stub, the doctor's word or the maid's place lost accordingly.",
+      "holds": true,
+      "quote": ""
+    },
+    {
+      "id": "T5",
+      "note": "The final turn is the axis by design, but each way is a distinct act (count the box and bring the valet to speak, snatch the key and march the house up, bargain to save the nephew, trim the account and name the wrong one) with its own cost.",
+      "holds": true,
+      "quote": ""
+    }
+  ],
+  "mechanics": [
+    {
+      "material": "none tracked: the thaw and the clearing of the study are told through events (the drip, the lodge-keeper, the maids sent up with pails)",
+      "note": "A deadline told through events whose passing changes what is left in the study, not a clock the player watches or runs out of.",
+      "kind": "fiction"
+    },
+    {
+      "material": "the name is wrong, the room believes you, and the story ends with an innocent sent to the magistrate at thaw and the killer standing at the fire: the one way you can lose",
+      "note": "The game ending in the player's defeat on a wrong accusation, licensed by the incorrect_resolution trigger.",
+      "kind": "fiction"
+    },
+    {
+      "material": "you have given the magistrate the killer's own case with a servant's word under it, which is the one way to lose",
+      "note": "The same licensed loss restated in turn 5's wrong way through.",
+      "kind": "fiction"
+    },
+    {
+      "material": "counting the seconds between each door to fix the true hour of the quarrel",
+      "note": "A re-walked round that yields an hour as a clue through events, not a meter the player is shown.",
+      "kind": "fiction"
+    },
+    {
+      "material": "you set the candle box on the table and count it one short before the room",
+      "note": "A physical object counted as evidence, held as a clue and a document-like thing, not a tracked stock.",
+      "kind": "fiction"
+    },
+    {
+      "material": "the Major stands at the fire unnamed and drives to the magistrate as the master's grieving friend",
+      "note": "The bargain way ends with the killer free but is not framed as the player's defeat; it is the story's price on that way.",
+      "kind": "fiction"
+    },
+    {
+      "material": "the tallow stub and your written timeline are taken into the Major's keeping",
+      "note": "A complication that removes objects from your hands and changes what you can lay before the room, held as hidden state.",
+      "kind": "fiction"
+    },
+    {
+      "material": "the valet's forty years in the house, and the master's name as an honest man",
+      "note": "What the story costs its people on the way the right name holds; the game does not end, so it is the price.",
+      "kind": "fiction"
+    }
+  ]
+}

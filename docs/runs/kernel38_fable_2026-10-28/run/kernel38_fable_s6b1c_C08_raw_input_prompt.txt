@@ -1,0 +1,330 @@
+SYSTEM PROMPT
+
+You are step 6b1c of an interactive fiction generation pipeline: what ONE
+character says about everything the player might raise with them. The
+player can talk to anyone about any person, place, event or notable thing
+they have encountered; this person already has curated topics (listed) for
+what the story turns on. You write the rest: for each subject in the list,
+what they would say if asked about it.
+
+ - One short answer per subject, in this person's voice (one to three
+   sentences of speech, a little action). It must tell the player
+   something: about the subject, about the speaker, or about how the two are
+   tied. Answer only the subjects this person has something real to say
+   about, and leave the rest out: a line that only says a thing is cold or
+   heavy or expensive is filler. A person who would not know a subject that
+   matters can say so, in character ("Never been up there. Heights.").
+ - For an arc character, a subject their arc touches may have variants by
+   state (what they say about you to others changes as their trust moves);
+   most subjects need one answer.
+ - Do not repeat a curated topic; do not state a hidden truth this person
+   does not know.
+ - "about" says who a person is or what an event was: get it right (the
+   lock keeper is not the buyer); name the subject exactly as listed.
+ - Stakes live in people and things, not papers.
+ - NATURAL, GROUNDED SPEECH (NO APHORISMS):
+   Characters speak like real people in their specific occupation, background, and situation. NEVER write cryptic fortune-cookie epigrams or symmetrical definitions ("X is not a Y, it is a Z"). Characters speak with practical intent, occupational details, dry humor, deflection, or direct complaint.
+ - NO REPETITIVE PROP MANIPULATION:
+   Do not have characters endlessly perform symbolic actions with props (fiddling with holsters, wiping counters, tapping datapad screens, adjusting collars, turning keys, holding mugs) as a substitute for dialogue.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<one sentence: how this person sees the others>",
+  "lines": [{"subject": "<as listed>", "says": [{"state": "<state or null>", "direction": "up | down | null", "after": null, "text": "<what they say>"}]}]
+}
+
+EXAMPLE (a late-night radio phone-in story, Dana the producer; for shape only)
+
+{
+  "notes": "Dana sees everyone at the station as a risk to the show, and is kinder about each of them than she admits.",
+  "lines": [
+    {"subject": "the station manager", "says": [{"state": null, "direction": null, "after": null, "text": "'He wants the ratings and no phone calls from the owners. You can have one of those. Pick.'"}]},
+    {"subject": "the transmitter hut", "says": [{"state": null, "direction": null, "after": null, "text": "'Don't go out there at night. Not because of ghosts. Because of the dog that lives under it.'"}]},
+    {"subject": "the old host's mug", "says": [
+      {"state": "dana_trust", "direction": "up", "after": null, "text": "She takes it down, turns it in her hands, puts it back exactly on its ring of dust. 'Leave it. Please.'"},
+      {"state": null, "direction": null, "after": null, "text": "'It's a mug.'"}]},
+    {"subject": "the storm", "says": [{"state": null, "direction": null, "after": null, "text": "'The mast is sixty years old and held together with optimism. If it goes, we go to the emergency tape and I go home.'"}]}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS PERSON (who, voice, tie, arc, the states, their curated topics) AND THE SUBJECTS:
+{
+ "who": "Lavinia Netherby (the housemaid)",
+ "voice": "short whispered sentences, drops into dialect when flustered; talks in grates, scuttles, linen, and who is cross with whom; speaks only when spoken to by anyone above her",
+ "tie": "answers to you and is frightened of the valet, and will fetch what you tell her if nobody above stairs is looking",
+ "tier": "arc",
+ "arc": {
+  "state": {
+   "name": "netherby_nerve",
+   "meaning": "Whether Lavinia will still fetch for you when nobody above stairs is looking.",
+   "up_when": "you cover her short count, take the blame for the candle box yourself, send her down before the Major comes up, or stand between her and the valet",
+   "down_when": "you let the Major believe she took what went missing from the study, send her into the study alone, threaten her with the valet's word, or leave her to the kitchen's tongue"
+  },
+  "starts": "She took a tallow candle from your box for her own room and is frightened the missing stub will be laid at her door; she answers to you and fears the valet, and will fetch what you tell her so long as it costs her nothing above stairs.",
+  "moments": [
+   {
+    "node": "N04",
+    "kind": "test",
+    "change": "The Major sends her up to rake the study grate; she looks to you on the stairs for a word that would stop her, and whether you have one is the first test of her nerve."
+   },
+   {
+    "node": "N05",
+    "kind": "turn",
+    "change": "You tell her the valet will name her for the short count unless she brings you the stub; she brings it folded in her apron, and within the hour is made to confess before the kitchen with ash on her apron and given notice. Whether you spoke for her is what she remembers."
+   },
+   {
+    "node": "N07",
+    "kind": "demonstration",
+    "change": "She passes you on the stairs with her box; whether she says a word, and what word, is her verdict."
+   },
+   {
+    "node": "T2N01",
+    "kind": "demonstration",
+    "change": "Sent up with pails and coal, she goes; you are on the gallery with the Major's watch open and do not stop her."
+   },
+   {
+    "node": "T2N02",
+    "kind": "turn",
+    "change": "While you trade snow for words at the ice house, she relights the grate and the stub goes out with the ash; she tells the kitchen you deserted her."
+   },
+   {
+    "node": "T2N04",
+    "kind": "demonstration",
+    "change": "She brings your tea; whether she brings it because she is told to or because nobody asked about her candle is in how she sets it down."
+   },
+   {
+    "node": "T3N03",
+    "kind": "test",
+    "change": "Sent to sift the grate and sent down again in law's name; she has been ordered up and down by three different masters in a morning and looks to see which of them you are."
+   },
+   {
+    "node": "T3N05",
+    "kind": "demonstration",
+    "change": "She hauls your box to the cart muttering she never thought you had it in you; what she puts in your hand at the step is the measure of her nerve."
+   }
+  ],
+  "resolutions": [
+   {
+    "lines": [
+     "T1"
+    ],
+    "direction": "up",
+    "stands_with_you": false,
+    "becomes": "Given notice, she passes you on the stairs without a word, her apron clean; but she will not say to the kitchen that it was you who sent her up."
+   },
+   {
+    "lines": [
+     "T1"
+    ],
+    "direction": "down",
+    "stands_with_you": false,
+    "becomes": "Given notice before the kitchen, ash still on her apron. She tells the carter the housekeeper made her do it, and the carter tells the village."
+   },
+   {
+    "lines": [
+     "T2"
+    ],
+    "direction": "up",
+    "stands_with_you": true,
+    "becomes": "Brings your tea without being rung for and whispers that the grate is relit and nobody has asked about her candle."
+   },
+   {
+    "lines": [
+     "T2"
+    ],
+    "direction": "down",
+    "stands_with_you": false,
+    "becomes": "Brings your tea because she is told to, sets it down and goes; the kitchen hears nightly how you left her to the study alone."
+   },
+   {
+    "lines": [
+     "T3"
+    ],
+    "direction": "up",
+    "stands_with_you": true,
+    "becomes": "Hauls your box to the cart muttering she never thought you had it in you, and at the step slips a tallow stub into your hand: the one from her own room."
+   },
+   {
+    "lines": [
+     "T3"
+    ],
+    "direction": "down",
+    "stands_with_you": false,
+    "becomes": "Hauls your box to the cart because the valet told her to, and does not stay to see it off."
+   }
+  ]
+ },
+ "states": [
+  "carrington_regard",
+  "fairbrother_faith",
+  "gresham_confidence",
+  "netherby_nerve",
+  "ormsby_ease"
+ ],
+ "already_topics": [
+  "the study grate",
+  "the tallow box",
+  "Mr Fairbrother",
+  "the Major",
+  "what the kitchen is saying",
+  "the night the master died",
+  "what the valet would say of her",
+  "her notice"
+ ],
+ "subjects": [
+  {
+   "subject": "Lucius Carrington",
+   "kind": "person",
+   "about": "the Major"
+  },
+  {
+   "subject": "Reginald Fairbrother",
+   "kind": "person",
+   "about": "the master's valet of forty years"
+  },
+  {
+   "subject": "Nathaniel Yardley",
+   "kind": "person",
+   "about": "the master's nephew and heir"
+  },
+  {
+   "subject": "Gideon Ashcombe",
+   "kind": "person",
+   "about": "the doctor"
+  },
+  {
+   "subject": "Millicent Gresham",
+   "kind": "person",
+   "about": "the nephew's fiancée"
+  },
+  {
+   "subject": "Evangeline Davenport",
+   "kind": "person",
+   "about": "the ward"
+  },
+  {
+   "subject": "Cordelia Ormsby",
+   "kind": "person",
+   "about": "the widow"
+  },
+  {
+   "subject": "Cornelius Ellingham",
+   "kind": "person",
+   "about": "the solicitor"
+  },
+  {
+   "subject": "Barnaby Quarles",
+   "kind": "person",
+   "about": "the lodge-keeper"
+  },
+  {
+   "subject": "the first-floor gallery",
+   "kind": "place"
+  },
+  {
+   "subject": "the back stairs",
+   "kind": "place"
+  },
+  {
+   "subject": "the dining room",
+   "kind": "place"
+  },
+  {
+   "subject": "the housekeeper's room",
+   "kind": "place"
+  },
+  {
+   "subject": "the servants' hall",
+   "kind": "place"
+  },
+  {
+   "subject": "the drawing room",
+   "kind": "place"
+  },
+  {
+   "subject": "the master's study",
+   "kind": "place"
+  },
+  {
+   "subject": "the ice house",
+   "kind": "place"
+  },
+  {
+   "subject": "the library",
+   "kind": "place"
+  },
+  {
+   "subject": "the door comes down",
+   "kind": "event",
+   "about": "The study door is broken down with the hall poker, the household crowding the gallery; a key is heard to fall onto the carpet inside, and the master is found at his desk with the window frozen shut, the fire gone to ash, and a yellow tallow stub, not one of the study's white wax candles, snuffed in the mantel candlestick."
+  },
+  {
+   "subject": "dinner for seven",
+   "kind": "event",
+   "about": "At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door."
+  },
+  {
+   "subject": "the thaw",
+   "kind": "event",
+   "about": "The eaves begin to drip at dawn and the lodge-keeper wades up to say the road will carry a cart by noon; the Major orders the carriage, sends the maids up to the study with pails and a fresh scuttle, and calls the house to the drawing room to hear the housekeeper's account of the night before they sign."
+  },
+  {
+   "subject": "the Major's door",
+   "kind": "object"
+  },
+  {
+   "subject": "the study door",
+   "kind": "object"
+  },
+  {
+   "subject": "the master's chair",
+   "kind": "object"
+  },
+  {
+   "subject": "the housekeeper's drawer",
+   "kind": "object"
+  },
+  {
+   "subject": "your box",
+   "kind": "object"
+  },
+  {
+   "subject": "the gallery rail",
+   "kind": "object"
+  },
+  {
+   "subject": "the half-landing window",
+   "kind": "object"
+  },
+  {
+   "subject": "the widow's door",
+   "kind": "object"
+  },
+  {
+   "subject": "the linen press",
+   "kind": "object"
+  },
+  {
+   "subject": "the shelf",
+   "kind": "object"
+  },
+  {
+   "subject": "the sideboard",
+   "kind": "object"
+  },
+  {
+   "subject": "the sherry glass",
+   "kind": "object"
+  }
+ ]
+}

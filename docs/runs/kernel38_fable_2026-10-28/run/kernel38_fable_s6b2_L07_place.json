@@ -1,0 +1,80 @@
+{
+  "notes": "The study is one room-sized space off the gallery, so it is a single room with no internal exits: the place the whole house has been kept out of. The player will want the lock on the inside of the door and the lamp on the writing table, which together settle what was seen through the keyhole, and the small tallow drip on the hearthrug that should not be in a wax-candle room.",
+  "rooms": [
+    {
+      "name": "the study",
+      "description": "A square first-floor room panelled in dark oak, with one tall window onto the snow-blind park and a writing table set so the master sat with his back to the fire and his face to the door. The jamb is splintered pale where the door was forced, and the brass of the inside lock is the only bright thing in the room. The air holds cold ash, stale cigar and lamp oil, and the panelling ticks as the house cools. Grey snow light lies flat across everything and reaches nowhere.",
+      "frame": {
+        "composition": "Eye-level view from just inside the forced doorway, looking across the writing table toward the tall window, the inside lock plate in the near foreground",
+        "subjects": [
+          "Oak writing table with lamp and blotter",
+          "Forced door jamb with splintered pale wood and brass inside lock",
+          "Tall sash window full of grey snow light",
+          "Cold marble fireplace with turned hearthrug"
+        ],
+        "environment": "Flat grey daylight from a single tall window, dark oak panelling, cold ash in the grate, dust motes still in the air, no fire lit",
+        "palette_mood": "Charcoal oak, snow-grey window, dull brass, cold ash white; sealed, held-breath, forensic stillness",
+        "prompt_summary": "Atmospheric concept illustration, Victorian country-house study, dark oak panelling, writing table facing a forced door with splintered jamb and brass inside lock, tall window of flat grey snowlight, cold fireplace, dust in still air, sombre muted palette"
+      }
+    }
+  ],
+  "exits": [],
+  "objects": [
+    {
+      "name": "the inside lock",
+      "room": "the study",
+      "description": "A heavy brass rim lock on the room side of the door, its keyhole a clean black slot a finger wide. With a key standing in it from this side, nothing at all can be seen through from the gallery.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the reading lamp",
+      "room": "the study",
+      "description": "A brass colza lamp with a green glass shade on the writing table, set at the master's left hand so its light fell straight across the room to the door. The reservoir is near dry; it burned a long while after anyone needed it.",
+      "portable": true,
+      "story": true
+    },
+    {
+      "name": "the tallow drip",
+      "room": "the study",
+      "description": "A single grey spot of hardened tallow on the hearthrug, a yard inside the door. This is a wax-candle room; tallow lives on the back stairs.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the writing table",
+      "room": "the study",
+      "description": "A broad oak table with a tooled leather top and a blotter whose pink sheet has been turned recently. Held to the window, the blotter gives back a few words in reverse, a date and half a signature.",
+      "portable": false,
+      "story": true
+    },
+    {
+      "name": "the tantalus",
+      "room": "the study",
+      "description": "Three cut-glass decanters locked in an oak frame, the little key gone from its hook. Two decanters are full; the third stands a finger lower than the others, its stopper set back slightly crooked.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the bell rope",
+      "room": "the study",
+      "description": "A worn crimson pull beside the chimneypiece, its tassel grey from forty years of one hand. It rings the master's bell in the servants' hall and nowhere else.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the estate map",
+      "room": "the study",
+      "description": "A framed survey of the park and farms, hung where the master could see it from his chair. The home farm and two fields have been shaded in pencil, and a figure written and rubbed out in the margin.",
+      "portable": false,
+      "story": false
+    },
+    {
+      "name": "the fender",
+      "room": "the study",
+      "description": "A low brass fender before the cold fireplace, the rail dented on the left side where something heavy came down against it. The dent has been there long enough to tarnish.",
+      "portable": false,
+      "story": false
+    }
+  ]
+}

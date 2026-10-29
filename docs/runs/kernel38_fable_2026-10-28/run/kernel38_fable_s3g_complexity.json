@@ -1,0 +1,22 @@
+{
+  "target_ending_count": {
+    "min": 1,
+    "max": 2,
+    "evidence_basis": "strong_inference",
+    "note": "A single stated \"fair solution\" forces one true resting point (with at most a tonal variant in aftermath); the explicitly wanted wrong accusations are terminal failure off-ramps against that one answer, not counted as distinct endings."
+  },
+  "branching_density": {
+    "level": "moderate",
+    "evidence_basis": "strong_inference",
+    "note": "The accusation itself is a single fork, but seven lying guests plus a stated mix of real clues and red herrings force a recurring choice at each investigative beat about whom to press or what to pursue — regular steering without every beat being a fork."
+  },
+  "state_richness": {
+    "level": "moderate",
+    "channels": [
+      "clues discovered / red herrings taken",
+      "which guests' lies have been exposed"
+    ],
+    "evidence_basis": "strong_inference",
+    "note": "Recognizing a fair versus wrong accusation requires the engine to remember which clues the player has found and which of the seven guests' lies they have pressed, since the solution must be supportable from what was actually gathered."
+  }
+}

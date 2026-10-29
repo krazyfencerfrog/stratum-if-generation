@@ -1,0 +1,77 @@
+{
+  "status": "proposed",
+  "why": "Built from the seed without alteration of its fork or its world: turn 3's third way is where this road leaves T1, and a housekeeper who owes Cordelia Ormsby a silence, has never put the candle box in front of Fairbrother, and believes the Major was behind his own door at eleven is left with one name the glass in her drawer can carry. One thing is added to N03 itself: what the widow says she heard through the Major's door is fixed as Evangeline's voice, so the player walks away from that midnight having handed the killer an alibi. Turn 4 is played by its third way, because a line that finishes by naming Millicent needs the tallow stub raked out to the heap rather than kept, and the doctor's sentence about a dying master sending for his friend reads, to a woman who has the Major in his room, as proof the study stood open and lit for whoever came back. The world the seed asked for is reached intact: the fiancée is lost, every servant and the Major himself remain, and the story closes on the single defeat the failure model licenses.",
+  "through_line": {
+    "title": "The Wrong Passenger",
+    "motivation": "You begin wanting the right name before the road carries a cart. At midnight the widow, caught at the keyhole, whispers that she heard Evangeline's voice through the Major's door at eleven, and after that the Major is a man with a witness and the ward's eleven o'clock quarrel is a lie about where she herself was, not about what she heard. What you want narrows to getting Nathaniel out of the carriage whatever it costs the rest of them, and with the stub on the ash heap, the valet never asked and the widow's letter and hairpin yours to keep, the only name a drawing room will accept from a servant is Millicent Gresham's.",
+    "strategy": "Honour the widow's bargain and leave the valet in his chair; let the Major stack his case against the nephew without contradicting it; buy the doctor's sentence at the ice house instead of the stub from the study; then read your account in the drawing room cut to the quarrel the house already believes, the lipstick glass in your hand and the fiancée's ten past ten turned against her.",
+    "turning_point": "The ice house. While you stand in the slush trading the doctor's snow for his words about a dying master and his oldest friend, the maids rake the study grate and the yellow stub goes out in the pail, and you walk back across the yard carrying a case in which the one candle on the back stairs at eleven can be made a lady's.",
+    "differs_from": "T1 names the Major against the whole house and pays with the valet's forty years, the housemaid's place, the fiancée's ring and the master's good name; this line answers the question the other way round, with the house's own verdict and a servant's word under it: Millicent goes down the road, the Major sits at the master's table unnamed, the valet, the housemaid and the widow all keep what they had, and the story ends in the one defeat the brief allows."
+  },
+  "divergence": {
+    "diverges_at": "N03",
+    "trigger": "you left the valet in his chair at the nephew's door, walked the rounds alone counting seconds door to door, and caught the widow on her knees at the study keyhole with her hairpin, and traded her silence for your own",
+    "trigger_kind": "act",
+    "way": 3,
+    "instead_of": "you went to Fairbrother in his chair with the candle box open in your hands, counted it one short in front of him and told him you would set the box before the heir at breakfast unless he gave you the hour",
+    "opportunity": "What the widow tells you through chattering teeth on the gallery must be this: at eleven, passing the Major's door on her way to the study, she heard Evangeline Davenport's voice inside it, low and pleading, and a man's step; she took it for a scene between the ward and the Major and went on to the study door to listen there instead.",
+    "shift": "Cordelia Ormsby's whisper puts the Major behind his own door at eleven with the ward, so the one moving light you saw on the back stairs at that hour cannot have been lit for him, and Evangeline's eleven o'clock quarrel becomes a girl's lie about where she herself was. You have bought that with a silence about a hairpin and a forged letter, you have not asked the valet his hour and he has not offered it, and the nephew has called through his panel that you too have left him to it. The case you can still make for Nathaniel is the one that puts someone else in the study after twenty to eleven, and the only person who has admitted to being there at all is the woman whose mouth is on the glass in your room."
+  },
+  "ending": {
+    "title": "The Wrong Passenger",
+    "summary": "Millicent Gresham is driven down the thawing road in the Major's carriage on the housekeeper's word and the lipstick glass, with Carrington beside her to deliver the household's account; Nathaniel is unlocked and cleared and goes to the stables without looking at you. Fairbrother thanks you at the sideboard for never having asked him the hour, Lavinia brings your tea as she always has, the widow keeps her letter and the ward her lie, and the master's oldest friend sits in the master's chair at dinner. You lock the study at night with the key he hands you across the table, and the story ends there, in the one way it can be lost: an innocent at the magistrate's and the killer at the fire.",
+    "answer": "pole_b",
+    "standing": [
+      "the master's valet of forty years",
+      "the housemaid",
+      "the master's nephew and heir",
+      "the widow",
+      "the Major"
+    ],
+    "lost": [
+      "the nephew's fiancée"
+    ],
+    "changed": "the master's killer stays in the house as its guest of honour and gives the orders at the master's table; the fiancée goes to the magistrate on a servant's word and the lipstick glass; the tallow stub is on the ash heap, the valet's hour is never spoken, the widow's letter is never found, and the master is remembered as a man killed in a quarrel over a settlement",
+    "pays_price": false
+  },
+  "beats": [
+    {
+      "beat": "third_crisis",
+      "turn": null,
+      "way": null,
+      "event": 3,
+      "plants": [],
+      "pays": [],
+      "adapted": "At dawn the eaves drip, the lodge-keeper wades up the drive to say the road will carry a cart by noon, and the Major orders the carriage, sends two maids up to the study with pails and a fresh scuttle, and tells the doctor the body goes to the ice house within the hour. He does not search your room: Millicent has told him about the glass, and instead he stops you on the gallery with his watch out and tells you, low, that a lady's sherry glass kept unwashed in a housekeeper's drawer is either evidence or blackmail, and that it will go into your account in the drawing room, the young lady's visit at ten and the nephew's quarrel after it, or he will tell the heir which of the two it was. Cordelia Ormsby, passing in her wrapper, tells him for the whole gallery to hear what a discreet woman you are, and goes down to breakfast with her forged letter still in her bodice; Nathaniel, hearing the Major's voice through his panel, pushes a scrap of paper under the door that says only 'twenty to eleven, the yard, you saw me', and you pick it up and put it in your apron without answering."
+    },
+    {
+      "beat": "third_crisis",
+      "turn": 4,
+      "way": 3,
+      "event": null,
+      "plants": [],
+      "pays": [],
+      "adapted": "You leave the study to the maids and go out across the yard, where the drifts have gone to grey slush and the doctor is walking beside the master's body on a door carried by the groom and the lodge-keeper, and in the cold of the ice house you tell Ashcombe that you know whose boots tracked snow into the gun room and from whose window, and that you will say nothing of it if he says now, before Ellingham, that the master knew he was dying and had sent for his oldest friend. He says it, dry and exact, with the solicitor's hand on the ice-house door; but with the widow's eleven o'clock in your head it tells you only that the study was open and lit for whoever came back after the nephew had gone. When you come in by the scullery with your skirts soaked to the knee the grate has been raked, relit and the ash pail carried to the heap, the yellow stub with it; Lavinia, who swept the dead man's carpet alone under the Major's eye, says to the kitchen that the housekeeper ran off and left her to it, and you let her say it rather than tell her what you were buying."
+    },
+    {
+      "beat": "climax",
+      "turn": 5,
+      "way": 4,
+      "event": null,
+      "plants": [],
+      "pays": [],
+      "adapted": "In the drawing room before the fire, with the carriage at the door and Nathaniel brought down between the valet and the groom, you read your account trimmed to what the house already believes and keep back every lie you have promised or taken: the widow's hairpin and letter, the doctor's snow, the ward's hour in the Major's room. Then you set the sherry glass on the table with her mouth on it and put Millicent's name across the fire: that she was in the study at ten with a settlement the master laughed at, that she asked his housekeeper to wash the glass and say nothing, that the nephew was in the stable yard by twenty to eleven by your own rounds, and that the one light you saw after that was a candle going up the back stairs, a servants' tallow from the box at their foot, carried by someone who would not take her own wax candle from her room to be seen with it. Every face turns and Millicent goes still; Nathaniel starts a sentence twice and does not finish it; Fairbrother at the sideboard says nothing when the Major asks him whether a lady could have passed up those stairs unseen, and the Major says that the magistrate will take a lady as readily as a gentleman and sends the groom for Miss Gresham's cloak."
+    },
+    {
+      "beat": "aftermath",
+      "turn": null,
+      "way": null,
+      "event": null,
+      "plants": [],
+      "pays": [],
+      "adapted": "The carriage goes down the dripping road with Millicent inside it and the Major on the box beside the groom, the household's account and the sherry glass wrapped in a napkin in his coat; Nathaniel, unlocked and cleared, walks past you to the stables and does not look at you, and the ward recites her eleven o'clock to the solicitor in the same words as before. Fairbrother says at the sideboard that the housekeeper has been good enough never to ask him the hour, and that he is obliged to her; Lavinia brings your tea at four; the widow dines with her letter unburnt. At dinner the master's oldest friend takes the master's chair, carves, and when the cloth is drawn hands you the study key across the table and tells you to lock up, and you do, and the story ends with the wrong passenger at the magistrate's and the killer with his feet to the fire."
+    }
+  ],
+  "skipped_beats": [],
+  "rejoins_at": null
+}

@@ -1,0 +1,445 @@
+SYSTEM PROMPT
+
+You are step 7d of an interactive fiction generation pipeline: you compile
+ONE scene for the engine. The engine is room-based: the player moves between
+the rooms this scene opens, examines things, talks to people, and acts
+through a menu (verb, then object, then detail). Everything the player can
+DO in this scene beyond looking and talking is what you write: each action
+is one menu entry with what happens when it is taken. Code adds the
+mechanics (what each choice does to the story's states, which flags it
+sets); you write the scene.
+
+What you write, naming rooms, people and things exactly as the packet does:
+ - opening: what the player reads on entering the scene, two to four
+   sentences: where they are, what has changed, who is here, what presses.
+   It tells the world, never a deed of the player's ("You carry the saddle
+   into the square" is a choice the player did not make): the player acts
+   only through the menu. Something big that happened between scenes (a
+   death, a fire) is told as what the player finds or hears, not done by
+   them, and never left unsaid.
+   ARRIVAL AFTERMATH (when the packet includes "arriving"):
+   The player has just chosen a branch divergence to enter this story line.
+   The packet provides "arriving" with "trigger", "instead_of", "shift",
+   "from_scene", and "line_title". The opening MUST establish the immediate
+   fallout and altered reality of that choice (what consequence landed, who is
+   alienated or emboldened, what new pressure or debt presses now). Never
+   open cold as if nothing happened; ground the room in the aftermath of what
+   was just chosen.
+ - start_room, and placement: where each person stands. Where the opening
+   puts someone, place them there.
+ - room_text: for any room that is different in this scene (water on the
+   floor, a light left on), its text for this scene, as variants: by state
+   (the tells due here: show the effect of the player's earlier choice in
+   what a person does or where they stand; give the direction, up or down,
+   since the two read differently), or after a node, with a default.
+ - moments: one per OPPORTUNITY node.
+   CRITICAL OPTION COUNT AND CORRESPONDENCE:
+   * Active option count must match Stage A EXACTLY: For an opportunity with N
+     options in Stage A (the packet's node["options"]), you MUST write EXACTLY N
+     active engine actions in the SAME ORDER, each with "neutral": false. Never
+     add extraneous choices for narrative richness (e.g. do NOT invent 3 actions
+     when Stage A specifies 2), and never omit an option.
+   * REQUIRED opportunities ("required": true in the packet): You MUST append
+     EXACTLY ONE extra option at the end of the "options" list with "neutral": true,
+     giving something to do that takes no side ("'Later. Let's get her moving first.'").
+     DO NOT leave "neutral": false on this neutral option! It must be explicitly
+     "neutral": true.
+   * OPTIONAL opportunities ("required": false or omitted): Do NOT add a neutral
+     option! Write only the N active options (all "neutral": false) and provide a
+     "lapse" object (after how many actions it passes and what that looks like).
+   An active option is a physical try: write what happens when it succeeds or fails,
+   in one text.
+ - actions: everything else the player can do here:
+    - each REVELATION node becomes an action that finds it out ("reveals":
+      [the node id]): read the letter, open the drawer, ask at the right
+      moment;
+    - action economy: at most ONE optional environmental action, and only if it reveals essential
+      world lore or provides a tool. Strictly avoid mundane prop filler (do NOT invent actions like
+      dragging sticks over ruts, polishing black pins, or fiddling with door latches);
+    - for EVERY entry in "leaving", the action that takes it ("leads_to": its target):
+        * Default / linear progression: leaving the scene through an exit must always use verb "go"
+          (or "talk" for departures with a character), never "take" or "use", labelled with how ("out the front door").
+          EXIT GATING: In scenes containing opportunity moments, Python automatically gates exits on
+          resolving the scene's core dilemma. Do not author exits that pretend the player can slip away
+          unaddressed before facing the companions or challenge present;
+        * BRANCH DIVERGENCE (when "kind" is "branch"):
+          A branch is NEVER an unannounced booby trap or an ambiguous prop poke. The packet provides
+          the branch's full divergence context ("trigger", "instead", "shift", "branch_title", "branch_motivation").
+          1. DRAMATIC STANDOFF: Staged as an active impasse. The characters advocating each path
+             must visibly clash, plead, or state their demands/warnings in the opening and dialogues.
+             If taking a path risks or destroys a character's prop, money, or trust, that vulnerability
+             must be established in the room or dialogue BEFORE the action is chosen.
+             CRITICAL FOR OPENING: The standoff in the opening must be narrated through character speech,
+             demands, and room atmosphere. NEVER describe hypothetical, potential, or past player deeds in the opening
+             (no "whichever voice you give the tiller", no "you prepare to choose"): the player acts only
+             through the menu.
+          2. TELEGRAPHED LABELS: The menu label and detail phrase must telegraph the strategic commitment
+             or approach (e.g. "let Osric pay to cut ropes (scrapper deal)" vs "sound the gong for naval honors"),
+             strictly under 40 characters. Never use generic ambiguous verbs that disguise the fork as
+             routine exploration (no blind "grip tiller" or "batter pawl").
+          3. PHYSICAL CAUSALITY & CONTROL FIXTURES: A branch departure representing transit or taking command
+             must be taken by a physical verb (go, cut, untie, heave, cast off), not ambient conversation topics.
+             For vehicle controls or fixed machinery (tillers, handwheels, levers, valves, hawsers), use
+             manipulation verbs (grip, turn, steer, lever, heave, throw), NEVER "take" (in the engine, "take"
+             strictly picks up a portable item into player inventory).
+      If the protagonist is a distributed network or ship AI (see THE KERNEL / PACKET),
+      actions and movement represent telemetry, data bus queries, radio commands, or
+      sensor sweeps; never use human bipedal locomotion ("step down", "walk into", "climb")
+      or physical anatomy ("your hands", "in your pocket", "catch your breath").
+    * GENRE OPTIONS & SCENE DISCIPLINE:
+--- GENERAL SCENE OPTIONS & AGENCY GUIDELINES ---
+1. SECOND-PERSON AGENCY: Options must offer meaningful verbs and stances for "you", representing genuinely distinct tactical, moral, or interpersonal attitudes.
+2. CONSEQUENCE VISIBILITY: The player should understand what is risked or offered by each option without exposing the underlying game state numbers.
+ - events: the event_here (if any) and anything the scene does by itself,
+   each with when it happens (after a number of turns, or after a node).
+   An event is something new that happens later in the scene, never the
+   opening told again.
+ - nudges: one or two, for a player who has done nothing that matters for a
+   while: someone prompts, or the world pushes. A nudge fires wherever the
+   player is, so it must not assume a room ("Dana's voice over the talkback"
+   works anywhere in the station; "Dana looks up from the board" does not).
+ - props: any small thing an action needs that the rooms do not list (a
+   cushion to jam into a crack), with its room. Something that is not a
+   thing at all (the water, the course, the dark) can be an action's object
+   as it is: the menu shows its words.
+ - frame: the scene's establishing keyframe plate for multimodal rendering and spatial grounding (the starting tableau in start_room):
+   * composition: camera perspective and framing looking from start_room
+   * subjects: characters present in the scene, their physical poses, proximity, active gestures
+   * environment: time of day, weather, active lighting, ambient atmosphere
+   * palette_mood: dominant color palette, contrast, dramatic tension
+   * prompt_summary: dense prompt for multimodal scene art (e.g. 16-bit retro pixel art, graphic novel woodcut, or atmospheric concept illustration)
+
+Rules:
+ - Verbs: prefer the core verbs (talk, use, give, show, take); add a story
+   verb where the action deserves its own word, especially one the story
+   repeats (bail, climb, salute). Take is ONLY picking up a portable thing that can
+   be carried in inventory: operating vehicle controls, fixed machinery, doors or
+   structural fittings gets a manipulation verb (grip, turn, steer, heave, throw,
+   lever, open). Leaving through a door, signing a paper or acting on two things
+   gets its own verb (leave, sign, wrap). Look, examine, wait and think are the
+   engine's own: never write them. Never two actions with the same verb, object and detail.
+ - Every option and action is something done or said, never a moral label
+   ("be kind"). A detail that is a line to say goes in quotation marks.
+ - Menu labels must be concise action phrases or short spoken lines, strictly
+   under 40 characters (e.g. "put the letter on the table", "make two teas").
+   Never write full narrative sentences or compound descriptions as labels.
+ - Option count matching for moments: For each opportunity node, generate an
+   exact 1:1 match to Stage A's options list in the same order, with each active
+   option marked "neutral": false. If and only if the opportunity is marked
+   "required": true in the packet, append exactly one final neutral option marked
+   "neutral": true (something taking no side). Never add extraneous options and
+   never omit an option.
+ - Option Deduplication: Never generate duplicate or near-identical options across moments or actions (e.g. do not offer "The Ember Road" in one moment and "The Ember Road. You lead" in another). Every option must present a distinct tactical, moral, or narrative stance.
+ - Strict Action Budget: A scene should contain 3 to 6 total actions (the opportunity moments, true revelation actions if any, at most one incidental activity, and the exit actions), never 8 to 13. High action counts dilute tension into aimless clicking.
+ - Stakes live in bodies, places and things; paper only where the story is
+   about it.
+ - Keep each text short: this is a placeholder a later prose pass rewrites,
+   but it must be the right event, in the story's tone.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<two sentences: how the scene plays>",
+  "opening": "<two to four sentences>",
+  "start_room": "<room>",
+  "placement": [{"who": "<name>", "room": "<room>"}],
+  "room_text": [{"room": "<room>", "variants": [{"state": "<state or null>", "direction": "up | down | null", "after": "<node or null>", "text": "<text>"}]}],
+  "moments": [{"node": "<opportunity node id>",
+               "options": [
+                 {"verb": "<verb>", "object": "<name>", "detail": "<name, or a line in quotes, or null>", "label": "<concise menu label for the detail, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "neutral": false},
+                 {"verb": "<verb>", "object": "<name>", "detail": "<line in quotes or null, taking no side>", "label": "<label under 40 chars>", "room": "<room or null>", "text": "<takes no side>", "neutral": true}
+               ],
+               "lapse": {"after": 4, "text": "<what passing it looks like>"}}],
+  "actions": [{"verb": "<verb>", "object": "<name or null>", "detail": "<or null>", "label": "<concise menu label, under 40 chars>", "room": "<room or null>", "text": "<what happens>", "reveals": ["<revelation node id>"], "leads_to": "<target from leaving, or null>", "once": false}],
+  "events": [{"text": "<what happens>", "after_turns": 2, "after": null}],
+  "nudges": [{"after": 4, "text": "<placeless>"}],
+  "props": [{"name": "<thing>", "room": "<room>", "description": "<when examined>", "portable": true}],
+  "frame": {"composition": "<camera perspective from start_room>", "subjects": ["<who is here, their poses>"],
+            "environment": "<time of day, lighting, weather>", "palette_mood": "<colors, mood>",
+            "prompt_summary": "<dense scene illustration prompt>"}
+}
+
+EXAMPLE (a late-night radio phone-in story, one scene; for shape only)
+
+{
+  "notes": "The caller is on hold while Dana watches you through the glass; the tea is a small kindness you can miss, and the manager's call is the way on.",
+  "opening": "Two in the morning. Line four has been lit for six minutes and Dana has not put it through. She is watching you through the glass with her hand on the reject switch.",
+  "start_room": "the studio",
+  "placement": [{"who": "Dana Pryce", "room": "the control booth"}],
+  "frame": {
+    "composition": "Wide eye-level shot looking through the double-pane soundproof studio window into the dimly-lit control booth",
+    "subjects": ["Dana Pryce sitting stiffly with hand hovering over red reject toggle", "Pulsing white light from call board line four"],
+    "environment": "Two in the morning, darkened radio studio, harsh blinking indicator bulb piercing the amber valve glow",
+    "palette_mood": "Muted amber, dark mahogany foam, cold blinking white bulb; suspended, claustrophobic, fraught",
+    "prompt_summary": "16-bit retro pixel art, looking through a glass studio window at 2 AM into a radio control booth, producer hand hovering over switch, blinking white phone light"
+  },
+  "room_text": [{"room": "the control booth", "variants": [
+    {"state": "dana_trust", "direction": "down", "after": null, "text": "The talkback key is off. Whatever Dana is saying to the station phone, she does not want you to hear it."},
+    {"state": null, "direction": null, "after": null, "text": "Line four's bulb blinks on the call board, steady as a pulse."}]}],
+  "moments": [{"node": "N02a", "options": [
+    {"verb": "talk", "object": "Dana Pryce", "detail": "'Drop it. You're right.'", "label": "'Drop it. You're right.'", "room": null, "text": "She flips the cover and kills the line. 'Thank you,' she says, and means it, and cues the next record herself.", "neutral": false},
+    {"verb": "use", "object": "the call board", "detail": "line four", "label": "line four: put it through yourself", "room": "the control booth", "text": "You lean past her and punch the line through. Dana takes her headphones off and sets them on the desk, very gently, which is worse than throwing them.", "neutral": false},
+    {"verb": "talk", "object": "Dana Pryce", "detail": "'Hold him. I need a minute.'", "label": "'Hold him. I need a minute.'", "room": null, "text": "She holds him. She does not take her hand off the switch.", "neutral": true}],
+   "lapse": {"after": 4, "text": ""}}],
+  "actions": [
+    {"verb": "use", "object": "the kettle", "detail": null, "label": "make two teas", "room": "the corridor", "text": "You make two teas and leave one on the ledge by the booth door. Ten minutes later the cup is empty and turned upside down, which is Dana for thank you.", "reveals": [], "leads_to": null, "once": true},
+    {"verb": "take", "object": "the old host's mug", "detail": null, "label": "the old host's mug", "room": "the studio", "text": "There is a phone number scratched into the glaze on the bottom, under the dried tea.", "reveals": ["N02b"], "leads_to": null, "once": true},
+    {"verb": "talk", "object": "Dana Pryce", "detail": "'Get the manager on the phone.'", "label": "'Get the manager on the phone.'", "room": null, "text": "Dana dials without a word and hands you the receiver through the hatch.", "reveals": [], "leads_to": "S_N03", "once": true}],
+  "events": [{"text": "Line four goes dark on its own. Then lights again.", "after_turns": 3, "after": null}],
+  "nudges": [{"after": 4, "text": "Dana's voice over the talkback, flat: 'Your record's ending in thirty seconds. Do something.'"}],
+  "props": []
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS SCENE (its nodes with the opportunities' options and which are required, the event here, the tells due here, the rooms it opens with their things, the people here, the states, where it can lead):
+{
+ "scene": {
+  "id": "S_N02",
+  "title": "Dinner for Seven",
+  "beat": "second_crisis",
+  "lines": [
+   "T1",
+   "T2"
+  ]
+ },
+ "nodes": [
+  {
+   "id": "N02",
+   "kind": "major",
+   "summary": "Over the master's empty chair Major Carrington holds the table on Evangeline Davenport's recited eleven o'clock quarrel, promising the magistrate the nephew at thaw. You whisper to Millicent Gresham that her sherry glass stays unwashed until she gives the hour; between courses she does: ten past ten, fire high. Nathaniel Yardley, who saw you whisper, bolts for the stables and is dragged back half-frozen and locked in. By midnight Millicent tells the Major you pocket things.",
+   "image": "the master's empty chair at the head of a table nobody eats from"
+  },
+  {
+   "id": "N02a",
+   "kind": "opportunity",
+   "summary": "The Major lays his watch on the cloth beside the master's empty place and asks you, before the table, whether the clocks were wound that night. Evangeline's eleven o'clock hangs on your answer; the solicitor's pen waits above his paper.",
+   "image": "the Major's watch open on the white cloth",
+   "options": [
+    {
+     "n": 1,
+     "do": "Say the clocks were wound by your hand and keep to his watch",
+     "effect": "he closes the watch and tells Ellingham the house keeps good time",
+     "active": false
+    },
+    {
+     "n": 2,
+     "do": "Say the hall clock ran a quarter fast that night, before the guests",
+     "effect": "Evangeline's colour goes; the Major asks the solicitor to note that the housekeeper disputes the house's clocks",
+     "active": false
+    }
+   ],
+   "required": true
+  },
+  {
+   "id": "N02b",
+   "kind": "opportunity",
+   "summary": "Millicent follows you to the pantry after the cloth is drawn. The sherry glass with its brown ring sits in your drawer. She asks whether it is washed yet. The Major's step is in the passage behind her, slow and coming nearer.",
+   "image": "a brown sherry ring in an unwashed glass",
+   "options": [
+    {
+     "n": 1,
+     "do": "Wash the glass before her and call ten o'clock a settlement of her father's debts",
+     "effect": "she watches the water take the ring and says nothing, which is thanks",
+     "active": false
+    },
+    {
+     "n": 2,
+     "do": "Tell her it stays in the drawer while her hour stands",
+     "effect": "she looks at the drawer as if it were a door she cannot lock, and goes",
+     "active": false
+    },
+    {
+     "n": 3,
+     "do": "Slide the drawer shut as the Major opens the pantry door",
+     "effect": "either it closes before he looks, or it sticks and he sees the glass and Millicent's face together",
+     "active": true
+    }
+   ],
+   "required": true
+  },
+  {
+   "id": "N02c",
+   "kind": "opportunity",
+   "summary": "Past midnight the Major has you to the library. Miss Gresham, he says, believes the housekeeper pockets things. He asks you, as a courtesy, to turn out your apron on the table. The tallow stub is in the left pocket under your keys.",
+   "image": "your keys laid on the library table",
+   "options": [
+    {
+     "n": 1,
+     "do": "Empty the apron on the table, stub and all",
+     "effect": "he picks up the stub, looks at it, and puts it in his own pocket with the key",
+     "active": false
+    },
+    {
+     "n": 2,
+     "do": "Say it holds keys and a thimble, and offer the household book instead",
+     "effect": "he takes your word as a servant's word and waves the book away unopened",
+     "active": false
+    },
+    {
+     "n": 3,
+     "do": "Stop at the tallow box on the way and put the stub back before you go in",
+     "effect": "either the apron is empty when he asks, or Fairbrother finds you at his box at midnight and holds his candle to your face",
+     "active": true
+    }
+   ],
+   "required": true
+  },
+  {
+   "id": "N02d",
+   "kind": "demonstration",
+   "summary": "The Major tells the solicitor the housekeeper will keep the hours for him until the thaw, his thumb holding your rounds book open at the murder night. He does not ask you. He has already decided what you are for.",
+   "image": "the Major's thumb holding your rounds book open",
+   "warns": "carrington_regard"
+  },
+  {
+   "id": "N02e",
+   "kind": "demonstration",
+   "summary": "The Major sets Fairbrother on a hall chair outside the nephew's locked room and says, not to you but over your head, that the housekeeper walks the rounds tonight; if she brings back the house's hour she goes in the account, and if not the solicitor has another word for her.",
+   "image": "a hall chair set square against the nephew's door, a candle on the floor beside it",
+   "warns": "carrington_regard"
+  }
+ ],
+ "event_here": [
+  "At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door."
+ ],
+ "tells_due_here": [
+  {
+   "from": "N02a",
+   "states": [
+    "carrington_regard"
+   ],
+   "how": "the Major either hands you the morning's orders for the maids himself or sends them down by the valet with your name left off"
+  },
+  {
+   "from": "N02c",
+   "states": [
+    "carrington_regard",
+    "fairbrother_faith"
+   ],
+   "how": "the Major either sets your rounds book under his own thumb on the table as his instrument or has it fetched from your room by Fairbrother and does not hand it back"
+  }
+ ],
+ "rooms": [
+  {
+   "name": "the dining room",
+   "objects": [
+    "the master's chair",
+    "the cloth",
+    "the sideboard",
+    "the tureen",
+    "the carving set",
+    "the portrait",
+    "the grate",
+    "the north windows"
+   ]
+  },
+  {
+   "name": "the serving pantry",
+   "objects": [
+    "the housekeeper's drawer",
+    "the sherry glass",
+    "the service door",
+    "the lead sink",
+    "the plate-warmer",
+    "the glass cloths",
+    "the tray"
+   ]
+  }
+ ],
+ "people": [
+  {
+   "name": "Lucius Carrington",
+   "role": "the Major",
+   "topics": [
+    "the study key",
+    "the nephew",
+    "the master",
+    "your rounds",
+    "the hour of the quarrel",
+    "the decoration"
+   ]
+  },
+  {
+   "name": "Millicent Gresham",
+   "role": "the nephew's fiancée",
+   "topics": [
+    "the sherry glass",
+    "the study at ten",
+    "Mr. Yardley",
+    "Mr. Yardley's debts",
+    "Major Carrington",
+    "what she told the Major"
+   ]
+  },
+  {
+   "name": "Nathaniel Yardley",
+   "role": "the master's nephew and heir",
+   "topics": [
+    "where he was that night",
+    "his debts",
+    "Miss Gresham",
+    "the Major",
+    "the light on the back stair",
+    "Reginald Fairbrother"
+   ]
+  },
+  {
+   "name": "Evangeline Davenport",
+   "role": "the ward",
+   "topics": [
+    "the quarrel",
+    "the hour",
+    "the master",
+    "the nephew",
+    "the Major",
+    "Lucius Carrington"
+   ]
+  },
+  {
+   "name": "Cornelius Ellingham",
+   "role": "the solicitor",
+   "topics": [
+    "the will",
+    "Mr Yardley",
+    "the Major",
+    "your rounds book",
+    "the master's summons",
+    "Reginald Fairbrother"
+   ]
+  },
+  {
+   "name": "Reginald Fairbrother",
+   "role": "the master's valet of forty years",
+   "topics": [
+    "the tallow box",
+    "the hour he drew the last candle",
+    "the master",
+    "the Major",
+    "the nephew's door",
+    "the master's health"
+   ]
+  }
+ ],
+ "states": [
+  "carrington_regard",
+  "fairbrother_faith",
+  "gresham_confidence",
+  "netherby_nerve",
+  "ormsby_ease"
+ ],
+ "visibility": "observed",
+ "leaving": [
+  {
+   "to": "S_N03",
+   "kind": "default"
+  }
+ ]
+}

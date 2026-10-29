@@ -1,0 +1,289 @@
+{
+  "notes": "The Major has ordered you before the fire to read his account aloud; you count the candle box instead, and the three reckonings (Millicent's glass, Cordelia's hairpin, Fairbrother's silence) fall as the room turns from the Major to you. Naming the Major is the way out, and the solicitor and the nephew take his arms.",
+  "opening": "The drawing-room fire has been built high, as it was at ten on the night the master died, and the eight of them are arranged before it like a jury that has already voted. Major Carrington holds a sheet of his own writing out towards you and says, without looking at you, that the housekeeper will read it to the room so that the matter is closed before the roads open. On the sofa table lies the candle box, its lid shut, and beside it a twist of paper labelled in Mr Ellingham's hand. Fairbrother stands by the double doors with his hands at his sides, and the snow light through the tall windows is grey on every face.",
+  "start_room": "the drawing room",
+  "placement": [
+    {
+      "who": "Lucius Carrington",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Reginald Fairbrother",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Nathaniel Yardley",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Millicent Gresham",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Gideon Ashcombe",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Cornelius Ellingham",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Cordelia Ormsby",
+      "room": "the drawing room"
+    },
+    {
+      "who": "Evangeline Davenport",
+      "room": "the drawing room"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the drawing room",
+      "variants": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "The Major holds his written account out to you himself, as one hands a paper to a person who can read it, and waits."
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "The Major has given his paper to Mr Ellingham, who reads it aloud over your head as though you were the hearthrug. You are to stand there and be the proof of it."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "Mrs Ormsby sits beside Dr Ashcombe on the sofa, close enough that their sleeves touch; she has not taken her eyes off the hairpin in its paper."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "Mrs Ormsby has taken the window seat, the whole width of the room between herself and the doctor, and the snow light makes her look already in mourning."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "The fire is high and the coal scuttle nearly empty. The mantel clock, which nobody has wound, has stopped at twenty to twelve."
+        }
+      ]
+    },
+    {
+      "room": "the front hall",
+      "variants": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "At the foot of the back stairs Lavinia holds the baize door open for you with her shoulder, and lowers her eyes, and says nothing, which from her is a great deal."
+        },
+        {
+          "state": "netherby_nerve",
+          "direction": "down",
+          "after": null,
+          "text": "The baize door at the foot of the back stairs swings shut in your face. Lavinia's heels are already on the servants' stair."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Snow has drifted against the inside of the front door where it does not fit its frame. The hanging lantern is still lit from last night; no one has thought to put it out."
+        }
+      ]
+    }
+  ],
+  "moments": [
+    {
+      "node": "N06a",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'Her father's debts, asked for plainly.'",
+          "label": "'Her father's debts, asked plainly'",
+          "room": null,
+          "text": "You say that Miss Gresham went to the study at ten to ask the master, plainly and as one asks a thing of a relation, to settle her father's debts, and that the sherry was his and not hers. Nathaniel's face closes like a book, but it does not break. Millicent keeps her chin level and looks at the fire.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'She begged him, over a glass.'",
+          "label": "'She begged him, over a glass'",
+          "room": null,
+          "text": "You say she begged. You say it in the voice one uses for the inventory. Millicent stands as if she had been struck, and the glass of the thing is in the air between her and Nathaniel, and he does not go to her.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Millicent Gresham",
+          "detail": "'The glass can wait. The candles first.'",
+          "label": "'The glass can wait. The candles first'",
+          "room": null,
+          "text": "You say the glass will keep, and turn back to the box. Millicent lets out a breath nobody but you hears. Nathaniel does not stop looking at her.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    },
+    {
+      "node": "N06b",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Gideon Ashcombe",
+          "detail": "'The gallery was empty at midnight.'",
+          "label": "'The gallery was empty at midnight'",
+          "room": null,
+          "text": "You say that as far as you saw the gallery was empty at midnight, and you saw a good deal. The doctor nods once, uncaps his pen, and signs. Across the room the widow's breath goes out of her slowly, like a kettle taken off the hob.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Gideon Ashcombe",
+          "detail": "'Mrs Ormsby knelt there at midnight.'",
+          "label": "'Mrs Ormsby knelt there at midnight'",
+          "room": null,
+          "text": "You say Mrs Ormsby knelt at the keyhole at midnight and went afterwards to the doctor's own door. The pen does not pause; he signs anyway. But he does not look at her, and he does not offer her his arm, and you understand he will not until the carriage.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Gideon Ashcombe",
+          "detail": "'Ask me after you have signed, Doctor.'",
+          "label": "'Ask me after you have signed, Doctor'",
+          "room": null,
+          "text": "You say the certificate is his business and the gallery yours, and he may ask again when the ink is dry. He holds the pen above the paper. Mrs Ormsby's hands are white on the hairpin's wrapper.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    },
+    {
+      "node": "N06c",
+      "options": [
+        {
+          "verb": "hold",
+          "object": "the silence",
+          "detail": null,
+          "label": "let the silence stand",
+          "room": "the drawing room",
+          "text": "You say nothing. The fire ticks. The silence goes on long enough for a man to decide what forty years were for, and then Fairbrother says, to the room and in his own words, that he lit the Major up the back stair at eleven, and stood at the master's door, and heard the key turn behind him.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Reginald Fairbrother",
+          "detail": "'You lit the Major up at eleven.'",
+          "label": "'You lit the Major up at eleven'",
+          "room": null,
+          "text": "You say that Fairbrother lit the Major up the back stair at eleven, and tell him to confirm it. He says 'yes' to the carpet. The room has heard your word and not his, and he knows it, and so do you.",
+          "neutral": false
+        },
+        {
+          "verb": "talk",
+          "object": "Reginald Fairbrother",
+          "detail": "'Fairbrother, more coal on the fire.'",
+          "label": "'Fairbrother, more coal on the fire'",
+          "room": null,
+          "text": "You ask him for coal, as you would on any evening. He goes to the scuttle and finds it nearly empty, and kneels to scrape it anyway, and the room waits while he does.",
+          "neutral": true
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    }
+  ],
+  "actions": [
+    {
+      "verb": "count",
+      "object": "the candle box",
+      "detail": null,
+      "label": "count the candles aloud",
+      "room": "the drawing room",
+      "text": "You lift the lid and count in the voice you use for the linen: eleven white candles, and one slot empty. You say that a key in a lock fills its keyhole, and that at midnight you saw the lamp through the master's. Which means the key was not in it. Mr Ellingham sets down the Major's paper very quietly.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true
+    },
+    {
+      "verb": "talk",
+      "object": "Lucius Carrington",
+      "detail": "'Major Carrington.'",
+      "label": "'Major Carrington.'",
+      "room": null,
+      "text": "You say his name, and nothing after it, because nothing after it is needed. The Major's hand goes to the mantel. Nathaniel Yardley takes one arm and Mr Ellingham the other, and the fire, built high as it was at ten, throws their shadows across the double doors.",
+      "reveals": [],
+      "leads_to": "S_N07",
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "text": "Dr Ashcombe clears his throat and says, to the fire rather than to anyone, that the master's summons reached him at ten past eleven, and that when he went up the Major was already coming down.",
+      "after_turns": null,
+      "after": "N06c"
+    },
+    {
+      "text": "The stopped mantel clock gives one dry click as its spring lets go. Evangeline Davenport flinches; the Major does not.",
+      "after_turns": 3,
+      "after": null
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "The Major's voice, carrying through the house: 'Read it. The woman was engaged to read it, not to stand there.'"
+    },
+    {
+      "after": 7,
+      "text": "Somewhere a door the snow has swollen groans in its frame, and nobody moves to see, because everyone is listening for what you will say next."
+    }
+  ],
+  "props": [
+    {
+      "name": "the candle box",
+      "room": "the drawing room",
+      "description": "The tallow box from the butler's pantry, brought up and set on the sofa table. Twelve slots. Eleven candles, white and unburnt.",
+      "portable": false
+    },
+    {
+      "name": "the Major's paper",
+      "room": "the drawing room",
+      "description": "A single sheet in a soldier's upright hand, headed 'An Account of the Night'. It puts Lucius Carrington in his bed from half past ten.",
+      "portable": true
+    },
+    {
+      "name": "the hairpin",
+      "room": "the drawing room",
+      "description": "A tortoiseshell hairpin in a twist of paper, labelled in the solicitor's hand: 'Found at the study keyhole. C.E.'",
+      "portable": true
+    }
+  ],
+  "frame": {
+    "composition": "Wide eye-level shot from the drawing-room doorway, the hearth centred and the eight figures arranged in a half-ring before it, the housekeeper's point of view from the edge of the carpet",
+    "subjects": [
+      "Lucius Carrington standing at the chimneypiece holding out a written sheet, not looking at the viewer",
+      "Reginald Fairbrother upright by the double doors, hands flat at his sides",
+      "Nathaniel Yardley and Millicent Gresham seated apart on the sofa, not touching",
+      "Cordelia Ormsby and Gideon Ashcombe, he with a pen and certificate on his knee",
+      "Cornelius Ellingham at the sofa table beside an open candle box and a labelled twist of paper",
+      "Evangeline Davenport small in the window seat"
+    ],
+    "environment": "Late morning, grey snow light through tall sash windows, fire built unnaturally high in the grate, stopped mantel clock, drifts against the glass",
+    "palette_mood": "Cold grey-white window light against hot amber firelight, dark walnut and bottle-green upholstery, long shadows; held breath, accusation about to fall",
+    "prompt_summary": "Atmospheric Victorian graphic-novel illustration, snowbound country-house drawing room, eight guests and servants ringed before a blazing fire under grey snow light, a military man holding out a paper, an open candle box with one empty slot on the table, stopped clock, tense deductive tableau"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "fichtean_curve",
+  "name": "Fichtean curve",
+  "shape": "the story opens inside the first crisis and climbs through crises of different kinds to a climax, with almost no preamble and a short aftermath",
+  "modifier": {
+    "id": "none",
+    "name": "no modifier",
+    "effect": ""
+  },
+  "reading": "The story opens already inside its first crisis, the study door coming down and the key pocketed, and it never gets a calm stretch: each turn is a new kind of squeeze in the same snowbound house, the room that holds the truth being swept closer every hour. It should build to a single accusation in the drawing room, with the carriage at the door, and land hard and briefly: the name either holds or the house's verdict goes down the road instead, and there is only a short morning after.",
+  "why": "Its opening crisis is the broken door in turn 1, its second and third crises are the dinner-table verdict and the dawn clearing of the study, which is the escalating 3b.primary_trajectory over the hours_to_days of 3e.timeline_duration inside the single building of 3f.setting_scale; its climax is the drawing-room naming where the hard, terminal failure of 3-0c (incorrect_resolution) is met, and its short aftermath is all the story needs after that. seven_point also fits the single_fork and designed gap, but it wants a hook-to-opposite transformation and a preamble before its first turn; this story has no preamble and its housekeeper does not change in kind, she is squeezed until she must speak.",
+  "named_in_kernel": null,
+  "shortlist": [
+    "three_act",
+    "fichtean_curve",
+    "seven_point"
+  ],
+  "scores": {
+    "three_act": 2.0,
+    "freytag": 0.0,
+    "heros_journey": -1.0,
+    "save_the_cat": 1.0,
+    "fichtean_curve": 2.0,
+    "seven_point": 6.0,
+    "story_circle": 1.0,
+    "kishotenketsu": -2.0
+  },
+  "beats": [
+    {
+      "id": "opening_crisis",
+      "name": "Opening crisis",
+      "job": "the story opens inside the first crisis; who the protagonist is and what is at stake are shown by how it is met",
+      "required": true
+    },
+    {
+      "id": "second_crisis",
+      "name": "Second crisis",
+      "job": "a worse crisis, different in kind; what the first one spent or revealed shapes it",
+      "required": true
+    },
+    {
+      "id": "third_crisis",
+      "name": "Third crisis",
+      "job": "the price of the earlier ways through comes due, and the opposition makes its strongest move",
+      "required": true
+    },
+    {
+      "id": "climax",
+      "name": "Climax",
+      "job": "the last crisis, where the story's question is answered by what the protagonist does",
+      "required": true
+    },
+    {
+      "id": "aftermath",
+      "name": "Aftermath",
+      "job": "brief: what is left, and what it cost",
+      "required": true
+    }
+  ]
+}

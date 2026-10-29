@@ -1,0 +1,175 @@
+{
+  "fields": {
+    "3-0a.primary_decision_axis": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3-0a.decision_mechanism": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3-0a.secondary_decision_axes[0]": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3-0a.decision_landscape": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3-0b.protagonist_identity": {
+      "evidence_basis": "mixed",
+      "class": "constraint"
+    },
+    "3-0b.epistemic_gap": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3-0b.gap_resolution": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3-0c.failure_presence": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3-0c.failure_triggers": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3-0c.failure_cost": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3-0c.failure_scope": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.primary_affect": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.primary_trajectory": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3b.secondary_affects[0]": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.secondary_affects[1]": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.tone": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3b.somatic_address": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.transgression.ceiling": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3b.transgression.floor": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3c.core_thematic_axis": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3c.secondary_thematic_axis": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3c.moral_valence.best_case_framing": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3c.moral_valence.worst_case_framing": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3d.viewpoint_handoff.ceiling": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3d.viewpoint_handoff.floor": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3d.viewpoint_handoff.count": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3d.viewpoint_excursions.ceiling": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3d.viewpoint_excursions.floor": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3d.viewpoint_excursions.types": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3d.viewpoint_excursions.interactive": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3e.timeline_structure": {
+      "evidence_basis": "genre_association",
+      "class": "default"
+    },
+    "3e.timeline_duration.ceiling": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3e.timeline_duration.floor": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3f.setting_structure.ceiling": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3f.setting_structure.floor": {
+      "evidence_basis": "explicit",
+      "class": "constraint"
+    },
+    "3f.setting_scale.ceiling": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3f.setting_scale.floor": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3g.target_ending_count": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3g.branching_density": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    },
+    "3g.state_richness": {
+      "evidence_basis": "strong_inference",
+      "class": "constraint"
+    }
+  },
+  "counts": {
+    "explicit": 9,
+    "genre_association": 6,
+    "strong_inference": 24,
+    "mixed": 1
+  },
+  "total_scored_judgments": 40,
+  "constraint_count": 34,
+  "constraint_share": 0.55,
+  "suggested_budget": "minimal",
+  "budget_rule": "weighted constraint_share (explicit 1.0, strong_inference 0.5) >= 0.5 -> minimal; >= 0.2 -> moderate; otherwise generous"
+}

@@ -1,0 +1,149 @@
+{
+  "notes": "Evangeline's arc makes visible the pride of being the one witness the house listens to: she recites her eleven o'clock in the same words every time and glances at the clock before she speaks it. The topic the story turns on is the hour of the quarrel, which she has moved by half an hour to keep herself in her bed and out of the gallery.",
+  "history": null,
+  "description": [
+    {
+      "state": "carrington_regard",
+      "direction": "up",
+      "after": null,
+      "text": "She has taken to watching you rather than the room, and when you pass she stops mid-sentence and waits until you are through the door before she picks up her account again at the same word."
+    },
+    {
+      "state": "carrington_regard",
+      "direction": "down",
+      "after": null,
+      "text": "She sits where the Major can see her, back straight, hands folded, and sends you for a shawl or a candle with a small lift of the chin, as she has since she was nine."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": "N03",
+      "text": "Twenty, pale and over-neat, and before she gives any hour her eyes go to the nearest clock first, as though checking the recitation against it."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": null,
+      "text": "Twenty, in black that was let down in a hurry, hair pinned too tight; she holds herself like a girl who has been told she is important and means to stay so."
+    }
+  ],
+  "here": [
+    {
+      "state": "carrington_regard",
+      "direction": "up",
+      "after": null,
+      "text": "Evangeline stands a little apart with her hands clasped, watching whichever door you came through."
+    },
+    {
+      "state": null,
+      "direction": null,
+      "after": null,
+      "text": "Evangeline sits very upright with a shawl she did not fetch herself across her knees, waiting to be asked."
+    }
+  ],
+  "topics": [
+    {
+      "label": "the quarrel",
+      "known_after": null,
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": "N03",
+          "text": "'I was in my bed. The hall clock struck eleven and I heard his voice raised through the floor, and another, lower, and then the door.' The same words as at dinner, in the same order, and her eyes go to the mantel clock before she begins."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I was in my bed. The hall clock struck eleven and I heard his voice raised through the floor, and another, lower, and then the door.' She counts the three sounds off on her fingers for you. 'You may tell the Major I said so again.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the hour",
+      "known_after": "N03",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'If your rounds say half past ten then your rounds are wrong, and I should be careful what I put in a book the Major is reading.' Her voice climbs. 'I have said eleven to the whole table. Who are you to have a different hour?'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Eleven. I have said eleven and I will go on saying eleven.' Her colour comes up fast. 'A housekeeper's candle is not a clock, and nobody asked you where you were.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the master",
+      "known_after": null,
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'He took me in at six and never once sent me to a school. He said I had a good memory for faces and a better one for hours.' She smooths the black over her knee. 'I do not know who the house goes to. I only know I have nowhere else.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the nephew",
+      "known_after": null,
+      "says": [
+        {
+          "state": "netherby_nerve",
+          "direction": "up",
+          "after": null,
+          "text": "'Mr Yardley's voice is low. The second voice was low.' She hesitates, which she does not often do. 'Lavinia says she heard him on the back stairs. I did not say that. I said what I heard through the floor.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mr Yardley quarrelled with his uncle every visit about money, and he was the only one in the house with a reason to.' She says it brightly, like a lesson learned. 'The Major says the magistrate will see it at once.'"
+        }
+      ],
+      "moves": []
+    },
+    {
+      "label": "the Major",
+      "known_after": null,
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'He has you keeping the hours now, has he.' A small tight smile. 'He had me keeping them yesterday. You will find he does not keep two clocks for long.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Major Carrington has been very good. He said at once that a lady's account is worth more than a servant's candle, and wrote mine down himself.' She straightens. 'He will see I am kept on, whoever has the house.'"
+        }
+      ],
+      "moves": []
+    }
+  ],
+  "portrait": {
+    "composition": "Medium bust portrait, slight three-quarter angle, chin lifted a fraction too high, hands folded in lap just visible at the frame's lower edge",
+    "subjects": [
+      "Evangeline Davenport, the ward",
+      "Twenty years old",
+      "Slight, narrow-shouldered build",
+      "Pale oval face, light grey eyes wide and attentive, faint pink at the cheekbones as if just contradicted",
+      "Dark hair pinned severely back with one strand escaping at the temple",
+      "Gaze directed slightly past the viewer toward an unseen clock"
+    ],
+    "environment": "Black mourning dress let down in haste with an uneven hem visible at the wrist, high jet-buttoned collar, a borrowed paisley shawl slipping off one shoulder, small silver watch-chain at the waist with no watch on it",
+    "palette_mood": "Grey snow-light from a tall window, dull black cloth, cold white skin, one warm point of low firelight on the cheek; eager, brittle, watchful",
+    "prompt_summary": "Atmospheric Victorian concept illustration, bust portrait of a pale twenty-year-old woman in hasty black mourning with tightly pinned dark hair and a slipping paisley shawl, grey eyes fixed just past the viewer, chin raised, grey snow-light from a window and faint firelight, brittle eager expression, country house interior softly out of focus"
+  }
+}

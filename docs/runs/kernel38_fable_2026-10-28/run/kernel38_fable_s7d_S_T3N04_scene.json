@@ -1,0 +1,238 @@
+{
+  "notes": "The Major has the house gathered at the study end demanding your signature; the one thing to do is take his key and fill the keyhole, which earns you a blow and the Major in Nathaniel's grip. Then Ellingham asks for the record, and what you choose to say decides whether a servant's hour is written down beside the gentleman's.",
+  "opening": "The whole house is gathered at the study end, and the Major has your rounds book open on the linen press with Mr Ellingham's pen laid across it. 'You will sign it,' he says. 'Eleven o'clock, the lamp through the keyhole, and your name beneath, or say before these people that you cannot.' The master's key hangs on his waistcoat chain, bow turned to the sconces; Mr Yardley stands at your elbow, Dr Ashcombe at the widow's, and the study door is still locked between you all and what the lamp showed. Fairbrother's candle burns at the stair head, and in two days no one has asked him his hour.",
+  "start_room": "the study end",
+  "placement": [
+    {
+      "who": "Lucius Carrington",
+      "room": "the study end"
+    },
+    {
+      "who": "Cornelius Ellingham",
+      "room": "the study end"
+    },
+    {
+      "who": "Nathaniel Yardley",
+      "room": "the study end"
+    },
+    {
+      "who": "Cordelia Ormsby",
+      "room": "the study end"
+    },
+    {
+      "who": "Gideon Ashcombe",
+      "room": "the study end"
+    },
+    {
+      "who": "Reginald Fairbrother",
+      "room": "the stair head"
+    }
+  ],
+  "room_text": [
+    {
+      "room": "the study end",
+      "variants": [
+        {
+          "state": null,
+          "direction": null,
+          "after": "T3N04a",
+          "text": "The master's key stands in the study lock, bow outward, and the keyhole is dark. The Major's shoulders are still held; nobody has told Mr Yardley he may let go."
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "up",
+          "after": null,
+          "text": "Miss Gresham stands at Nathaniel's side, not behind him, and meets your eye once, steadily, before she looks back to the Major."
+        },
+        {
+          "state": "gresham_confidence",
+          "direction": "down",
+          "after": null,
+          "text": "Miss Gresham keeps Nathaniel's arm between herself and you and does not look up from the Turkey runner."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "up",
+          "after": null,
+          "text": "Mrs Ormsby has come nearest the study door of any of them, her hands folded, ready to be asked to look."
+        },
+        {
+          "state": "ormsby_ease",
+          "direction": "down",
+          "after": null,
+          "text": "Mrs Ormsby keeps to the end window, with Dr Ashcombe's shoulder set between her and you."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Bare boards, the fire bucket, the linen press with your rounds book open on it. The study door is locked, and the whole house is breathing in the one cold corridor."
+        }
+      ]
+    },
+    {
+      "room": "the stair head",
+      "variants": [
+        {
+          "state": "fairbrother_faith",
+          "direction": "up",
+          "after": null,
+          "text": "Fairbrother has left the newel post and stands a pace behind your shoulder, candle shielded in his palm, as a valet stands behind a master."
+        },
+        {
+          "state": "fairbrother_faith",
+          "direction": "down",
+          "after": null,
+          "text": "Fairbrother has gone down to the foot of the stairs with his candle and stands there with his head down, as if waiting to be sent for."
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "Fairbrother waits at the newel post with his candle, the grey snow light from the half-landing window on his back."
+        }
+      ]
+    }
+  ],
+  "moments": [
+    {
+      "node": "T3N04a",
+      "options": [
+        {
+          "verb": "talk",
+          "object": "Cornelius Ellingham",
+          "detail": "'The key, the lamp, the stub. No more.'",
+          "label": "'The key, the lamp, the stub. No more.'",
+          "room": null,
+          "text": "You give it as you would give the week's accounts. A key in the inside lock fills the keyhole; at midnight you saw lamplight through it, so no key stood there. The tallow stub lies on the bare boards where no wax belongs, because a man waited in the dark outside this door. Ellingham writes it. No servant's hour goes down on his page, and at the stair head Fairbrother's head comes up for the first time in two days.",
+          "neutral": false,
+          "when": null,
+          "once": true,
+          "reveals": [],
+          "leads_to": null,
+          "frame": null
+        },
+        {
+          "verb": "talk",
+          "object": "Cornelius Ellingham",
+          "detail": "'Fairbrother lit a man up at eleven.'",
+          "label": "'Fairbrother lit a man up at eleven.'",
+          "room": null,
+          "text": "You say the key and the lamp and the stub, and then you add the rest: that at eleven Fairbrother lit a gentleman up the back stairs, and knows whose coat it was. Every face on the gallery turns from the Major to the stair head. The valet's candle shakes. He must answer now, before the Major's own hour is written, and he knows it.",
+          "neutral": false,
+          "when": null,
+          "once": true,
+          "reveals": [],
+          "leads_to": null,
+          "frame": null
+        },
+        {
+          "verb": "talk",
+          "object": "Lucius Carrington",
+          "detail": "'Eleven, Major. By your own watch.'",
+          "label": "'Eleven, Major. By your own watch.'",
+          "room": null,
+          "text": "'Eleven, Major. By your own watch, which you held to the sconce while you told me the hour.' You read him his night back, step by step, before the whole house: the gallery, the dark, the stub, the key in his pocket when he came to say the door was locked. He stops fighting Nathaniel's grip and looks at you, not with anger: as at a thing to be remembered.",
+          "neutral": false,
+          "when": null,
+          "once": true,
+          "reveals": [],
+          "leads_to": null,
+          "frame": null
+        },
+        {
+          "verb": "talk",
+          "object": "Nathaniel Yardley",
+          "detail": "'Hold him, Mr Yardley. Mind his arm.'",
+          "label": "'Hold him, Mr Yardley. Mind his arm.'",
+          "room": null,
+          "text": "Nathaniel shifts his grip and the Major's breath whistles through his teeth. Ellingham waits with his pen lifted. Nothing has yet been said that can be written down.",
+          "neutral": true,
+          "when": null,
+          "once": false,
+          "reveals": [],
+          "leads_to": null,
+          "frame": null
+        }
+      ],
+      "lapse": {
+        "after": 4,
+        "text": ""
+      }
+    }
+  ],
+  "actions": [
+    {
+      "verb": "set",
+      "object": "the study door",
+      "detail": "the master's key",
+      "label": "set the master's key in the lock",
+      "room": "the study end",
+      "text": "'A key standing in the inside lock fills the keyhole, sir. At midnight I saw the lamp through it.' You step to him, lift the master's key off his chain before his hand can close, and set it in the study lock from this side, bow outward. 'Look.' Ellingham kneels, then the doctor, then the widow; the keyhole is black. The Major's open hand catches your cheek and the sconces jump. Nathaniel Yardley has his arms pinned behind him before the second blow, and you name him there, the tallow stub on the boards behind his heel. Fairbrother, at the stair head, has never once been asked his hour.",
+      "reveals": [],
+      "leads_to": null,
+      "once": true,
+      "neutral": false,
+      "when": null,
+      "frame": null
+    },
+    {
+      "verb": "go",
+      "object": "the stair head",
+      "detail": null,
+      "label": "down to the hall, to set it in writing",
+      "room": null,
+      "text": "Ellingham closes the rounds book over his pen. 'The drawing room, I think, and a fair copy. Mr Yardley, bring him.' The house goes down the stairs in the order it came up, and you go last, as staff do, past Fairbrother's candle.",
+      "reveals": [],
+      "leads_to": "S_T3N05",
+      "once": true,
+      "neutral": false,
+      "when": null,
+      "frame": null
+    }
+  ],
+  "events": [
+    {
+      "text": "A slide of snow goes off the roof above the end window with a sound like a dropped sheet. Nobody on the gallery moves, but the Major's eyes go to the window, and then to the key.",
+      "after_turns": 3,
+      "after": null
+    }
+  ],
+  "nudges": [
+    {
+      "after": 4,
+      "text": "Ellingham's voice carries along the corridor, dry and exact: 'Housekeeper. The house is waiting on you, and the pen is drying.'"
+    },
+    {
+      "after": 7,
+      "text": "The Major, raised, from wherever he stands: 'Sign it, woman, or say before them all that you cannot.'"
+    }
+  ],
+  "props": [
+    {
+      "name": "the master's key",
+      "room": "the study end",
+      "description": "A long iron key with a worn brass bow, hung on the Major's waistcoat chain beside his watch. It is the only key to the study, and it has been in his pocket since the night the door was found locked.",
+      "portable": false
+    },
+    {
+      "name": "the tallow stub",
+      "room": "the study end",
+      "description": "An inch of kitchen tallow, burnt down and gone out, lying on the bare boards a yard from the study door. The sconces here take wax. Nobody who belongs on this floor carries tallow.",
+      "portable": false
+    }
+  ],
+  "frame": {
+    "composition": "Eye-level shot from the study end looking back down the long gallery toward the stair head, the locked study door at the viewer's shoulder, the gathered household filling the narrow corridor",
+    "subjects": [
+      "Lucius Carrington, the Major, squared before the linen press with one hand flat on an open rounds book, watch chain and iron key glinting at his waistcoat",
+      "Cornelius Ellingham, solicitor, pen held out, spectacles catching sconce light",
+      "Nathaniel Yardley close at the housekeeper's elbow, jaw set",
+      "Cordelia Ormsby in black near the end window with Dr Gideon Ashcombe's shoulder half before her",
+      "Reginald Fairbrother far off at the stair head, a small candle flame, head bowed"
+    ],
+    "environment": "Late grey afternoon, snow light flat through the end window, low gas sconces along the gallery, breath faintly visible in the cold corridor, bare boards and a fire bucket",
+    "palette_mood": "Ash grey and tallow yellow against dark oak and mourning black, one point of brass on the key; airless, formal, every figure held still as a witness",
+    "prompt_summary": "Atmospheric Victorian graphic-novel illustration, long narrow country-house gallery seen from the study door, a household in mourning dress gathered in a cold corridor lit by low sconces and grey snow light, a military gentleman with a key on his watch chain demanding a signature on an open ledger, a solicitor holding out a pen, a distant valet with a single candle at the stair head, bare floorboards, tension and suspicion"
+  }
+}

@@ -1,0 +1,244 @@
+SYSTEM PROMPT
+
+You are step 6b1c of an interactive fiction generation pipeline: what ONE
+character says about everything the player might raise with them. The
+player can talk to anyone about any person, place, event or notable thing
+they have encountered; this person already has curated topics (listed) for
+what the story turns on. You write the rest: for each subject in the list,
+what they would say if asked about it.
+
+ - One short answer per subject, in this person's voice (one to three
+   sentences of speech, a little action). It must tell the player
+   something: about the subject, about the speaker, or about how the two are
+   tied. Answer only the subjects this person has something real to say
+   about, and leave the rest out: a line that only says a thing is cold or
+   heavy or expensive is filler. A person who would not know a subject that
+   matters can say so, in character ("Never been up there. Heights.").
+ - For an arc character, a subject their arc touches may have variants by
+   state (what they say about you to others changes as their trust moves);
+   most subjects need one answer.
+ - Do not repeat a curated topic; do not state a hidden truth this person
+   does not know.
+ - "about" says who a person is or what an event was: get it right (the
+   lock keeper is not the buyer); name the subject exactly as listed.
+ - Stakes live in people and things, not papers.
+ - NATURAL, GROUNDED SPEECH (NO APHORISMS):
+   Characters speak like real people in their specific occupation, background, and situation. NEVER write cryptic fortune-cookie epigrams or symmetrical definitions ("X is not a Y, it is a Z"). Characters speak with practical intent, occupational details, dry humor, deflection, or direct complaint.
+ - NO REPETITIVE PROP MANIPULATION:
+   Do not have characters endlessly perform symbolic actions with props (fiddling with holsters, wiping counters, tapping datapad screens, adjusting collars, turning keys, holding mugs) as a substitute for dialogue.
+
+OUTPUT FORMAT (JSON)
+
+Output ONLY valid JSON, no markdown code fences, no commentary.
+
+{
+  "notes": "<one sentence: how this person sees the others>",
+  "lines": [{"subject": "<as listed>", "says": [{"state": "<state or null>", "direction": "up | down | null", "after": null, "text": "<what they say>"}]}]
+}
+
+EXAMPLE (a late-night radio phone-in story, Dana the producer; for shape only)
+
+{
+  "notes": "Dana sees everyone at the station as a risk to the show, and is kinder about each of them than she admits.",
+  "lines": [
+    {"subject": "the station manager", "says": [{"state": null, "direction": null, "after": null, "text": "'He wants the ratings and no phone calls from the owners. You can have one of those. Pick.'"}]},
+    {"subject": "the transmitter hut", "says": [{"state": null, "direction": null, "after": null, "text": "'Don't go out there at night. Not because of ghosts. Because of the dog that lives under it.'"}]},
+    {"subject": "the old host's mug", "says": [
+      {"state": "dana_trust", "direction": "up", "after": null, "text": "She takes it down, turns it in her hands, puts it back exactly on its ring of dust. 'Leave it. Please.'"},
+      {"state": null, "direction": null, "after": null, "text": "'It's a mug.'"}]},
+    {"subject": "the storm", "says": [{"state": null, "direction": null, "after": null, "text": "'The mast is sixty years old and held together with optimism. If it goes, we go to the emergency tape and I go home.'"}]}
+  ]
+}
+
+---
+
+THE KERNEL:
+A Victorian country-house murder. A snowstorm has cut the house off for two days, and the master of the house is dead in his locked study. You're the new housekeeper, the only person who saw where everyone was that night. Seven guests, all lying about something. I want real clues and red herrings, a fair solution, and I want to be able to accuse the wrong person.
+
+TONE: tone: formal, atmospheric, observant; affect: deductive suspicion; how the tone is produced: Formal and observant: the player is staff, addressed by surname, expected not to be noticed, and so notices everything; etiquette is the surface each lie is slipped under. Atmospheric: the house creaks and drips, fires burn low, the snow light is grey through every window, and suspicion escalates as each cleared alibi narrows the room.
+
+THIS PERSON (who, voice, tie, arc, the states, their curated topics) AND THE SUBJECTS:
+{
+ "who": "Cornelius Ellingham (the solicitor)",
+ "voice": "careful, qualified sentences full of conditions and sub-clauses; speaks in instruments, signatures, and what will and will not stand at law; never offers an opinion without first asking who else has given one",
+ "tie": "is the one guest who addresses you as a witness rather than a servant, because he knows a housekeeper's rounds are evidence",
+ "tier": "supporting",
+ "arc": {
+  "starts": "Wants the old will to stand and the unsigned one never mentioned; addresses you as a witness because he knows a housekeeper's rounds are evidence.",
+  "moments": [
+   {
+    "node": "N05",
+    "change": "Lists what the Major takes from your room in his own hand, so that the inventory is law's and not the Major's."
+   },
+   {
+    "node": "T3N02",
+    "change": "Puts his name under your hours and tells the Major they go to the magistrate, not before; the case becomes his instrument and the unsigned will becomes his price."
+   },
+   {
+    "node": "T2N02",
+    "change": "Hears the doctor state that the master was dying and had sent for his oldest friend, and writes it down without asking what it is for."
+   }
+  ],
+  "ends": "Rides down the road beside whoever the carriage carries, to say what will stand, with the old will intact and the new one never spoken of."
+ },
+ "states": [
+  "carrington_regard",
+  "fairbrother_faith",
+  "gresham_confidence",
+  "netherby_nerve",
+  "ormsby_ease"
+ ],
+ "already_topics": [
+  "the will",
+  "Mr Yardley",
+  "the Major",
+  "your rounds book",
+  "the master's summons"
+ ],
+ "subjects": [
+  {
+   "subject": "Lucius Carrington",
+   "kind": "person",
+   "about": "the Major"
+  },
+  {
+   "subject": "Reginald Fairbrother",
+   "kind": "person",
+   "about": "the master's valet of forty years"
+  },
+  {
+   "subject": "Nathaniel Yardley",
+   "kind": "person",
+   "about": "the master's nephew and heir"
+  },
+  {
+   "subject": "Gideon Ashcombe",
+   "kind": "person",
+   "about": "the doctor"
+  },
+  {
+   "subject": "Millicent Gresham",
+   "kind": "person",
+   "about": "the nephew's fiancée"
+  },
+  {
+   "subject": "Evangeline Davenport",
+   "kind": "person",
+   "about": "the ward"
+  },
+  {
+   "subject": "Cordelia Ormsby",
+   "kind": "person",
+   "about": "the widow"
+  },
+  {
+   "subject": "Lavinia Netherby",
+   "kind": "person",
+   "about": "the housemaid"
+  },
+  {
+   "subject": "Barnaby Quarles",
+   "kind": "person",
+   "about": "the lodge-keeper"
+  },
+  {
+   "subject": "the first-floor gallery",
+   "kind": "place"
+  },
+  {
+   "subject": "the back stairs",
+   "kind": "place"
+  },
+  {
+   "subject": "the dining room",
+   "kind": "place"
+  },
+  {
+   "subject": "the housekeeper's room",
+   "kind": "place"
+  },
+  {
+   "subject": "the servants' hall",
+   "kind": "place"
+  },
+  {
+   "subject": "the drawing room",
+   "kind": "place"
+  },
+  {
+   "subject": "the master's study",
+   "kind": "place"
+  },
+  {
+   "subject": "the ice house",
+   "kind": "place"
+  },
+  {
+   "subject": "the library",
+   "kind": "place"
+  },
+  {
+   "subject": "the door comes down",
+   "kind": "event",
+   "about": "The study door is broken down with the hall poker, the household crowding the gallery; a key is heard to fall onto the carpet inside, and the master is found at his desk with the window frozen shut, the fire gone to ash, and a yellow tallow stub, not one of the study's white wax candles, snuffed in the mantel candlestick."
+  },
+  {
+   "subject": "dinner for seven",
+   "kind": "event",
+   "about": "At dinner, with the master's chair empty and the storm at the windows, the Major tells the table that the quarrel in the study is known to all and that he will carry the household's account to the magistrate at the thaw; the nephew bolts from the table for the stables, is dragged back half-frozen from the yard, and is locked in his room with the valet set at his door."
+  },
+  {
+   "subject": "the thaw",
+   "kind": "event",
+   "about": "The eaves begin to drip at dawn and the lodge-keeper wades up to say the road will carry a cart by noon; the Major orders the carriage, sends the maids up to the study with pails and a fresh scuttle, and calls the house to the drawing room to hear the housekeeper's account of the night before they sign."
+  },
+  {
+   "subject": "the Major's door",
+   "kind": "object"
+  },
+  {
+   "subject": "the nephew's door",
+   "kind": "object"
+  },
+  {
+   "subject": "the master's chair",
+   "kind": "object"
+  },
+  {
+   "subject": "the account book",
+   "kind": "object"
+  },
+  {
+   "subject": "the coat stand",
+   "kind": "object"
+  },
+  {
+   "subject": "the writing table",
+   "kind": "object"
+  },
+  {
+   "subject": "the solicitor's writing case",
+   "kind": "object"
+  },
+  {
+   "subject": "the gallery rail",
+   "kind": "object"
+  },
+  {
+   "subject": "the half-landing window",
+   "kind": "object"
+  },
+  {
+   "subject": "the widow's door",
+   "kind": "object"
+  },
+  {
+   "subject": "the gallery windows",
+   "kind": "object"
+  },
+  {
+   "subject": "the study door",
+   "kind": "object"
+  }
+ ]
+}

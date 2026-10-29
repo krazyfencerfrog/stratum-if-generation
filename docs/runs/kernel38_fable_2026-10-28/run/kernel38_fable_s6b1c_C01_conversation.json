@@ -1,0 +1,383 @@
+{
+  "notes": "The Major grades every soul in the house as a man grades troops, reliable or not, and the housekeeper is the one piece he has not yet fixed on the map.",
+  "lines": [
+    {
+      "subject": "Gideon Ashcombe",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Ashcombe puts the death between eleven and one and wanted brandy after saying it. A regimental surgeon would have given me the half-hour before he reached for the bottle. Two hours is no use to a magistrate.'"
+        }
+      ]
+    },
+    {
+      "subject": "Millicent Gresham",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'Miss Gresham has a good eye for what goes into a servant's apron. She has reported it to me. I'd mind that, if I were you, next time you're near the study.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Miss Gresham means to be mistress of this house within the year and is weighing the staff already. Serve her as you'd serve the mistress. It saves changing habits later.'"
+        }
+      ]
+    },
+    {
+      "subject": "Evangeline Davenport",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The ward keeps time like a quartermaster's wife. Eleven, she says, voices through the study door. A girl who has just lost her guardian does not invent the hour, and I'll hold the table on it.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cordelia Ormsby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Mrs Ormsby was at the piano until the shouting stopped her hands. She'll sign her statement without argument; widows know what a house sounds like with a dead man in it. Take hers first.'"
+        }
+      ]
+    },
+    {
+      "subject": "Lavinia Netherby",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The maid laid the study fire at six and swears to white wax in the sticks. Nervous girl. Nervous girls miscount. Keep her below and off the gallery; I'll not have her fainting on the carpet.'"
+        }
+      ]
+    },
+    {
+      "subject": "Cornelius Ellingham",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'Ellingham is paid by the estate. The estate is the nephew. You carried your hours to him and not to me, and I note it.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Ellingham draws the papers up. He does not decide what goes in them. A clerk with a better coat and a worse constitution.'"
+        }
+      ]
+    },
+    {
+      "subject": "Barnaby Quarles",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Quarles waded up at dawn to report the road. The one man on this estate who came and told me a thing without being sent for. Noon, he says, and I'll take his word over the doctor's.'"
+        }
+      ]
+    },
+    {
+      "subject": "the first-floor gallery",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'One corridor. Bedroom doors along it, the study at the end, a window beyond. Whoever went to that door walked that carpet, and I have posted men on worse ground than a gallery.'"
+        }
+      ]
+    },
+    {
+      "subject": "the back stairs",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'I sent you below and you came up the valet's stairs. I do not forget a man who leaves his post. Nor a woman.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Servants' stairs. They come out at the valet's door by the study end. Fairbrother's route for forty years. Not yours.'"
+        }
+      ]
+    },
+    {
+      "subject": "the dining room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'We dine at eight. A house keeps its hours or it comes to pieces, same as a mess. Lay the master's place and leave the chair empty.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's room",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'Your room. I'll want to see inside it before the magistrate does.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Your room, your keys, your book. Keep the door locked. Miss Gresham has been through it already in her head.'"
+        }
+      ]
+    },
+    {
+      "subject": "the servants' hall",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I do not go below. Not my ground. You carry my orders down and bring the maids' answers up; that is the arrangement and it has served.'"
+        }
+      ]
+    },
+    {
+      "subject": "the drawing room",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The account is read there and signed there. Fire built up, chairs in a row, Ellingham at the writing table. I want the house to hear it once, together, before the carriage comes round.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's study",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The room stands as it was found until I say otherwise. Nobody in, nothing out. I'll send the maids up with pails when I judge it; a magistrate shouldn't be handed a room two days cold and stinking of ash.'"
+        }
+      ]
+    },
+    {
+      "subject": "the ice house",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Ashcombe and I carried him down ourselves. A man is not left at his desk for two days whatever the coroner prefers. It is forty yards from the kitchen door; keep the maids from it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the library",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I had the port in the library until half past ten by my watch, then went up. Mrs Ormsby passed the door; ask her. I've no objection to my own hours being checked. They stand.'"
+        }
+      ]
+    },
+    {
+      "subject": "the door comes down",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I gave the order for the poker. Three strokes, hinge side, and a thing dropped on the carpet inside before the door went. Window fast, fire dead. I've seen men dead in the field with less to go on and the matter settled by noon.'"
+        }
+      ]
+    },
+    {
+      "subject": "dinner for seven",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'A man with a clear conscience sits through his soup. The boy ran for the stables in a snowstorm and we fetched him back half dead. I had him locked in for his own preservation as much as the house's.'"
+        }
+      ]
+    },
+    {
+      "subject": "the thaw",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Noon for the road, Quarles says. Account read at ten, carriage at half past eleven, pails to the study at nine. Write the hours down; I'll not have the day drift.'"
+        }
+      ]
+    },
+    {
+      "subject": "the Major's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'I keep my door shut and my watch on the table beside the bed. I heard the quarrel through it as any man on the gallery would. Questions about my door come to me, not to the maids.'"
+        }
+      ]
+    },
+    {
+      "subject": "the nephew's door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Locked, and Fairbrother on the hall chair outside it. It stays locked until the magistrate. Not punishment. Custody. There is a difference and the boy will learn it.'"
+        }
+      ]
+    },
+    {
+      "subject": "the study door",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Two inches of oak and it took the poker and three men. Nobody slipped through that. It is off its hinge now; I've had the frame left as it broke so the magistrate can see the work.'"
+        }
+      ]
+    },
+    {
+      "subject": "the end window",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Frozen fast. I put my own shoulder to it the morning we broke in and it did not give a quarter inch. Nobody came by the window. Strike it off and move on.'"
+        }
+      ]
+    },
+    {
+      "subject": "the master's chair",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'A table wants a head or it goes to pieces. Somebody carves. Until the estate is settled it will be me, and I'll thank the house not to make a drama of it.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Nobody sits in it. Lay the place, leave the chair. The regiment does the same for a fallen colonel.'"
+        }
+      ]
+    },
+    {
+      "subject": "the cloth",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The cloth stays over him. Ashcombe put it there and he was right to. A man's face is not for the maids to carry about the house.'"
+        }
+      ]
+    },
+    {
+      "subject": "the housekeeper's drawer",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'I am told things find their way into that drawer. When I ask for it open, I'll expect it open.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Your drawer is your business until the magistrate asks for the wages book. Keep it in order. That is all.'"
+        }
+      ]
+    },
+    {
+      "subject": "the account book",
+      "says": [
+        {
+          "state": "carrington_regard",
+          "direction": "up",
+          "after": null,
+          "text": "'Clean page. Write it as I give it, hour by my watch, and sign at the foot. A plain record, properly kept, is worth more to a magistrate than seven gentlefolk remembering.'"
+        },
+        {
+          "state": "carrington_regard",
+          "direction": "down",
+          "after": null,
+          "text": "'You have been writing in that book what I did not dictate. I have seen the pencil going. Bring it up.'"
+        },
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'Bring the book to the drawing room at ten. We shall want it read aloud.'"
+        }
+      ]
+    },
+    {
+      "subject": "the long table",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'When I have the maids questioned, sit them along one side of it. A row is easier to watch than a ring. Any sergeant will tell you.'"
+        }
+      ]
+    },
+    {
+      "subject": "the hall chair",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'That chair is Fairbrother's post outside the nephew's door. He has sat in a hall forty years for one master; he can sit two nights for another's heir without a cushion.'"
+        }
+      ]
+    },
+    {
+      "subject": "the inside lock",
+      "says": [
+        {
+          "state": null,
+          "direction": null,
+          "after": null,
+          "text": "'The lock was turned from inside. The door came down, and what was in it fell. That is what a locked room means and I'll not have it argued by people who have never held a position.'"
+        }
+      ]
+    }
+  ]
+}

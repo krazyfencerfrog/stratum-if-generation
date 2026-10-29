@@ -1,0 +1,70 @@
+{
+  "in_genre_elements": [
+    {
+      "element": "The telephone wire is found cut clean rather than snapped by ice, discovered while the housekeeper is checking the line with a guest holding the lantern, so the two of them now share knowledge that someone inside did it deliberately.",
+      "why_it_fits": "Transforms the snowstorm isolation from accident into intent, and makes the housekeeper's first ally also her first suspect since he was alone with the wire."
+    },
+    {
+      "element": "Everyone is gathered in the great hall and made to re-enact, step by step, where they stood and walked the night of the murder, with the housekeeper calling out what she remembers; one guest's reconstruction places him in a corridor she knows was dark and empty.",
+      "why_it_fits": "Gives the housekeeper's unique vantage a physical stage, lets the player catch spoken lies against remembered movement, and lets the player misread an innocent discrepancy as guilt."
+    },
+    {
+      "element": "A guest arrives on skis out of the blizzard claiming to be a police sergeant, but he carries no warrant card and his boots are dry; the household must decide whether to obey or confine him.",
+      "why_it_fits": "Injects a seventh wildcard into a sealed house and offers a tempting wrong accusation: the stranger nobody can vouch for."
+    },
+    {
+      "element": "A nursery-rhyme tune is heard whistled in the upper corridor at night and later hummed absently by a guest at breakfast, who freezes when he realises others heard it.",
+      "why_it_fits": "A sound-clue that the housekeeper can track through the house's acoustics, usable as either a genuine link to the killer or a red herring picked up by an innocent ear."
+    },
+    {
+      "element": "One guest is revealed to have known the dead master as a child under a different name, exposed when an old servant's photograph is produced and the guest's reaction gives her away before any words are spoken.",
+      "why_it_fits": "Buried past connection to the victim is the classic Christie engine, and the face-to-face exposure gives the housekeeper a scene to play rather than a document to read."
+    },
+    {
+      "element": "Coal for the fires is running low and the household must decide which rooms to keep warm, forcing suspects who loathe each other to share one hearth and overhear each other's whispered arguments.",
+      "why_it_fits": "The warming fire becomes a pressure chamber where alliances and lies surface through proximity, and the housekeeper controls the coal and thus who sits where."
+    },
+    {
+      "element": "The study key is found in the pocket of a coat hanging in the hall, but five guests wore similar dark overcoats and the coats were swapped in the dark during the first panic.",
+      "why_it_fits": "A physical locked-room clue with a fair but ambiguous chain of custody, letting the player accuse whoever they believe last wore the coat."
+    },
+    {
+      "element": "A second death, or near-death, occurs while the housekeeper is away from the room for exactly the minutes it took to fetch linen, meaning the killer timed it to her absence and must have been watching her.",
+      "why_it_fits": "Makes the housekeeper's observing role dangerous and narrows suspects to those who could see her leave, tightening the fair-play logic."
+    }
+  ],
+  "fusion_elements": [
+    {
+      "element": "The household imposes a buddy rule: no one may go anywhere alone, and pairs must be reassigned by lot each night so that any two people are never together twice; the housekeeper draws the pairs and can rig them.",
+      "why_it_fits": "Gives the player a mechanical lever to force suspects together or test an alibi, with the dread that whoever they pair with could be the killer."
+    },
+    {
+      "element": "A physical test is devised to check who was truly in the snow that night: boots are set by the fire and the ones that steam and shed ice-crust betray a walk outside, while someone secretly swaps their boots before the test.",
+      "why_it_fits": "A Carpenter-style blood-test ritual rebuilt for a Victorian house, giving a tense group scene with a fair tell and a sabotaged result."
+    },
+    {
+      "element": "Paranoia escalates into the guests demanding each person be locked in a separate room at night, but there are only four working locks, so the housekeeper must decide who goes unlocked and who shares.",
+      "why_it_fits": "Resource scarcity forces moral and tactical choices and creates a new locked-room situation that may trap an innocent with the killer."
+    },
+    {
+      "element": "The generator-equivalent, a boiler that heats the pipes, is sabotaged and the house begins to freeze from the outer rooms inward, giving an environmental deadline before people must crowd into a single room with the murderer.",
+      "why_it_fits": "The cold becomes a clock that compresses space and time, pushing the player to accuse before the house is uninhabitable."
+    },
+    {
+      "element": "A guest proposes burning the dead master's body in the stable to prevent some imagined contamination, and the household must physically restrain him, destroying or preserving the corpse with its forensic clues.",
+      "why_it_fits": "Transplants the flamethrower panic into a struggle over evidence, where losing the body means losing fair-play clues like the wound angle."
+    },
+    {
+      "element": "A trusted-seeming figure, the kindly doctor among the guests, is found to have hidden a hypodermic in the cold-store ice, and no one can tell whether it was for the master, himself, or someone else.",
+      "why_it_fits": "Mirrors the horror of the familiar face concealing something, offering a strong wrong-accusation path while keeping a fair alternative explanation."
+    },
+    {
+      "element": "Someone has been slipping out through the coal-chute to the snow, and the housekeeper finds half-filled fresh prints leading toward the frozen lake, forcing a choice to follow before the storm erases them.",
+      "why_it_fits": "An expiring physical trail outside the sealed house adds a race against weather and a chance to be ambushed or misled."
+    },
+    {
+      "element": "The group, exhausted and sleepless, votes to tie up the person the housekeeper names most suspicious; once bound, that person cannot defend themselves while the real killer acts.",
+      "why_it_fits": "Turns the player's accusation into a physical consequence with real cost, making the wrong accusation genuinely dangerous rather than merely incorrect."
+    }
+  ]
+}

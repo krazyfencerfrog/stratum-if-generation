@@ -1,0 +1,20 @@
+{
+  "note": "One man from outside the snow, who brings the road with him and wants nothing from the house but to leave it.",
+  "people": [
+    {
+      "who": "Barnaby Quarles (the lodge-keeper)",
+      "description": "A broad, stooped man in a greatcoat crusted white to the knees, his beard frozen stiff and his nose the colour of a brick. He stands on the mat and will not come further in, as if the carpet were another man's field.",
+      "here": "Quarles stamps the snow from his boots and holds his cap in both red hands, waiting to be asked.",
+      "topics": [
+        {
+          "label": "the road",
+          "says": "'Lane's open to the mill bridge, Mrs. —, and no further. Drifts past that'd bury a horse. Give it till noon and a cart might come, if the wind holds off. If it don't, you've got us for another day.'"
+        },
+        {
+          "label": "the night of the storm",
+          "says": "'I heard nowt but the wind, and I'll say so to any constable that asks. Lodge is half a mile off. What goes on in this house goes on without me, and I've always liked it that way.'"
+        }
+      ]
+    }
+  ]
+}

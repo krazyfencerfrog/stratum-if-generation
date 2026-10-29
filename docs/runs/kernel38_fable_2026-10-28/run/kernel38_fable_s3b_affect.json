@@ -1,0 +1,53 @@
+{
+  "primary_affect": {
+    "label": "deductive suspicion",
+    "evidence_basis": "strong_inference",
+    "note": "Seven guests all lying, real clues and red herrings, and a fair solution center the sustained experience on scrutinizing everyone rather than on fear or grief."
+  },
+  "primary_trajectory": {
+    "shape": "escalating",
+    "evidence_basis": "genre_association",
+    "note": "A fair-play whodunit conventionally tightens as suspects are eliminated toward a single accusation; the two-day snowbound isolation reinforces mounting pressure."
+  },
+  "secondary_affects": [
+    {
+      "label": "snowbound confinement",
+      "relation": "complementary",
+      "evidence_basis": "strong_inference",
+      "note": "The storm cutting the house off for two days with a killer among the guests adds a trapped, closed-circle pressure to the suspicion."
+    },
+    {
+      "label": "fear of misjudgment",
+      "relation": "intermittent",
+      "evidence_basis": "strong_inference",
+      "note": "The Kernel explicitly wants the player able to accuse the wrong person, so the stakes of a false accusation surface at decision points rather than throughout."
+    }
+  ],
+  "tone": {
+    "descriptors": [
+      "formal",
+      "atmospheric",
+      "observant"
+    ],
+    "evidence_basis": "genre_association",
+    "note": "No register is stated; these are conventional for a Victorian country-house mystery told from a servant's watchful vantage."
+  },
+  "somatic_address": {
+    "level": 1,
+    "channels": [],
+    "evidence_basis": "strong_inference",
+    "note": "The Kernel's emphasis is entirely on clues, lies, and deduction; the snowstorm functions as plot isolation rather than a bodily register."
+  },
+  "transgression": {
+    "ceiling": {
+      "level": 2,
+      "evidence_basis": "strong_inference",
+      "note": "Publicly accusing an innocent guest carries real social cost in the fiction, but the narrative frames it as a puzzle failure rather than a grave moral violation."
+    },
+    "floor": {
+      "level": 1,
+      "evidence_basis": "strong_inference",
+      "note": "The cost is choice-driven: correctly solving the case keeps the housekeeper fully within investigator norms."
+    }
+  }
+}
