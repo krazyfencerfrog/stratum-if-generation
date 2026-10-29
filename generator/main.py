@@ -320,11 +320,12 @@ class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
                  branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1,
-                 dynamic_names=False, genre='', collapse_phase3=False):
+                 dynamic_names=False, genre='', collapse_phase3=False, resolvers=False):
         self.story_id = story_id
         self.genre = (genre or '').strip().lower()
         self.dynamic_names = bool(dynamic_names or os.environ.get('STRATUM_DYNAMIC_NAMES') == '1')
         self.collapse_phase3 = bool(collapse_phase3 or os.environ.get('STRATUM_COLLAPSE_PHASE3') == '1')
+        self.auto_resolver = bool(resolvers or os.environ.get('STRATUM_RESOLVERS') == '1')
         self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
@@ -2460,6 +2461,9 @@ class StoryGenerator:
         builder = OutlineBuilder(self, max_iterations=max_iterations, branching=self.branching)
         story = builder.run()
         self.analysis['story'] = story
+        if story.get('resolvers'):
+            self.analysis['resolvers'] = story['resolvers']
+            self.save_story_json('resolvers.json', {'resolvers': story['resolvers']})
         return story
 
     # ------------------------------------------------------------------ 4e: the outline judge
@@ -2791,6 +2795,8 @@ def main(argv=None):
                         help="genre pack to use (default: auto-detected or 'general')")
     parser.add_argument("--collapse-phase3", action="store_true",
                         help="collapse Phase 3 into a single unified IF Shape Read (s3_if_shape), reading true decision cardinality and saving 16 calls")
+    parser.add_argument("--resolvers", action="store_true",
+                        help="enable automatic climax resolver and state asset synthesis")
     args = parser.parse_args(argv)
 
     story_id = slugify(args.story_id)
@@ -2805,7 +2811,8 @@ def main(argv=None):
                              branching=args.branching, outline_judge=not args.no_outline_judge,
                              author=args.author, parallel=args.parallel,
                              dynamic_names=args.dynamic_names, genre=args.genre,
-                             collapse_phase3=args.collapse_phase3)
+                             collapse_phase3=args.collapse_phase3,
+                             resolvers=args.resolvers)
         gen.stop_after = args.stop_after
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)

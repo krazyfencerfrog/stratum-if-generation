@@ -205,46 +205,141 @@ def apply_resolver(package: Dict[str, Any], spec: ResolverSpec) -> Dict[str, Any
     pkg = json.loads(json.dumps(package))  # deep copy
     scenes = pkg.setdefault('scenes', {})
     endings = pkg.setdefault('endings', {})
+    world = pkg.setdefault('world', {})
+    objects = world.setdefault('objects', {})
+    chars = world.setdefault('characters', {})
+    verbs = pkg.setdefault('verbs', {})
+
+    # Ensure option verbs are registered
+    for opt in spec.options:
+        v = opt.verb or 'talk'
+        if v not in verbs:
+            verbs[v] = {'label': v.capitalize()}
+
+    # 0. Register any missing item objects in package['world']['objects']
+    for asset in spec.assets:
+        if asset.kind == 'item' or any('take' in eff or 'give' in eff for eff in asset.effects):
+            if asset.id not in objects:
+                objects[asset.id] = {
+                    'name': asset.label,
+                    'description': asset.description or f"Notable evidence: {asset.label}.",
+                    'portable': True,
+                    'location': 'player'
+                }
 
     # 1. Wire asset acquisition hooks into earlier scene interactions
     for asset in spec.assets:
-        if asset.scene_id and asset.action_id and asset.scene_id in scenes:
-            sc = scenes[asset.scene_id]
-            for it in sc.get('interactions', []):
-                if it.get('id') == asset.action_id:
-                    existing = it.setdefault('effects', [])
-                    for eff in asset.effects:
-                        if eff not in existing:
-                            existing.append(eff)
+        target_sid = asset.scene_id
+        if target_sid not in scenes and f"S_{target_sid}" in scenes:
+            target_sid = f"S_{target_sid}"
+        if target_sid and target_sid in scenes:
+            sc = scenes[target_sid]
+            matched = False
+            if asset.action_id:
+                for it in sc.get('interactions', []):
+                    if it.get('id') == asset.action_id:
+                        matched = True
+                        existing = it.setdefault('effects', [])
+                        for eff in asset.effects:
+                            if eff not in existing:
+                                existing.append(eff)
+            if not matched:
+                # Add discovery interaction into the scene
+                effects = list(asset.effects)
+                if not effects and asset.state_condition:
+                    if asset.state_condition.startswith('flags.'):
+                        effects.append({'set': asset.state_condition.replace('flags.', '')})
+                    elif asset.state_condition.startswith("has('") and asset.state_condition.endswith("')"):
+                        effects.append({'take': asset.state_condition[5:-2]})
+
+                if asset.kind == 'item':
+                    disc_it = {
+                        'id': f"{target_sid}_get_{asset.id}",
+                        'verb': 'take',
+                        'object': asset.id,
+                        'object_label': asset.label,
+                        'text': asset.description or f"You take {asset.label}.",
+                        'effects': effects or [{'take': asset.id}],
+                        'once': True,
+                        'reach': 'any'
+                    }
+                else:
+                    room_loc = sc.get('start_room') or (sc.get('rooms') or [None])[0]
+                    if asset.id not in objects:
+                        objects[asset.id] = {
+                            'name': asset.label,
+                            'description': asset.description or f"An environmental detail: {asset.label}.",
+                            'portable': False,
+                            'location': room_loc
+                        }
+                    disc_it = {
+                        'id': f"{target_sid}_get_{asset.id}",
+                        'verb': 'examine',
+                        'object': asset.id,
+                        'object_label': asset.label,
+                        'text': asset.description or f"You discover {asset.label}.",
+                        'effects': effects,
+                        'once': True,
+                        'reach': 'any'
+                    }
+                sc.setdefault('interactions', []).append(disc_it)
 
     # 2. Transform the convergence scene
-    if spec.scene_id not in scenes:
+    conv_sid = spec.scene_id
+    if conv_sid not in scenes and f"S_{conv_sid}" in scenes:
+        conv_sid = f"S_{conv_sid}"
+    if conv_sid not in scenes:
         raise ValueError(f"Convergence scene {spec.scene_id} not found in package.")
 
-    conv_scene = scenes[spec.scene_id]
+    conv_scene = scenes[conv_sid]
     conv_scene.setdefault('moments', [])
     conv_scene.setdefault('interactions', [])
     conv_scene.setdefault('exits', [])
 
-    # Remove existing exit-triggering interaction if present
-    # (e.g. S_N06.a2 that previously forced a single linear path)
+    # Remove only the linear exit-triggering interaction (not branch interactions)
+    linear_targets = {
+        ex['to'] for ex in conv_scene.get('exits', [])
+        if ex.get('kind') in ('default', 'ending')
+    }
+    orig_linear_target = next(iter(linear_targets)) if linear_targets else None
+
     orig_interactions = conv_scene['interactions']
     conv_scene['interactions'] = [
         it for it in orig_interactions
-        if not any(str(eff.get('set', '')).startswith(f"go_{spec.scene_id}__") for eff in (it.get('effects') or []))
+        if not any(
+            str(eff.get('set', '')).startswith(f"go_{conv_sid}__") and
+            str(eff.get('set', '')).split(f"go_{conv_sid}__", 1)[1] in linear_targets
+            for eff in (it.get('effects') or [])
+        )
     ]
 
     # Build the Resolver Moment
     opt_ids = []
     for opt in spec.options:
+        target_obj = opt.target
+        target_label = opt.label
+        detail_val = opt.detail
+        detail_lbl = opt.label if opt.detail else None
+
+        if target_obj is None and detail_val is not None:
+            # Cannot have detail without object in Stratum engine
+            target_obj = re.sub(r"[^a-zA-Z0-9]+", "_", str(detail_val)).strip("_").lower() or "option"
+            target_label = opt.label
+            detail_val = None
+            detail_lbl = None
+        elif target_obj is not None and not target_label:
+            target_label = opt.label
+
+        flag_name = opt.intent_flag.replace('flags.', '')
         opt_it = {
             'id': opt.id,
             'verb': opt.verb,
-            'object': opt.target,
-            'detail': opt.detail,
-            'detail_label': opt.label,
+            'object': target_obj,
+            'object_label': target_label,
+            'detail': detail_val,
+            'detail_label': detail_lbl,
             'text': opt.text,
-            'effects': [{'set': opt.intent_flag}],
+            'effects': [{'set': flag_name}],
             'once': True,
             'reach': 'any'
         }
@@ -262,13 +357,25 @@ def apply_resolver(package: Dict[str, Any], spec: ResolverSpec) -> Dict[str, Any
     conv_scene['moments'].append(resolver_moment)
 
     # 3. Rewire scene exits
-    # Remove existing default/branch exits from this scene to old downstream nodes
-    conv_scene['exits'] = []
+    # Preserve branch exits to other lines, replace default exits with resolver outcomes
+    branch_exits = [ex for ex in conv_scene.get('exits', []) if ex.get('kind') == 'branch']
+    conv_scene['exits'] = list(branch_exits)
     for outcome in spec.outcomes:
+        target = outcome.target
+        kind = outcome.kind
+        # If the success outcome targets an ending directly but conv_scene originally led to a forward scene,
+        # route success through that forward scene to preserve reachability.
+        if (outcome.id in ('outcome_conviction', 'outcome_prepared') or
+                outcome.id.startswith('outcome_prepared_') or
+                "physical_proof" in outcome.condition or "critical_key" in outcome.condition):
+            if orig_linear_target and orig_linear_target in scenes and orig_linear_target != target:
+                target = orig_linear_target
+                kind = 'default'
+
         conv_scene['exits'].append({
-            'to': outcome.target,
+            'to': target,
             'when': outcome.condition,
-            'kind': outcome.kind
+            'kind': kind
         })
 
     # 4. Register endings in package['endings'] if kind == 'ending'

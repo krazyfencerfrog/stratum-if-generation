@@ -517,6 +517,49 @@ IF_SHAPE = obj(
     ),
 )
 
+# ---------------------------------------------------------------- step 4 resolver
+
+STATE_ASSET_SCHEMA = obj(
+    id=S,
+    kind=enum(['item', 'observation', 'testimony', 'fact']),
+    label=S,
+    subject=STR_OR_NULL,
+    description=S,
+    state_condition=S,
+    scene_id=STR_OR_NULL,
+    action_id=STR_OR_NULL,
+)
+
+RESOLVER_OPTION_SCHEMA = obj(
+    id=S,
+    label=S,
+    verb=S,
+    target=STR_OR_NULL,
+    detail=STR_OR_NULL,
+    intent_flag=S,
+    text=S,
+)
+
+RESOLVER_OUTCOME_SCHEMA = obj(
+    id=S,
+    target=S,
+    condition=S,
+    kind=enum(['ending', 'default', 'redirect']),
+    title=S,
+    summary=S,
+)
+
+RESOLVER_SPEC = obj(
+    reading=S,
+    scene_id=S,
+    moment_id=S,
+    dimension=S,
+    neutral_option_id=STR_OR_NULL,
+    assets=arr(STATE_ASSET_SCHEMA),
+    options=arr(RESOLVER_OPTION_SCHEMA),
+    outcomes=arr(RESOLVER_OUTCOME_SCHEMA),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -532,6 +575,7 @@ ALL = {
     'IDENTITY_EPISTEMIC': IDENTITY_EPISTEMIC,
     'IF_SHAPE': IF_SHAPE,
     'GENRE_CLASSIFICATION': GENRE_CLASSIFICATION,
+    'RESOLVER_SPEC': RESOLVER_SPEC,
 }
 
 

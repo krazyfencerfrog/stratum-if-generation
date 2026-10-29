@@ -214,6 +214,7 @@ class StubClient(LlmClient):
             ('You are step 4p', 's4p'),
             ('You are step 4e', 's4e'),
             ('You are step 4f', 's4f'),
+            ('You are step 4r', 's4_resolver'),
             ('You are step 5a0', 's5a0'),
             ('You are step 5a1', 's5a1'),
             ('You are step 5a2', 's5a2'),
@@ -1315,6 +1316,80 @@ class StubClient(LlmClient):
         pick = lambda w: {"winner": w, "why": "stub", "quote": "" if w == 'same' else first_words(one if w == '1' else two)}
         return {"cost": pick('1'), "setups": pick('same'), "opposition": pick('1'), "turn": pick('1'),
                 "picture": pick(longer), "play": pick('1')}
+
+    def p_s4_resolver(self, p):
+        nodes_text = self.text_after(p, '- NODES:') or ''
+        node_ids = re.findall(r'"id":\s*"([A-Za-z0-9_]+)"', nodes_text)
+        non_endings = [nid for nid in node_ids if not nid.startswith('E_')]
+        conv_nid = non_endings[-1] if non_endings else 'N01'
+        conv_sid = f"S_{conv_nid}"
+        first_sid = f"S_{non_endings[0]}" if non_endings else "S_N01"
+
+        return {
+            "reading": "stub: resolver specification for convergence point",
+            "scene_id": conv_sid,
+            "moment_id": f"m_{conv_nid}_resolver",
+            "dimension": "accusation",
+            "neutral_option_id": "opt_silence",
+            "assets": [
+                {
+                    "id": "physical_proof",
+                    "kind": "item",
+                    "label": "Tallow Stub",
+                    "subject": "stub suspect",
+                    "description": "A snuffed yellow candle stub.",
+                    "state_condition": "has('physical_proof')",
+                    "scene_id": first_sid,
+                    "action_id": None
+                }
+            ],
+            "options": [
+                {
+                    "id": "opt_accuse_major",
+                    "label": "Accuse the Major",
+                    "verb": "talk",
+                    "target": "c_major",
+                    "detail": None,
+                    "intent_flag": "accuse_major",
+                    "text": "You step forward and name the Major."
+                },
+                {
+                    "id": "opt_silence",
+                    "label": "Remain silent",
+                    "verb": "wait",
+                    "target": "silence",
+                    "detail": None,
+                    "intent_flag": "silence",
+                    "text": "You keep your silence."
+                }
+            ],
+            "outcomes": [
+                {
+                    "id": "outcome_conviction",
+                    "target": f"E_{conv_nid}",
+                    "condition": "flags.accuse_major and has('physical_proof')",
+                    "kind": "ending",
+                    "title": "The Conviction",
+                    "summary": "With proof shown, the truth holds."
+                },
+                {
+                    "id": "outcome_unproven",
+                    "target": "E_unproven",
+                    "condition": "flags.accuse_major",
+                    "kind": "ending",
+                    "title": "The Unproven Claim",
+                    "summary": "Without proof, your accusation is dismissed."
+                },
+                {
+                    "id": "outcome_silence",
+                    "target": "E_silence",
+                    "condition": "flags.silence",
+                    "kind": "ending",
+                    "title": "The Cost of Silence",
+                    "summary": "You said nothing; the road belongs to the killer."
+                }
+            ]
+        }
 
     # ------------------------------------------------------------------ stage A
 

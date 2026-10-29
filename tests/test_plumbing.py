@@ -4703,6 +4703,90 @@ def collapsed_if_shape_and_brief_generation():
         shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
+@test
+def state_resolver_synthesis_and_pipeline_integration():
+    import main as gen_main
+    import resolver_generator
+    import state_resolver
+
+    test_id = 'resolver_test'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    try:
+        gen = gen_main.StoryGenerator(story_id=f'{PREFIX}{test_id}')
+        # Exercise prompt via stub client
+        res = gen.run_prompt('s4', 'resolver', {
+            '$$KERNEL$$': 'A locked room murder.',
+            '$$PREMISE$$': '{}',
+            '$$PROMISES$$': '{}',
+            '$$NODES$$': '[]',
+            '$$CAST$$': '[]',
+            '$$CARDINALITY$$': '5',
+        }, prompt_file='s4_resolver.prompt', schema=schemas.RESOLVER_SPEC)
+        check(isinstance(res, dict) and 'options' in res and 'outcomes' in res, f"resolver prompt failed: {res}")
+        used_prompts.add('s4_resolver.prompt')
+
+        # Test synthesis on mystery premise
+        mystery_story = {
+            'story_id': 'm_story',
+            'nodes': {
+                'N01': {'title': 'The Hall', 'beat': 'status_quo'},
+                'N02': {'title': 'The Study', 'beat': 'inciting_incident'},
+                'N03': {'title': 'The Drawing Room', 'beat': 'climax'},
+            },
+            'lines': {'T1': {'path': ['N01', 'N02', 'N03']}},
+            'characters': {
+                'c_prot': {'name': 'Arabella Vane', 'label': 'the housekeeper'},
+                'c_major': {'name': 'Lucius Carrington', 'label': 'the major'},
+                'c_valet': {'name': 'Barnaby Quarles', 'label': 'the valet'},
+            },
+            'premise': {
+                'protagonist': {'name': 'Arabella Vane', 'who': 'the housekeeper'},
+                'hidden_truth': {
+                    'truth': 'The Major Lucius Carrington killed the master with the poker.',
+                },
+                'cast_seeds': [
+                    {'role': 'the major', 'label': 'Lucius Carrington'},
+                    {'role': 'the valet', 'label': 'Barnaby Quarles'},
+                ]
+            }
+        }
+        spec_m = resolver_generator.synthesize_resolver(mystery_story)
+        check(spec_m.scene_id == 'S_N03', f"expected S_N03, got {spec_m.scene_id}")
+        check(spec_m.dimension == 'accusation', f"expected accusation, got {spec_m.dimension}")
+        check(len(spec_m.options) >= 3, f"expected at least 3 options, got {len(spec_m.options)}")
+        check(len(spec_m.assets) >= 1, f"expected assets, got {len(spec_m.assets)}")
+
+        # Test synthesis on sci-fi / non-whodunit premise
+        scifi_story = {
+            'story_id': 'scifi_story',
+            'nodes': {
+                'N01': {'title': 'The Reactor Core', 'beat': 'crisis'},
+                'N02': {'title': 'The Escape Pods', 'beat': 'climax'},
+            },
+            'lines': {'T1': {'path': ['N01', 'N02']}},
+            'characters': {
+                'c_eng': {'name': 'Chief Engineer', 'label': 'the engineer'},
+                'c_ai': {'name': 'Ship AI', 'label': 'the central computer'},
+            },
+            'premise': {
+                'protagonist': {'name': 'Pilot', 'who': 'the navigator'},
+                'turns': [
+                    {'id': 1, 'situation': 'Core breach', 'ways': [{'summary': 'Vent the plasma'}, {'summary': 'Jettison the core'}]}
+                ],
+                'cast_seeds': [
+                    {'role': 'the engineer', 'label': 'Chief Engineer'},
+                    {'role': 'the central computer', 'label': 'Ship AI'},
+                ]
+            }
+        }
+        spec_s = resolver_generator.synthesize_resolver(scifi_story)
+        check(spec_s.scene_id == 'S_N02', f"expected S_N02, got {spec_s.scene_id}")
+        check(spec_s.dimension == 'pivotal_choice', f"expected pivotal_choice, got {spec_s.dimension}")
+        check(len(spec_s.options) >= 2, f"expected options, got {len(spec_s.options)}")
+    finally:
+        shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
 # ---------------------------------------------------------------- runner
 
 

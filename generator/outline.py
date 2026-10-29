@@ -130,6 +130,7 @@ class OutlineBuilder:
         self.plan = None            # the branch plan (branching 'plan'): its seeds, consumed in order
         self.stop_reason = None
         self.warnings = []
+        self.resolvers = []
 
         self.shape = self.targets()
         self.register_premise_cast()
@@ -393,6 +394,22 @@ class OutlineBuilder:
 
         if not self.stop_reason:
             self.stop_reason = 'loop ended'
+
+        if getattr(self.gen, 'auto_resolver', True) and not self.resolvers:
+            try:
+                import resolver_generator
+                spec = resolver_generator.generate_resolver_spec(
+                    self.gen, self.story_json(light=True),
+                    brief=self.gen.analysis.get('s3_brief'),
+                    promises=self.gen.analysis.get('s3_4_promises')
+                )
+                if spec:
+                    self.resolvers = [spec.to_dict()]
+                    if hasattr(self.gen, 'save_story_json'):
+                        self.gen.save_story_json('resolvers.json', {'resolvers': self.resolvers})
+            except Exception as e:
+                self.warnings.append(f"resolver generation warning: {e}")
+
         story = self.save_story()
         print(f'--- step 4 done: {self.stop_reason}')
         for f in story['checks']['findings']:
@@ -1379,6 +1396,7 @@ class OutlineBuilder:
             'branching': self.branching,
             'plan': self.plan,
             'promises': self.gen.analysis.get('s3_4_promises'),
+            'resolvers': getattr(self, 'resolvers', []),
         }
         if light:
             return story
@@ -1589,6 +1607,17 @@ def story_markdown(story):
         for h in hooks:
             out.append(f"- {h['node']} (turn {h['turn']}, way {h['way']}): {h['what']} (cost: {h['cost']})")
         out.append('')
+
+    resolvers = story.get('resolvers') or []
+    if resolvers:
+        import state_resolver
+        import resolver_generator
+        try:
+            specs = state_resolver.load_resolver_specs(resolvers)
+            for sp in specs:
+                out.append(resolver_generator.format_resolver_markdown(sp))
+        except Exception:
+            pass
 
     ck = story.get('checks') or {}
     out.append('## Computed checks')
