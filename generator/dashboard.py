@@ -223,7 +223,37 @@ def story_detail(root, story_id, view='all'):
         detail['session'], mine = combined(views), calls[sessions[0].get('first_call', 0):]
     detail['calls'] = [{k: c[k] for k in CALL_FIELDS if k in c} for c in mine]
     detail['totals'] = totals_of(mine)
+    work = detail['session'].get('python_work')
+    if work:
+        work['left_seconds'] = scenes_left(work, data.get('playtest_timing'))
     return detail
+
+
+def python_work_view(work, now):
+    """The session's long Python work in progress (stats.python_progress)
+    with its times so far."""
+    if not work:
+        return None
+    work = dict(work)
+    work['elapsed'] = now - (parse_stamp(work.get('started')) or now)
+    work['phase_elapsed'] = now - (parse_stamp(work.get('phase_started')) or now)
+    return work
+
+
+def scenes_left(work, timing):
+    """About how long the playtest's scene exploration has left, from what
+    each scene took the last time this story was playtested: that run's
+    wall time, scaled by the share of its scene time still to do. None
+    without a last playtest that knew most of these scenes."""
+    if not work or work.get('phase') != 'exploring scenes' or not timing:
+        return None
+    before = timing.get('scene_seconds') or {}
+    total = sum(before.values())
+    finished = set(work.get('finished') or [])
+    if not total or not timing.get('seconds') or len(set(before) & finished) < len(finished) * 0.8:
+        return None
+    todo = sum(t for sid, t in before.items() if sid not in finished)
+    return timing['seconds'] * todo / total
 
 
 def session_view(root, story_id, session, mine, state, now):
@@ -255,6 +285,7 @@ def session_view(root, story_id, session, mine, state, now):
         call['log_bytes'] = os.path.getsize(log) if call.get('log') and os.path.isfile(log) else 0
         running.append(call)
     s['running'] = running
+    s['python_work'] = python_work_view(s.get('python_work'), now) if state == 'running' else None
     s['calls'] = s.get('calls', sum(1 for c in mine if c.get('seconds') is not None))
     if 'model_seconds' not in s:
         # so far (a stopped run: until it last did anything): finished calls and the

@@ -24,6 +24,7 @@ The result is validated by the engine and written beside the package.
 
 import argparse
 import copy
+import hashlib
 import json
 import os
 import re
@@ -458,14 +459,15 @@ class ProseWriter:
                 n = len(words(t))
                 if n > 2 * TARGETS[k] and n > 1.3 * len(words(originals[i])):
                     soft.append(f'{i}: {n} words, more than twice the {TARGETS[k]} this kind of text aims at')
-            if self.gen and hasattr(self.gen, 'thread_client'):
+            if self.gen and hasattr(self.gen, 'run_prompt'):
                 try:
-                    client = self.gen.thread_client()
-                    craft_prompt = self.gen.load_prompt('s8j_craft.prompt').replace(
-                        '$$TEXTS_JSON$$', json.dumps(got, ensure_ascii=False, indent=1)
-                    )
-                    _, craft_resp = client.run_prompt(craft_prompt, format=schemas.CRAFT_JUDGE)
-                    craft_parsed = self.gen.lenient_json_loads(craft_resp)
+                    # a call of its own (timed, logged, on the dashboard), saved by what it judged:
+                    # a retry's new texts are judged afresh, and a resumed run reads the verdict back
+                    texts_json = json.dumps(got, ensure_ascii=False, indent=1)
+                    digest = hashlib.sha1(json.dumps(got, sort_keys=True).encode('utf-8')).hexdigest()[:10]   # the texts, not their order
+                    craft_parsed = self.gen.run_prompt(f's8j_{uid}', f'craft_{digest}', {'$$TEXTS_JSON$$': texts_json},
+                                                       prompt_file='s8j_craft.prompt', klass='classify',
+                                                       schema=schemas.CRAFT_JUDGE)
                     if craft_parsed and craft_parsed.get('verdict') == 'issues_found':
                         for v in craft_parsed.get('violations') or []:
                             soft.append(f"{v.get('text_id')}: {v.get('reason')} ({v.get('quote')})")

@@ -868,15 +868,20 @@ class SceneCompiler:
         out = io.StringIO()
         # scenes explored at once in worker processes; a quick playtest is over before they would start
         jobs = int(os.environ.get('STRATUM_PLAYTEST_JOBS') or (1 if quick else engine_playtest.default_jobs()))
-        with stats.stage(getattr(self, 'gen', None), 'stage D: engine playtest'):
+        gen = getattr(self, 'gen', None)
+        with stats.stage(gen, 'stage D: engine playtest'), stats.python_work(gen) as progress:
             result = engine_playtest.run(story, runs=runs, max_states=max_states, walkthroughs=True, out=out,
                                          styled_runs=10 if quick else None, scene_states=1500 if quick else None,
-                                         jobs=jobs)
+                                         jobs=jobs, progress=progress)
             # the scenes explored in worker processes: their time beyond the wall time is Python a
             # one-at-a-time run would also have spent
             timing = (result.get('explore') or {}).get('timing') or {}
-            stats.parallel_work(getattr(self, 'gen', None), sum((timing.get('scene_seconds') or {}).values()),
+            stats.parallel_work(gen, sum((timing.get('scene_seconds') or {}).values()),
                                 timing.get('seconds') or 0)
+            if timing.get('scene_seconds') and isinstance(getattr(gen, 'stats', None), stats.RunStats):
+                # what each scene took, so the next playtest of this story can say how long it has left
+                gen.stats.record_extra('playtest_timing', {'seconds': round(timing.get('seconds') or 0, 2), 'scene_seconds': {
+                    sid: round(t, 2) for sid, t in timing['scene_seconds'].items()}})
         metrics = extract_playtest_metrics(story, result)
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report

@@ -587,7 +587,7 @@ def default_jobs():
     return max(1, (os.cpu_count() or 1) // 2)
 
 
-def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, jobs=1):
+def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, jobs=1, progress=None):
     """Every scene explored on its own, from entry states the scenes before it
     leave in (the start state for the first). Scales with the size of a
     scene, not of the story; the price is sampling: a scene reached in more
@@ -629,13 +629,22 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
             sampled.add(sid)
         return [buckets[k] for k in spread(keys, per_scene)]
 
+    def tell(finished, running):
+        if progress:
+            progress(phase='exploring scenes', done=len(finished), total=len(order),
+                     finished=[s for s in order if s in finished], running=list(running))
+
     if jobs <= 1 or len(order) <= 1:
+        finished = set()
         for sid in order:
+            tell(finished, [sid])
             todo = entries(sid)
             if todo:
                 t0 = time.time()
                 scenes[sid] = explore_scene(story, sid, todo, norm, max_states)
                 scene_seconds[sid] = time.time() - t0
+            finished.add(sid)
+        tell(finished, [])
     else:
         import concurrent.futures
         import multiprocessing
@@ -655,11 +664,13 @@ def explore_scenes(story, max_states=SCENE_STATES, per_scene=ENTRIES_PER_SCENE, 
                     else:
                         done.add(sid)               # nothing leads here: never reached
                 if running:
+                    tell(done, [s for s in order if s in running.values()])
                     finished, _ = concurrent.futures.wait(running, return_when=concurrent.futures.FIRST_COMPLETED)
                     for f in finished:
                         sid = running.pop(f)
                         scenes[sid], scene_seconds[sid] = f.result()
                         done.add(sid)
+            tell(done, [])
         scenes = {sid: scenes[sid] for sid in order if sid in scenes}
 
     endings = {}
@@ -857,8 +868,11 @@ def pattern_exits(story):
             if 'pattern(' in ex.get('when', '')]
 
 
-def play(story, style='random', runs=500, max_steps=400, seed=0):
+def play(story, style='random', runs=500, max_steps=400, seed=0, progress=None):
+    """`progress(done=, total=)`, if given, hears how many runs are done
+    about twenty times over the style's runs."""
     rng = random.Random(seed)
+    every = max(1, runs // 20)
     pick = chooser(story, style)
     endings, combos, steps, unfinished = Counter(), Counter(), [], 0
     reached, shifted = Counter(), Counter()
@@ -866,6 +880,8 @@ def play(story, style='random', runs=500, max_steps=400, seed=0):
     opps = set(opportunities(story))
     seen = Counter()
     for run in range(runs):
+        if progress and run % every == 0:
+            progress(done=run, total=runs)
         eng = Engine(story)
         eng.start(seed=rng.random())
         seen_scenes = {eng.state.scene}
@@ -947,19 +963,38 @@ def styles_for(story):
 WHOLE_STORY_SCENES = 3    # stories with more scenes are explored one scene at a time
 
 
+def play_styles(story, runs, styled_runs, progress=None):
+    """Every style's playthroughs, reported to `progress` as phase
+    'playing', the style, its runs done and its place among the styles."""
+    styles = styles_for(story)
+    plays = []
+    for k, style in enumerate(styles, 1):
+        tell = (lambda done, total, style=style, k=k: progress(phase='playing', style=style, done=done, total=total,
+                                                                  part=[k, len(styles)])) if progress else None
+        plays.append(play(story, style, runs=runs if style == 'random' else styled_runs, progress=tell))
+    if progress:
+        progress(phase='findings and walkthroughs')
+    return plays
+
+
 def run(story, runs=500, max_states=50000, walkthroughs=False, out=sys.stdout, styled_runs=None, scene_states=None,
-        by_scene=None, jobs=1):
+        by_scene=None, jobs=1, progress=None):
     """Explore (the whole story when it is small, else scene by scene), play
     every style, report. `by_scene` forces the method; `scene_states` caps
-    each scene's exploration; `jobs` explores that many scenes at once."""
+    each scene's exploration; `jobs` explores that many scenes at once.
+    `progress(**fields)`, if given, hears where the work has got: its
+    `phase`, and for a phase with a count its `done` and `total` (and, for
+    scenes, the ids `finished` and `running`)."""
     if by_scene is None:
         by_scene = len(story.scenes) > WHOLE_STORY_SCENES
     if by_scene:
-        return run_by_scene(story, runs, scene_states or SCENE_STATES, walkthroughs, out, styled_runs, jobs)
+        return run_by_scene(story, runs, scene_states or SCENE_STATES, walkthroughs, out, styled_runs, jobs, progress)
+    if progress:
+        progress(phase='exploring the whole story')
     result = explore(story, max_states=max_states)
     errors, notes = explore_findings(story, result)
     styled_runs = styled_runs or max(50, runs // 5)
-    plays = [play(story, style, runs=runs if style == 'random' else styled_runs) for style in styles_for(story)]
+    plays = play_styles(story, runs, styled_runs, progress)
     e2, n2 = play_findings(story, plays)
     errors += e2
     notes += n2
@@ -1012,11 +1047,11 @@ def print_plays(plays, story, out):
                 print(f'      shift {sid} -> {to}: {rate:.0%}', file=out)
 
 
-def run_by_scene(story, runs, scene_states, walkthroughs, out, styled_runs, jobs=1):
-    result = explore_scenes(story, max_states=scene_states, jobs=jobs)
+def run_by_scene(story, runs, scene_states, walkthroughs, out, styled_runs, jobs=1, progress=None):
+    result = explore_scenes(story, max_states=scene_states, jobs=jobs, progress=progress)
     errors, notes = scene_findings(story, result)
     styled_runs = styled_runs or max(50, runs // 5)
-    plays = [play(story, style, runs=runs if style == 'random' else styled_runs) for style in styles_for(story)]
+    plays = play_styles(story, runs, styled_runs, progress)
     e2, n2 = play_findings(story, plays)
     errors += e2
     notes += n2

@@ -178,8 +178,13 @@ function serialNow(rec, calls, d) {
   if (rec.serial_seconds == null) return null;
   return rec.serial_seconds + (d ? (calls.length ? d * calls.length : d) : 0);
 }
+// Python time under a second is bookkeeping between calls, not work: the page leaves it out
+// (the run stats still record it). The engine playtest is the one stage that does real Python work.
+const PYTHON_SHOWN = 1;
+const pythonShown = p => p != null && p >= PYTHON_SHOWN ? p : null;
 const serialTitle = (rec, total) => `one at a time: ${duration(total)} = ${duration(rec.serial_model_seconds)} waiting on the model `
-  + `(every call's wait added up) + ${duration(rec.serial_python_seconds)} of Python`
+  + `(every call's wait added up)`
+  + (pythonShown(rec.serial_python_seconds) ? ` + ${duration(rec.serial_python_seconds)} of Python` : '')
   + (rec.parallel_python_seconds ? ` (${duration(rec.parallel_python_seconds)} of it done in parallel workers)` : '');
 
 // where a stage's loop has got, from its calls in flight: "scene 5 of 15 · part 5 of 34",
@@ -194,6 +199,30 @@ function progressOf(calls) {
     return `${label ? label + 's ' : ''}${items}${n ? ' of ' + n : ''}`;
   }
   return going.map(c => c.batch).join('; ');
+}
+
+// long Python work (the engine playtest) as one line: "exploring scenes · 9 of 15",
+// "playing random · 120 of 200 · style 1 of 4"
+function workText(w) {
+  if (!w) return '';
+  const count = w.total ? `${w.done} of ${w.total}` : '';
+  const style = w.style ? ` ${w.style}` : '';
+  const part = w.part ? `style ${w.part[0]} of ${w.part[1]}` : '';
+  return [w.phase + style, count, part].filter(Boolean).join(' · ');
+}
+
+// the Python work in flight when no call is: where it has got, a bar for its count, and how long it may have left
+function workCard(w, d) {
+  const running = (w.running || []).length ? `running ${w.running.map(esc).join(', ')}` : '';
+  const left = w.left_seconds != null ? Math.max(0, w.left_seconds - d) : null;
+  const bar = w.total ? `<div class="budget"><div class="bar"><span style="width:${100 * w.done / w.total}%;background:var(--python)"></span></div>
+      <div class="sub">${left != null ? `about ${duration(left)} of scenes left, at the last playtest's pace` : ''}</div></div>` : '';
+  return `<div class="call">
+    <div class="row"><span class="nm">Python · ${esc(w.stage || '')}</span><span class="t">${duration(w.elapsed + d)}</span></div>
+    <div class="meta">${esc(workText(w))}${w.phase_elapsed != null ? ' · this phase ' + duration(w.phase_elapsed + d) : ''}</div>
+    ${running ? `<div class="row"><span class="meta">${running}</span></div>` : ''}
+    ${bar}
+  </div>`;
 }
 
 // one call in flight: what it is, what it runs on, how it is going, and how long it has against its budget
@@ -298,7 +327,8 @@ function render() {
     <h2 style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">${esc(detail.story_id)} · ${combined ? `all ${detail.runs} runs` : 'run ' + detail.runs}${switcher}</h2>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <span class="badge ${stateClass(detail.state)}">${esc(detail.state)}</span>
-      <span>${current ? 'now: <b>' + esc(current.stage) + '</b>' + (progressOf(s.running) ? ' · <b>' + esc(progressOf(s.running)) + '</b>' : '')
+      <span>${current ? 'now: <b>' + esc(current.stage) + '</b>' + (progressOf(s.running) ? ' · <b>' + esc(progressOf(s.running)) + '</b>'
+                        : s.python_work ? ' · <b>' + esc(workText(s.python_work)) + '</b>' : '')
                       : (detail.state === 'running' ? 'starting' : 'started ' + esc(s.started))}</span>
     </div>
     ${detail.state === 'stopped' ? '<p class="err">The run is marked running but its process is gone: killed or crashed before it could close its record.</p>' : ''}
@@ -313,7 +343,7 @@ function render() {
         ${serial && elapsed && serial > elapsed * 1.02 ? `<div class="s">parallel saved ${duration(serial - elapsed)} (${(serial / elapsed).toFixed(1)}×)</div>` : ''}</div>
       <div class="tile"><div class="k">Model calls</div><div class="v">${t.calls}${s.running.length ? ' <small style="font-size:13px;color:var(--accent)">+' + s.running.length + ' live</small>' : ''}</div></div>
       <div class="tile"><div class="k">Model time</div><div class="v" style="color:var(--model)">${duration(model)}</div></div>
-      <div class="tile"><div class="k">Python time</div><div class="v" style="color:var(--python)">${duration(python)}</div></div>
+      <div class="tile"><div class="k">Python time</div><div class="v" style="color:var(--python)">${pythonShown(python) != null ? duration(python) : '–'}</div></div>
       <div class="tile"><div class="k">Thinking</div><div class="v">${kb(t.thinking_bytes)} KB</div></div>
       <div class="tile"><div class="k">Rejected attempts</div><div class="v" style="${t.rejected ? 'color:var(--warn)' : ''}">${t.rejected}</div></div>
     </div>
@@ -322,7 +352,9 @@ function render() {
 
   // in flight
   html += `<div class="panel"><h2>In flight</h2>`;
-  if (!s.running.length) {
+  if (!s.running.length && s.python_work) {
+    html += '<div class="flight">' + workCard(s.python_work, d) + '</div>';
+  } else if (!s.running.length) {
     html += `<p class="empty">${detail.state === 'running' ? 'No model call right now (Python is working).' : 'Nothing: the run is not going.'}</p>`;
   } else {
     html += '<div class="flight">' + s.running.map(c => flightCard(c, c.elapsed + d)).join('') + '</div>';
@@ -350,12 +382,12 @@ function render() {
     const tot = (m || 0) + (p || 0);
     const one = pending ? null : serialNow(st, running ? s.running.filter(c => c.stage === st.stage || st.depth === 0) : [], running ? d : 0);
     html += `<tr class="depth${Math.min(st.depth || 0, 2)} ${pending ? 'pending' : ''}">
-      <td><span class="mark ${cls}">${mark}</span>${esc(st.stage)}${!pending && !running && st.outcome !== 'ok' ? ` <span class="${cls}">(${esc(st.outcome)})</span>` : ''}${st.runs > 1 ? ` <span class="empty" title="work from more than one run, added up">· ${st.runs} runs</span>` : ''}${running && progressOf(s.running.filter(c => c.stage === st.stage)) ? ` <span class="s-running">· ${esc(progressOf(s.running.filter(c => c.stage === st.stage)))}</span>` : ''}</td>
+      <td><span class="mark ${cls}">${mark}</span>${esc(st.stage)}${!pending && !running && st.outcome !== 'ok' ? ` <span class="${cls}">(${esc(st.outcome)})</span>` : ''}${st.runs > 1 ? ` <span class="empty" title="work from more than one run, added up">· ${st.runs} runs</span>` : ''}${running && progressOf(s.running.filter(c => c.stage === st.stage)) ? ` <span class="s-running">· ${esc(progressOf(s.running.filter(c => c.stage === st.stage)))}</span>` : ''}${running && s.python_work && s.python_work.stage === st.stage ? ` <span class="s-running">· ${esc(workText(s.python_work))}</span>` : ''}</td>
       <td class="n">${st.calls ?? (running ? '…' : '')}</td>
       <td class="n">${pending ? '' : duration(wall)}</td>
       <td class="n" title="${one != null ? serialTitle(st, one) : ''}">${one != null ? duration(one) : ''}${one && wall && one > wall * 1.05 ? ` <span class="empty">${(one / wall).toFixed(1)}×</span>` : ''}</td>
       <td class="n">${m != null ? duration(m) : ''}</td>
-      <td class="n">${p != null ? duration(p) : ''}</td>
+      <td class="n">${pythonShown(p) != null ? duration(p) : ''}</td>
       <td>${tot > 0 ? `<div class="bar" style="margin:6px 0"><span style="width:${100 * m / tot}%;background:var(--model)"></span><span style="width:${100 * p / tot}%;background:var(--python)"></span></div>` : ''}</td>
     </tr>`;
   }
@@ -394,7 +426,7 @@ function callsPanel(title) {
     html += '<p class="empty">None finished yet.</p>';
   } else {
     html += `<div class="calls scroll" data-scroll="calls"><table>
-      <tr><th>Call</th><th>Class</th><th class="n">Model</th><th class="n">Python</th><th class="n">Thinking KB</th><th class="n">Answer KB</th><th>Result</th></tr>` +
+      <tr><th>Call</th><th>Class</th><th class="n">Model</th><th class="n">Thinking KB</th><th class="n">Answer KB</th><th>Result</th></tr>` +
       calls.map(c => {
         const result = c.ok ? '<span class="s-ok">ok</span>'
           : c.breaker ? `<span class="s-stopped">breaker: ${esc(c.breaker)}</span>`
@@ -402,7 +434,7 @@ function callsPanel(title) {
         const over = (c.over_target || []).length ? ` <span class="s-stopped" title="over target: ${esc(c.over_target.join(', '))}">▲</span>` : '';
         return `<tr><td style="font-family:var(--mono)">${esc(c.prefix)}_${esc(c.name)}${c.attempt > 1 ? ' <span style="color:var(--muted)">#' + c.attempt + '</span>' : ''}</td>
           <td>${esc(c.klass)}${c.mode === 'no_think' ? ' <span style="color:var(--muted)">(no think)</span>' : ''}</td>
-          <td class="n">${duration(c.seconds)}${over}</td><td class="n">${c.check_seconds != null ? duration(c.check_seconds) : '–'}</td>
+          <td class="n">${duration(c.seconds)}${over}</td>
           <td class="n">${kb(c.thinking_bytes)}</td><td class="n">${kb(c.response_bytes)}</td><td>${result}</td></tr>`;
       }).join('') + '</table></div>';
   }

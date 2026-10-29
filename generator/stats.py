@@ -22,9 +22,10 @@ once) and Python time (the rest). A `[timing]` line is printed as each
 stage ends, and a table at the end of the run.
 
 Progress: the open session also holds its process id, the stages the run
-means to go through (`plan`) and the calls in flight (`running`), and the
-file is saved as each stage and call starts, so generator/dashboard.py
-can show a run while it is going. On the Claude backend each call also
+means to go through (`plan`), the calls in flight (`running`) and where
+long Python work has got (`python_work`: the engine playtest's phase and
+count), and the file is saved as each stage and call starts, so
+generator/dashboard.py can show a run while it is going. On the Claude backend each call also
 records the subscription's 5-hour and weekly usage (`usage_limits`), and
 the session keeps the newest reading.
 
@@ -246,6 +247,22 @@ def parallel_work(owner, work_seconds, wall_seconds):
         st.parallel_work(work_seconds, wall_seconds)
 
 
+@contextlib.contextmanager
+def python_work(owner):
+    """A progress callback for long Python work (the engine playtest),
+    for the length of the block: what it reports is the session's
+    `python_work`, which the dashboard shows while no call is in flight.
+    None for an owner without an open session."""
+    st = getattr(owner, 'stats', None)
+    if not isinstance(st, RunStats) or st.current is None:
+        yield None
+        return
+    try:
+        yield st.python_progress
+    finally:
+        st.python_progress()
+
+
 def stage(owner, name):
     """owner.stats.stage(name), or nothing for an owner without run stats
     (a test's stand-in generator)."""
@@ -284,16 +301,19 @@ class RunStats:
             self.extra[key] = value
             self.save()
 
-    def record(self, model_started=None, model_ended=None, **rec):
+    def record(self, model_started=None, model_ended=None, nested_seconds=0.0, **rec):
         """One call attempt. model_started/model_ended (epoch seconds) are
         when the client was called and when it returned: stored as the
-        call's `started`, and what came after as its `check_seconds`."""
+        call's `started`, and what came after as its `check_seconds`.
+        nested_seconds is the time the check spent in calls of its own (a
+        judge the validator asks): those are recorded as calls, so they are
+        not counted again as this call's checking."""
         profile = call_profile(rec.get('klass'))
         now = time.time()
         rec.setdefault('at', time.strftime('%Y-%m-%dT%H:%M:%S'))
         if model_started is not None and model_ended is not None:
             rec['started'] = stamp(model_started)
-            rec['check_seconds'] = round(now - model_ended, 3)
+            rec['check_seconds'] = round(max(0.0, now - model_ended - nested_seconds), 3)
         rec['target_thinking_bytes'] = profile['target_thinking_bytes']
         rec['target_seconds'] = profile['target_seconds']
         over = []
@@ -397,6 +417,29 @@ class RunStats:
                 self.last_progress_save = time.time()
                 self.save()
 
+    def python_progress(self, **fields):
+        """Where long Python work has got (python_work): its `phase`, and
+        for a phase with a count its `done` and `total`. No fields clears
+        it. Saved when the phase changes, else at most once a second."""
+        if self.current is None:
+            return
+        now = time.time()
+        with self.lock:
+            before = self.current.get('python_work')
+            if not fields:
+                if before is not None:
+                    del self.current['python_work']
+                    self.save()
+                return
+            new_phase = not before or before.get('phase') != fields.get('phase')
+            self.current['python_work'] = dict(
+                fields, stage=self.open_stages[-1] if self.open_stages else None,
+                started=before['started'] if before else stamp(now),
+                phase_started=stamp(now) if new_phase else before['phase_started'])
+            if new_phase or now - self.last_progress_save >= 1:
+                self.last_progress_save = now
+                self.save()
+
     @contextlib.contextmanager
     def in_flight(self, **call):
         """Lists a call under the session's `running` while its body runs,
@@ -422,6 +465,7 @@ class RunStats:
         calls, model = self._spent(self.session_t0, t1, 0)
         with self.lock:
             self.current['running'] = []
+            self.current.pop('python_work', None)
             self.current.update({'ended': stamp(t1), 'seconds': round(t1 - self.session_t0, 3),
                                  'model_seconds': round(model, 3),
                                  'python_seconds': round(t1 - self.session_t0 - model, 3),

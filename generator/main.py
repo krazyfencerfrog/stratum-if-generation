@@ -513,6 +513,28 @@ class StoryGenerator:
         output_member_name = f'{prefix}_{name}'
         prompt_file_name = prompt_file or f'{prefix}_{name}.prompt'
         print(f'out: {output_file_name}')
+        # a call made from inside another call's check (a judge its validator asks) is recorded as a
+        # call of its own; the counter lets the outer call leave that time out of its checking. Set
+        # on the way out to its value on the way in plus this call's whole time, so calls nested in
+        # this one, already inside that time, are not added twice.
+        entered, before = time.time(), getattr(self._local, 'nested', 0.0)
+        depth = getattr(self._local, 'depth', 0)
+        self._local.depth = depth + 1
+        try:
+            return self._run_prompt(prefix, name, replacement_mapping, is_json, prompt_file, validator, retries,
+                                    klass, schema, output_file_name, output_member_name, prompt_file_name)
+        finally:
+            self._local.depth = depth
+            if depth:
+                self._local.nested = before + time.time() - entered
+
+    def _nested_since(self, mark):
+        """Seconds this thread has spent in run_prompt calls made from inside
+        a check since `mark` (an earlier reading of the counter)."""
+        return getattr(self._local, 'nested', 0.0) - mark
+
+    def _run_prompt(self, prefix, name, replacement_mapping, is_json, prompt_file, validator, retries, klass,
+                    schema, output_file_name, output_member_name, prompt_file_name):
         val = self.load_story_file(output_file_name)
         if val:
             parsed = self.lenient_json_loads(val) if is_json else val
@@ -676,6 +698,8 @@ class StoryGenerator:
 
             self.save_story_file(f'{prefix}_raw_output_thinking.txt', thinking)
             self.save_story_file(f'{prefix}_raw_output_response.txt', response)
+            nested_mark = getattr(self._local, 'nested', 0.0)
+            rec['nested_seconds'] = 0.0
             try:
                 if is_json:
                     parsed = self.lenient_json_loads(response)
@@ -686,6 +710,7 @@ class StoryGenerator:
                     if not parsed.strip():
                         raise ValueError('the response was empty')
             except SoftReject as e:
+                rec['nested_seconds'] = self._nested_since(nested_mark)
                 if attempts_left > 0:
                     last_error = e
                     rec['error'] = str(e)
@@ -698,6 +723,7 @@ class StoryGenerator:
                 rec['soft_problems'] = str(e)
                 print(f'  attempt {attempt} for {output_member_name} accepted with problems left to the next check: {e}')
             except json.JSONDecodeError as e:
+                rec['nested_seconds'] = self._nested_since(nested_mark)
                 last_error = e
                 rec['error'] = str(e)
                 self.keep_rejected(prefix, attempt, thinking, response)
@@ -716,6 +742,7 @@ class StoryGenerator:
                 else:
                     break
             except (ValueError, KeyError, TypeError, AttributeError, IndexError) as e:
+                rec['nested_seconds'] = self._nested_since(nested_mark)
                 last_error = e
                 rec['error'] = str(e)
                 self.keep_rejected(prefix, attempt, thinking, response)
@@ -726,6 +753,7 @@ class StoryGenerator:
                     continue
                 break
             rec['ok'] = True
+            rec['nested_seconds'] = self._nested_since(nested_mark)
             done = self.stats.record(**rec)
             print(f"[timing] {output_member_name}: {duration(done['seconds'])} model + "
                   f"{duration(done.get('check_seconds'))} python checking the answer"

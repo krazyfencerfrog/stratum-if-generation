@@ -37,6 +37,7 @@ import sys
 import tempfile
 import threading
 import time
+import types
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1427,6 +1428,40 @@ def stage_3_5_cast_agency_judge_evaluation():
           f"agency finding not recorded in gen.analysis: {gen.analysis.get('s3_5j_findings')}")
 
     used_prompts.update(['s3_5j1_agency.prompt', 's3_5j2_dilemma.prompt'])
+    shutil.rmtree(gen.story_path, ignore_errors=True)
+
+
+@test
+def a_judge_asked_from_inside_a_check_is_its_own_call():
+    import schemas
+    from main import StoryGenerator
+
+    test_id = f'{PREFIX}nested_judge'
+    shutil.rmtree(story_dir(test_id), ignore_errors=True)
+    gen = StoryGenerator(story_id=test_id)
+    texts = json.dumps({'t01': 'The relay hums in the dark.'}, indent=1)
+    judged = []
+
+    def validate(parsed):
+        # the edit check asks a judge, as prose's does: a recorded call, not this call's checking
+        judged.append(gen.run_prompt('s8j_U1', 'craft_x', {'$$TEXTS_JSON$$': texts}, prompt_file='s8j_craft.prompt',
+                                     klass='classify', schema=schemas.CRAFT_JUDGE))
+
+    before = os.environ.get('STUB_DELAY')
+    os.environ['STUB_DELAY'] = '0.3'
+    try:
+        gen.run_prompt('s8j', 'craft_outer', {'$$TEXTS_JSON$$': texts}, prompt_file='s8j_craft.prompt',
+                       klass='classify', schema=schemas.CRAFT_JUDGE, validator=validate)
+    finally:
+        if before is None:
+            os.environ.pop('STUB_DELAY', None)
+        else:
+            os.environ['STUB_DELAY'] = before
+    recs = {c['prefix'] + '_' + c['name']: c for c in gen.stats.calls}
+    outer, inner = recs.get('s8j_craft_outer'), recs.get('s8j_U1_craft_x')
+    check(judged and inner and inner['seconds'] >= 0.25, f'the judge is not a call of its own: {recs}')
+    check(outer and outer['check_seconds'] < 0.2,
+          f"the judge's time counted again as the outer call's checking: {outer}")
     shutil.rmtree(gen.story_path, ignore_errors=True)
 
 
@@ -3395,6 +3430,36 @@ def dashboard_follows_a_run():
     model, python = dashboard.serial_time(overlapping, [{'elapsed': 4}], 1000, 20, 0, 1030)
     check(model == 30 and abs(python - (3 + 5)) < 0.01,
           f'a call in flight that began after the stage closed is not its work: {model} + {python}')
+    # long Python work in progress: its phase and count while it runs, gone when it ends; the page's
+    # estimate of the scenes left comes from the last playtest's scene times
+    tmp = tempfile.mkdtemp()
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            st = stats_mod.RunStats(os.path.join(tmp, 'run_stats.json'), 'work')
+            st.start_session([])
+            with st.stage('stage D: engine playtest'), stats_mod.python_work(types.SimpleNamespace(stats=st)) as progress:
+                progress(phase='exploring scenes', done=1, total=4, finished=['A'], running=['B', 'C'])
+                saved = json.load(open(st.path))['sessions'][0].get('python_work') or {}
+                progress(phase='exploring scenes', done=2, total=4, finished=['A', 'B'], running=['C'])
+                live = dict(st.current['python_work'])
+            after = json.load(open(st.path))['sessions'][0]
+            st.end_session('ok')
+        check(saved.get('phase') == 'exploring scenes' and saved.get('stage') == 'stage D: engine playtest'
+              and saved.get('done') == 1, f'python work not saved as it starts: {saved}')
+        check(live['done'] == 2 and live['phase_started'] == saved['phase_started'], f'same phase, new count: {live}')
+        check('python_work' not in after, f'python work left behind after it ended: {after}')
+        view = dashboard.python_work_view(live, dashboard.parse_stamp(live['phase_started']) + 5)
+        check(abs(view['phase_elapsed'] - 5) < 0.01, f'view: {view}')
+        timing = {'seconds': 100, 'scene_seconds': {'A': 10, 'B': 30, 'C': 60, 'D': 100}}
+        left = dashboard.scenes_left(view, timing)
+        check(left is not None and abs(left - 100 * 160 / 200) < 0.01, f'scenes left: {left}')
+        check(dashboard.scenes_left(view, None) is None
+              and dashboard.scenes_left(dict(view, finished=['X', 'Y']), timing) is None,
+              'an estimate from a playtest that did not know these scenes')
+        with stats_mod.python_work(object()) as none:
+            check(none is None, 'a progress callback without run stats')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
     tmp = tempfile.mkdtemp()
     try:
         with contextlib.redirect_stdout(io.StringIO()):

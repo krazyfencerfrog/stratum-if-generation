@@ -218,7 +218,8 @@ python generator/dashboard.py              # --port N, --stories DIR
 ```
 
 It lists the stories, newest first, and for one story shows its latest run: how far it has got through the stages
-it planned, the calls in flight, each stage's model and Python time, and every call so far. Next to each wall time it
+it planned, the calls in flight, each stage's model and Python time (Python time under a second is left blank: it is
+bookkeeping between calls), and every call so far. Next to each wall time it
 shows how long the same work would have taken one thing at a time (every call's wait and checking added up, plus the
 time the engine playtest's worker processes spent beyond their wall time), so you can see what `--parallel` and
 `STRATUM_PLAYTEST_JOBS` saved. Each call in flight shows
@@ -226,7 +227,7 @@ its stage and place in a parallel batch, the model and effort, how long it has r
 cut-off, why it is a retry, and links to the tail of its log and the prompt it was sent. On Claude the call also
 streams: its phase (requesting, thinking, writing), the thinking tokens so far (`-p` withholds the thinking itself),
 the time to its first answer token and the answer's size, with the answer itself written to the log as it arrives;
-a call sleeping out a usage limit shows when it will try again. Above that, for Claude runs, it shows the 5-hour and weekly usage as the newest call left them. It reads
+a call sleeping out a usage limit shows when it will try again. While no call is in flight and the engine playtest is working, it shows where that has got: the scenes explored and running, then each play style's runs, with a bar and, from the last playtest of the story, about how long the scenes have left. Above that, for Claude runs, it shows the 5-hour and weekly usage as the newest call left them. It reads
 `<id>_run_stats.json`, which the run saves as each stage and call starts, so it can be opened
 before, during or after a run. A run that was killed shows as stopped.
 

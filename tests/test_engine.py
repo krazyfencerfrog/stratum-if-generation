@@ -559,6 +559,16 @@ def playtest_reports_scene_by_scene():
     report = playtest.run(story, runs=20, styled_runs=10, out=out, by_scene=True)
     check('explored scene by scene' in out.getvalue() and any(e.startswith('STUCK') for e in report['errors']),
           out.getvalue()[:400])
+    # where it has got, as it goes: the scenes one by one, then each style's runs, then the findings
+    heard = []
+    playtest.run(story, runs=20, styled_runs=10, out=io.StringIO(), by_scene=True, progress=lambda **f: heard.append(f))
+    phases = [h['phase'] for h in heard]
+    scenes = [h for h in heard if h['phase'] == 'exploring scenes']
+    check(scenes and scenes[-1]['done'] == scenes[-1]['total'] == len(story.scenes) and not scenes[-1]['running'],
+          f'scenes: {scenes}')
+    plays = [h for h in heard if h['phase'] == 'playing']
+    check(plays and all(h['style'] and h['part'][1] == len(playtest.styles_for(story)) for h in plays)
+          and phases[-1] == 'findings and walkthroughs', f'phases: {phases}')
 
 
 @test
@@ -575,7 +585,10 @@ def playtest_explores_scenes_in_parallel_as_it_does_serially():
             scenes[sid] = r
         return dict({k: v for k, v in result.items() if k != 'timing'}, scenes=scenes)     # how long it took differs
     serial = playtest.explore_scenes(story, max_states=50)
-    parallel = playtest.explore_scenes(story, max_states=50, jobs=4)
+    heard = []
+    parallel = playtest.explore_scenes(story, max_states=50, jobs=4, progress=lambda **f: heard.append(f))
+    check(heard and heard[-1]['done'] == len(story.scenes) and any(h['running'] for h in heard),
+          f'parallel progress: {heard[-3:]}')
     check(len(serial['scenes']) == len(story.scenes), f"only {len(serial['scenes'])} scenes explored")
     check(list(parallel['scenes']) == list(serial['scenes']), 'scenes explored in another order')
     check(plain(parallel) == plain(serial), 'the parallel exploration differs from the serial one')
