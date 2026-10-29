@@ -547,9 +547,16 @@ class ArcBuilder:
                             else:
                                 clean.append({'state': st, 'direction': d})
                         o['moves'] = clean
-                        moved = moved or bool(clean)
+                        if o.get('gives'):
+                            o['gives'] = [str(g).strip() for g in as_list(o.get('gives')) if str(g).strip()]
+                        if o.get('takes'):
+                            o['takes'] = [str(t).strip() for t in as_list(o.get('takes')) if str(t).strip()]
+                        if o.get('sets'):
+                            o['sets'] = [str(s).strip() for s in as_list(o.get('sets')) if str(s).strip()]
+                        has_eff = bool(clean) or bool(o.get('gives')) or bool(o.get('takes')) or bool(o.get('sets'))
+                        moved = moved or has_eff
                     if options and not moved:
-                        problems.append(f'{where}: no option moves a state; an opportunity moves an arc')
+                        problems.append(f'{where}: no option has an effect; an opportunity must move an arc, change knowledge, or alter world state')
                     tell = x.get('tell') or {}
                     if not str(tell.get('how') or '').strip():
                         soft.append(f'{where}: no tell (how and where the player sees the effect, within two nodes)')

@@ -208,6 +208,175 @@ def build_brief(bundle, constraint_map, cross_check):
     return brief
 
 
+def build_brief_from_if_shape(if_shape: dict) -> dict:
+    """Builds a full story brief directly from the unified IF Shape Read (s3_if_shape),
+    preserving the schema and field IDs expected by all downstream prompts."""
+    prot = if_shape.get('protagonist') or {}
+    dec = if_shape.get('decision_axis') or {}
+    fail = if_shape.get('failure_and_outcomes') or {}
+    aff = if_shape.get('affect_and_theme') or {}
+    poles = aff.get('thematic_poles') or {}
+    sett = if_shape.get('setting_and_timeline') or {}
+    channels = if_shape.get('state_channels') or {}
+
+    cardinality = int(dec.get('cardinality') or 3)
+    target_endings = max(cardinality, int(fail.get('target_ending_count') or 3))
+
+    fields = {
+        '3-0a.primary_decision_axis': {
+            'label': dec.get('primary_axis', 'the central choice'),
+            'description': dec.get('description', ''),
+            'cardinality': cardinality,
+            'binding': 'constraint',
+        },
+        '3-0a.decision_mechanism': {
+            'shape': 'multi_fork' if cardinality > 2 else 'single_fork',
+            'binding': 'constraint',
+        },
+        '3-0a.secondary_decision_axes': {
+            'axes': [{'label': a, 'relation': 'independent'} for a in (dec.get('secondary_axes') or [])],
+            'binding': 'constraint',
+        },
+        '3-0a.decision_landscape': {
+            'shape': 'layered',
+            'binding': 'constraint',
+        },
+        '3-0b.protagonist_identity': {
+            'type': prot.get('type', 'human'),
+            'role': prot.get('role', 'protagonist'),
+            'embodiment': derive_embodiment(
+                prot.get('type', 'human'),
+                prot.get('role', 'protagonist'),
+                explicit_embodiment=prot.get('embodiment'),
+            ),
+            'binding': 'constraint',
+        },
+        '3-0b.epistemic_gap': {
+            'present': bool(prot.get('epistemic_gap')),
+            'description': prot.get('epistemic_gap', ''),
+            'design_status': 'designed',
+            'binding': 'constraint',
+        },
+        '3-0b.gap_resolution': {
+            'expectation': 'resolution_optional_or_choice_dependent',
+            'binding': 'constraint',
+        },
+        '3-0c.failure_presence': {
+            'value': 'playable_outcomes',
+            'binding': 'constraint',
+        },
+        '3-0c.failure_triggers': {
+            'types': ['decision_consequence', 'unproven_claim', 'tactical_error'],
+            'binding': 'constraint',
+        },
+        '3-0c.failure_cost': {
+            'value': 'playable_ending_variant',
+            'binding': 'constraint',
+        },
+        '3-0c.failure_scope': {
+            'value': 'distinct_ending',
+            'binding': 'constraint',
+        },
+        '3b.primary_affect': {
+            'label': aff.get('primary_affect', 'tension'),
+            'binding': 'constraint',
+        },
+        '3b.primary_trajectory': {
+            'shape': 'escalating',
+            'binding': 'default',
+        },
+        '3b.secondary_affects': {
+            'labels': [],
+            'binding': 'free',
+        },
+        '3b.tone': {
+            'descriptors': aff.get('tone') or ['somber', 'tense'],
+            'binding': 'constraint',
+        },
+        '3b.somatic_address': {
+            'level': 'moderate',
+            'channels': ['visceral', 'environmental'],
+            'binding': 'default',
+        },
+        '3b.transgression': {
+            'ceiling': 'moderate',
+            'floor': 'low',
+            'binding': 'free',
+        },
+        '3c.core_thematic_axis': {
+            'pole_a': poles.get('pole_a', 'duty'),
+            'pole_b': poles.get('pole_b', 'discretion'),
+            'binding': 'constraint',
+        },
+        '3c.secondary_thematic_axis': {
+            'approaches': [],
+            'binding': 'free',
+        },
+        '3c.moral_valence': {
+            'best_case': 'principled resolution',
+            'worst_case': 'tragic fallout',
+            'binding': 'default',
+        },
+        '3d.viewpoint_handoff': {
+            'ceiling': 0,
+            'floor': 0,
+            'count_min': 0,
+            'count_max': 0,
+            'binding': 'constraint',
+        },
+        '3d.viewpoint_excursions': {
+            'ceiling': 0,
+            'floor': 0,
+            'binding': 'constraint',
+        },
+        '3e.timeline_structure': {
+            'structure': sett.get('timeline_structure', 'tight_deadline'),
+            'clock': sett.get('world_clock', ''),
+            'binding': 'constraint',
+        },
+        '3e.timeline_duration': {
+            'value': 'hours',
+            'binding': 'default',
+        },
+        '3f.setting_structure': {
+            'structure': sett.get('setting_structure', 'single_building'),
+            'binding': 'constraint',
+        },
+        '3f.setting_scale': {
+            'scale': sett.get('setting_scale', 'immediate'),
+            'binding': 'constraint',
+        },
+        '3g.target_ending_count': {
+            'min': target_endings,
+            'max': max(target_endings + 2, 8),
+            'binding': 'constraint',
+        },
+        '3g.branching_density': {
+            'value': 'convergence_with_multi_outcome',
+            'binding': 'constraint',
+        },
+        '3g.state_richness': {
+            'value': 'high',
+            'binding': 'constraint',
+        },
+    }
+
+    return {
+        'binding_legend': 'constraint: may not be contradicted; default: convention supplied it, '
+                          'may be replaced with something more specific; free: nothing known, fill it',
+        'fields': fields,
+        'cross_check': {
+            'primary_branch_source': 'decision_axis',
+            'conflicts': [],
+            'unresolved': [],
+        },
+        'enrichment_budget': 'moderate',
+        'state_channels': channels,
+        'candidate_options': dec.get('candidate_options') or [],
+        'candidate_endings': fail.get('candidate_endings') or [],
+    }
+
+
 def brief_lite(brief):
     """The handful of fields the per-node and review prompts need for tone
     and stakes; everything else stays out of those packets."""

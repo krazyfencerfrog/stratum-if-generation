@@ -4679,6 +4679,30 @@ def stage_2_creative_catalysts():
         shutil.rmtree(story_dir(test_id), ignore_errors=True)
 
 
+@test
+def collapsed_if_shape_and_brief_generation():
+    """Phase 3 Collapsed (§5.4): single IF Shape Read.
+    Verifies that s3_if_shape.prompt runs, extracts decision cardinality,
+    and produces a valid, rich story brief without running 16 extractions."""
+    from main import StoryGenerator
+    test_id = f'{PREFIX}_ifshape'
+    try:
+        gen = StoryGenerator(story_id=test_id, collapse_phase3=True)
+        gen.kernel = "Seven suspects at a snowbound estate. A locked room murder. You must accuse the killer or the wrong person."
+        brief = gen.run_phase3()
+        check(isinstance(brief, dict), f"expected dict brief, got: {brief}")
+        check(os.path.isfile(gen.story_file_path('s3_if_shape.json')), "s3_if_shape.json not saved")
+        check(os.path.isfile(gen.story_file_path('s3_brief.json')), "s3_brief.json not saved")
+        fields = brief.get('fields', {})
+        dec = fields.get('3-0a.primary_decision_axis', {})
+        check(dec.get('cardinality') == 7, f"expected cardinality 7, got: {dec}")
+        fail = fields.get('3-0c.failure_presence', {})
+        check(fail.get('value') == 'playable_outcomes', f"expected playable_outcomes, got: {fail}")
+        used_prompts.add('s3_if_shape.prompt')
+    finally:
+        shutil.rmtree(story_dir(test_id), ignore_errors=True)
+
+
 # ---------------------------------------------------------------- runner
 
 

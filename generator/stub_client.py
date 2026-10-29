@@ -206,6 +206,7 @@ class StubClient(LlmClient):
             ('repair step for the craft spine', 's3_75r'),
             ('You are the story-form step', 's3_8'),
             ('You are the genre-promises step', 's3_4'),
+            ('interactive fiction shape-read step', 's3_if_shape'),
             ('You are step 4a', 's4a'),
             ('You are step 4b', 's4b'),
             ('You are step 4c', 's4c'),
@@ -428,6 +429,54 @@ class StubClient(LlmClient):
         }
 
     # ------------------------------------------------------------------ phase 3
+
+    def p_s3_if_shape(self, p):
+        return {
+            'reading': 'A tense interactive mystery requiring mechanical deduction and physical evidence.',
+            'protagonist': {
+                'role': 'investigator',
+                'type': 'human',
+                'embodiment': 'embodied_human',
+                'wants': 'discover the truth and survive the night',
+                'epistemic_gap': 'who committed the crime and how the study was entered',
+            },
+            'decision_axis': {
+                'primary_axis': 'which of the suspects to accuse at dawn',
+                'description': 'The player must commit to naming the guilty party before the storm clears.',
+                'cardinality': 7,
+                'candidate_options': [
+                    {'id': f'opt_{i}', 'label': f'Suspect {i}', 'description': f'Accuse suspect {i}'}
+                    for i in range(1, 8)
+                ],
+                'secondary_axes': ['which room to search before midnight'],
+            },
+            'state_channels': {
+                'inventory': [{'id': 'key_stub', 'label': 'A bent brass key', 'role': 'proves entry'}],
+                'knowledge_and_clues': [{'id': 'candle_testimony', 'label': 'Valet statement', 'role': 'contradicts alibi'}],
+                'world_state': [{'id': 'storm_clock', 'label': 'Snowstorm severity', 'role': 'regulates egress'}],
+            },
+            'failure_and_outcomes': {
+                'is_failure_playable': True,
+                'failure_model': 'Wrong accusations lead to distinct playable endings with their own consequences.',
+                'candidate_endings': [
+                    {'label': 'True Conviction', 'nature': 'success_with_proof', 'summary': 'The guilty is named with proof.'},
+                    {'label': 'Wrong Accusation', 'nature': 'wrong_choice', 'summary': 'An innocent party is named in error.'},
+                    {'label': 'Silence at Dawn', 'nature': 'retreat_silence', 'summary': 'No name is spoken.'},
+                ],
+                'target_ending_count': 7,
+            },
+            'affect_and_theme': {
+                'primary_affect': 'tension',
+                'tone': ['somber', 'claustrophobic'],
+                'thematic_poles': {'pole_a': 'truth', 'pole_b': 'discretion'},
+            },
+            'setting_and_timeline': {
+                'setting_structure': 'single_building',
+                'setting_scale': 'country manor',
+                'timeline_structure': 'tight_deadline',
+                'world_clock': 'The storm passes by morning.',
+            },
+        }
 
     def p_s3_0a(self, p):
         return {

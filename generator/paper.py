@@ -26,8 +26,21 @@ KERNEL_ALLOWANCE = 2
 
 
 def word(text):
-    m = PAPER.search(str(text or ''))
-    return m.group(0) if m else None
+    text_str = str(text or '')
+    for m in PAPER.finditer(text_str):
+        w = m.group(0).lower()
+        if w in ('account', 'accounts'):
+            # Testimony / narrative / idiom rather than financial/ledger paperwork
+            start, end = m.start(), m.end()
+            surrounding = text_str[max(0, start - 35):min(len(text_str), end + 35)].lower()
+            if re.search(r'\b(sworn|verbal|eyewitness|personal|household(?:\'s)?|her|his|their|my|your|our|own|full|faithful|first-hand|witness|spoken|gave|given|give|read|reads|reading)\s+accounts?\b', surrounding):
+                continue
+            if re.search(r'\baccounts?\s+of\s+(what|the|her|his|where|when|events|how)\b', surrounding):
+                continue
+            if re.search(r'\b(on\s+account\s+of|take\s+(?:no\s+|into\s+)?account|on\s+no\s+account)\b', surrounding):
+                continue
+        return m.group(0)
+    return None
 
 
 def allowance(n, kernel):

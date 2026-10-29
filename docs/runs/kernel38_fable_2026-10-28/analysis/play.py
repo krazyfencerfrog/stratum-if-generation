@@ -10,10 +10,9 @@ A command is a substring matched case-insensitively against each leaf's full pat
 import json
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                '..', '..', '..', '..', '..', 'Users', 'Shared', 'sv-dustin', 'source',
-                                'stratum-if-generation', 'engine'))
-sys.path.insert(0, '/Users/Shared/sv-dustin/source/stratum-if-generation/engine')
+ENGINE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'engine'))
+if ENGINE_DIR not in sys.path:
+    sys.path.insert(0, ENGINE_DIR)
 from runtime import Engine
 from story import Story
 

@@ -290,7 +290,10 @@ ARC_PLAN = obj(
     pattern_shifts=arr(obj(required=['state', 'direction', 'at', 'does', 'why'], state=S, direction=UP_DOWN, at=S,
                            does=enum(['resolution', 'ending', 'line']), to=S, why=S)),
 )
-OPTION = obj(do=S, effect=S, moves=arr(obj(state=S, direction=UP_DOWN)), active=B)
+OPTION = obj(do=S, effect=S, moves=arr(obj(state=S, direction=UP_DOWN)), active=B,
+             gives={'anyOf': [S, arr(S), {'type': 'null'}]},
+             takes={'anyOf': [S, arr(S), {'type': 'null'}]},
+             sets={'anyOf': [S, arr(S), {'type': 'null'}]})
 MINOR_NODE = obj(
     required=['after', 'kind', 'serves', 'title', 'summary', 'image', 'who'],
     after=S, kind=enum(['opportunity', 'revelation', 'demonstration', 'resolution']), serves=arr(S),
@@ -313,7 +316,8 @@ VARIANT = obj(state=STR_OR_NULL, direction=UP_DOWN_OR_NULL, after=STR_OR_NULL, t
 WORLD_CHARACTER = obj(
     required=['notes', 'history', 'description', 'here', 'topics'],
     notes=S, history=STR_OR_NULL, description=arr(VARIANT), here=arr(VARIANT),
-    topics=arr(obj(required=['label', 'known_after', 'says'], label=S, known_after=STR_OR_NULL, says=arr(VARIANT),
+    topics=arr(obj(required=['label', 'says'], label=S, known_after=STR_OR_NULL,
+                   known_when=STR_OR_NULL, requires=STR_OR_NULL, says=arr(VARIANT),
                    moves=arr(obj(state=S, direction=UP_DOWN)))),
     portrait=FRAME_OR_NULL,
 )
@@ -471,6 +475,48 @@ IDENTITY_EPISTEMIC = obj(
     ),
 )
 
+# ---------------------------------------------------------------- stage 3 unified IF shape read (§5.4)
+
+IF_SHAPE = obj(
+    reading=S,
+    protagonist=obj(
+        role=S,
+        type=enum(['human', 'non_human', 'systemic_entity']),
+        embodiment=enum(['embodied_human', 'non_human_bounded', 'distributed_network', 'sessile_entity', 'swarm']),
+        wants=S,
+        epistemic_gap=S,
+    ),
+    decision_axis=obj(
+        primary_axis=S,
+        description=S,
+        cardinality=I,
+        candidate_options=arr(obj(id=S, label=S, description=S)),
+        secondary_axes=arr(S),
+    ),
+    state_channels=obj(
+        inventory=arr(obj(id=S, label=S, role=S)),
+        knowledge_and_clues=arr(obj(id=S, label=S, role=S)),
+        world_state=arr(obj(id=S, label=S, role=S)),
+    ),
+    failure_and_outcomes=obj(
+        is_failure_playable=B,
+        failure_model=S,
+        candidate_endings=arr(obj(label=S, nature=S, summary=S)),
+        target_ending_count=I,
+    ),
+    affect_and_theme=obj(
+        primary_affect=S,
+        tone=arr(S),
+        thematic_poles=obj(pole_a=S, pole_b=S),
+    ),
+    setting_and_timeline=obj(
+        setting_structure=S,
+        setting_scale=S,
+        timeline_structure=S,
+        world_clock=S,
+    ),
+)
+
 ALL = {
     'SHAPE': SHAPE, 'PROMISES': PROMISES, 'ENGINE': ENGINE, 'TURNS': TURNS, 'CAST': CAST,
     'KERNEL_CHECK': KERNEL_CHECK, 'PREMISE_CHECK': PREMISE_CHECK, 'PREMISE_REPAIR': PREMISE_REPAIR, 'MAIN_LINE': MAIN_LINE,
@@ -484,6 +530,7 @@ ALL = {
     'RULES_JUDGE': RULES_JUDGE,
     'CRAFT_JUDGE': CRAFT_JUDGE, 'CONTENT_RATING_JUDGE': CONTENT_RATING_JUDGE,
     'IDENTITY_EPISTEMIC': IDENTITY_EPISTEMIC,
+    'IF_SHAPE': IF_SHAPE,
     'GENRE_CLASSIFICATION': GENRE_CLASSIFICATION,
 }
 

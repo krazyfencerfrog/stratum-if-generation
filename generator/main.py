@@ -45,7 +45,7 @@ from pathlib import Path
 
 from llm_client import LlmCallError
 from errors import SoftReject, PipelineHalt
-from brief import (build_brief, brief_lines, constraint_fields, kernel_clauses,
+from brief import (build_brief, build_brief_from_if_shape, brief_lines, constraint_fields, kernel_clauses,
                    valid_serves, ending_tier_from_stated, promises_lines, shape_targets)
 from stats import RunStats, call_profile, sampler_for, step_of, duration, usage_line, SCHEMA_VERSION
 import frameworks
@@ -320,10 +320,11 @@ class StoryGenerator:
     def __init__(self, story_id, max_repairs=DEFAULT_MAX_REPAIRS, no_think_steps=(), think_steps=(),
                  breakers=True, framework_override=None, force_answer=True, promises=True,
                  branching='plan', outline_judge=True, stories_root=None, author='Anonymous', parallel=1,
-                 dynamic_names=False, genre=''):
+                 dynamic_names=False, genre='', collapse_phase3=False):
         self.story_id = story_id
         self.genre = (genre or '').strip().lower()
         self.dynamic_names = bool(dynamic_names or os.environ.get('STRATUM_DYNAMIC_NAMES') == '1')
+        self.collapse_phase3 = bool(collapse_phase3 or os.environ.get('STRATUM_COLLAPSE_PHASE3') == '1')
         self.author = (author or 'Anonymous').strip()
         self.max_repairs = max_repairs
         self.no_think_steps = set(no_think_steps or ())
@@ -1468,6 +1469,8 @@ class StoryGenerator:
     # ------------------------------------------------------------------ the pipeline
 
     def run_phase3(self):
+        if getattr(self, 'collapse_phase3', False) or os.environ.get('STRATUM_COLLAPSE_PHASE3') == '1':
+            return self.run_phase3_collapsed()
         if not getattr(self, 'genre', None):
             self.s2_classify_genre()
         if 's2_catalysts' not in self.analysis:
@@ -1502,6 +1505,22 @@ class StoryGenerator:
         })
         self.build_constraint_map()
         self.build_story_brief()
+
+    def run_phase3_collapsed(self):
+        """Collapsed Phase 3 (§5.4): A single IF Shape Read (prompts/s3_if_shape.prompt)
+        that reads the true decision cardinality, playable failures, and state channels,
+        replacing 16 separate model calls and eliminating the binary drama bias."""
+        if not getattr(self, 'genre', None):
+            self.s2_classify_genre()
+        replace_vars = {'$$KERNEL$$': self.kernel}
+        answer = self.run_prompt('s3', 'if_shape', replace_vars, schema=schemas.IF_SHAPE)
+        self.analysis['s3_if_shape'] = answer
+        self.save_story_json('s3_if_shape.json', answer)
+
+        brief = build_brief_from_if_shape(answer)
+        self.analysis['s3_brief'] = brief
+        self.save_story_json('s3_brief.json', brief)
+        return brief
 
     # ------------------------------------------------------------------ 3.4: genre promises
 
@@ -2770,6 +2789,8 @@ def main(argv=None):
                              "scenes) this many at once; for remote clients (agy). Default 1: one at a time")
     parser.add_argument("--genre", default='',
                         help="genre pack to use (default: auto-detected or 'general')")
+    parser.add_argument("--collapse-phase3", action="store_true",
+                        help="collapse Phase 3 into a single unified IF Shape Read (s3_if_shape), reading true decision cardinality and saving 16 calls")
     args = parser.parse_args(argv)
 
     story_id = slugify(args.story_id)
@@ -2783,7 +2804,8 @@ def main(argv=None):
                              force_answer=not args.no_force_answer, promises=not args.no_promises,
                              branching=args.branching, outline_judge=not args.no_outline_judge,
                              author=args.author, parallel=args.parallel,
-                             dynamic_names=args.dynamic_names, genre=args.genre)
+                             dynamic_names=args.dynamic_names, genre=args.genre,
+                             collapse_phase3=args.collapse_phase3)
         gen.stop_after = args.stop_after
     except PipelineHalt as halt:
         print(f'\nPIPELINE HALTED: {halt}', file=sys.stderr)

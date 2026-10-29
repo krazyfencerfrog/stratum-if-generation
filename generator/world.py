@@ -285,12 +285,12 @@ class WorldBuilder:
         def validate(parsed):
             problems, soft = [], []
             topics = [t for t in as_list(parsed.get('topics')) if isinstance(t, dict) and t.get('label')]
-            want = (3, 8) if self.tiers.get(cid) == 'arc' else (2, 5)
+            want = (3, 8) if self.tiers.get(cid) == 'arc' else (2, 7)
             if not want[0] <= len(topics) <= want[1]:
                 problems.append(f'{len(topics)} topics; give {want[0]} to {want[1]}')
             for t in topics:
                 compile_variants(t.get('says'), self.states, self.nodes, problems, f"topic {t['label']!r}")
-                if t.get('known_after') not in (None, '', 'null') and t['known_after'] not in self.nodes:
+                if t.get('known_after') not in (None, '', 'null') and not t.get('known_when') and not t.get('requires') and t['known_after'] not in self.nodes:
                     problems.append(f"topic {t['label']!r}: known_after {t['known_after']!r} is not a node")
                 if not as_list(t.get('says')):
                     problems.append(f"topic {t['label']!r} says nothing")
@@ -358,7 +358,15 @@ class WorldBuilder:
                 continue
             tid = slug(t['label'], topics)
             topic = {'label': t['label'], 'says': compile_variants(t.get('says'), self.states, self.nodes, problems, tid)}
-            if t.get('known_after') not in (None, '', 'null'):
+            if t.get('known_when') not in (None, '', 'null'):
+                topic['known_when'] = str(t['known_when']).strip()
+            elif t.get('requires') not in (None, '', 'null'):
+                req = str(t['requires']).strip()
+                if req.startswith(('has(', 'seen(', 'known(', 'flags.', 'at(')):
+                    topic['known_when'] = req
+                else:
+                    topic['known_when'] = f"has('{req}')"
+            elif t.get('known_after') not in (None, '', 'null'):
                 topic['known_when'] = f"flags.done_{t['known_after']}"
             moves = [m for m in as_list(t.get('moves')) if isinstance(m, dict) and m.get('state') in self.states]
             if moves:

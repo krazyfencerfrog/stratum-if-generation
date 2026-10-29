@@ -21,7 +21,7 @@ What you write:
  - topics: the CURATED things the player can talk to them about, the ones
    the story turns on: what they want, what they hold, what they know, what
    they are hiding, the people they are tied to. Three to eight for an arc
-   character, two to five for a supporting one. For each: a label the menu
+   character, two to seven for a supporting one. For each: a label the menu
    shows ("the caller", "her last job"), known_after (a node id after which
    the player can ask; null if from the start), and what they say, as
    variants by state where their stance changes the answer. A topic may move

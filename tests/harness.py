@@ -119,7 +119,7 @@ def run(tests, path, jobs=1, collect=None, into=None, last=()):
     name `collect` are merged into `into`, and `last` runs here after every
     other test: tests that read what all the others recorded."""
     if jobs <= 1:
-        return run_here(tests)
+        return run_here([fn for fn in tests if fn not in last] + list(last))
     failed = 0
     units = groups_of([fn for fn in tests if fn not in last])
     with concurrent.futures.ProcessPoolExecutor(max_workers=min(jobs, max(1, len(units))),

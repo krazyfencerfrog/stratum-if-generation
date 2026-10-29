@@ -41,6 +41,7 @@ import stats
 from errors import SoftReject
 import example_guard
 import paper
+import state_resolver
 from world import compile_variants, slug, as_list, compact
 
 norm = checks.norm
@@ -620,6 +621,15 @@ class SceneCompiler:
             ids = []
             for i, (o, src) in enumerate(zip(opts, a2), 1):
                 effects = [{'move': mv['state'], 'dir': mv['direction']} for mv in src.get('moves') or []]
+                for eff in (src.get('effects') or []) + (o.get('effects') or []):
+                    if eff not in effects:
+                        effects.append(eff)
+                for g in as_list(src.get('gives') or o.get('gives')):
+                    effects.append({'give': g})
+                for t in as_list(src.get('takes') or o.get('takes')):
+                    effects.append({'take': t})
+                for s in as_list(src.get('sets') or o.get('sets')):
+                    effects.append({'set': s})
                 effects.append({'set': f'done_{nid}'})
                 it = interaction(o, f'{sid}.{nid}.{i}', effects, f'moment {nid} option {i}')
                 if it:
@@ -808,7 +818,7 @@ class SceneCompiler:
             'rating_advisory': rating_info['rating_advisory'],
         }
 
-        return {
+        pkg = {
             'format': 'stratum-story/1', 'story_id': self.story.get('story_id'),
             'title': main.get('title') or self.story.get('story_id'),
             'metadata': metadata,
@@ -821,6 +831,26 @@ class SceneCompiler:
             'start': {'scene': first, 'room': (scenes.get(first) or {}).get('start_room')},
             'endings': endings,
         }
+        for spec in self.get_resolvers():
+            pkg = state_resolver.apply_resolver(pkg, spec)
+        return pkg
+
+    def get_resolvers(self):
+        """Finds any ResolverSpec applicable to this story."""
+        specs = []
+        if hasattr(self.gen, 'story_file_path'):
+            res_path = self.gen.story_file_path('resolvers.json')
+            if os.path.isfile(res_path):
+                specs.extend(state_resolver.load_resolver_specs(res_path))
+        if not specs and hasattr(self.gen, 'story_path_str'):
+            alt_path = os.path.join(self.gen.story_path_str, 'resolvers.json')
+            if os.path.isfile(alt_path):
+                specs.extend(state_resolver.load_resolver_specs(alt_path))
+        if not specs and isinstance(self.arcs.get('resolvers'), list):
+            specs.extend(state_resolver.load_resolver_specs(self.arcs['resolvers']))
+        if not specs and isinstance(self.story.get('resolvers'), list):
+            specs.extend(state_resolver.load_resolver_specs(self.story['resolvers']))
+        return specs
 
     def premise_protagonist(self):
         return (self.story.get('premise') or {}).get('protagonist') or {}
@@ -883,6 +913,10 @@ class SceneCompiler:
                 gen.stats.record_extra('playtest_timing', {'seconds': round(timing.get('seconds') or 0, 2), 'scene_seconds': {
                     sid: round(t, 2) for sid, t in timing['scene_seconds'].items()}})
         metrics = extract_playtest_metrics(story, result)
+        import agency
+        agency_metrics = agency.compute_agency_metrics(package, result)
+        metrics['agency'] = agency_metrics
+        report['agency'] = agency_metrics
         report['playtest'] = {'errors': result['errors'], 'notes': result['notes'], 'text': out.getvalue(), 'metrics': metrics}
         return report
 
@@ -901,6 +935,8 @@ class SceneCompiler:
         metrics = (report.get('playtest') or {}).get('metrics')
         if metrics and hasattr(self.gen, 'stats') and self.gen.stats:
             self.gen.stats.record_extra('playtest', metrics)
+            if 'agency' in metrics:
+                self.gen.stats.record_extra('agency', metrics['agency'])
 
         validator_errors = report.get('errors') or []
         play_errors = (report.get('playtest') or {}).get('errors') or []
@@ -991,6 +1027,10 @@ def report_markdown(story_id, findings, report):
             f"- Stuck states: {metrics.get('stuck_states', 0)}",
             '',
         ]
+    agency_metrics = report.get('agency')
+    if agency_metrics:
+        import agency
+        out += ['', agency.format_agency_report(agency_metrics)]
     if play.get('text'):
         out += ['## Playtest Log', '```', play['text'].rstrip(), '```']
     return '\n'.join(out) + '\n'
